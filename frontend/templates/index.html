@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- HERO SECTION -->
+<div class="text-center mb-5">
+
+    <h1 class="display-4 fw-bold mb-3">
+        🚀 Your AI Career Copilot
+    </h1>
+
+    <p class="lead text-light mb-4">
+        Analyze your resume. Discover missing skills.
+        Get AI-powered roadmaps.
+        Match with real-time global jobs.
+    </p>
+
+    {% if session.get('user_id') %}
+        <a href="/dashboard" class="btn btn-primary btn-lg me-3">
+            Go To Dashboard
+        </a>
+    {% else %}
+        <a href="/register" class="btn btn-primary btn-lg me-3">
+            Get Started Free
+        </a>
+        <a href="/login" class="btn btn-outline-light btn-lg">
+            Login
+        </a>
+    {% endif %}
+
+</div>
+
+
+<!-- FEATURES SECTION -->
+<div class="row g-4 mt-5">
+
+    <div class="col-md-4">
+        <div class="card-glass p-4 h-100">
+            <h4>📊 Skill Intelligence</h4>
+            <p>
+                Extract skills from resume using AI.
+                Identify missing skills instantly.
+                See your career readiness score.
+            </p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card-glass p-4 h-100">
+            <h4>🧠 AI Career Roadmap</h4>
+            <p>
+                Personalized roadmap for your role.
+                Step-by-step learning path.
+                Future-proof skill recommendations.
+            </p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card-glass p-4 h-100">
+            <h4>💼 Job Match Intelligence</h4>
+            <p>
+                Real-time job matching.
+                AI-based fit score.
+                See Strong / Medium / Weak match instantly.
+            </p>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- SOCIAL PROOF -->
+<div class="mt-5 text-center">
+
+    <h3 class="mb-4">What Users Say</h3>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card-glass p-4">
+                <p>
+                    "PathPilot showed me exactly what skills I was missing.
+                    Landed 3 interviews in 2 weeks."
+                </p>
+                <small class="text-info">— Tushar</small>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card-glass p-4">
+                <p>
+                    "The job match intelligence is insane.
+                    It actually ranks jobs by fit."
+                </p>
+                <small class="text-info">— Pinki</small>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card-glass p-4">
+                <p>
+                    "Feels like having a career mentor powered by AI."
+                </p>
+                <small class="text-info">— Deep Randhawa</small>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- FINAL CTA -->
+<div class="text-center mt-5">
+
+    <h2 class="mb-3">Ready To Level Up Your Career?</h2>
+
+    {% if session.get('user_id') %}
+        <a href="/upload" class="btn btn-primary btn-lg">
+            Upload Resume Now
+        </a>
+    {% else %}
+        <a href="/register" class="btn btn-primary btn-lg">
+            Create Free Account
+        </a>
+    {% endif %}
+
+</div>
+
+{% endblock %}

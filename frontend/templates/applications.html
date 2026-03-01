@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">📌 Application Tracker</h2>
+
+<!-- =======================
+     STATS PANEL
+======================= -->
+<div class="row mb-4">
+
+    <div class="col-md-3">
+        <div class="card-glass p-3 text-center">
+            <h4 id="totalCount">0</h4>
+            <small>Total</small>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card-glass p-3 text-center">
+            <h4 id="appliedCount">0</h4>
+            <small>Applied</small>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card-glass p-3 text-center">
+            <h4 id="interviewCount">0</h4>
+            <small>Interview</small>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card-glass p-3 text-center">
+            <h4 id="offerCount">0</h4>
+            <small>Offers</small>
+        </div>
+    </div>
+
+</div>
+
+<!-- =======================
+     TABLE
+======================= -->
+<div class="card-glass p-4">
+
+    <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Job</th>
+                    <th>Company</th>
+                    <th>Status</th>
+                    <th>Change</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody id="appTable"></tbody>
+        </table>
+    </div>
+
+    <div id="emptyState" class="text-center mt-4" style="display:none;">
+        <h5>No applications yet 🚀</h5>
+        <p class="text-muted">
+            Start applying to jobs to track your progress.
+        </p>
+        <a href="/jobs" class="btn btn-primary">
+            Explore Jobs
+        </a>
+    </div>
+
+</div>
+
+
+<script>
+
+function statusBadge(status) {
+
+    const colors = {
+        "Saved": "secondary",
+        "Applied": "info",
+        "Interview": "warning",
+        "Offer": "success",
+        "Rejected": "danger"
+    };
+
+    return `<span class="badge bg-${colors[status] || 'secondary'}">
+                ${status}
+            </span>`;
+}
+
+
+async function loadApps() {
+
+    const res = await fetch("/api/applications");
+    const data = await res.json();
+
+    const table = document.getElementById("appTable");
+    const emptyState = document.getElementById("emptyState");
+
+    table.innerHTML = "";
+
+    if (data.length === 0) {
+        emptyState.style.display = "block";
+        return;
+    }
+
+    emptyState.style.display = "none";
+
+    let total = data.length;
+    let applied = 0;
+    let interview = 0;
+    let offer = 0;
+
+    data.forEach(app => {
+
+        if (app.status === "Applied") applied++;
+        if (app.status === "Interview") interview++;
+        if (app.status === "Offer") offer++;
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${app.title}</td>
+            <td>${app.company || ""}</td>
+            <td>${statusBadge(app.status)}</td>
+            <td>
+                <select class="form-select form-select-sm"
+                        onchange="updateStatus(${app.id}, this.value)">
+                    <option ${app.status==="Saved"?"selected":""}>Saved</option>
+                    <option ${app.status==="Applied"?"selected":""}>Applied</option>
+                    <option ${app.status==="Interview"?"selected":""}>Interview</option>
+                    <option ${app.status==="Offer"?"selected":""}>Offer</option>
+                    <option ${app.status==="Rejected"?"selected":""}>Rejected</option>
+                </select>
+            </td>
+            <td>
+                <button onclick="deleteApp(${app.id})"
+                        class="btn btn-sm btn-outline-danger">
+                    ✕
+                </button>
+            </td>
+        `;
+
+        table.appendChild(row);
+    });
+
+    // Update stats
+    document.getElementById("totalCount").innerText = total;
+    document.getElementById("appliedCount").innerText = applied;
+    document.getElementById("interviewCount").innerText = interview;
+    document.getElementById("offerCount").innerText = offer;
+}
+
+
+async function updateStatus(id, status) {
+
+    await fetch("/api/update-application", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            id: id,
+            status: status
+        })
+    });
+
+    loadApps();
+}
+
+
+async function deleteApp(id) {
+
+    if (!confirm("Remove this application?")) return;
+
+    await fetch("/api/delete-application", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ id: id })
+    });
+
+    loadApps();
+}
+
+
+loadApps();
+
+</script>
+
+{% endblock %}

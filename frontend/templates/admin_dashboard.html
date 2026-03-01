@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>🛠 Admin Control Panel</h2>
+
+<div class="row mt-4">
+
+    <div class="col-md-3">
+        <div class="card-glass p-4 text-center">
+            <h3>{{ total_users }}</h3>
+            <p>Total Users</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card-glass p-4 text-center">
+            <h3>{{ total_jobs }}</h3>
+            <p>Total Jobs</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card-glass p-4 text-center">
+            <h3>{{ total_resumes }}</h3>
+            <p>Total Resumes</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card-glass p-4 text-center">
+            <h3>${{ revenue }}</h3>
+            <p>Estimated Revenue</p>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

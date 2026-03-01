@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">📊 Market Intelligence Pro</h2>
+
+<div class="row g-4">
+
+    <!-- Top Skills -->
+    <div class="col-md-6">
+        <div class="card-glass p-4">
+            <h5>🔥 Top Skills Demand</h5>
+            <canvas id="skillsChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Role Demand -->
+    <div class="col-md-6">
+        <div class="card-glass p-4">
+            <h5>🎯 Role Demand</h5>
+            <canvas id="roleChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<div class="mt-5 card-glass p-4">
+    <h5>📈 Hiring Trend</h5>
+    <canvas id="trendChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+// Top Skills
+fetch("/api/market/top-skills")
+.then(res => res.json())
+.then(data => {
+
+    new Chart(document.getElementById("skillsChart"), {
+        type: "bar",
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: "Demand",
+                data: data.values,
+                backgroundColor: "#38bdf8"
+            }]
+        }
+    });
+});
+
+// Role Demand
+fetch("/api/market/role-demand")
+.then(res => res.json())
+.then(data => {
+
+    new Chart(document.getElementById("roleChart"), {
+        type: "pie",
+        data: {
+            labels: data.labels,
+            datasets: [{
+                data: data.values,
+                backgroundColor: [
+                    "#3b82f6",
+                    "#6366f1",
+                    "#06b6d4",
+                    "#10b981",
+                    "#f59e0b"
+                ]
+            }]
+        }
+    });
+});
+
+// Hiring Trend
+fetch("/api/market/hiring-trend")
+.then(res => res.json())
+.then(data => {
+
+    new Chart(document.getElementById("trendChart"), {
+        type: "line",
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: "Jobs Posted",
+                data: data.values,
+                borderColor: "#10b981",
+                backgroundColor: "rgba(16,185,129,0.2)",
+                tension: 0.4
+            }]
+        }
+    });
+});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+{% block content %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+/* Remove white container conflict */
+.content-container {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+/* Glass Card */
+.glass-card {
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(35px);
+    border-radius: 24px;
+    padding: 45px;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #ffffff;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+}
+
+/* Gradient Title */
+.gradient-title {
+    font-size: 34px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #00f5ff, #7b61ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Inputs */
+.form-select {
+    background: rgba(255,255,255,0.12) !important;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white !important;
+}
+
+.form-select option {
+    color: black;
+}
+
+.form-label {
+    color: #dcdcdc;
+    font-weight: 500;
+}
+
+/* Button */
+.glow-btn {
+    background: linear-gradient(90deg, #7b61ff, #00f5ff);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 12px;
+    border-radius: 12px;
+    transition: 0.3s;
+}
+
+.glow-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 25px rgba(0,245,255,0.6);
+}
+
+/* Salary Number */
+.salary-number {
+    font-size: 60px;
+    font-weight: 800;
+    background: linear-gradient(90deg, #00ff94, #00f5ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Tier Bands */
+.tier-card {
+    background: rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+/* Advice Box */
+.advice-box {
+    background: rgba(0,255,180,0.08);
+    border-left: 4px solid #00ff94;
+    padding: 15px;
+    border-radius: 12px;
+}
+
+/* Premium */
+.premium-lock {
+    background: rgba(255, 200, 0, 0.1);
+    border: 1px solid rgba(255,200,0,0.3);
+    padding: 15px;
+    border-radius: 12px;
+}
+
+</style>
+
+<div class="container py-5">
+
+    <h2 class="gradient-title mb-5">🌍 Global AI Salary Intelligence</h2>
+
+    <div class="glass-card mb-5">
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+                <label class="form-label">Role</label>
+                <select id="role" class="form-select">
+                    <option>Full Stack Developer</option>
+                    <option>AI Engineer</option>
+                    <option>Backend Developer</option>
+                    <option>Data Scientist</option>
+                    <option>DevOps Engineer</option>
+                    <option>Mobile Developer</option>
+                    <option>Blockchain Developer</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Experience Level</label>
+                <select id="experience_level" class="form-select">
+                    <option>Fresher</option>
+                    <option>Intermediate</option>
+                    <option>Senior</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Country</label>
+                <select id="country" class="form-select" onchange="toggleState()">
+                    <option>India</option>
+                    <option>USA</option>
+                    <option>Germany</option>
+                </select>
+            </div>
+
+            <div class="col-md-4" id="stateContainer">
+                <label class="form-label">India State</label>
+                <select id="state" class="form-select">
+                    <option>Karnataka</option>
+                    <option>Maharashtra</option>
+                    <option>Delhi</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="mt-4">
+            <button class="glow-btn w-100" onclick="predictSalary()">
+                Analyze Global Salary
+            </button>
+        </div>
+
+    </div>
+
+    <div id="salaryResult"></div>
+
+</div>
+
+<script>
+
+function toggleState() {
+    const country = document.getElementById("country").value;
+    document.getElementById("stateContainer").style.display =
+        country === "India" ? "block" : "none";
+}
+
+function animateCounter(element, start, end, duration) {
+    let startTime = null;
+    function update(currentTime) {
+        if (!startTime) startTime = currentTime;
+        const progress = Math.min((currentTime - startTime) / duration, 1);
+        element.innerText = Math.floor(progress * (end - start) + start).toLocaleString();
+        if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+}
+
+async function predictSalary() {
+
+    try {
+
+        const role = document.getElementById("role").value;
+        const experience_level = document.getElementById("experience_level").value;
+        const country = document.getElementById("country").value;
+        const state = document.getElementById("state").value;
+
+        const response = await fetch("/api/salary-predict", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ role, experience_level, country, state })
+        });
+
+        const data = await response.json();
+
+        const tiers = data.company_tiers || {startup:0,product:0,mnc:0,faang:0};
+        const skills = data.top_paying_skills || [];
+        const growth = data.growth_projection || [];
+        const advice = data.negotiation_advice || "Improve your skills to negotiate better.";
+
+        document.getElementById("salaryResult").innerHTML = `
+            <div class="glass-card text-center mt-5">
+
+                <h4>Estimated Salary</h4>
+                <div class="salary-number">
+                    ${data.currency}<span id="salaryCounter">0</span>
+                </div>
+
+                <p>
+                    Range: ${data.currency}${data.salary_range_min.toLocaleString()} 
+                    - ${data.currency}${data.salary_range_max.toLocaleString()}
+                </p>
+
+                <hr class="my-4">
+
+                <h5>📈 5-Year Projection</h5>
+                <canvas id="salaryChart" height="120"></canvas>
+
+                <hr class="my-4">
+
+                <h5>🏢 Company Tier Salary Bands</h5>
+                <div class="tier-card">Startup: ${data.currency}${tiers.startup.toLocaleString()}</div>
+                <div class="tier-card">Product: ${data.currency}${tiers.product.toLocaleString()}</div>
+                <div class="tier-card">MNC: ${data.currency}${tiers.mnc.toLocaleString()}</div>
+                <div class="tier-card">FAANG: ${data.currency}${tiers.faang.toLocaleString()}</div>
+
+                <hr class="my-4">
+
+                <h5>📊 Skill Salary Impact</h5>
+                <div id="skillImpact"></div>
+
+                <hr class="my-4">
+
+                <div class="advice-box">
+                    <strong>🧠 AI Negotiation Advice:</strong>
+                    <p>${advice}</p>
+                </div>
+
+                <div class="premium-lock mt-4">
+                    🔒 Advanced FAANG comparison & global heatmap available in Premium.
+                </div>
+
+            </div>
+        `;
+
+        animateCounter(
+            document.getElementById("salaryCounter"),
+            0,
+            data.predicted_salary,
+            1200
+        );
+
+        // Skill impact bars
+        let skillHTML = "";
+        skills.forEach(skill => {
+            const impact = Math.floor(Math.random() * 20) + 10;
+            skillHTML += `
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>${skill}</span>
+                        <span>+${impact}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" style="width:${impact}%"></div>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById("skillImpact").innerHTML = skillHTML;
+
+        // Chart
+        const ctx = document.getElementById("salaryChart").getContext("2d");
+
+        new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: growth.map(item => "Year " + item.year),
+                datasets: [{
+                    label: "Projected Salary",
+                    data: growth.map(item => item.salary),
+                    borderColor: "#00f5ff",
+                    backgroundColor: "rgba(0,245,255,0.2)",
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                plugins: { legend: { labels: { color: "white" } } },
+                scales: {
+                    x: { ticks: { color: "white" } },
+                    y: { ticks: { color: "white" } }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error("Salary UI Error:", error);
+        alert("Frontend error. Check console.");
+    }
+}
+
+</script>
+
+{% endblock %}

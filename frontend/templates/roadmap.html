@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold">AI Career Roadmap</h2>
+        <p class="text-muted">
+            Analyze your skills, detect gaps, and follow a structured AI-powered learning plan.
+        </p>
+    </div>
+</div>
+
+
+<!-- ========================= -->
+<!-- Role Selection -->
+<!-- ========================= -->
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-body">
+        <div class="row align-items-end">
+
+            <div class="col-md-8">
+                <label class="form-label fw-semibold">Target Role</label>
+                <select id="roleSelect" class="form-select">
+                    <option disabled selected>Select Target Role</option>
+                    <option>Full Stack Developer</option>
+                    <option>AI Engineer</option>
+                    <option>Backend Developer</option>
+                    <option>DevOps Engineer</option>
+                    <option>Data Scientist</option>
+                    <option>Mobile Developer</option>
+                    <option>Blockchain Developer</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <button class="btn btn-dark w-100" onclick="loadRoadmap()">
+                    Analyze Career Path
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================= -->
+<!-- Analytics Overview Cards -->
+<!-- ========================= -->
+<div id="analyticsContainer" class="row mb-5" style="display:none;">
+
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm border-0">
+            <div class="card-body">
+                <h6>Role Match</h6>
+                <h3 id="roleScore">0%</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm border-0">
+            <div class="card-body">
+                <h6>Placement Probability</h6>
+                <h3 id="placementScore">0%</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm border-0">
+            <div class="card-body">
+                <h6>Total Learning Time</h6>
+                <h3 id="totalWeeks">0 Weeks</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm border-0">
+            <div class="card-body">
+                <h6>Missing Skills</h6>
+                <h3 id="missingCount">0</h3>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- Stage Progress -->
+<!-- ========================= -->
+<h4 class="mb-3">Stage Progress</h4>
+<div id="stageProgressContainer" class="mb-4"></div>
+
+
+<!-- ========================= -->
+<!-- Missing Skills Summary -->
+<!-- ========================= -->
+<div id="missingSkillsContainer" class="mb-4"></div>
+
+
+<!-- ========================= -->
+<!-- Roadmap Stages -->
+<!-- ========================= -->
+<div id="roadmapContainer"></div>
+
+
+<!-- ========================= -->
+<!-- Learning Plan -->
+<!-- ========================= -->
+<hr class="my-5">
+
+<h3 class="mb-4">Personalized Learning Plan</h3>
+<div id="learningPlanContainer"></div>
+
+
+
+<script>
+
+// ===============================
+// Load Roadmap
+// ===============================
+async function loadRoadmap() {
+
+    const role = document.getElementById("roleSelect").value;
+
+    if (!role) {
+        alert("Please select a role first.");
+        return;
+    }
+
+    try {
+
+        const response = await fetch("/api/roadmap", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ role: role })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        // Show analytics section
+        document.getElementById("analyticsContainer").style.display = "flex";
+
+        // Update analytics
+        document.getElementById("roleScore").innerText =
+            (data.role_score || 0) + "%";
+
+        document.getElementById("placementScore").innerText =
+            (data.placement_probability || 0) + "%";
+
+        document.getElementById("totalWeeks").innerText =
+            (data.total_learning_weeks || 0) + " Weeks";
+
+        document.getElementById("missingCount").innerText =
+            (data.missing_skills?.length || 0);
+
+        // Render sections
+        renderStageProgress(data.stage_completion);
+        renderMissingSkills(data);
+        renderRoadmap(data);
+        renderLearningPlan(data);
+        renderMarket(data.market_intelligence);
+
+    } catch (error) {
+        console.error("Error loading roadmap:", error);
+        alert("Something went wrong. Please try again.");
+    }
+}
+
+
+
+// ===============================
+// Stage Progress
+// ===============================
+function renderStageProgress(stages) {
+
+    const container = document.getElementById("stageProgressContainer");
+    container.innerHTML = "";
+
+    if (!stages) return;
+
+    for (const stage in stages) {
+
+        const percent = stages[stage];
+
+        container.innerHTML += `
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <strong>${stage}</strong>
+                    <span>${percent}%</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar bg-success"
+                         style="width:${percent}%"></div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+
+
+// ===============================
+// Missing Skills
+// ===============================
+function renderMissingSkills(data) {
+
+    const container = document.getElementById("missingSkillsContainer");
+    container.innerHTML = "";
+
+    if (!data.missing_skills || data.missing_skills.length === 0) {
+        container.innerHTML = `
+            <div class="alert alert-success">
+                🎉 You already have all required skills for this role!
+            </div>
+        `;
+        return;
+    }
+
+    let skillsHtml = "";
+
+    data.missing_skills.forEach(skill => {
+        skillsHtml += `<span class="badge bg-danger me-2 mb-2">${skill}</span>`;
+    });
+
+    container.innerHTML = `
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="mb-3">Missing Skills</h5>
+                ${skillsHtml}
+            </div>
+        </div>
+    `;
+}
+
+
+
+// ===============================
+// Roadmap Stages
+// ===============================
+function renderRoadmap(data) {
+
+    const container = document.getElementById("roadmapContainer");
+    container.innerHTML = "";
+
+    if (!data.roadmap) return;
+
+    for (const stage in data.roadmap) {
+
+        const card = document.createElement("div");
+        card.className = "card mb-4 shadow-sm border-0";
+
+        const body = document.createElement("div");
+        body.className = "card-body";
+
+        body.innerHTML = `<h5 class="fw-bold mb-3">${stage}</h5>`;
+
+        data.roadmap[stage].forEach(skillObj => {
+
+            body.innerHTML += skillObj.status === "Completed"
+                ? `<span class="badge bg-success me-2 mb-2">${skillObj.skill}</span>`
+                : `<span class="badge bg-danger me-2 mb-2">${skillObj.skill}</span>`;
+        });
+
+        card.appendChild(body);
+        container.appendChild(card);
+    }
+}
+
+
+
+// ===============================
+// Learning Plan
+// ===============================
+function renderLearningPlan(data) {
+
+    const container = document.getElementById("learningPlanContainer");
+    container.innerHTML = "";
+
+    if (!data.learning_plan) return;
+
+    for (const week in data.learning_plan) {
+
+        const plan = data.learning_plan[week];
+
+        container.innerHTML += `
+            <div class="card mb-4 shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="fw-bold">${week} - ${plan.skill}</h5>
+                    <p><strong>Difficulty:</strong> ${plan.difficulty}</p>
+                    <p><strong>Duration:</strong> ${plan.duration_weeks} week(s)</p>
+
+                    <hr>
+
+                    <p><strong>Why Important:</strong> ${plan.explanation?.why_important || ""}</p>
+                    <p><strong>Real World Usage:</strong> ${plan.explanation?.real_world_usage || ""}</p>
+                    <p><strong>Career Impact:</strong> ${plan.explanation?.career_impact || ""}</p>
+                    <p><strong>Project Suggestion:</strong> ${plan.explanation?.project_suggestion || ""}</p>
+                </div>
+            </div>
+        `;
+    }
+}
+
+
+
+// ===============================
+// Market Intelligence
+// ===============================
+function renderMarket(market) {
+
+    const container = document.getElementById("marketContainer");
+    container.innerHTML = "";
+
+    if (!market) return;
+
+    let trendingHtml = "";
+    (market.trending_skills || []).slice(0, 10).forEach(skill => {
+        trendingHtml += `<span class="badge bg-primary me-2 mb-2">${skill}</span>`;
+    });
+
+    let missingHtml = "";
+    (market.high_demand_missing || []).slice(0, 10).forEach(skill => {
+        missingHtml += `<span class="badge bg-danger me-2 mb-2">${skill}</span>`;
+    });
+
+    let overlapHtml = "";
+    (market.role_market_overlap || []).forEach(skill => {
+        overlapHtml += `<span class="badge bg-success me-2 mb-2">${skill}</span>`;
+    });
+
+    container.innerHTML = `
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+
+                <h5 class="fw-bold mb-3">📊 Market Intelligence</h5>
+
+                <h6>🔥 Trending Market Skills</h6>
+                ${trendingHtml || "<p class='text-muted'>No data available</p>"}
+
+                <hr>
+
+                <h6>🚀 High Demand Skills You Don’t Have</h6>
+                ${missingHtml || "<p class='text-muted'>You're aligned with market demand</p>"}
+
+                <hr>
+
+                <h6>🎯 Role + Market Overlap Skills</h6>
+                ${overlapHtml || "<p class='text-muted'>No overlap found</p>"}
+
+            </div>
+        </div>
+    `;
+}
+
+</script>
+<hr class="my-5">
+
+<h3 class="mb-4">📊 Market Intelligence</h3>
+
+<div id="marketContainer"></div>
+{% endblock %}

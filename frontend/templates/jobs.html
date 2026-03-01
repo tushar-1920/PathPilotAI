@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+.jobs-container {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(35px);
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+}
+
+.job-card {
+    background: rgba(255,255,255,0.07);
+    border-radius: 18px;
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(255,255,255,0.12);
+    transition: all 0.3s ease;
+    color: #ffffff;
+}
+
+.job-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0,255,255,0.15);
+}
+
+.score-bar {
+    height: 8px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.15);
+    overflow: hidden;
+}
+
+.score-fill {
+    height: 100%;
+    background: linear-gradient(90deg,#00ff94,#00f5ff);
+    transition: width 1s ease;
+}
+
+.badge-fit-Strong { background: #00ff94; color: black; }
+.badge-fit-Medium { background: #ffaa00; color: black; }
+.badge-fit-Weak { background: #ff4c4c; color: white; }
+
+.live-badge {
+    background: linear-gradient(90deg,#00f5ff,#7b61ff);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #bbb;
+}
+
+.spinner-box {
+    text-align:center;
+    padding:40px;
+}
+
+.form-select {
+    background: rgba(255,255,255,0.1) !important;
+    color: white !important;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.form-select option {
+    color: black;
+}
+
+::selection {
+    background: #00f5ff;
+    color: black;
+}
+
+</style>
+
+<h2 class="mb-4 text-white fw-bold">💼 AI Job Match Intelligence</h2>
+
+<div class="jobs-container mb-4">
+
+    <div class="row g-3 mb-4">
+
+        <!-- Dynamic Role Dropdown -->
+        <div class="col-md-3">
+            <select id="roleFilter" class="form-select"></select>
+        </div>
+
+        <div class="col-md-3">
+            <select id="fitFilter" class="form-select">
+                <option value="">All Fit Levels</option>
+                <option>Strong</option>
+                <option>Medium</option>
+                <option>Weak</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <select id="sortFilter" class="form-select">
+                <option value="desc">Sort: Highest Match</option>
+                <option value="asc">Sort: Lowest Match</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <button class="btn btn-success w-100" onclick="refreshJobs()">
+                🔄 Fetch Live Jobs
+            </button>
+        </div>
+
+    </div>
+
+    <button class="btn btn-info w-100 mb-4" onclick="loadJobs()">
+        Apply Filters
+    </button>
+
+    <div id="jobsList"></div>
+
+</div>
+
+<script>
+
+/* ===============================
+   LOAD ROLES DYNAMICALLY
+================================ */
+
+async function loadRoles() {
+
+    try {
+        const res = await fetch("/api/job-roles");
+        const roles = await res.json();
+
+        const select = document.getElementById("roleFilter");
+
+        select.innerHTML = `<option value="">All Roles</option>`;
+
+        roles.forEach(role => {
+            select.innerHTML += `<option>${role}</option>`;
+        });
+
+    } catch {
+        console.log("Failed to load roles");
+    }
+}
+
+/* ===============================
+   REFRESH LIVE JOBS
+================================ */
+
+async function refreshJobs() {
+    await fetch("/api/refresh-jobs");
+    loadJobs();
+}
+
+/* ===============================
+   LOAD JOB MATCHES
+================================ */
+
+async function loadJobs() {
+
+    const container = document.getElementById("jobsList");
+
+    container.innerHTML = `
+        <div class="spinner-box text-white">
+            <div class="spinner-border text-info"></div>
+            <div class="mt-3">Fetching AI-matched jobs...</div>
+        </div>
+    `;
+
+    const role = document.getElementById("roleFilter").value;
+    const fit = document.getElementById("fitFilter").value;
+    const sort = document.getElementById("sortFilter").value;
+
+    const params = new URLSearchParams({ role, fit, sort });
+
+    try {
+
+        const response = await fetch("/api/job-matches?" + params.toString());
+        const jobs = await response.json();
+
+        container.innerHTML = "";
+
+        if (!jobs || jobs.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    🚀 No jobs found.<br>
+                    Try refreshing live jobs.
+                </div>
+            `;
+            return;
+        }
+
+        jobs.forEach(job => {
+
+            container.innerHTML += `
+                <div class="job-card">
+
+                    <div class="d-flex justify-content-between align-items-start">
+
+                        <div>
+                            <h5 class="fw-bold">${job.title}</h5>
+                            <small>${job.company} • ${job.location}</small>
+                            <div class="mt-2">
+                                <span class="live-badge">
+                                    🌍 ${job.source || "Live"}
+                                </span>
+                            </div>
+                        </div>
+
+                        <span class="badge badge-fit-${job.fit_level}">
+                            ${job.fit_level} Fit
+                        </span>
+
+                    </div>
+
+                    <div class="mt-4">
+                        <strong>Match Score:</strong>
+                        <span class="match-score" data-score="${job.match_score}">0</span>%
+                        <div class="score-bar mt-2">
+                            <div class="score-fill" style="width:${job.match_score}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <strong class="text-info">Required Skills:</strong>
+                        <div class="mt-2 text-light">
+                            ${job.skills_required}
+                        </div>
+                    </div>
+
+                </div>
+            `;
+        });
+
+        animateScores();
+
+    } catch {
+        container.innerHTML = `
+            <div class="empty-state">
+                ⚠️ Something went wrong loading jobs.
+            </div>
+        `;
+    }
+}
+
+/* ===============================
+   ANIMATE MATCH SCORE
+================================ */
+
+function animateScores() {
+
+    document.querySelectorAll(".match-score").forEach(el => {
+
+        const score = parseInt(el.dataset.score);
+        let current = 0;
+
+        const interval = setInterval(() => {
+            current++;
+            el.textContent = current;
+            if (current >= score) clearInterval(interval);
+        }, 5);
+    });
+}
+
+/* INIT */
+loadRoles();
+loadJobs();
+
+</script>
+
+{% endblock %}

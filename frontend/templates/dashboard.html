@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">Career Dashboard</h2>
+
+
+<!-- Skill Score -->
+<div class="card mb-4">
+
+    <div class="card-body">
+
+        <h5>Skill Score</h5>
+
+        <div class="progress">
+
+            <div id="skillScoreBar"
+                 class="progress-bar bg-success"
+                 role="progressbar"
+                 style="width: 0%">
+
+            </div>
+
+        </div>
+
+        <p id="skillScoreText"></p>
+
+    </div>
+
+</div>
+
+
+<!-- Career Readiness -->
+<div class="card mb-4">
+
+    <div class="card-body">
+
+        <h5>Career Readiness</h5>
+
+        <div class="progress">
+
+            <div id="readinessBar"
+                 class="progress-bar bg-info"
+                 role="progressbar"
+                 style="width: 0%">
+
+            </div>
+
+        </div>
+
+        <p id="readinessText"></p>
+
+    </div>
+
+</div>
+
+
+<!-- Skills List -->
+<div class="card">
+
+    <div class="card-body">
+
+        <h5>Your Skills</h5>
+
+        <ul id="skillsList" class="list-group"></ul>
+
+    </div>
+
+</div>
+
+<hr class="my-5">
+
+<h4>📈 Skill Growth Timeline</h4>
+
+<canvas id="growthChart" height="100"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+fetch("/api/skill-growth")
+.then(res => res.json())
+.then(data => {
+
+    const ctx = document.getElementById("growthChart");
+
+    new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: "Skill Score Over Time",
+                data: data.scores,
+                borderColor: "#38bdf8",
+                backgroundColor: "rgba(56,189,248,0.2)",
+                tension: 0.4
+            }]
+        }
+    });
+});
+</script>
+
+<script>
+
+async function loadDashboard() {
+
+    const res = await fetch("/api/dashboard");
+
+    const data = await res.json();
+
+
+    // Skill score
+    document.getElementById("skillScoreBar").style.width =
+        data.skill_score + "%";
+
+    document.getElementById("skillScoreText").innerText =
+        data.skill_score + "%";
+
+
+    // Readiness score
+    document.getElementById("readinessBar").style.width =
+        data.readiness_score + "%";
+
+    document.getElementById("readinessText").innerText =
+        data.readiness_score + "%";
+
+
+    // Skills list
+    const skillsList = document.getElementById("skillsList");
+
+    skillsList.innerHTML = "";
+
+    data.skills.forEach(skill => {
+
+        const li = document.createElement("li");
+
+        li.className = "list-group-item";
+
+        li.innerText = skill;
+
+        skillsList.appendChild(li);
+
+    });
+
+}
+
+
+loadDashboard();
+
+</script>
+
+<canvas id="trendChart" height="100"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+fetch("/api/skill-trend")
+.then(res => res.json())
+.then(data => {
+
+    const ctx = document.getElementById("trendChart");
+
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: Object.keys(data),
+            datasets: [{
+                label: "Skill Frequency",
+                data: Object.values(data),
+                backgroundColor: "#38bdf8"
+            }]
+        }
+    });
+});
+</script>
+<div class="card-glass p-4 mt-4">
+    <h5>🤖 AI Recommendations</h5>
+    <ul id="recommendations"></ul>
+</div>
+
+<script>
+fetch("/api/recommendations")
+.then(res => res.json())
+.then(data => {
+    const list = document.getElementById("recommendations");
+    data.forEach(rec => {
+        const li = document.createElement("li");
+        li.innerText = rec;
+        list.appendChild(li);
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">📄 Upload Your Resume</h2>
+
+<div class="card-glass p-4">
+
+    <form id="uploadForm">
+
+        <div class="mb-3">
+            <input class="form-control" type="file" id="resumeFile" required>
+        </div>
+
+        <button class="btn btn-success" type="submit">
+            Upload Resume
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- Loading Indicator -->
+<div id="loadingBox" class="mt-4" style="display:none;">
+    <div class="card-glass p-4 text-center">
+        <div class="spinner-border text-info"></div>
+        <p class="mt-3">Analyzing your resume with AI...</p>
+    </div>
+</div>
+
+
+<!-- Extracted Skills Section -->
+<div id="resultSection" style="display:none;">
+
+    <hr class="my-5">
+
+    <h3>🧠 Extracted Skills:</h3>
+
+    <ul id="skillsList" class="list-group mt-3"></ul>
+
+    <!-- AI Career Identity Block -->
+    <div id="identityBox" class="mt-4"></div>
+
+    <!-- What Next Section -->
+    <div class="mt-4 p-4 card-glass">
+
+        <h5>🚀 What Next?</h5>
+
+        <p>
+            Now that your skills are analyzed,
+            explore powerful AI-driven career tools:
+        </p>
+
+        <div class="d-flex flex-wrap gap-3 mt-3">
+
+            <a href="/dashboard" class="btn btn-outline-light">
+                View Career Dashboard
+            </a>
+
+            <a href="/roadmap" class="btn btn-outline-info">
+                Generate AI Roadmap
+            </a>
+
+            <a href="/jobs" class="btn btn-outline-success">
+                Explore Job Matches
+            </a>
+
+            <a href="/salary" class="btn btn-outline-warning">
+                Salary Insights
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+document.getElementById("uploadForm").addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const fileInput = document.getElementById("resumeFile");
+
+    if (!fileInput.files.length) return;
+
+    const formData = new FormData();
+    formData.append("resume", fileInput.files[0]);
+
+    document.getElementById("loadingBox").style.display = "block";
+    document.getElementById("resultSection").style.display = "none";
+
+    const response = await fetch("/api/upload-resume", {
+        method: "POST",
+        body: formData
+    });
+
+    const result = await response.json();
+
+    document.getElementById("loadingBox").style.display = "none";
+    document.getElementById("resultSection").style.display = "block";
+
+    const skillsList = document.getElementById("skillsList");
+    const identityBox = document.getElementById("identityBox");
+
+    skillsList.innerHTML = "";
+    identityBox.innerHTML = "";
+
+    if (!result.skills || result.skills.length === 0) {
+        skillsList.innerHTML = "<li class='list-group-item'>No skills detected.</li>";
+        return;
+    }
+
+    // Render skills
+    result.skills.forEach(skill => {
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.textContent = skill;
+        skillsList.appendChild(li);
+    });
+
+    // Render AI Identity
+    if (result.identity) {
+
+        identityBox.innerHTML = `
+            <div class="card-glass p-4">
+                <h4>🧠 AI Career Identity</h4>
+                <p class="mt-2">
+                    Based on your resume, you are best suited for:
+                </p>
+
+                <p>
+                    <strong>Primary Role:</strong> 
+                    ${result.identity.primary_role} 
+                    (${result.identity.primary_score}% match)
+                </p>
+
+                <p>
+                    <strong>Secondary Role:</strong> 
+                    ${result.identity.secondary_role} 
+                    (${result.identity.secondary_score}% match)
+                </p>
+
+                <div class="mt-3">
+                    <small class="text-info">
+                        Your strongest skill cluster aligns with ${result.identity.primary_role}.
+                    </small>
+                </div>
+            </div>
+        `;
+    }
+
+});
+
+</script>
+
+{% endblock %}

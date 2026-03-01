@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PathPilot AI</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at top, #1e293b, #0f172a 70%);
+    color: #e2e8f0;
+    margin: 0;
+}
+
+/* NAVBAR */
+.navbar {
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(12px);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.nav-link {
+    color: #cbd5e1 !important;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: #38bdf8 !important;
+}
+
+.dropdown-menu {
+    background-color: #1e293b;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.dropdown-item {
+    color: #cbd5e1;
+}
+
+.dropdown-item:hover {
+    background-color: #334155;
+    color: white;
+}
+
+/* BUTTONS */
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    border: none;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+/* GLASS CARD */
+.card-glass {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+}
+
+/* PAGE */
+.page-wrapper {
+    margin-top: 90px;
+    padding: 40px 20px;
+}
+
+/* FOOTER */
+.footer {
+    margin-top: 60px;
+    padding: 30px 0;
+    text-align: center;
+    font-size: 14px;
+    color: #94a3b8;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+</style>
+
+</head>
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm">
+<div class="container">
+
+<a class="navbar-brand" href="/">🚀 PathPilot AI</a>
+
+<button class="navbar-toggler" type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav">
+<span class="navbar-toggler-icon"></span>
+</button>
+
+<div class="collapse navbar-collapse" id="navbarNav">
+<ul class="navbar-nav ms-auto align-items-lg-center">
+
+<li class="nav-item">
+<a class="nav-link" href="/">Home</a>
+</li>
+
+{% if session.get('user_id') %}
+
+<!-- AUTH USER NAV -->
+
+<li class="nav-item">
+<a class="nav-link" href="/dashboard">Dashboard</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/forecast">Forecast</a>
+</li>
+
+{% if session.get('role') == 'admin' %}
+<li class="nav-item">
+    <a class="nav-link text-warning" href="/admin">Admin</a>
+</li>
+{% endif %}
+
+<li class="nav-item">
+<a class="nav-link" href="/upload">Upload</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="/jobs">Jobs</a>
+</li>
+
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+Career Tools
+</a>
+<ul class="dropdown-menu dropdown-menu-end shadow">
+<li><a class="dropdown-item" href="/roadmap">Career Roadmap</a></li>
+<li><a class="dropdown-item" href="/salary">Salary Insights</a></li>
+<li><a class="dropdown-item" href="/market">Market Intelligence</a></li>
+<li><a class="dropdown-item" href="/resume-history">Resume History</a></li>
+<li><a class="dropdown-item" href="/applications">Applications</a></li>
+</ul>
+</li>
+
+<li class="nav-item ms-3">
+<a class="btn btn-outline-light btn-sm" href="/logout">Logout</a>
+</li>
+
+{% else %}
+
+<!-- GUEST NAV -->
+
+<li class="nav-item">
+<a class="nav-link" href="/login">Login</a>
+</li>
+
+<li class="nav-item ms-3">
+<a class="btn btn-primary btn-sm" href="/register">Get Started</a>
+</li>
+
+{% endif %}
+
+</ul>
+</div>
+</div>
+</nav>
+
+<!-- ================= PAGE CONTENT ================= -->
+<div class="page-wrapper">
+<div class="container">
+{% block content %}{% endblock %}
+</div>
+</div>
+
+<!-- ================= FOOTER ================= -->
+<div class="footer">
+© 2026 PathPilot AI — Intelligent Career Intelligence Platform
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

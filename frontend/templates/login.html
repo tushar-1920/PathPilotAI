@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center align-items-center" style="min-height:75vh;">
+<div class="col-md-5">
+
+<div class="card-glass p-5 shadow-lg">
+
+<h2 class="mb-4 text-center fw-bold">🔐 Login to PathPilot AI</h2>
+
+<form method="POST" action="/login">
+
+<div class="mb-3">
+<label class="form-label">Email</label>
+<input type="email" name="email" class="form-control" required>
+</div>
+
+<div class="mb-4">
+<label class="form-label">Password</label>
+<input type="password" name="password" class="form-control" required>
+</div>
+
+<button type="submit" class="btn btn-primary w-100 py-2">
+Login
+</button>
+
+</form>
+
+<hr class="my-4">
+
+<p class="text-center">
+Don’t have an account?
+<a href="/register" class="fw-bold text-info">Create one</a>
+</p>
+
+</div>
+</div>
+</div>
+
+{% endblock %}

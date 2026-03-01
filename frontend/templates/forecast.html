@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>🔮 AI Career Forecast</h2>
+
+<div class="row mt-4">
+
+    <div class="col-md-6">
+        <div class="card-glass p-4">
+            <h4>🔥 Skill Growth Forecast</h4>
+            <ul id="skillForecast"></ul>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card-glass p-4">
+            <h4>📈 Role Growth Forecast</h4>
+            <ul id="roleForecast"></ul>
+        </div>
+    </div>
+
+</div>
+
+<div class="card-glass p-4 mt-4">
+    <h4>🎯 Recommended Future Skills</h4>
+    <p id="futureSkills"></p>
+</div>
+
+<script>
+async function loadForecast() {
+
+    const res = await fetch("/api/forecast-data");
+    const data = await res.json();
+
+    const skillList = document.getElementById("skillForecast");
+    const roleList = document.getElementById("roleForecast");
+
+    data.skill_forecast.forEach(item => {
+        skillList.innerHTML += `<li>${item.skill} (${item.demand})</li>`;
+    });
+
+    data.role_forecast.forEach(item => {
+        roleList.innerHTML += `<li>${item.role} (${item.demand})</li>`;
+    });
+
+    document.getElementById("futureSkills").innerText =
+        data.suggestions.join(", ");
+}
+
+loadForecast();
+</script>
+
+{% endblock %}
