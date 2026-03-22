@@ -1,13 +1,24 @@
 import os
+from datetime import timedelta
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
+
+    # =========================
+    # Environment
+    # =========================
+    ENV = os.environ.get("FLASK_ENV", "development")
+    DEBUG = ENV == "development"
+
     # =========================
     # Security
     # =========================
-    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
+    SECRET_KEY = os.environ.get(
+        "SECRET_KEY",
+        "dev-secret-key-change-in-production"
+    )
 
     # =========================
     # Database
@@ -19,16 +30,19 @@ class Config:
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # =========================
-    # Session Security
-    # =========================
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = "Lax"
-
-    # Set to True only in production (HTTPS required)
-    SESSION_COOKIE_SECURE = False
+    
 
     # =========================
     # Upload Settings
     # =========================
-    MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10MB upload limit
+    MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10MB
+
+    # =========================
+    # Stripe Configuration
+    # =========================
+    STRIPE_SECRET_KEY = None
+    STRIPE_MONTHLY_PRICE_ID = None
+    STRIPE_ANNUAL_PRICE_ID = None
+    STRIPE_WEBHOOK_SECRET = None
+
+    OPENAI_API_KEY = "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"

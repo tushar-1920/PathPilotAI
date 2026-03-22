@@ -1,0 +1,571 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;--red:#ff5757;--purple:#a855f7;--rim:rgba(255,255,255,.06);--glass:rgba(255,255,255,.028);--font-d:"Syne",sans-serif;--font-b:"DM Sans",sans-serif;--ease:cubic-bezier(.16,1,.3,1);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#000!important;color:#fff!important;font-family:var(--font-b);}
+.pf-page{min-height:100vh;background:#000;position:relative;}
+.pf-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 55% 45% at 5% 10%,rgba(91,107,255,.1) 0%,transparent 65%),radial-gradient(ellipse 45% 40% at 95% 85%,rgba(0,229,200,.08) 0%,transparent 60%);}
+.pf-grid{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:60px 60px;}
+.pf-body{position:relative;z-index:1;max-width:1020px;margin:0 auto;padding:28px 22px 100px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── HEADER CARD ── */
+.pf-header-card{border-radius:22px;overflow:hidden;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);margin-bottom:18px;}
+.pf-cover{height:160px;background:linear-gradient(135deg,rgba(91,107,255,.4),rgba(0,229,200,.22),rgba(168,85,247,.18));position:relative;overflow:hidden;}
+.pf-cover::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.06) 1px,transparent 1px);background-size:22px 22px;}
+.pf-header-body{padding:0 30px 24px;}
+.pf-avatar-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:-50px;margin-bottom:14px;flex-wrap:wrap;gap:12px;}
+.pf-avatar-wrap{position:relative;flex-shrink:0;}
+.pf-avatar{width:100px;height:100px;border-radius:22px;border:3px solid #000;background:linear-gradient(135deg,rgba(91,107,255,.4),rgba(0,229,200,.2));display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:34px;font-weight:800;color:#fff;box-shadow:0 6px 28px rgba(0,0,0,.6);overflow:hidden;}
+.pf-avatar img{width:100%;height:100%;object-fit:cover;}
+.pf-cam-btn{position:absolute;bottom:-4px;right:-4px;width:26px;height:26px;border-radius:8px;background:var(--neon);border:2px solid #000;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;transition:transform .2s;}
+.pf-cam-btn:hover{transform:scale(1.15);}
+.pf-header-actions{display:flex;gap:9px;flex-wrap:wrap;padding-top:52px;}
+.pf-btn{padding:9px 20px;border-radius:10px;font-family:var(--font-b);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .18s;text-decoration:none;display:inline-flex;align-items:center;gap:7px;border:1px solid transparent;}
+.pf-btn-primary{background:linear-gradient(135deg,var(--neon),#3a4aff);color:#fff;box-shadow:0 4px 18px rgba(91,107,255,.4);}
+.pf-btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(91,107,255,.55);}
+.pf-btn-primary.following{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14);box-shadow:none;}
+.pf-btn-sec{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12);color:rgba(255,255,255,.65);}
+.pf-btn-sec:hover{background:rgba(255,255,255,.1);color:#fff;}
+.pf-btn-msg{background:rgba(0,229,200,.08);border-color:rgba(0,229,200,.22);color:rgba(0,229,200,.9);}
+.pf-btn-msg:hover{background:rgba(0,229,200,.16);}
+
+.pf-name-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:3px;}
+.pf-name{font-family:var(--font-d);font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-.8px;color:#fff;}
+.pf-username{font-size:14px;color:rgba(0,229,200,.7);font-weight:500;}
+.pf-headline{font-size:14.5px;color:rgba(255,255,255,.45);font-weight:300;margin-bottom:10px;}
+.pf-location{font-size:12.5px;color:rgba(255,255,255,.28);display:flex;align-items:center;gap:4px;margin-bottom:12px;}
+.pf-stats-row{display:flex;gap:22px;flex-wrap:wrap;}
+.pf-stat{cursor:pointer;text-align:center;}
+.pf-stat-num{font-family:var(--font-d);font-size:19px;font-weight:800;color:#fff;letter-spacing:-1px;}
+.pf-stat-lbl{font-size:10.5px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1px;margin-top:1px;}
+
+/* ── USERNAME SET BANNER ── */
+.pf-username-banner{background:rgba(91,107,255,.08);border:1px solid rgba(91,107,255,.2);border-radius:14px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.pf-username-banner p{font-size:13.5px;color:rgba(255,255,255,.5);flex:1;}
+.pf-username-input-row{display:flex;gap:8px;align-items:center;flex:1;min-width:220px;}
+.pf-username-inp{background:rgba(255,255,255,.05);border:1px solid rgba(91,107,255,.3);border-radius:9px;padding:9px 14px;color:#fff;font-family:var(--font-b);font-size:14px;outline:none;flex:1;}
+.pf-username-inp:focus{border-color:rgba(91,107,255,.6);}
+.pf-username-status{font-size:12px;margin-top:4px;}
+.pf-username-ok{color:var(--green);}
+.pf-username-err{color:var(--red);}
+
+/* ── LAYOUT ── */
+.pf-layout{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start;}
+
+/* ── CARDS ── */
+.pf-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:24px;margin-bottom:14px;position:relative;overflow:hidden;}
+.pf-card::before{content:"";position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(91,107,255,.2),rgba(0,229,200,.12),transparent);}
+.pf-card-title{font-family:var(--font-d);font-size:16px;font-weight:700;color:#fff;letter-spacing:-.3px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+.pf-card-title a{font-size:12px;font-weight:500;color:rgba(91,107,255,.8);text-decoration:none;}
+.pf-card-title a:hover{color:var(--neon);}
+
+/* ── SKILLS ── */
+.pf-skill-tags{display:flex;flex-wrap:wrap;gap:7px;}
+.pf-skill-tag{padding:4px 13px;border-radius:100px;font-size:12px;font-weight:500;background:rgba(91,107,255,.08);border:1px solid rgba(91,107,255,.18);color:#818cf8;transition:all .2s;cursor:default;}
+.pf-skill-tag:hover{background:rgba(91,107,255,.16);}
+.pf-skill-tag.cyan{background:rgba(0,229,200,.07);border-color:rgba(0,229,200,.18);color:rgba(0,229,200,.8);}
+.pf-skill-section-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;margin-bottom:8px;margin-top:12px;}
+
+/* ── SOCIAL ── */
+.pf-social-link{display:flex;align-items:center;gap:11px;padding:10px 14px;border-radius:11px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);text-decoration:none;margin-bottom:8px;transition:all .2s;}
+.pf-social-link:hover{background:rgba(255,255,255,.06);transform:translateX(4px);}
+.pf-social-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.pf-social-name{font-size:13px;font-weight:600;color:rgba(255,255,255,.65);}
+.pf-social-url{font-size:11px;color:rgba(255,255,255,.28);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;}
+
+/* ── CERTIFICATES ── */
+.pf-cert-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.pf-cert-item:last-child{border-bottom:none;padding-bottom:0;}
+.pf-cert-icon{width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,rgba(255,181,71,.15),rgba(255,181,71,.07));border:1px solid rgba(255,181,71,.18);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;}
+.pf-cert-icon img{width:100%;height:100%;object-fit:cover;}
+.pf-cert-body{flex:1;}
+.pf-cert-title{font-family:var(--font-d);font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;letter-spacing:-.2px;}
+.pf-cert-issuer{font-size:12px;color:rgba(255,255,255,.38);margin-bottom:5px;}
+.pf-cert-footer{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.pf-cert-date{font-size:11px;color:rgba(255,255,255,.22);}
+.pf-cert-verify{font-size:11px;color:rgba(0,229,200,.7);text-decoration:none;display:flex;align-items:center;gap:4px;}
+.pf-cert-verify:hover{color:var(--cyan);}
+
+/* ── POSTS ── */
+.pf-post-item{padding:18px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.pf-post-item:last-child{border-bottom:none;padding-bottom:0;}
+.pf-post-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.pf-post-mini-av{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,rgba(91,107,255,.35),rgba(0,229,200,.2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;overflow:hidden;}
+.pf-post-mini-av img{width:100%;height:100%;object-fit:cover;}
+.pf-post-author{font-size:13.5px;font-weight:600;color:#fff;}
+.pf-post-time{font-size:11.5px;color:rgba(255,255,255,.28);}
+.pf-post-badge{display:inline-flex;padding:2px 9px;border-radius:100px;font-size:9.5px;font-weight:700;margin-bottom:7px;letter-spacing:.5px;}
+.badge-achievement{background:rgba(255,181,71,.12);border:1px solid rgba(255,181,71,.2);color:var(--amber);}
+.badge-milestone{background:rgba(0,229,200,.1);border:1px solid rgba(0,229,200,.2);color:var(--cyan);}
+.badge-image{background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.2);color:#818cf8;}
+.pf-post-content{font-size:14px;color:rgba(255,255,255,.58);line-height:1.75;font-weight:300;white-space:pre-wrap;margin-bottom:10px;}
+.pf-post-image{width:100%;border-radius:12px;max-height:320px;object-fit:cover;margin-bottom:10px;border:1px solid rgba(255,255,255,.07);}
+.pf-post-actions{display:flex;gap:8px;}
+.pf-post-action{display:flex;align-items:center;gap:5px;font-size:12.5px;color:rgba(255,255,255,.3);cursor:pointer;padding:5px 10px;border-radius:8px;transition:all .2s;}
+.pf-post-action:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);}
+.pf-post-action.liked{color:var(--red);}
+
+/* ── SUGGESTED ── */
+.pf-sug-item{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.pf-sug-item:last-child{border-bottom:none;}
+.pf-sug-av{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(91,107,255,.3),rgba(0,229,200,.15));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;overflow:hidden;}
+.pf-sug-av img{width:100%;height:100%;object-fit:cover;}
+.pf-sug-name{font-size:13px;font-weight:600;color:#fff;margin-bottom:1px;}
+.pf-sug-uname{font-size:11px;color:rgba(0,229,200,.6);}
+.pf-sug-hl{font-size:11.5px;color:rgba(255,255,255,.3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pf-sug-follow-btn{margin-left:auto;padding:5px 12px;border-radius:8px;border:1px solid rgba(91,107,255,.3);background:rgba(91,107,255,.08);color:#818cf8;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .2s;flex-shrink:0;}
+.pf-sug-follow-btn:hover{background:rgba(91,107,255,.18);}
+
+/* ── SEARCH BAR ── */
+.pf-search-bar{display:flex;gap:10px;margin-bottom:14px;}
+.pf-search-inp{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:11px 16px;color:#fff;font-family:var(--font-b);font-size:14px;outline:none;transition:border-color .2s;}
+.pf-search-inp:focus{border-color:rgba(91,107,255,.45);}
+.pf-search-inp::placeholder{color:rgba(255,255,255,.22);}
+.pf-search-btn{padding:11px 18px;border-radius:11px;border:none;background:rgba(91,107,255,.15);color:#818cf8;font-size:14px;cursor:pointer;transition:all .2s;}
+.pf-search-btn:hover{background:rgba(91,107,255,.25);}
+.pf-search-results{margin-top:8px;}
+
+/* ── MISC ── */
+.pf-empty{font-size:13.5px;color:rgba(255,255,255,.2);font-style:italic;padding:6px 0;}
+.pf-spin{width:18px;height:18px;border:2px solid rgba(255,255,255,.06);border-top-color:var(--neon);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0;}
+
+/* ── POST MODAL ── */
+.pf-modal-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;}
+.pf-modal-overlay.open{display:flex;}
+.pf-modal{background:#0d0d18;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px;width:100%;max-width:500px;margin:16px;position:relative;animation:fadeUp .3s ease both;}
+.pf-modal-title{font-family:var(--font-d);font-size:18px;font-weight:700;color:#fff;margin-bottom:16px;}
+.pf-modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(255,255,255,.3);font-size:20px;cursor:pointer;}
+.pf-type-row{display:flex;gap:8px;margin-bottom:14px;}
+.pf-type-btn{flex:1;padding:8px;border-radius:8px;font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid;}
+.pf-type-btn.active{opacity:1;}
+.pf-type-btn:not(.active){opacity:.45;}
+.pf-textarea{width:100%;height:110px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:13px 15px;color:#fff;font-family:var(--font-b);font-size:14px;resize:none;outline:none;line-height:1.7;}
+.pf-textarea:focus{border-color:rgba(91,107,255,.4);}
+.pf-img-preview{width:100%;border-radius:10px;max-height:180px;object-fit:cover;margin-top:10px;display:none;}
+.pf-img-upload-row{display:flex;align-items:center;gap:10px;margin-top:10px;}
+.pf-img-label{padding:7px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.45);font-size:12.5px;font-weight:500;cursor:pointer;transition:all .2s;}
+.pf-img-label:hover{background:rgba(255,255,255,.09);color:#fff;}
+.pf-modal-actions{display:flex;gap:9px;margin-top:14px;justify-content:flex-end;}
+.pf-modal-cancel{padding:9px 20px;border-radius:9px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.45);font-family:var(--font-b);font-size:13.5px;cursor:pointer;}
+.pf-modal-submit{padding:9px 24px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--neon),#3a4aff);color:#fff;font-family:var(--font-b);font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(91,107,255,.4);}
+
+@media(max-width:900px){.pf-layout{grid-template-columns:1fr;}.pf-header-body{padding:0 16px 20px;}.pf-body{padding:16px 12px 80px;}}
+</style>
+
+<div class="pf-page">
+<div class="pf-glow"></div>
+<div class="pf-grid"></div>
+<div class="pf-body">
+
+  <!-- HEADER -->
+  <div class="pf-header-card" style="animation:fadeUp .45s ease both">
+    <div class="pf-cover"></div>
+    <div class="pf-header-body">
+      <div class="pf-avatar-row">
+        <div class="pf-avatar-wrap">
+          <div class="pf-avatar" id="profileAvatar">
+            {% if profile and profile.profile_image %}
+              <img src="/static/{{ profile.profile_image }}" alt="{{ user.name }}">
+            {% else %}
+              {{ user.name[0].upper() if user.name else "?" }}
+            {% endif %}
+          </div>
+          {% if is_own %}
+          <label class="pf-cam-btn" for="photoInput" title="Change photo">📷</label>
+          <input type="file" id="photoInput" accept="image/*" style="display:none">
+          {% endif %}
+        </div>
+        <div class="pf-header-actions">
+          {% if is_own %}
+            <a href="/edit-profile" class="pf-btn pf-btn-sec">✏️ Edit Profile</a>
+            <a href="/messages" class="pf-btn pf-btn-msg">💬 Messages</a>
+          {% else %}
+            <button class="pf-btn pf-btn-primary {{ 'following' if is_following else '' }}" id="followBtn" data-uid="{{ user.id }}" data-following="{{ 'true' if is_following else 'false' }}">
+              {{ "✓ Following" if is_following else "+ Follow" }}
+            </button>
+            <a href="/messages/{{ user.id }}" class="pf-btn pf-btn-msg">
+              💬 Message{% if unread_from %} <span style="background:var(--red);border-radius:100px;padding:1px 6px;font-size:10px;margin-left:2px;">{{ unread_from }}</span>{% endif %}
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="pf-name-row">
+        <div class="pf-name">{{ user.name }}</div>
+        {% if profile and profile.username %}
+          <div class="pf-username">@{{ profile.username }}</div>
+        {% endif %}
+      </div>
+      <div class="pf-headline">{{ profile.headline if profile and profile.headline else "No headline yet" }}</div>
+      {% if profile and profile.location %}
+      <div class="pf-location">📍 {{ profile.location }}</div>
+      {% endif %}
+      <div class="pf-stats-row">
+        <div class="pf-stat"><div class="pf-stat-num" id="followersCount">{{ followers_count }}</div><div class="pf-stat-lbl">Followers</div></div>
+        <div class="pf-stat"><div class="pf-stat-num" id="followingCount">{{ following_count }}</div><div class="pf-stat-lbl">Following</div></div>
+        <div class="pf-stat"><div class="pf-stat-num">{{ posts|length if posts is defined else 0 }}</div><div class="pf-stat-lbl">Posts</div></div>
+        <div class="pf-stat"><div class="pf-stat-num">{{ certs|length if certs is defined else 0 }}</div><div class="pf-stat-lbl">Certs</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- USERNAME BANNER — show only if own profile and no username yet -->
+  {% if is_own and (not profile or not profile.username) %}
+  <div class="pf-username-banner" style="animation:fadeUp .45s .04s ease both">
+    <div style="font-size:20px">✨</div>
+    <p><strong style="color:#fff">Set your @username</strong> — People can search and find you with it. You can only set this once.</p>
+    <div style="flex:1;min-width:220px">
+      <div class="pf-username-input-row">
+        <input class="pf-username-inp" id="usernameInp" placeholder="yourname" maxlength="20" oninput="checkUsername(this.value)">
+        <button class="pf-btn pf-btn-primary" onclick="setUsername()" style="padding:9px 16px;font-size:13px;">Set</button>
+      </div>
+      <div class="pf-username-status" id="usernameStatus"></div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- MAIN LAYOUT -->
+  <div class="pf-layout">
+    <div class="pf-left">
+
+      <!-- About -->
+      {% if profile and profile.bio %}
+      <div class="pf-card" style="animation:fadeUp .45s .06s ease both">
+        <div class="pf-card-title">About {% if is_own %}<a href="/edit-profile">Edit</a>{% endif %}</div>
+        <div style="font-size:14.5px;color:rgba(255,255,255,.48);font-weight:300;line-height:1.82;">{{ profile.bio }}</div>
+      </div>
+      {% endif %}
+
+      <!-- Skills -->
+      {% set has_resume = resume_skills is defined and resume_skills and resume_skills|length > 0 %}
+      {% set has_profile_skills = profile and profile.skills_summary %}
+      {% if has_resume or has_profile_skills %}
+      <div class="pf-card" style="animation:fadeUp .45s .08s ease both">
+        <div class="pf-card-title">⚡ Skills {% if is_own %}<a href="/edit-profile">Edit</a>{% endif %}</div>
+        {% if has_resume %}
+        <div class="pf-skill-section-lbl" style="color:rgba(0,229,200,.55);">From Resume</div>
+        <div class="pf-skill-tags" style="margin-bottom:12px;">
+          {% for s in resume_skills %}<div class="pf-skill-tag cyan">{{ s }}</div>{% endfor %}
+        </div>
+        {% endif %}
+        {% if has_profile_skills %}
+        <div class="pf-skill-section-lbl" style="color:rgba(91,107,255,.55);">Additional</div>
+        <div class="pf-skill-tags">
+          {% for s in profile.skills_summary.split(",") %}{% if s.strip() %}<div class="pf-skill-tag">{{ s.strip() }}</div>{% endif %}{% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Certificates -->
+      <div class="pf-card" style="animation:fadeUp .45s .1s ease both">
+        <div class="pf-card-title">🏆 Certificates {% if is_own %}<a href="/certificates">Manage</a>{% endif %}</div>
+        {% if certs is defined and certs %}
+          {% for cert in certs %}
+          <div class="pf-cert-item">
+            <div class="pf-cert-icon">
+              {% if cert.image_url %}<img src="{{ cert.image_url }}" alt="">{% else %}🎖️{% endif %}
+            </div>
+            <div class="pf-cert-body">
+              <div class="pf-cert-title">{{ cert.title }}</div>
+              <div class="pf-cert-issuer">{{ cert.issuer or "" }}</div>
+              <div class="pf-cert-footer">
+                {% if cert.issued_date %}<span class="pf-cert-date">📅 {{ cert.issued_date }}</span>{% endif %}
+                {% if cert.link %}<a href="{{ cert.link }}" target="_blank" class="pf-cert-verify">🔗 Verify</a>{% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="pf-empty">No certificates yet.{% if is_own %} <a href="/certificates" style="color:var(--cyan)">Add one →</a>{% endif %}</div>
+        {% endif %}
+      </div>
+
+      <!-- Posts -->
+      <div class="pf-card" style="animation:fadeUp .45s .12s ease both">
+        <div class="pf-card-title">
+          Posts
+          {% if is_own %}<a href="#" onclick="openPostModal();return false;">+ New Post</a>{% endif %}
+        </div>
+        <div id="postsContainer">
+          {% if posts is defined and posts %}
+            {% for post in posts %}
+            <div class="pf-post-item" id="post-{{ post.id }}">
+              <div class="pf-post-header">
+                <div class="pf-post-mini-av">
+                  {% if profile and profile.profile_image %}<img src="/static/{{ profile.profile_image }}">
+                  {% else %}{{ user.name[0].upper() }}{% endif %}
+                </div>
+                <div>
+                  <div class="pf-post-author">{{ user.name }}</div>
+                  <div class="pf-post-time">{{ post.created_at.strftime("%b %d, %Y") if post.created_at else "" }}</div>
+                </div>
+              </div>
+              {% if post.post_type == "achievement" %}<div class="pf-post-badge badge-achievement">🏆 Achievement</div>
+              {% elif post.post_type == "milestone" %}<div class="pf-post-badge badge-milestone">🎯 Milestone</div>
+              {% elif post.post_type == "image" %}<div class="pf-post-badge badge-image">📷 Photo</div>{% endif %}
+              <div class="pf-post-content">{{ post.content }}</div>
+              {% if post.image_url %}
+              <img src="{{ post.image_url }}" class="pf-post-image" alt="Post image">
+              {% endif %}
+              <div class="pf-post-actions">
+                <div class="pf-post-action" id="like-btn-{{ post.id }}" onclick="toggleLike({{ post.id }}, this)">♡ <span id="likes-{{ post.id }}">0</span></div>
+                <div class="pf-post-action" onclick="toggleComments({{ post.id }})">💬 <span id="cmts-{{ post.id }}">0</span></div>
+                {% if is_own %}<div class="pf-post-action" onclick="deletePost({{ post.id }})">🗑</div>{% endif %}
+              </div>
+              <div id="comments-{{ post.id }}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05)">
+                <div id="comments-list-{{ post.id }}"></div>
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                  <input id="comment-inp-{{ post.id }}" placeholder="Add a comment..." style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:8px 12px;color:#fff;font-family:var(--font-b);font-size:13px;outline:none;">
+                  <button onclick="submitComment({{ post.id }})" style="padding:8px 14px;border-radius:9px;border:none;background:rgba(91,107,255,.15);color:#818cf8;font-size:12.5px;font-weight:600;cursor:pointer;">Send</button>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="pf-empty">No posts yet.{% if is_own %} Share your first achievement!{% endif %}</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="pf-right">
+
+      <!-- Social Links -->
+      {% if profile and (profile.github or profile.linkedin or profile.portfolio or profile.twitter) %}
+      <div class="pf-card" style="animation:fadeUp .45s .07s ease both">
+        <div class="pf-card-title">Connect</div>
+        {% if profile.github %}<a href="{{ profile.github }}" target="_blank" class="pf-social-link"><div class="pf-social-icon" style="background:rgba(255,255,255,.06)">⌥</div><div><div class="pf-social-name">GitHub</div><div class="pf-social-url">{{ profile.github }}</div></div></a>{% endif %}
+        {% if profile.linkedin %}<a href="{{ profile.linkedin }}" target="_blank" class="pf-social-link"><div class="pf-social-icon" style="background:rgba(10,102,194,.15)">in</div><div><div class="pf-social-name">LinkedIn</div><div class="pf-social-url">{{ profile.linkedin }}</div></div></a>{% endif %}
+        {% if profile.portfolio %}<a href="{{ profile.portfolio }}" target="_blank" class="pf-social-link"><div class="pf-social-icon" style="background:rgba(0,229,200,.1)">🌐</div><div><div class="pf-social-name">Portfolio</div><div class="pf-social-url">{{ profile.portfolio }}</div></div></a>{% endif %}
+        {% if profile.twitter %}<a href="{{ profile.twitter }}" target="_blank" class="pf-social-link"><div class="pf-social-icon" style="background:rgba(29,155,240,.1)">𝕏</div><div><div class="pf-social-name">Twitter / X</div><div class="pf-social-url">{{ profile.twitter }}</div></div></a>{% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Search Users -->
+      <div class="pf-card" style="animation:fadeUp .45s .09s ease both">
+        <div class="pf-card-title">🔍 Find People</div>
+        <div class="pf-search-bar">
+          <input class="pf-search-inp" id="searchInp" placeholder="Search by name or @username" oninput="searchUsers(this.value)">
+        </div>
+        <div id="searchResults"></div>
+        <div id="suggestedUsers"><div style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.25);font-size:12.5px;"><div class="pf-spin"></div> Loading...</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- POST MODAL -->
+<div class="pf-modal-overlay" id="postModal">
+  <div class="pf-modal">
+    <div class="pf-modal-title" id="modalTitle">📝 Create Post</div>
+    <button class="pf-modal-close" onclick="closePostModal()">×</button>
+    <div class="pf-type-row">
+      <button class="pf-type-btn active" id="btn-text" style="border-color:rgba(91,107,255,.3);background:rgba(91,107,255,.1);color:#818cf8" onclick="setType('text',this)">📝 Post</button>
+      <button class="pf-type-btn" id="btn-achievement" style="border-color:rgba(255,181,71,.2);background:rgba(255,181,71,.06);color:var(--amber)" onclick="setType('achievement',this)">🏆 Achievement</button>
+      <button class="pf-type-btn" id="btn-milestone" style="border-color:rgba(0,229,200,.2);background:rgba(0,229,200,.05);color:var(--cyan)" onclick="setType('milestone',this)">🎯 Milestone</button>
+      <button class="pf-type-btn" id="btn-image" style="border-color:rgba(168,85,247,.2);background:rgba(168,85,247,.05);color:#c084fc" onclick="setType('image',this)">📷 Photo</button>
+    </div>
+    <textarea class="pf-textarea" id="postContent" placeholder="What's on your mind?"></textarea>
+    <img id="imgPreview" class="pf-img-preview">
+    <div class="pf-img-upload-row">
+      <label class="pf-img-label" for="postImageFile">📎 Attach Image</label>
+      <input type="file" id="postImageFile" accept="image/*" style="display:none" onchange="previewPostImage(this)">
+      <span id="imgName" style="font-size:12px;color:rgba(255,255,255,.25);"></span>
+    </div>
+    <div class="pf-modal-actions">
+      <button class="pf-modal-cancel" onclick="closePostModal()">Cancel</button>
+      <button class="pf-modal-submit" onclick="submitPost()">Publish</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ME  = parseInt("{{ session.get('user_id', 0) }}") || 0;
+const UID = parseInt("{{ user.id }}") || 0;
+let currentPostType = "text";
+let uploadedImageUrl = "";
+
+// ── Photo upload ──
+const photoInput = document.getElementById("photoInput");
+if (photoInput) photoInput.addEventListener("change", async e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => document.getElementById("profileAvatar").innerHTML = `<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+  reader.readAsDataURL(file);
+  const fd = new FormData(); fd.append("photo", file);
+  const d = await fetch("/api/profile/upload-photo",{method:"POST",body:fd}).then(r=>r.json());
+  if (!d.success) alert(d.error || "Upload failed");
+});
+
+// ── Username ──
+let usernameTimer;
+async function checkUsername(val) {
+  const status = document.getElementById("usernameStatus");
+  val = val.trim().toLowerCase();
+  if (!val) { status.textContent = ""; return; }
+  if (!/^[a-z0-9_]{3,20}$/.test(val)) {
+    status.innerHTML = `<span class="pf-username-err">3-20 chars, letters/numbers/underscores only</span>`; return;
+  }
+  status.textContent = "Checking...";
+  clearTimeout(usernameTimer);
+  usernameTimer = setTimeout(async () => {
+    const d = await fetch(`/api/profile/check-username?username=${val}`).then(r=>r.json());
+    status.innerHTML = d.available
+      ? `<span class="pf-username-ok">✓ @${val} is available</span>`
+      : `<span class="pf-username-err">✗ Already taken</span>`;
+  }, 400);
+}
+async function setUsername() {
+  const val = document.getElementById("usernameInp")?.value.trim().toLowerCase();
+  if (!val) return;
+  const d = await fetch("/api/profile/set-username",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:val})}).then(r=>r.json());
+  if (d.success) { location.reload(); }
+  else document.getElementById("usernameStatus").innerHTML = `<span class="pf-username-err">${d.error}</span>`;
+}
+
+// ── Follow ──
+const followBtn = document.getElementById("followBtn");
+if (followBtn) followBtn.addEventListener("click", async () => {
+  const isF = followBtn.dataset.following === "true";
+  const d   = await fetch(`/api/${isF?"unfollow":"follow"}/${UID}`,{method:"POST"}).then(r=>r.json());
+  if (d.success) {
+    followBtn.dataset.following = d.following ? "true" : "false";
+    followBtn.textContent = d.following ? "✓ Following" : "+ Follow";
+    followBtn.classList.toggle("following", d.following);
+    document.getElementById("followersCount").textContent = d.followers_count;
+  }
+});
+
+// ── Post modal ──
+function openPostModal() { document.getElementById("postModal").classList.add("open"); }
+function closePostModal() { document.getElementById("postModal").classList.remove("open"); uploadedImageUrl = ""; document.getElementById("imgPreview").style.display="none"; document.getElementById("imgName").textContent=""; document.getElementById("postContent").value=""; }
+function setType(t, btn) {
+  currentPostType = t;
+  document.querySelectorAll(".pf-type-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+}
+function previewPostImage(input) {
+  const file = input.files[0]; if (!file) return;
+  document.getElementById("imgName").textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = e => { const img = document.getElementById("imgPreview"); img.src = e.target.result; img.style.display = "block"; };
+  reader.readAsDataURL(file);
+}
+async function submitPost() {
+  const content = document.getElementById("postContent").value.trim();
+  if (!content) return;
+  // Upload image if attached
+  const fileInput = document.getElementById("postImageFile");
+  let imageUrl = "";
+  if (fileInput.files[0]) {
+    const fd = new FormData(); fd.append("image", fileInput.files[0]);
+    const d  = await fetch("/api/posts/upload-image",{method:"POST",body:fd}).then(r=>r.json());
+    if (d.success) imageUrl = d.image_url;
+  }
+  const d = await fetch("/api/posts/create",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content,post_type:currentPostType,image_url:imageUrl})}).then(r=>r.json());
+  if (d.success) { closePostModal(); location.reload(); }
+}
+
+// ── Like ──
+async function toggleLike(postId, el) {
+  const d = await fetch(`/api/posts/like/${postId}`,{method:"POST"}).then(r=>r.json());
+  if (d.success) { el.classList.toggle("liked",d.liked); el.innerHTML=`${d.liked?"♥":"♡"} <span id="likes-${postId}">${d.likes}</span>`; }
+}
+
+// ── Comments ──
+function toggleComments(postId) {
+  const div = document.getElementById(`comments-${postId}`);
+  const isVisible = div.style.display !== "none";
+  div.style.display = isVisible ? "none" : "block";
+  if (!isVisible) loadComments(postId);
+}
+async function loadComments(postId) {
+  // Comments loaded via post data
+}
+async function submitComment(postId) {
+  const inp = document.getElementById(`comment-inp-${postId}`);
+  const content = inp.value.trim(); if (!content) return;
+  const d = await fetch(`/api/posts/comment/${postId}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content})}).then(r=>r.json());
+  if (d.success) {
+    const list = document.getElementById(`comments-list-${postId}`);
+    const initials = d.user_name ? d.user_name[0] : "?";
+    list.innerHTML += `<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;"><div style="width:28px;height:28px;border-radius:8px;background:rgba(91,107,255,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">${d.user_image?`<img src="${d.user_image}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`:initials}</div><div style="flex:1"><div style="font-size:12.5px;font-weight:600;color:#fff;margin-bottom:2px">${d.user_name}</div><div style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.6">${d.content}</div></div></div>`;
+    inp.value = "";
+    const cnt = document.getElementById(`cmts-${postId}`);
+    if (cnt) cnt.textContent = parseInt(cnt.textContent||0) + 1;
+  }
+}
+
+// ── Delete post ──
+async function deletePost(postId) {
+  if (!confirm("Delete this post?")) return;
+  const d = await fetch(`/api/posts/delete/${postId}`,{method:"DELETE"}).then(r=>r.json());
+  if (d.success) document.getElementById(`post-${postId}`)?.remove();
+}
+
+// ── Load post likes on init ──
+async function initPostData() {
+  try {
+    const posts = await fetch(`/api/posts/user/${UID}`).then(r=>r.json());
+    posts.forEach(p => {
+      const el = document.getElementById(`likes-${p.id}`);
+      const btn = document.getElementById(`like-btn-${p.id}`);
+      const cmts = document.getElementById(`cmts-${p.id}`);
+      if (el) el.textContent = p.likes;
+      if (btn && p.liked) { btn.classList.add("liked"); btn.innerHTML=`♥ <span id="likes-${p.id}">${p.likes}</span>`; }
+      if (cmts) cmts.textContent = p.comments;
+    });
+  } catch(e) {}
+}
+
+// ── Search users ──
+let searchTimer;
+function searchUsers(q) {
+  clearTimeout(searchTimer);
+  const results = document.getElementById("searchResults");
+  const suggested = document.getElementById("suggestedUsers");
+  if (!q.trim()) { results.innerHTML = ""; suggested.style.display = "block"; loadSuggested(); return; }
+  suggested.style.display = "none";
+  searchTimer = setTimeout(async () => {
+    results.innerHTML = `<div style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.25);font-size:12.5px;padding:8px 0;"><div class="pf-spin"></div> Searching...</div>`;
+    const data = await fetch(`/api/users/search?q=${encodeURIComponent(q)}`).then(r=>r.json());
+    if (!data.length) { results.innerHTML = `<div class="pf-empty">No users found for "${q}"</div>`; return; }
+    results.innerHTML = data.map(u => userCard(u)).join("");
+  }, 300);
+}
+
+async function loadSuggested() {
+  const container = document.getElementById("suggestedUsers");
+  try {
+    const data = await fetch("/api/users/search").then(r=>r.json());
+    if (!data.length) { container.innerHTML = `<div class="pf-empty">No suggestions yet.</div>`; return; }
+    container.innerHTML = data.filter(u=>u.id!==ME).slice(0,5).map(u => userCard(u)).join("");
+  } catch(e) { container.innerHTML = `<div class="pf-empty">Could not load.</div>`; }
+}
+
+function userCard(u) {
+  const av = u.image ? `<img src="${u.image}" style="width:100%;height:100%;object-fit:cover;">` : (u.name?u.name[0].toUpperCase():"?");
+  const uname = u.username ? `<div class="pf-sug-uname">@${u.username}</div>` : "";
+  const followBtn = u.id === ME ? "" : u.is_following
+    ? `<button class="pf-sug-follow-btn" style="opacity:.5" disabled>✓</button>`
+    : `<button class="pf-sug-follow-btn" onclick="quickFollow(${u.id},this)">+ Follow</button>`;
+  return `<div class="pf-sug-item"><a href="/profile/${u.id}" style="display:flex;align-items:center;gap:11px;text-decoration:none;flex:1;min-width:0"><div class="pf-sug-av">${av}</div><div style="flex:1;min-width:0">${uname}<div class="pf-sug-name">${u.name}</div><div class="pf-sug-hl">${u.headline||""}</div></div></a>${followBtn}</div>`;
+}
+
+async function quickFollow(userId, btn) {
+  const d = await fetch(`/api/follow/${userId}`,{method:"POST"}).then(r=>r.json());
+  if (d.success) { btn.textContent = "✓"; btn.style.opacity = ".5"; btn.disabled = true; }
+}
+
+initPostData();
+loadSuggested();
+</script>
+{% endblock %}

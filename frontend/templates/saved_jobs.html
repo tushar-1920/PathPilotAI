@@ -1,0 +1,757 @@
+\{% extends "base.html" %}
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --neon:   #5b6bff;
+  --cyan:   #00e5c8;
+  --green:  #22c55e;
+  --amber:  #ffb547;
+  --red:    #ff5757;
+  --rim:    rgba(255,255,255,0.06);
+  --glass:  rgba(255,255,255,0.028);
+  --font-d: 'Syne', sans-serif;
+  --font-b: 'DM Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #000 !important; color: #fff !important; font-family: var(--font-b); }
+
+/* ── PAGE SHELL ── */
+.sj-page { min-height: 100vh; background: #000; position: relative; overflow-x: hidden; width: 100%; }
+
+.sj-glow {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 50% 40% at 5% 10%,  rgba(91,107,255,.1)  0%, transparent 65%),
+    radial-gradient(ellipse 40% 35% at 95% 85%,  rgba(0,229,200,.07)  0%, transparent 60%),
+    radial-gradient(ellipse 30% 25% at 55% 40%,  rgba(255,181,71,.04) 0%, transparent 70%);
+}
+.sj-grid {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.sj-body { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 64px 40px 140px; }
+
+/* ── HEADER ── */
+.sj-head { margin-bottom: 56px; animation: fadeUp .7s ease both; }
+
+.sj-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 18px; border-radius: 100px;
+  background: rgba(91,107,255,.08); border: 1px solid rgba(91,107,255,.22);
+  font-size: 10.5px; font-weight: 600; color: var(--cyan);
+  letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 22px;
+}
+.sj-eyebrow-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--cyan); box-shadow: 0 0 8px var(--cyan);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.15} }
+
+.sj-title {
+  font-family: var(--font-d);
+  font-size: clamp(32px, 4.5vw, 54px);
+  font-weight: 300; letter-spacing: -2.5px;
+  color: rgba(255,255,255,.65); line-height: 1.08;
+}
+.sj-title strong { font-weight: 800; color: #fff; }
+.sj-title .grad {
+  background: linear-gradient(110deg, #fff 0%, var(--neon) 50%, var(--cyan) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.sj-sub {
+  font-size: 14.5px; color: rgba(255,255,255,.28); font-weight: 300;
+  margin-top: 16px; line-height: 1.75; max-width: 520px;
+}
+
+/* ── SUMMARY STRIP ── */
+.sj-strip {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  margin-bottom: 40px; animation: fadeUp .7s .1s ease both;
+}
+.sj-strip-pill {
+  display: flex; align-items: center; gap: 9px;
+  padding: 10px 20px; border-radius: 12px;
+  background: var(--glass); border: 1px solid rgba(255,255,255,.07);
+  font-size: 12.5px; color: rgba(255,255,255,.35); font-weight: 400;
+}
+.sj-strip-val {
+  font-family: var(--font-d); font-size: 18px;
+  font-weight: 800; letter-spacing: -1px; color: #fff;
+}
+.sj-strip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── CARD ── */
+.sj-card {
+  background: var(--glass);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 22px; position: relative; overflow: hidden;
+}
+.sj-card::before {
+  content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(91,107,255,.35), rgba(0,229,200,.2), transparent);
+}
+
+/* ── TABLE ── */
+.sj-table-wrap { overflow-x: auto; }
+
+.sj-sec-eyebrow {
+  font-size: 10.5px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 2.5px; color: rgba(255,255,255,.28);
+  display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+  padding: 32px 38px 0;
+}
+.sj-sec-eyebrow::after { content:''; flex:1; height:1px; background:var(--rim); }
+
+.sj-table {
+  width: 100%; border-collapse: collapse;
+}
+.sj-table thead tr {
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.sj-table thead th {
+  padding: 14px 20px 14px;
+  font-size: 10.5px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 2px; color: rgba(255,255,255,.25);
+  white-space: nowrap;
+}
+.sj-table thead th:first-child { padding-left: 38px; }
+.sj-table thead th:last-child  { padding-right: 38px; }
+
+.sj-table tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  transition: background .2s;
+  animation: fadeUp .5s ease both;
+}
+.sj-table tbody tr:hover { background: rgba(255,255,255,.025); }
+.sj-table tbody tr:last-child { border-bottom: none; }
+
+.sj-table tbody td {
+  padding: 20px 20px;
+  font-size: 14px; color: rgba(255,255,255,.6); vertical-align: middle;
+}
+.sj-table tbody td:first-child { padding-left: 38px; }
+.sj-table tbody td:last-child  { padding-right: 38px; }
+
+/* ── TABLE CELLS ── */
+.job-title-cell strong {
+  font-family: var(--font-d); font-size: 15px;
+  font-weight: 700; color: #fff; letter-spacing: -.3px;
+  display: block; margin-bottom: 3px;
+}
+.job-title-cell span {
+  font-size: 11.5px; color: rgba(255,255,255,.22); font-weight: 300;
+}
+
+.level-badge {
+  display: inline-flex; padding: 4px 13px; border-radius: 100px;
+  font-size: 11.5px; font-weight: 600;
+  background: rgba(91,107,255,.1); border: 1px solid rgba(91,107,255,.22);
+  color: rgba(180,190,255,.85); white-space: nowrap;
+}
+
+/* Progress bar */
+.score-wrap { min-width: 140px; }
+.score-label {
+  display: flex; justify-content: space-between;
+  margin-bottom: 7px;
+}
+.score-num {
+  font-family: var(--font-d); font-size: 15px;
+  font-weight: 800; letter-spacing: -1px;
+}
+.score-pct { font-size: 11px; color: rgba(255,255,255,.25); }
+.score-track {
+  height: 6px; border-radius: 100px;
+  background: rgba(255,255,255,.06); overflow: hidden;
+}
+.score-fill {
+  height: 100%; border-radius: 100px;
+  width: 0; transition: width 1.2s cubic-bezier(.16,1,.3,1);
+}
+
+.elig-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 14px; border-radius: 100px;
+  font-size: 11.5px; font-weight: 600; white-space: nowrap;
+}
+.elig-high { background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.22); color: rgba(134,239,172,.9); }
+.elig-mid  { background: rgba(255,181,71,.1); border: 1px solid rgba(255,181,71,.22); color: rgba(255,213,140,.9); }
+.elig-low  { background: rgba(255,87,87,.1);  border: 1px solid rgba(255,87,87,.22);  color: rgba(255,160,160,.9); }
+.elig-dot  { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+.date-cell { font-size: 12.5px; color: rgba(255,255,255,.22); font-weight: 300; white-space: nowrap; }
+
+/* Action buttons */
+.action-cell { display: flex; gap: 8px; align-items: center; }
+.act-btn {
+  padding: 7px 16px; border-radius: 10px; border: none;
+  font-family: var(--font-b); font-size: 12.5px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+  transition: transform .18s, box-shadow .18s, opacity .18s;
+}
+.act-btn:hover { transform: translateY(-1px); }
+.act-btn-compare {
+  background: rgba(91,107,255,.12); border: 1px solid rgba(91,107,255,.25);
+  color: rgba(180,190,255,.9);
+}
+.act-btn-compare:hover { background: rgba(91,107,255,.2); box-shadow: 0 4px 16px rgba(91,107,255,.25); }
+.act-btn-delete {
+  background: rgba(255,87,87,.08); border: 1px solid rgba(255,87,87,.18);
+  color: rgba(255,160,160,.8);
+}
+.act-btn-delete:hover { background: rgba(255,87,87,.16); box-shadow: 0 4px 16px rgba(255,87,87,.2); }
+
+/* ── EMPTY / LOADING STATES ── */
+.sj-empty { padding: 70px 40px; text-align: center; }
+.sj-empty-icon { font-size: 48px; margin-bottom: 18px; opacity: .18; }
+.sj-empty-title { font-family: var(--font-d); font-size: 18px; font-weight: 700; color: rgba(255,255,255,.35); margin-bottom: 8px; }
+.sj-empty-sub { font-size: 13.5px; color: rgba(255,255,255,.18); font-weight: 300; line-height: 1.7; }
+
+.sj-loading { padding: 70px 40px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.sj-spinner {
+  width: 42px; height: 42px;
+  border: 2px solid rgba(255,255,255,.06);
+  border-top-color: var(--neon); border-radius: 50%;
+  animation: spin .85s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.sj-loading-lbl { font-size: 13px; color: rgba(255,255,255,.25); font-weight: 300; }
+
+/* ── MODAL ── */
+.sj-modal-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,.75); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn .25s ease;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.sj-modal {
+  width: min(560px, 92vw);
+  background: #0a0a10;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 24px; overflow: hidden;
+  animation: slideUp .3s cubic-bezier(.16,1,.3,1);
+  position: relative;
+}
+@keyframes slideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+
+.sj-modal::before {
+  content:''; position:absolute; top:0; left:10%; right:10%; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(91,107,255,.4), rgba(0,229,200,.25), transparent);
+}
+
+.modal-head { padding: 32px 36px 24px; border-bottom: 1px solid rgba(255,255,255,.06); }
+.modal-title {
+  font-family: var(--font-d); font-size: 20px;
+  font-weight: 700; color: #fff; margin-bottom: 6px; letter-spacing: -.5px;
+}
+.modal-sub { font-size: 13px; color: rgba(255,255,255,.28); font-weight: 300; }
+
+.modal-body { padding: 28px 36px; }
+.modal-lbl {
+  font-size: 10.5px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 2px; color: rgba(255,255,255,.28); margin-bottom: 10px;
+}
+.modal-select {
+  width: 100%; background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1); border-radius: 13px;
+  color: #fff; font-family: var(--font-b); font-size: 14px;
+  padding: 13px 40px 13px 16px; outline: none; appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba(255,255,255,0.3)' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat; background-position: right 14px center; background-size: 12px;
+  transition: border-color .25s, box-shadow .25s;
+}
+.modal-select option { background: #0a0a10; color: #fff; }
+.modal-select:focus { border-color: rgba(91,107,255,.5); box-shadow: 0 0 0 3px rgba(91,107,255,.12); }
+
+.modal-foot { padding: 0 36px 28px; display: flex; gap: 10px; }
+.modal-run-btn {
+  flex: 1; padding: 14px 20px; border-radius: 13px; border: none;
+  background: linear-gradient(135deg, var(--neon), #3a4aff);
+  color: #fff; font-family: var(--font-b); font-size: 14px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  box-shadow: 0 6px 28px rgba(91,107,255,.35);
+  transition: transform .2s, box-shadow .2s;
+}
+.modal-run-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(91,107,255,.55); }
+.modal-close-btn {
+  padding: 14px 24px; border-radius: 13px; border: 1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.04); color: rgba(255,255,255,.45);
+  font-family: var(--font-b); font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.modal-close-btn:hover { background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); }
+
+/* ── COMPARISON RESULT ── */
+.comp-section { margin-top: 50px; animation: fadeUp .6s ease both; }
+.comp-sec-eyebrow {
+  font-size: 10.5px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 2.5px; color: rgba(255,255,255,.28);
+  display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+}
+.comp-sec-eyebrow::after { content:''; flex:1; height:1px; background:var(--rim); }
+.comp-sec-title {
+  font-family: var(--font-d); font-size: clamp(20px,2.5vw,28px);
+  font-weight: 700; letter-spacing: -1px; color: #fff; margin-bottom: 24px;
+}
+
+/* Comparison card header */
+.comp-header {
+  padding: 38px 44px 30px;
+  border-bottom: 1px solid var(--rim);
+  display: flex; align-items: center; gap: 36px; flex-wrap: wrap;
+}
+.comp-ring { position: relative; width: 110px; height: 110px; flex-shrink: 0; }
+.comp-ring svg { transform: rotate(-90deg); }
+.comp-ring circle { fill: none; stroke-width: 7; stroke-linecap: round; }
+.ring-bg   { stroke: rgba(255,255,255,.06); }
+.ring-fill { transition: stroke-dashoffset 1.5s cubic-bezier(.16,1,.3,1); }
+.ring-green .ring-fill { stroke: var(--green); }
+.ring-amber .ring-fill { stroke: var(--amber); }
+.ring-red   .ring-fill { stroke: var(--red);   }
+.comp-ring-label {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.comp-ring-num {
+  font-family: var(--font-d); font-size: 26px;
+  font-weight: 800; letter-spacing: -1.5px; color: #fff;
+}
+.comp-ring-sub { font-size: 11px; color: rgba(255,255,255,.28); }
+
+.comp-info { flex: 1; }
+.comp-info-title {
+  font-family: var(--font-d); font-size: 21px;
+  font-weight: 700; color: #fff; letter-spacing: -.4px; margin-bottom: 10px;
+}
+.comp-meta { display: flex; flex-direction: column; gap: 5px; }
+.comp-meta-row { font-size: 13px; color: rgba(255,255,255,.35); font-weight: 300; }
+.comp-meta-row strong { color: rgba(255,255,255,.65); font-weight: 500; }
+
+/* Comparison body */
+.comp-body { padding: 34px 44px; }
+.comp-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.comp-col-title {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 2px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.comp-col-dot { width: 6px; height: 6px; border-radius: 50%; }
+.skill-chip {
+  display: inline-flex; padding: 6px 14px; border-radius: 100px;
+  font-size: 12.5px; font-weight: 500; margin: 0 5px 7px 0;
+}
+.chip-matched { background: rgba(34,197,94,.09); border: 1px solid rgba(34,197,94,.22); color: rgba(134,239,172,.9); }
+.chip-missing  { background: rgba(255,87,87,.09);  border: 1px solid rgba(255,87,87,.22);  color: rgba(255,160,160,.9); }
+
+.comp-insight {
+  margin-top: 28px; padding: 22px 26px; border-radius: 16px;
+  background: rgba(91,107,255,.05); border: 1px solid rgba(91,107,255,.15);
+}
+.comp-insight-title {
+  font-family: var(--font-d); font-size: 14px; font-weight: 700;
+  color: rgba(180,190,255,.9); margin-bottom: 7px;
+}
+.comp-insight-text { font-size: 13px; color: rgba(255,255,255,.35); font-weight: 300; line-height: 1.7; }
+
+/* ── ANIM ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── RESPONSIVE ── */
+@media(max-width:860px){
+  .sj-body { padding: 40px 20px 100px; }
+  .sj-table thead th:first-child, .sj-table tbody td:first-child { padding-left: 20px; }
+  .sj-table thead th:last-child, .sj-table tbody td:last-child { padding-right: 20px; }
+  .comp-header { flex-direction: column; align-items: flex-start; gap: 20px; padding: 26px 24px 20px; }
+  .comp-cols { grid-template-columns: 1fr; }
+  .comp-body { padding: 24px 22px; }
+  .sj-strip { gap: 10px; }
+}
+@media(max-width:600px){
+  .sj-strip-pill { flex-direction: column; text-align: center; padding: 14px 16px; }
+  .action-cell { flex-direction: column; align-items: flex-start; }
+}
+</style>
+
+<div class="sj-page">
+<div class="sj-glow"></div>
+<div class="sj-grid"></div>
+
+<div class="sj-body">
+
+  <!-- ── HEADER ── -->
+  <div class="sj-head">
+    <div class="sj-eyebrow"><div class="sj-eyebrow-dot"></div>Career Intelligence</div>
+    <div class="sj-title">
+      Your saved<br>
+      <strong>job analyses</strong>
+      &nbsp;<span class="grad">at a glance</span>
+    </div>
+    <div class="sj-sub">
+      Every job you've analyzed is tracked here — view match scores, compare against any resume, and spot skill gaps instantly.
+    </div>
+  </div>
+
+  <!-- ── SUMMARY STRIP (populated by JS) ── -->
+  <div class="sj-strip" id="summaryStrip">
+    <div class="sj-strip-pill">
+      <div class="sj-strip-dot" style="background:var(--neon)"></div>
+      <div><div class="sj-strip-val" id="statTotal">—</div>Jobs Analyzed</div>
+    </div>
+    <div class="sj-strip-pill">
+      <div class="sj-strip-dot" style="background:var(--green)"></div>
+      <div><div class="sj-strip-val" id="statAvg">—</div>Avg Match Score</div>
+    </div>
+    <div class="sj-strip-pill">
+      <div class="sj-strip-dot" style="background:var(--cyan)"></div>
+      <div><div class="sj-strip-val" id="statTop">—</div>Best Match</div>
+    </div>
+    <div class="sj-strip-pill">
+      <div class="sj-strip-dot" style="background:var(--amber)"></div>
+      <div><div class="sj-strip-val" id="statElig">—</div>Strong Matches</div>
+    </div>
+  </div>
+
+  <!-- ── TABLE CARD ── -->
+  <div class="sj-card" style="animation: fadeUp .7s .15s ease both;">
+    <div class="sj-sec-eyebrow">Saved Records</div>
+    <div class="sj-table-wrap">
+
+      <!-- Loading -->
+      <div id="tableLoading" class="sj-loading">
+        <div class="sj-spinner"></div>
+        <div class="sj-loading-lbl">Loading your saved job analyses…</div>
+      </div>
+
+      <!-- Empty -->
+      <div id="tableEmpty" class="sj-empty" style="display:none">
+        <div class="sj-empty-icon">📌</div>
+        <div class="sj-empty-title">No saved analyses yet</div>
+        <div class="sj-empty-sub">
+          Analyze a job description first and your results<br>
+          will be saved here automatically for comparison.
+        </div>
+      </div>
+
+      <!-- Table -->
+      <table class="sj-table" id="jobsTable" style="display:none">
+        <thead>
+          <tr>
+            <th>Job Title</th>
+            <th>Level</th>
+            <th>Match Score</th>
+            <th>Eligibility</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <!-- ✅ id="savedJobsTable" PRESERVED -->
+        <tbody id="savedJobsTable"></tbody>
+      </table>
+
+    </div>
+  </div>
+
+  <!-- ── COMPARISON RESULT ── -->
+  <!-- ✅ id="comparisonResult" PRESERVED -->
+  <div id="comparisonResult"></div>
+
+</div>
+</div>
+
+
+<!-- ✅ ALL BACKEND LOGIC 100% PRESERVED — only UI rendering enhanced ✅ -->
+<script>
+
+let resumesCache = []
+
+/* ── Score helpers ── */
+function scoreColor(s){ return s >= 80 ? "var(--green)" : s >= 60 ? "var(--amber)" : "var(--red)"; }
+function scoreTrackColor(s){ return s >= 80 ? "#22c55e" : s >= 60 ? "#ffb547" : "#ff5757"; }
+function ringClass(s){ return s >= 80 ? "ring-green" : s >= 60 ? "ring-amber" : "ring-red"; }
+function eligClass(t){
+  const v = (t||"").toLowerCase();
+  if(v.includes("strong")||v.includes("high")||v.includes("excell")) return "elig-high";
+  if(v.includes("partial")||v.includes("moderate")||v.includes("consider")) return "elig-mid";
+  return "elig-low";
+}
+
+/* ── Build animated ring SVG ── */
+function buildRingSVG(score, id){
+  const r = 46, circ = 2 * Math.PI * r;
+  return `
+    <div class="comp-ring ${ringClass(score)}" id="${id}">
+      <svg width="110" height="110" viewBox="0 0 110 110">
+        <circle class="ring-bg"   cx="55" cy="55" r="${r}" stroke-dasharray="${circ}" stroke-dashoffset="0"/>
+        <circle class="ring-fill" cx="55" cy="55" r="${r}"
+          stroke-dasharray="${circ}" stroke-dashoffset="${circ}" data-target="${circ - (score/100)*circ}" id="${id}-fill"/>
+      </svg>
+      <div class="comp-ring-label">
+        <div class="comp-ring-num">${score}%</div>
+        <div class="comp-ring-sub">match</div>
+      </div>
+    </div>`;
+}
+function animateRing(fillId){
+  setTimeout(()=>{
+    const el = document.getElementById(fillId);
+    if(el) el.style.strokeDashoffset = el.dataset.target;
+  }, 120);
+}
+
+// =========================
+// ✅ LOAD SAVED JOBS — logic preserved, UI enhanced
+// =========================
+async function loadSavedJobs(){
+  document.getElementById("tableLoading").style.display = "flex";
+  document.getElementById("tableEmpty").style.display  = "none";
+  document.getElementById("jobsTable").style.display   = "none";
+
+  const res  = await fetch("/api/saved-jobs");
+  const jobs = await res.json();
+
+  document.getElementById("tableLoading").style.display = "none";
+
+  if(!jobs || jobs.length === 0){
+    document.getElementById("tableEmpty").style.display = "block";
+    updateStrip([]);
+    return;
+  }
+
+  document.getElementById("jobsTable").style.display = "table";
+  updateStrip(jobs);
+
+  const table = document.getElementById("savedJobsTable");
+  table.innerHTML = "";
+
+  jobs.forEach((job, idx) => {
+    const color  = scoreTrackColor(job.score);
+    const eCls   = eligClass(job.eligibility);
+    const row    = document.createElement("tr");
+    row.style.animationDelay = (idx * 0.07) + "s";
+    row.innerHTML = `
+      <td class="job-title-cell">
+        <strong>${job.title || "Untitled Role"}</strong>
+        <span>Saved job analysis</span>
+      </td>
+      <td><span class="level-badge">${job.job_level || "N/A"}</span></td>
+      <td>
+        <div class="score-wrap">
+          <div class="score-label">
+            <span class="score-num" style="color:${color}">${job.score}%</span>
+            <span class="score-pct">match</span>
+          </div>
+          <div class="score-track">
+            <div class="score-fill" style="background:${color}" data-width="${job.score}"></div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <span class="elig-badge ${eCls}">
+          <span class="elig-dot"></span>
+          ${job.eligibility}
+        </span>
+      </td>
+      <td class="date-cell">${job.date}</td>
+      <td>
+        <div class="action-cell">
+          <button class="act-btn act-btn-compare" onclick="openCompareModal(${job.id})">
+            🔁 Compare
+          </button>
+          <button class="act-btn act-btn-delete" onclick="deleteSavedJob(${job.id})">
+            🗑 Delete
+          </button>
+        </div>
+      </td>
+    `;
+    table.appendChild(row);
+  });
+
+  /* Animate progress bars after paint */
+  setTimeout(()=>{
+    document.querySelectorAll(".score-fill[data-width]").forEach(el=>{
+      el.style.width = el.dataset.width + "%";
+    });
+  }, 150);
+}
+
+/* ── Summary strip ── */
+function updateStrip(jobs){
+  document.getElementById("statTotal").textContent = jobs.length;
+  if(!jobs.length){ return; }
+  const avg  = Math.round(jobs.reduce((a,j)=>a+j.score,0)/jobs.length);
+  const top  = Math.max(...jobs.map(j=>j.score));
+  const strong = jobs.filter(j=>j.score>=70).length;
+  document.getElementById("statAvg").textContent  = avg + "%";
+  document.getElementById("statTop").textContent  = top + "%";
+  document.getElementById("statElig").textContent = strong;
+}
+
+loadSavedJobs();
+
+// =========================
+// ✅ DELETE SAVED JOB — 100% preserved
+// =========================
+async function deleteSavedJob(jobId){
+  if(!confirm("Delete this saved job analysis?")) return;
+  await fetch("/api/delete-saved-job/"+jobId,{ method:"DELETE" });
+  loadSavedJobs();
+  document.getElementById("comparisonResult").innerHTML = "";
+}
+
+// =========================
+// ✅ OPEN COMPARE MODAL — logic preserved, UI enhanced
+// =========================
+async function openCompareModal(jobId){
+  const res     = await fetch("/api/resume-history");
+  const resumes = await res.json();
+
+  let options = "";
+  resumes.forEach(r=>{
+    options += `<option value="${r.id}">${r.filename}</option>`;
+  });
+
+  /* Remove any existing modal */
+  const existing = document.getElementById("compareModal");
+  if(existing) existing.remove();
+
+  const modal = `
+    <div id="compareModal" class="sj-modal-overlay" onclick="handleOverlayClick(event)">
+      <div class="sj-modal">
+        <div class="modal-head">
+          <div class="modal-title">🔁 Compare Resume vs Job</div>
+          <div class="modal-sub">Choose which resume to run the comparison against this job analysis.</div>
+        </div>
+        <div class="modal-body">
+          <div class="modal-lbl">Select Resume</div>
+          <!-- ✅ id="resumeSelect" PRESERVED -->
+          <select id="resumeSelect" class="modal-select">${options}</select>
+        </div>
+        <div class="modal-foot">
+          <button class="modal-run-btn" onclick="runResumeJobCompare(${jobId})">
+            ⚡ Run Comparison
+          </button>
+          <button class="modal-close-btn" onclick="closeModal()">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.insertAdjacentHTML("beforeend", modal);
+}
+
+/* Close on overlay click */
+function handleOverlayClick(e){
+  if(e.target.id === "compareModal") closeModal();
+}
+
+// =========================
+// ✅ CLOSE MODAL — 100% preserved
+// =========================
+function closeModal(){
+  const modal = document.getElementById("compareModal");
+  if(modal) modal.remove();
+}
+
+// =========================
+// ✅ RUN COMPARE — logic preserved, result UI enhanced
+// =========================
+async function runResumeJobCompare(jobId){
+  const resumeId = document.getElementById("resumeSelect").value;
+
+  const res  = await fetch("/api/compare-resume-job",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ resume_id: resumeId, job_id: jobId })
+  });
+  const data = await res.json();
+
+  closeModal();
+
+  const score      = data.score || 0;
+  const matched    = data.matched_skills || [];
+  const missing    = data.missing_skills || [];
+  const rName      = data.resume_name  || "Your Resume";
+  const jTitle     = data.job_title    || "This Job";
+
+  const matchedChips = matched.length
+    ? matched.map(s=>`<span class="skill-chip chip-matched">${s}</span>`).join("")
+    : `<span style="font-size:13px;color:rgba(255,255,255,.2);font-style:italic">No matched skills detected</span>`;
+
+  const missingChips = missing.length
+    ? missing.map(s=>`<span class="skill-chip chip-missing">${s}</span>`).join("")
+    : `<span style="font-size:13px;color:rgba(255,255,255,.2);font-style:italic">No gaps — excellent fit!</span>`;
+
+  /* ✅ id="comparisonResult" innerHTML — preserved, UI enhanced */
+  document.getElementById("comparisonResult").innerHTML = `
+    <div class="comp-section">
+      <div class="comp-sec-eyebrow">Comparison Result</div>
+      <div class="comp-sec-title">Resume vs Job Deep Analysis</div>
+      <div class="sj-card">
+
+        <div class="comp-header">
+          ${buildRingSVG(score, "compRing")}
+          <div class="comp-info">
+            <div class="comp-info-title">🎯 Resume vs Job Analysis</div>
+            <div class="comp-meta">
+              <div class="comp-meta-row"><strong>Resume:</strong> ${rName}</div>
+              <div class="comp-meta-row"><strong>Job:</strong> ${jTitle}</div>
+              <div class="comp-meta-row">
+                ${matched.length} skill${matched.length!==1?'s':''} matched &nbsp;·&nbsp;
+                ${missing.length} gap${missing.length!==1?'s':''} found
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp-body">
+          <div class="comp-cols">
+            <div>
+              <div class="comp-col-title">
+                <div class="comp-col-dot" style="background:var(--green)"></div>
+                ✅ Matched Skills (${data.matched_count || matched.length})
+              </div>
+              ${matchedChips}
+            </div>
+            <div>
+              <div class="comp-col-title">
+                <div class="comp-col-dot" style="background:var(--red)"></div>
+                ❌ Missing Skills
+              </div>
+              ${missingChips}
+            </div>
+          </div>
+
+          <div class="comp-insight">
+            <div class="comp-insight-title">💡 Skill Gap Insight</div>
+            <div class="comp-insight-text">
+              ${missing.length
+                ? `You're missing <strong style="color:rgba(255,160,160,.85)">${missing.length} skill${missing.length!==1?'s':''}</strong> for this role. Adding <strong style="color:#fff">${missing.slice(0,3).join(", ")}${missing.length>3?" and more":""}</strong> to your resume could significantly boost your match score and placement chances.`
+                : `Outstanding — your resume covers all the detected skills for this role. Focus on demonstrating real-world experience and impact in your applications.`
+              }
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>`;
+
+  animateRing("compRing-fill");
+
+  /* Scroll to result */
+  setTimeout(()=>{
+    document.getElementById("comparisonResult").scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 200);
+}
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="text-center mb-5">
+    <h1 class="fw-bold">Subscription & Billing</h1>
+    <p class="text-light">Manage your subscription and billing details.</p>
+</div>
+
+<div class="card-glass p-5 text-center">
+
+    <h3 id="planName">Loading...</h3>
+    <p id="billingCycle"></p>
+    <p id="expiryDate"></p>
+
+    <div class="mt-4">
+        <a href="/billing-portal"
+           class="btn btn-primary me-3">
+           Manage Billing
+        </a>
+
+        <a href="/pricing"
+           class="btn btn-outline-light">
+           Change Plan
+        </a>
+    </div>
+
+</div>
+
+<script>
+async function loadBilling() {
+
+    const res = await fetch("/api/user-info");
+    const data = await res.json();
+
+    document.getElementById("planName").innerText =
+        "Current Plan: " + data.plan.toUpperCase();
+
+    document.getElementById("billingCycle").innerText =
+        data.billing_cycle ? "Billing: " + data.billing_cycle : "";
+
+    document.getElementById("expiryDate").innerText =
+        data.expiry ? "Renewal: " + data.expiry : "";
+}
+
+loadBilling();
+</script>
+
+{% endblock %}

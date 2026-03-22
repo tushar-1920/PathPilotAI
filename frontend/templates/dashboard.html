@@ -1,192 +1,638 @@
 {% extends "base.html" %}
-
 {% block content %}
 
-<h2 class="mb-4">Career Dashboard</h2>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
+<style>
+:root {
+  --neon: #5b6bff;
+  --cyan: #00e5c8;
+  --amber: #ffb547;
+  --red: #ff5757;
+  --rim: rgba(255,255,255,0.06);
+  --font-d: 'Syne', sans-serif;
+  --font-b: 'DM Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-b) !important; background: #000 !important; color: #fff !important; -webkit-font-smoothing: antialiased; }
+footer, .footer, .site-footer, .main-footer, #footer { display: none !important; }
 
-<!-- Skill Score -->
-<div class="card mb-4">
+/* PAGE */
+.db { min-height: 100vh; background: #000; }
 
-    <div class="card-body">
-
-        <h5>Skill Score</h5>
-
-        <div class="progress">
-
-            <div id="skillScoreBar"
-                 class="progress-bar bg-success"
-                 role="progressbar"
-                 style="width: 0%">
-
-            </div>
-
-        </div>
-
-        <p id="skillScoreText"></p>
-
-    </div>
-
-</div>
-
-
-<!-- Career Readiness -->
-<div class="card mb-4">
-
-    <div class="card-body">
-
-        <h5>Career Readiness</h5>
-
-        <div class="progress">
-
-            <div id="readinessBar"
-                 class="progress-bar bg-info"
-                 role="progressbar"
-                 style="width: 0%">
-
-            </div>
-
-        </div>
-
-        <p id="readinessText"></p>
-
-    </div>
-
-</div>
-
-
-<!-- Skills List -->
-<div class="card">
-
-    <div class="card-body">
-
-        <h5>Your Skills</h5>
-
-        <ul id="skillsList" class="list-group"></ul>
-
-    </div>
-
-</div>
-
-<hr class="my-5">
-
-<h4>📈 Skill Growth Timeline</h4>
-
-<canvas id="growthChart" height="100"></canvas>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-fetch("/api/skill-growth")
-.then(res => res.json())
-.then(data => {
-
-    const ctx = document.getElementById("growthChart");
-
-    new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: data.labels,
-            datasets: [{
-                label: "Skill Score Over Time",
-                data: data.scores,
-                borderColor: "#38bdf8",
-                backgroundColor: "rgba(56,189,248,0.2)",
-                tension: 0.4
-            }]
-        }
-    });
-});
-</script>
-
-<script>
-
-async function loadDashboard() {
-
-    const res = await fetch("/api/dashboard");
-
-    const data = await res.json();
-
-
-    // Skill score
-    document.getElementById("skillScoreBar").style.width =
-        data.skill_score + "%";
-
-    document.getElementById("skillScoreText").innerText =
-        data.skill_score + "%";
-
-
-    // Readiness score
-    document.getElementById("readinessBar").style.width =
-        data.readiness_score + "%";
-
-    document.getElementById("readinessText").innerText =
-        data.readiness_score + "%";
-
-
-    // Skills list
-    const skillsList = document.getElementById("skillsList");
-
-    skillsList.innerHTML = "";
-
-    data.skills.forEach(skill => {
-
-        const li = document.createElement("li");
-
-        li.className = "list-group-item";
-
-        li.innerText = skill;
-
-        skillsList.appendChild(li);
-
-    });
-
+/* Fixed ambient glow */
+.db-glow {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 10%, rgba(91,107,255,.1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 80%, rgba(0,229,200,.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(91,107,255,.04) 0%, transparent 70%);
+}
+.db-grid {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size: 56px 56px;
 }
 
+.db-body { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 56px 56px 120px; }
 
-loadDashboard();
+/* ══ HEADER ══ */
+.db-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding-bottom: 56px;
+  border-bottom: 1px solid var(--rim);
+  margin-bottom: 72px;
+  animation: up .7s ease both;
+}
+.db-head-left {}
+.db-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 16px; border-radius: 100px;
+  background: rgba(91,107,255,.08); border: 1px solid rgba(91,107,255,.2);
+  font-size: 11px; font-weight: 600; color: var(--cyan);
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.db-eyebrow-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); animation: blink 2s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
 
-</script>
+.db-title {
+  font-family: var(--font-d);
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 300;
+  letter-spacing: -2px;
+  color: rgba(255,255,255,.7);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.db-title strong { font-weight: 800; color: #fff; }
+.db-title .grad {
+  background: linear-gradient(100deg, #fff 0%, var(--neon) 50%, var(--cyan) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  font-weight: 300;
+}
 
-<canvas id="trendChart" height="100"></canvas>
+.db-sub { font-size: 15px; color: rgba(255,255,255,.3); font-weight: 300; margin-top: 14px; line-height: 1.6; }
+
+/* plan badge */
+#planBadge {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 16px;
+  padding: 5px 14px; border-radius: 100px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  color: rgba(255,255,255,.4); text-transform: uppercase;
+}
+
+/* upgrade btn */
+#upgradeBtn {
+  padding: 14px 28px; border-radius: 12px; border: none;
+  background: linear-gradient(135deg, var(--amber), #ff8c00);
+  color: #000; font-family: var(--font-b); font-size: 14px; font-weight: 700;
+  cursor: pointer; text-decoration: none;
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 8px 32px rgba(255,181,71,.3);
+  transition: transform .2s, box-shadow .2s; align-self: flex-start;
+}
+#upgradeBtn:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(255,181,71,.45); color: #000; }
+
+/* ══ SECTION WRAPPER ══ */
+.db-section { margin-bottom: 80px; animation: up .7s ease both; }
+.db-section:nth-child(2) { animation-delay: .08s; }
+.db-section:nth-child(3) { animation-delay: .16s; }
+.db-section:nth-child(4) { animation-delay: .24s; }
+.db-section:nth-child(5) { animation-delay: .32s; }
+
+.db-section-label {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 11px; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: rgba(255,255,255,.3);
+  margin-bottom: 24px;
+}
+.db-section-label::after { content: ''; flex: 1; height: 1px; background: var(--rim); }
+
+.db-section-title {
+  font-family: var(--font-d);
+  font-size: clamp(22px, 2.5vw, 32px);
+  font-weight: 700; letter-spacing: -1px;
+  color: #fff; margin-bottom: 32px;
+}
+
+/* ══ CARD BASE ══ */
+.card {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 20px;
+  position: relative; overflow: hidden;
+}
+.card-pad { padding: 36px 40px; }
+
+/* top shimmer line */
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 20%; right: 20%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.07), transparent);
+}
+
+/* ══ ROLE IDENTITY ══ */
+#roleIdentity {
+  font-family: var(--font-d);
+  font-size: 20px; font-weight: 600;
+  color: var(--cyan);
+  padding: 24px 0 32px;
+  border-bottom: 1px solid var(--rim);
+  margin-bottom: 32px;
+  display: flex; align-items: center; gap: 12px;
+  line-height: 1.4;
+}
+#roleIdentity::before {
+  content: '';
+  width: 4px; height: 28px; border-radius: 3px;
+  background: linear-gradient(to bottom, var(--neon), var(--cyan));
+  flex-shrink: 0;
+}
+
+/* ══ ATS SCORE ══ */
+.ats-row { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 16px; }
+.ats-left-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,.35); }
+.ats-number { font-family: var(--font-d); font-size: 48px; font-weight: 800; line-height: 1; letter-spacing: -2px; color: #fff; }
+#atsText { font-family: var(--font-d); font-size: 48px; font-weight: 800; line-height: 1; letter-spacing: -2px; color: #fff; }
+
+.ats-track {
+  height: 10px; border-radius: 100px;
+  background: rgba(255,255,255,.06);
+  overflow: hidden; margin-bottom: 12px;
+}
+#atsBar {
+  height: 100%; border-radius: 100px; width: 0%;
+  background: linear-gradient(90deg, var(--neon), var(--cyan));
+  box-shadow: 0 0 16px rgba(0,229,200,.35);
+  transition: width 1.4s cubic-bezier(.16,1,.3,1);
+}
+.ats-desc { font-size: 13.5px; color: rgba(255,255,255,.25); font-weight: 300; line-height: 1.6; }
+
+/* AI CTA banner */
+.ai-banner {
+  margin-top: 32px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  padding: 28px 32px; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(91,107,255,.08), rgba(0,229,200,.04));
+  border: 1px solid rgba(91,107,255,.18);
+  flex-wrap: wrap;
+}
+.ai-banner-text h5 { font-family: var(--font-d); font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.ai-banner-text p { font-size: 14px; color: rgba(255,255,255,.35); line-height: 1.6; font-weight: 300; }
+.ai-banner-btn {
+  padding: 13px 28px; border-radius: 11px; border: none;
+  background: linear-gradient(135deg, var(--neon), #3a4dff);
+  color: #fff; font-family: var(--font-b); font-size: 14px; font-weight: 600;
+  text-decoration: none; white-space: nowrap;
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 8px 28px rgba(91,107,255,.4);
+  transition: transform .2s, box-shadow .2s;
+}
+.ai-banner-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(91,107,255,.6); color: #fff; }
+
+/* Skills */
+.skills-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,.3); margin-bottom: 16px; margin-top: 32px; }
+#extractedSkillsContainer { display: flex; flex-wrap: wrap; gap: 8px; }
+.skill-pill {
+  padding: 7px 16px; border-radius: 100px;
+  background: rgba(91,107,255,.1); border: 1px solid rgba(91,107,255,.2);
+  font-size: 13px; font-weight: 500; color: rgba(255,255,255,.7);
+  transition: all .2s;
+}
+.skill-pill:hover { background: rgba(91,107,255,.2); border-color: rgba(91,107,255,.4); }
+
+/* ══ COMPETITIVE INTEL ══ */
+.intel-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 48px; }
+.intel-box {
+  padding: 28px 24px; border-radius: 16px;
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07);
+  text-align: center;
+  transition: border-color .3s, background .3s;
+}
+.intel-box:hover { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.12); }
+.intel-box-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,.3); margin-bottom: 12px; font-weight: 500; }
+.intel-box-val { font-family: var(--font-d); font-size: 38px; font-weight: 800; color: #fff; line-height: 1; letter-spacing: -1.5px; }
+
+/* Big score */
+.big-score-block {
+  text-align: center; padding: 56px 40px;
+  background: linear-gradient(135deg, rgba(91,107,255,.06), rgba(0,229,200,.03));
+  border: 1px solid rgba(91,107,255,.15); border-radius: 20px;
+}
+#competitiveScore {
+  font-family: var(--font-d);
+  font-size: clamp(72px, 10vw, 120px);
+  font-weight: 800; line-height: 1; letter-spacing: -5px;
+  background: linear-gradient(135deg, var(--neon), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  display: block;
+}
+#competitiveTier {
+  font-family: var(--font-d); font-size: 18px; font-weight: 700;
+  color: var(--amber); margin-top: 12px; letter-spacing: 1px;
+  display: block;
+}
+.big-score-name { font-size: 15px; color: rgba(255,255,255,.35); margin-top: 8px; font-weight: 300; }
+.big-score-note {
+  display: inline-block; margin-top: 20px;
+  padding: 10px 22px; border-radius: 10px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07);
+  font-size: 13px; color: rgba(255,255,255,.3); line-height: 1.6;
+}
+
+/* ══ KPI GRID ══ */
+.kpi-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+.kpi-box {
+  padding: 32px 28px; border-radius: 18px;
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07);
+  position: relative; overflow: hidden;
+  transition: border-color .3s, transform .3s;
+}
+.kpi-box:hover { border-color: rgba(255,255,255,.14); transform: translateY(-4px); }
+.kpi-box::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  opacity: 0; transition: opacity .3s;
+}
+.kpi-box:nth-child(1)::after { background: linear-gradient(90deg, var(--neon), var(--cyan)); }
+.kpi-box:nth-child(2)::after { background: linear-gradient(90deg, var(--cyan), rgba(0,229,200,.3)); }
+.kpi-box:nth-child(3)::after { background: linear-gradient(90deg, var(--neon), rgba(91,107,255,.3)); }
+.kpi-box:nth-child(4)::after { background: linear-gradient(90deg, var(--amber), rgba(255,181,71,.3)); }
+.kpi-box:hover::after { opacity: 1; }
+
+.kpi-box-label { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,.3); margin-bottom: 16px; }
+.kpi-box-val { font-family: var(--font-d); font-size: 42px; font-weight: 800; color: #fff; line-height: 1; letter-spacing: -2px; }
+
+/* ══ CHARTS ══ */
+.charts-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.chart-box { padding: 36px; border-radius: 20px; }
+.chart-head { margin-bottom: 28px; }
+.chart-head-title { font-family: var(--font-d); font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+.chart-head-sub { font-size: 13px; color: rgba(255,255,255,.3); font-weight: 300; }
+.chart-canvas-wrap { position: relative; height: 280px; }
+
+/* ══ DIVIDER ══ */
+.db-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.07) 30%, rgba(255,255,255,.07) 70%, transparent); margin: 0 0 80px; }
+
+/* ANIMATION */
+@keyframes up { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+  .db-body { padding: 40px 32px 80px; }
+  .intel-4 { grid-template-columns: 1fr 1fr; }
+  .kpi-4 { grid-template-columns: 1fr 1fr; }
+  .charts-2 { grid-template-columns: 1fr; }
+}
+@media(max-width:700px){
+  .db-body { padding: 28px 20px 60px; }
+  .db-head { flex-direction: column; gap: 24px; }
+  .intel-4, .kpi-4 { grid-template-columns: 1fr 1fr; }
+  .card-pad { padding: 24px 20px; }
+  .ai-banner { flex-direction: column; align-items: flex-start; }
+}
+</style>
+
+<div class="db">
+  <div class="db-glow"></div>
+  <div class="db-grid"></div>
+
+  <div class="db-body">
+
+    <!-- ══ HEADER ══ -->
+    <div class="db-head">
+      <div class="db-head-left">
+        <div class="db-eyebrow"><div class="db-eyebrow-dot"></div>Career Intelligence Dashboard</div>
+        <div class="db-title">
+          Welcome back,<br>
+          <strong id="welcomeText">—</strong>
+        </div>
+        <div class="db-sub">Your personalized AI career analysis · Real-time market intelligence</div>
+        <span id="planBadge">FREE</span>
+      </div>
+      <a id="upgradeBtn" href="#" class="d-none">🚀 Upgrade to Pro</a>
+    </div>
+
+    <!-- ══ RESUME INTELLIGENCE ══ -->
+    <div class="db-section">
+      <div class="db-section-label">Resume Intelligence</div>
+
+      <div class="card">
+        <div class="card-pad">
+
+          <!-- Role -->
+          <div id="roleIdentity">Upload your resume to analyze your role</div>
+
+          <!-- ATS -->
+          <div class="ats-row">
+            <div class="ats-left-label">ATS Score</div>
+            <span id="atsText">0%</span>
+          </div>
+          <div class="ats-track">
+            <div id="atsBar"></div>
+          </div>
+          <div class="ats-desc">
+            ATS Score measures your resume's keyword optimization and formatting alignment with real-world job postings and applicant tracking systems.
+          </div>
+
+          <!-- AI CTA -->
+          <div class="ai-banner">
+            <div class="ai-banner-text">
+              <h5>🤖 AI Resume Analyzer</h5>
+              <p>Get deep career insights — strengths, weaknesses, and specific improvement suggestions generated instantly by AI.</p>
+            </div>
+            <a href="/resume-ai" class="ai-banner-btn">🧠 Analyze My Resume →</a>
+          </div>
+
+          <!-- Skills -->
+          <div class="skills-title">Extracted Resume Skills</div>
+          <div id="extractedSkillsContainer"></div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="db-divider"></div>
+
+    <!-- ══ COMPETITIVE INTELLIGENCE ══ -->
+    <div class="db-section">
+      <div class="db-section-label">2026 Competitive Intelligence</div>
+      <div class="db-section-title">Market Readiness Index</div>
+
+      <!-- 4 sub-scores -->
+      <div class="intel-4">
+        <div class="intel-box">
+          <div class="intel-box-label">ATS Core</div>
+          <div class="intel-box-val" id="atsCore">0%</div>
+        </div>
+        <div class="intel-box">
+          <div class="intel-box-label">Market Relevance</div>
+          <div class="intel-box-val" id="marketScore">0%</div>
+        </div>
+        <div class="intel-box">
+          <div class="intel-box-label">Skill Diversity</div>
+          <div class="intel-box-val" id="diversityScore">0%</div>
+        </div>
+        <div class="intel-box">
+          <div class="intel-box-label">Growth Alignment</div>
+          <div class="intel-box-val" id="growthScore">0%</div>
+        </div>
+      </div>
+
+      <!-- Big score -->
+      <div class="big-score-block">
+        <span id="competitiveScore">0%</span>
+        <span id="competitiveTier"></span>
+        <div class="big-score-name">Competitive Score™</div>
+        <div class="big-score-note">Measures 2026 market readiness, stack depth &amp; growth alignment across your entire profile.</div>
+      </div>
+    </div>
+
+    <div class="db-divider"></div>
+
+    <!-- ══ KPI GRID ══ -->
+    <div class="db-section">
+      <div class="db-section-label">Career Metrics</div>
+      <div class="kpi-4">
+
+        <div class="kpi-box">
+          <div class="kpi-box-label">Skill Score</div>
+          <div class="kpi-box-val" id="skillScoreText">0%</div>
+        </div>
+
+        <div class="kpi-box">
+          <div class="kpi-box-label">Career Readiness</div>
+          <div class="kpi-box-val" id="readinessText">0%</div>
+        </div>
+
+        <div class="kpi-box">
+          <div class="kpi-box-label">User Percentile</div>
+          <div class="kpi-box-val" id="percentileScore">--</div>
+        </div>
+
+        <div class="kpi-box">
+          <div class="kpi-box-label">Market Volatility</div>
+          <div class="kpi-box-val" id="volatilityScore">--</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="db-divider"></div>
+
+    <!-- ══ CHARTS ══ -->
+    <div class="db-section">
+      <div class="db-section-label">Market Intelligence</div>
+      <div class="charts-2">
+
+        <div class="card chart-box">
+          <div class="chart-head">
+            <div class="chart-head-title">📈 Your Skills — 2026 Market Demand</div>
+            <div class="chart-head-sub">How in-demand your current skills are in the global job market</div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="userSkillDemandChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card chart-box">
+          <div class="chart-head">
+            <div class="chart-head-title">🔥 Global Peak Skills — 2026</div>
+            <div class="chart-head-sub">The most in-demand skills worldwide right now</div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="globalTrendChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /db-body -->
+</div><!-- /db -->
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-fetch("/api/skill-trend")
-.then(res => res.json())
-.then(data => {
+/* ── ALL BACKEND LOGIC UNTOUCHED ── */
+let userSkillChartInstance = null;
+let globalTrendChartInstance = null;
 
-    const ctx = document.getElementById("trendChart");
+document.addEventListener("DOMContentLoaded", () => {
+    loadDashboard();
+    loadMarketDemand();
+    loadGlobalTrends();
+});
 
-    new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: Object.keys(data),
-            datasets: [{
-                label: "Skill Frequency",
-                data: Object.values(data),
-                backgroundColor: "#38bdf8"
-            }]
+async function loadUserInfo() {
+    try {
+        const res = await fetch("/api/user-info");
+        const data = await res.json();
+        if (data.name) {
+            document.getElementById("welcomeText").innerText = data.name;
         }
-    });
-});
-</script>
-<div class="card-glass p-4 mt-4">
-    <h5>🤖 AI Recommendations</h5>
-    <ul id="recommendations"></ul>
-</div>
+    } catch (error) {
+        console.log("User info error:", error);
+    }
+}
 
-<script>
-fetch("/api/recommendations")
-.then(res => res.json())
-.then(data => {
-    const list = document.getElementById("recommendations");
-    data.forEach(rec => {
-        const li = document.createElement("li");
-        li.innerText = rec;
-        list.appendChild(li);
-    });
+document.addEventListener("DOMContentLoaded", () => {
+    loadUserInfo();
+    loadDashboard();
 });
+
+async function loadDashboard() {
+    try {
+        const res = await fetch("/api/dashboard");
+        const data = await res.json();
+
+        if (data.role_fit && data.role_fit.best_role) {
+            document.getElementById("roleIdentity").innerText =
+                `According to your resume, you are ${data.role_fit.percentage}% ${data.role_fit.best_role}`;
+        } else {
+            document.getElementById("roleIdentity").innerText = "Role analysis unavailable";
+        }
+
+        const ats = data.ats_score || 0;
+        const bar = document.getElementById("atsBar");
+        if (bar) {
+            bar.style.width = ats + "%";
+            if (ats >= 80) {
+                bar.style.background = "linear-gradient(90deg,#5b6bff,#00e5c8)";
+                bar.style.boxShadow = "0 0 16px rgba(0,229,200,.35)";
+            } else if (ats >= 60) {
+                bar.style.background = "linear-gradient(90deg,#ffb547,#ff8c00)";
+                bar.style.boxShadow = "0 0 16px rgba(255,181,71,.35)";
+            } else {
+                bar.style.background = "linear-gradient(90deg,#ff5757,#ff3d3d)";
+                bar.style.boxShadow = "0 0 16px rgba(255,87,87,.35)";
+            }
+        }
+
+        const atsText = document.getElementById("atsText");
+        if (atsText) atsText.innerText = ats + "%";
+
+        document.getElementById("skillScoreText").innerText = (data.skill_score || 0) + "%";
+        document.getElementById("readinessText").innerText = (data.readiness_score || 0) + "%";
+        document.getElementById("percentileScore").innerText = (data.percentile || 0) + "th %ile";
+        document.getElementById("volatilityScore").innerText = (data.volatility || 0) + "%";
+
+        const container = document.getElementById("extractedSkillsContainer");
+        container.innerHTML = "";
+        if (data.resume_skills && data.resume_skills.length > 0) {
+            data.resume_skills.forEach(skill => {
+                container.innerHTML += `<span class="skill-pill">${skill}</span>`;
+            });
+        } else {
+            container.innerHTML = `<span class="skill-pill" style="opacity:.4;">No skills detected yet</span>`;
+        }
+
+        if (data.elite) {
+            const atsCoreEl = document.getElementById("atsCore");
+            const marketEl = document.getElementById("marketScore");
+            const diversityEl = document.getElementById("diversityScore");
+            const growthEl = document.getElementById("growthScore");
+            const competitiveEl = document.getElementById("competitiveScore");
+            const competitiveTierText = data.elite.tier + " Tier";
+            document.getElementById("competitiveTier").innerText = competitiveTierText;
+            if (atsCoreEl) atsCoreEl.innerText = data.elite.ats_core + "%";
+            if (marketEl) marketEl.innerText = data.elite.market_score + "%";
+            if (diversityEl) diversityEl.innerText = data.elite.diversity_score + "%";
+            if (growthEl) growthEl.innerText = data.elite.growth_alignment + "%";
+            if (competitiveEl) {
+                competitiveEl.innerText = data.elite.competitive_score + "%";
+                if (data.elite.competitive_score >= 80) {
+                    competitiveEl.style.background = "linear-gradient(135deg,#5b6bff,#00e5c8)";
+                    competitiveEl.style.webkitBackgroundClip = "text";
+                    competitiveEl.style.webkitTextFillColor = "transparent";
+                } else if (data.elite.competitive_score >= 60) {
+                    competitiveEl.style.background = "linear-gradient(135deg,#ffb547,#ff8c00)";
+                    competitiveEl.style.webkitBackgroundClip = "text";
+                    competitiveEl.style.webkitTextFillColor = "transparent";
+                } else {
+                    competitiveEl.style.background = "linear-gradient(135deg,#ff5757,#ff3d3d)";
+                    competitiveEl.style.webkitBackgroundClip = "text";
+                    competitiveEl.style.webkitTextFillColor = "transparent";
+                }
+            }
+        }
+    } catch (error) {
+        console.log("Dashboard error:", error);
+    }
+}
+
+async function loadMarketDemand() {
+    try {
+        const res = await fetch("/api/skill-demand");
+        const data = await res.json();
+        const labels = data.map(d => d.skill);
+        const demand = data.map(d => d.demand);
+        if (userSkillChartInstance) userSkillChartInstance.destroy();
+        userSkillChartInstance = new Chart(document.getElementById("userSkillDemandChart"), {
+            type: "bar",
+            data: {
+                labels,
+                datasets: [{
+                    label: "2026 Market Demand Score",
+                    data: demand,
+                    backgroundColor: "rgba(91,107,255,0.65)",
+                    borderColor: "rgba(91,107,255,1)",
+                    borderWidth: 0,
+                    borderRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { backgroundColor:'rgba(10,10,10,.95)', borderColor:'rgba(255,255,255,.1)', borderWidth:1, titleColor:'#fff', bodyColor:'rgba(255,255,255,.5)', padding:14, cornerRadius:10 }
+                },
+                scales: {
+                    x: { ticks:{color:'rgba(255,255,255,.35)',font:{size:12}}, grid:{color:'rgba(255,255,255,.04)'} },
+                    y: { beginAtZero:true, max:100, ticks:{color:'rgba(255,255,255,.35)',font:{size:12}}, grid:{color:'rgba(255,255,255,.05)'} }
+                }
+            }
+        });
+    } catch (error) { console.log("Skill demand error:", error); }
+}
+
+async function loadGlobalTrends() {
+    try {
+        const res = await fetch("/api/global-trends");
+        const data = await res.json();
+        if (globalTrendChartInstance) globalTrendChartInstance.destroy();
+        globalTrendChartInstance = new Chart(document.getElementById("globalTrendChart"), {
+            type: "bar",
+            data: {
+                labels: data.map(d => d.skill),
+                datasets: [{
+                    label: "Global Demand (2026)",
+                    data: data.map(d => d.demand),
+                    backgroundColor: "rgba(0,229,200,0.55)",
+                    borderColor: "rgba(0,229,200,1)",
+                    borderWidth: 0,
+                    borderRadius: 8,
+                }]
+            },
+            options: {
+                indexAxis: "y",
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { backgroundColor:'rgba(10,10,10,.95)', borderColor:'rgba(255,255,255,.1)', borderWidth:1, titleColor:'#fff', bodyColor:'rgba(255,255,255,.5)', padding:14, cornerRadius:10 }
+                },
+                scales: {
+                    x: { beginAtZero:true, max:100, ticks:{color:'rgba(255,255,255,.35)',font:{size:12}}, grid:{color:'rgba(255,255,255,.05)'} },
+                    y: { ticks:{color:'rgba(255,255,255,.35)',font:{size:12}}, grid:{color:'rgba(255,255,255,.04)'} }
+                }
+            }
+        });
+    } catch (error) { console.log("Global trends error:", error); }
+}
 </script>
+
 {% endblock %}

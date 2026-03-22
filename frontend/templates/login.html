@@ -1,40 +1,389 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="row justify-content-center align-items-center" style="min-height:75vh;">
-<div class="col-md-5">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 
-<div class="card-glass p-5 shadow-lg">
+<style>
+:root {
+  --void: #000;
+  --surface: #080808;
+  --panel: #0d0d0d;
+  --rim: rgba(255,255,255,0.06);
+  --rim2: rgba(255,255,255,0.1);
+  --neon: #5b6bff;
+  --cyan: #00e5c8;
+  --lime: #a8ff57;
+  --amber: #ffb547;
+  --soft: rgba(255,255,255,0.35);
+  --body-color: rgba(255,255,255,0.5);
+  --white: #ffffff;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
-<h2 class="mb-4 text-center fw-bold">🔐 Login to PathPilot AI</h2>
+body{
+  font-family:var(--font-body)!important;
+  background:#000!important;
+  color:#fff!important;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
 
-<form method="POST" action="/login">
+footer,.footer,.site-footer,.main-footer,#footer{display:none!important;}
 
-<div class="mb-3">
-<label class="form-label">Email</label>
-<input type="email" name="email" class="form-control" required>
-</div>
+/* CURSOR */
+.cursor-dot{width:5px;height:5px;background:var(--cyan);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);opacity:0;transition:opacity .3s;}
+.cursor-ring{width:30px;height:30px;border:1px solid rgba(0,229,200,.5);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .25s,height .25s,border-color .25s,opacity .3s;opacity:0;}
 
-<div class="mb-4">
-<label class="form-label">Password</label>
-<input type="password" name="password" class="form-control" required>
-</div>
+/* ── MAIN LAYOUT ── */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
 
-<button type="submit" class="btn btn-primary w-100 py-2">
-Login
-</button>
 
-</form>
+/* ── RIGHT PANEL — Form ── */
+.login-right {
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 28px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-height: 100vh;
+}
 
-<hr class="my-4">
+/* Right ambient */
+.login-right::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 80% 30%, rgba(91,107,255,.08) 0%, transparent 65%);
+  pointer-events: none;
+}
 
-<p class="text-center">
-Don’t have an account?
-<a href="/register" class="fw-bold text-info">Create one</a>
-</p>
+.login-form-wrap {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 420px;
+}
 
-</div>
-</div>
-</div>
+/* Form header */
+.lf-header { margin-bottom: 42px; }
+.lf-eyebrow {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 14px; border-radius: 100px;
+  background: rgba(91,107,255,.1);
+  border: 1px solid rgba(91,107,255,.2);
+  font-size: 10.5px; font-weight: 600; color: var(--cyan);
+  letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 22px;
+}
+.ey-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); animation: pulse 1.8s infinite; }
+
+.lf-header h2 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 700; letter-spacing: -1.5px;
+  color: #fff; line-height: 1.1; margin-bottom: 10px;
+}
+.lf-header h2 span {
+  background: linear-gradient(120deg, #fff 30%, var(--neon) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.lf-header p { font-size: 14px; color: rgba(255,255,255,.35); line-height: 1.65; font-weight: 300; }
+
+/* Glass card wrapping form */
+.lf-glass {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+}
+.lf-glass::before {
+  content: '';
+  position: absolute; top: 0; left: 15%; right: 15%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(91,107,255,.5), rgba(0,229,200,.3), transparent);
+}
+
+/* Fields */
+.lf-field { margin-bottom: 20px; }
+.lf-field label {
+  display: block; font-size: 12.5px; font-weight: 500;
+  color: rgba(255,255,255,.6); margin-bottom: 9px; letter-spacing: .2px;
+}
+.lf-field-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+.lf-field-row label { margin: 0; }
+.forgot {
+  font-size: 12px; color: var(--neon); text-decoration: none;
+  opacity: .8; transition: opacity .2s;
+}
+.forgot:hover { opacity: 1; }
+
+.lf-input-wrap { position: relative; }
+.lf-input-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 14px; opacity: .35; pointer-events: none; transition: opacity .3s;
+}
+.lf-field input {
+  width: 100%; padding: 14px 44px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 11px;
+  color: #fff; font-family: var(--font-body); font-size: 14.5px;
+  outline: none;
+  transition: border-color .25s, background .25s, box-shadow .25s;
+}
+.lf-field input::placeholder { color: rgba(255,255,255,.22); }
+.lf-field input:focus {
+  border-color: var(--neon);
+  background: rgba(91,107,255,.07);
+  box-shadow: 0 0 0 3px rgba(91,107,255,.15);
+}
+.lf-field input:focus ~ .lf-input-icon { opacity: .85; }
+.lf-field input:-webkit-autofill,
+.lf-field input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #0a0b14 inset !important;
+  -webkit-text-fill-color: #fff !important;
+  border-color: var(--neon) !important;
+}
+
+.pw-toggle {
+  position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: rgba(255,255,255,.3);
+  cursor: pointer; font-size: 14px; padding: 4px;
+  transition: color .2s;
+}
+.pw-toggle:hover { color: rgba(255,255,255,.8); }
+
+/* Submit */
+.lf-submit {
+  width: 100%; padding: 16px;
+  margin-top: 8px; border-radius: 12px; border: none;
+  background: linear-gradient(135deg, var(--neon), #3a4dff);
+  color: #fff; font-family: var(--font-body);
+  font-size: 15.5px; font-weight: 600;
+  cursor: pointer; position: relative; overflow: hidden;
+  box-shadow: 0 8px 32px rgba(91,107,255,.4), 0 0 0 1px rgba(255,255,255,.1) inset;
+  transition: transform .2s, box-shadow .2s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  letter-spacing: -.1px;
+}
+.lf-submit::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.13), transparent);
+  opacity: 0; transition: opacity .2s;
+}
+.lf-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 42px rgba(91,107,255,.55), 0 0 0 1px rgba(255,255,255,.12) inset;
+}
+.lf-submit:hover::before { opacity: 1; }
+.lf-submit:active { transform: translateY(0); }
+.btn-arrow {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(255,255,255,.15);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px; transition: transform .2s;
+}
+.lf-submit:hover .btn-arrow { transform: translateX(3px); }
+
+/* Flash messages */
+.lf-flash {
+  padding: 12px 16px; border-radius: 10px; margin-bottom: 20px;
+  font-size: 13.5px; font-weight: 400; display: flex; align-items: center; gap: 10px;
+}
+.lf-flash.error { background: rgba(255,80,80,.1); border: 1px solid rgba(255,80,80,.2); color: rgba(255,140,140,.9); }
+.lf-flash.success { background: rgba(0,229,200,.08); border: 1px solid rgba(0,229,200,.2); color: var(--cyan); }
+
+/* Divider */
+.lf-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 28px 0 22px;
+}
+.lf-divider::before, .lf-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.07); }
+.lf-divider span { font-size: 12px; color: rgba(255,255,255,.25); white-space: nowrap; }
+
+/* Register link */
+.lf-register { text-align: center; font-size: 14px; color: rgba(255,255,255,.35); }
+.lf-register a { color: var(--neon); font-weight: 600; text-decoration: none; transition: color .2s; }
+.lf-register a:hover { color: var(--cyan); }
+
+/* Trust pills below form */
+.lf-trust {
+  display: flex; align-items: center; justify-content: center; gap: 18px;
+  margin-top: 28px; flex-wrap: wrap;
+}
+.lf-trust-pill { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: rgba(255,255,255,.25); }
+.lf-trust-sep { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,.15); }
+
+/* Floating particles */
+.particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.particle { position: absolute; border-radius: 50%; opacity: 0; animation: drift linear infinite; }
+@keyframes drift {
+  0%   { transform: translateY(110vh); opacity: 0; }
+  8%   { opacity: .5; }
+  92%  { opacity: .2; }
+  100% { transform: translateY(-10vh) translateX(20px); opacity: 0; }
+}
+
+/* Animations */
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.login-left-inner { animation: fadeUp .8s ease both; }
+.login-form-wrap { animation: fadeUp .8s .15s ease both; }
+
+/* RESPONSIVE */
+@media(max-width: 900px) {
+  .login-page { grid-template-columns: 1fr; }
+  .login-left { display: none; }
+  .login-right { padding: 60px 28px; min-height: 100vh; }
+  .login-form-wrap { max-width: 100%; }
+}
+</style>
+
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<div class="login-page">
+
+
+
+  <!-- ═══ RIGHT — Login Form ═══ -->
+  <div class="login-right">
+    <div class="particles" id="rightParticles"></div>
+
+    <div class="login-form-wrap">
+
+      <!-- Header -->
+      <div class="lf-header">
+        <div class="lf-eyebrow"><div class="ey-dot"></div>Welcome Back</div>
+        <h2><span>Sign in</span> to your<br>Career Dashboard</h2>
+        <p>Your personalized AI career intelligence is ready and waiting for you.</p>
+      </div>
+
+      <!-- Glass card with form -->
+      <div class="lf-glass">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="lf-flash {{ category }}">
+                <span>{{ '⚠️' if category == 'error' else '✓' }}</span>
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/login">
+
+          <div class="lf-field">
+            <label for="email">Email Address</label>
+            <div class="lf-input-wrap">
+              <span class="lf-input-icon">✉️</span>
+              <input type="email" id="email" name="email"
+                     placeholder="you@example.com"
+                     required autocomplete="email">
+            </div>
+          </div>
+
+          <div class="lf-field">
+            <div class="lf-field-row">
+              <label for="password">Password</label>
+              <a href="#" class="forgot">Forgot password?</a>
+            </div>
+            <div class="lf-input-wrap">
+              <span class="lf-input-icon">🔑</span>
+              <input type="password" id="password" name="password"
+                     placeholder="••••••••••"
+                     required autocomplete="current-password">
+              <button type="button" class="pw-toggle" id="pwToggle">👁</button>
+            </div>
+          </div>
+
+          <button type="submit" class="lf-submit">
+            <span>Sign In to PathPilot</span>
+            <div class="btn-arrow">→</div>
+          </button>
+
+        </form>
+
+        <div class="lf-divider"><span>Don't have an account?</span></div>
+
+        <div class="lf-register">
+          <a href="/register">Create your free account →</a>
+        </div>
+
+      </div><!-- /lf-glass -->
+
+      <!-- Trust row -->
+      <div class="lf-trust">
+        <div class="lf-trust-pill">🔐 <span>256-bit SSL</span></div>
+        <div class="lf-trust-sep"></div>
+        <div class="lf-trust-pill">⚡ <span>Instant access</span></div>
+        <div class="lf-trust-sep"></div>
+        <div class="lf-trust-pill">🛡️ <span>Data private</span></div>
+        <div class="lf-trust-sep"></div>
+        <div class="lf-trust-pill">✓ <span>Free to start</span></div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /login-page -->
+
+<script>
+/* CURSOR */
+const dot=document.getElementById('cursorDot'),ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.opacity='1';ring.style.opacity='.5';},{once:true});
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function tick(){dot.style.left=mx+'px';dot.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+document.querySelectorAll('a,button,input').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{ring.style.width='44px';ring.style.height='44px';ring.style.borderColor='rgba(91,107,255,.8)';});
+  el.addEventListener('mouseleave',()=>{ring.style.width='30px';ring.style.height='30px';ring.style.borderColor='rgba(0,229,200,.5)';});
+});
+
+/* PASSWORD TOGGLE */
+document.getElementById('pwToggle').addEventListener('click',function(){
+  const pw=document.getElementById('password');
+  if(pw.type==='password'){pw.type='text';this.textContent='🙈';}
+  else{pw.type='password';this.textContent='👁';}
+});
+
+/* INPUT ICON FOCUS */
+document.querySelectorAll('.lf-field input').forEach(inp=>{
+  const icon=inp.closest('.lf-input-wrap').querySelector('.lf-input-icon');
+  inp.addEventListener('focus',()=>icon.style.opacity='.9');
+  inp.addEventListener('blur',()=>icon.style.opacity='.35');
+});
+
+/* PARTICLES */
+function spawnParticles(containerId){
+  const pc=document.getElementById(containerId);
+  if(!pc)return;
+  const colors=['rgba(91,107,255,.45)','rgba(0,229,200,.35)','rgba(168,255,87,.25)'];
+  for(let i=0;i<14;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const s=Math.random()*2.5+1;
+    p.style.cssText=`width:${s}px;height:${s}px;background:${colors[i%3]};left:${Math.random()*100}%;animation-duration:${12+Math.random()*14}s;animation-delay:${Math.random()*14}s;`;
+    pc.appendChild(p);
+  }
+}
+spawnParticles('leftParticles');
+spawnParticles('rightParticles');
+</script>
 
 {% endblock %}

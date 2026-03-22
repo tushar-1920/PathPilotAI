@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="text-center mb-5">
+    <h1 class="fw-bold display-5">Flexible Pricing for Every Career Stage</h1>
+    <p class="text-light">Start free. Upgrade when you're ready to scale.</p>
+</div>
+
+<div class="text-center mb-4">
+    <select id="billingCycle" class="form-select w-25 mx-auto">
+        <option value="monthly">Monthly — $19</option>
+        <option value="annual">Annual — $190 (Save 17%)</option>
+    </select>
+</div>
+
+<div class="row g-4 justify-content-center">
+
+<div class="col-md-4">
+<div class="card-glass p-4 text-center h-100">
+<h4>Free</h4>
+<h2>$0</h2>
+<ul class="list-unstyled mt-4 text-start">
+<li>✔ Resume Parsing</li>
+<li>✔ Skill Score</li>
+<li>✔ Job Matching</li>
+<li>✔ Basic Forecast</li>
+<li>✖ Skill Gap Pro</li>
+<li>✖ Market Projection</li>
+</ul>
+<a href="/register" class="btn btn-outline-light mt-3 w-100">
+Get Started
+</a>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="card-glass p-4 text-center h-100 border border-success glow">
+<div class="badge bg-success mb-2">Most Popular</div>
+<h4>Pro</h4>
+<h2>$19</h2>
+<ul class="list-unstyled mt-4 text-start">
+<li>✔ Everything in Free</li>
+<li>✔ Skill Gap Analyzer Pro</li>
+<li>✔ AI Risk Meter</li>
+<li>✔ Market Growth Forecast</li>
+<li>✔ Advanced Recommendations</li>
+<li>✔ Priority Support</li>
+</ul>
+<button id="upgradeBtn"
+        class="btn btn-primary mt-3 w-100">
+Upgrade Now
+</button>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="card-glass p-4 text-center h-100">
+<h4>Enterprise</h4>
+<h2>Custom</h2>
+<ul class="list-unstyled mt-4 text-start">
+<li>✔ Everything in Pro</li>
+<li>✔ API Access</li>
+<li>✔ Team Dashboard</li>
+<li>✔ Hiring Analytics</li>
+<li>✔ Dedicated Support</li>
+</ul>
+<a href="mailto:contact@pathpilot.ai"
+   class="btn btn-outline-light mt-3 w-100">
+Contact Sales
+</a>
+</div>
+</div>
+
+</div>
+
+<script>
+document.getElementById("upgradeBtn")
+.addEventListener("click", async () => {
+
+    const billingCycle =
+        document.getElementById("billingCycle").value;
+
+    const res = await fetch("/create-checkout-session", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            billing_cycle: billingCycle
+        })
+    });
+
+    const data = await res.json();
+    window.location.href = data.url;
+});
+</script>
+
+{% endblock %}

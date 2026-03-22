@@ -1,38 +1,740 @@
 {% extends "base.html" %}
+{% block title %}Admin Control Center — PathPilot AI{% endblock %}
 {% block content %}
 
-<h2>🛠 Admin Control Panel</h2>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-<div class="row mt-4">
+<style>
+html,body{background:#000!important;color:#f1f5f9!important;}
+.container,.container-fluid,.row,.col,.col-12,.main-content,.content,.wrapper,.page-content,
+.content-wrapper,[class*="content"],[class*="wrapper"],[class*="page"]{background:#000!important;}
 
-    <div class="col-md-3">
-        <div class="card-glass p-4 text-center">
-            <h3>{{ total_users }}</h3>
-            <p>Total Users</p>
-        </div>
+#admin-root{
+  --neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;
+  --amber:#ffb547;--red:#ff5757;--purple:#a855f7;
+  --bg:#000;--bg2:#0a0a12;--bg3:#0f0f1a;--card:#0d0d18;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --txt:#f1f5f9;--txt2:#94a3b8;--txt3:#64748b;
+  --font:"DM Sans",sans-serif;--display:"Syne",sans-serif;--mono:"JetBrains Mono",monospace;
+  background:var(--bg);color:var(--txt);font-family:var(--font);
+  min-height:calc(100vh - 60px);padding-bottom:60px;
+}
+
+/* ── GLOW BG ── */
+.admin-glow{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 50% 40% at 5% 8%,rgba(91,107,255,.08) 0%,transparent 65%),
+    radial-gradient(ellipse 40% 35% at 95% 90%,rgba(0,229,200,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 30% 25% at 50% 50%,rgba(168,85,247,.04) 0%,transparent 70%);}
+.admin-grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);
+  background-size:56px 56px;}
+.admin-wrap{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:28px 24px;}
+
+/* ── HEADER ── */
+.admin-header{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:32px;flex-wrap:wrap;gap:14px;}
+.admin-title{font-family:var(--display);font-size:28px;font-weight:800;
+  letter-spacing:-.8px;color:#fff;}
+.admin-title span{background:linear-gradient(135deg,var(--neon),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.admin-badge{display:flex;align-items:center;gap:8px;padding:7px 16px;border-radius:100px;
+  background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.25);
+  color:#ff5757;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.admin-badge-dot{width:7px;height:7px;border-radius:50%;background:#ff5757;
+  animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,87,87,.5)}50%{box-shadow:0 0 0 6px rgba(255,87,87,0)}}
+.health-dot{width:9px;height:9px;border-radius:50%;background:#22c55e;
+  box-shadow:0 0 8px #22c55e;animation:pulse-g 2s ease-in-out infinite;}
+@keyframes pulse-g{0%,100%{box-shadow:0 0 6px #22c55e}50%{box-shadow:0 0 14px #22c55e}}
+
+/* ── SECTION LABEL ── */
+.sec-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;
+  color:var(--txt3);display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.sec-label::after{content:"";flex:1;height:1px;background:var(--border);}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.kpi-card{padding:22px 20px;border-radius:16px;background:var(--card);
+  border:1px solid var(--border);position:relative;overflow:hidden;
+  transition:transform .2s,border-color .2s;cursor:default;}
+.kpi-card:hover{transform:translateY(-3px);border-color:var(--border2);}
+.kpi-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .3s;}
+.kpi-card:hover::before{opacity:1;}
+.kpi-glow-neon::before{background:linear-gradient(90deg,var(--neon),rgba(91,107,255,0));}
+.kpi-glow-cyan::before{background:linear-gradient(90deg,var(--cyan),rgba(0,229,200,0));}
+.kpi-glow-green::before{background:linear-gradient(90deg,var(--green),rgba(34,197,94,0));}
+.kpi-glow-amber::before{background:linear-gradient(90deg,var(--amber),rgba(255,181,71,0));}
+.kpi-glow-red::before{background:linear-gradient(90deg,var(--red),rgba(255,87,87,0));}
+.kpi-glow-purple::before{background:linear-gradient(90deg,var(--purple),rgba(168,85,247,0));}
+.kpi-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;
+  justify-content:center;font-size:18px;margin-bottom:12px;}
+.kpi-num{font-family:var(--display);font-size:30px;font-weight:800;letter-spacing:-1px;
+  color:#fff;line-height:1;}
+.kpi-label{font-size:12px;color:var(--txt3);font-weight:500;margin-top:5px;text-transform:uppercase;letter-spacing:.8px;}
+.kpi-delta{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;
+  margin-top:8px;padding:2px 8px;border-radius:100px;}
+.kpi-up{background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.2);}
+.kpi-down{background:rgba(255,87,87,.1);color:#ff5757;border:1px solid rgba(255,87,87,.2);}
+.kpi-neutral{background:rgba(255,181,71,.1);color:#ffb547;border:1px solid rgba(255,181,71,.2);}
+
+/* ── CHART CARDS ── */
+.chart-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+.chart-grid-3{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px;}
+.chart-grid-full{margin-bottom:24px;}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:22px;overflow:hidden;}
+.chart-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.chart-card-title{font-family:var(--display);font-size:15px;font-weight:700;color:#fff;letter-spacing:-.3px;}
+.chart-card-sub{font-size:12px;color:var(--txt3);margin-top:2px;}
+.chart-wrap{height:220px;position:relative;}
+.chart-wrap-sm{height:180px;position:relative;}
+.chart-wrap-lg{height:260px;position:relative;}
+
+/* ── DATA TABLE ── */
+.data-table-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px;}
+.dtc-header{padding:18px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;}
+.dtc-title{font-family:var(--display);font-size:15px;font-weight:700;color:#fff;}
+.dtc-body{overflow-x:auto;}
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{text-align:left;padding:10px 16px;font-size:10.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:1.5px;color:var(--txt3);
+  border-bottom:1px solid var(--border);white-space:nowrap;}
+.data-table td{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);
+  font-size:13.5px;color:var(--txt);vertical-align:middle;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:rgba(255,255,255,.02);}
+.plan-badge{display:inline-flex;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;}
+.plan-pro{background:rgba(91,107,255,.12);color:#818cf8;border:1px solid rgba(91,107,255,.2);}
+.plan-free{background:rgba(100,116,139,.1);color:#94a3b8;border:1px solid rgba(100,116,139,.2);}
+.plan-ent{background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.2);}
+.verified-yes{color:#22c55e;font-size:13px;}
+.verified-no{color:#64748b;font-size:13px;}
+
+/* ── HEALTH PANEL ── */
+.health-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.health-item{padding:14px 16px;border-radius:12px;background:var(--card);
+  border:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.health-status{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.hs-ok{background:#22c55e;box-shadow:0 0 8px #22c55e;}
+.hs-warn{background:#ffb547;box-shadow:0 0 8px #ffb547;}
+.hs-err{background:#ff5757;box-shadow:0 0 8px #ff5757;}
+.health-name{font-size:13px;font-weight:600;color:#fff;}
+.health-detail{font-size:11px;color:var(--txt3);}
+
+/* ── STATS ROW ── */
+.mini-stats{display:flex;gap:20px;flex-wrap:wrap;}
+.mini-stat{text-align:center;}
+.mini-stat-n{font-family:var(--display);font-size:22px;font-weight:800;letter-spacing:-.5px;}
+.mini-stat-l{font-size:10.5px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+
+/* ── TOP SKILLS BARS ── */
+.skill-bars{padding:0 2px;}
+.skill-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.skill-bar-name{font-size:12.5px;color:var(--txt);width:140px;flex-shrink:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.skill-bar-track{flex:1;height:7px;border-radius:100px;background:rgba(255,255,255,.07);}
+.skill-bar-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--neon),var(--cyan));
+  transition:width .8s cubic-bezier(.16,1,.3,1);}
+.skill-bar-num{font-family:var(--mono);font-size:12px;color:var(--txt3);width:24px;text-align:right;}
+
+/* ── REFRESH BTN ── */
+.refresh-btn{padding:7px 16px;border-radius:9px;border:1px solid var(--border);
+  background:rgba(255,255,255,.04);color:var(--txt2);font-size:12.5px;font-weight:600;
+  cursor:pointer;transition:all .15s;font-family:var(--font);display:flex;align-items:center;gap:6px;}
+.refresh-btn:hover{border-color:var(--neon);color:#fff;background:rgba(91,107,255,.1);}
+
+/* ── LOADING SKELETON ── */
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%);
+  background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;height:20px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeUp .4s ease both;}
+.delay-1{animation-delay:.05s;} .delay-2{animation-delay:.1s;} .delay-3{animation-delay:.15s;}
+.delay-4{animation-delay:.2s;}  .delay-5{animation-delay:.25s;} .delay-6{animation-delay:.3s;}
+.delay-7{animation-delay:.35s;} .delay-8{animation-delay:.4s;}
+
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .chart-grid-2,.chart-grid-3{grid-template-columns:1fr;}.health-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:640px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.kpi-num{font-size:24px;}}
+</style>
+
+<div id="admin-root">
+<div class="admin-glow"></div>
+<div class="admin-grid-bg"></div>
+<div class="admin-wrap">
+
+  <!-- ── HEADER ── -->
+  <div class="admin-header fade-in">
+    <div>
+      <div class="admin-title">PathPilot <span>Control Center</span></div>
+      <div style="font-size:13px;color:var(--txt3);margin-top:4px">
+        Real-time platform analytics · <span id="lastUpdated" style="color:var(--cyan)">Loading…</span>
+      </div>
     </div>
-
-    <div class="col-md-3">
-        <div class="card-glass p-4 text-center">
-            <h3>{{ total_jobs }}</h3>
-            <p>Total Jobs</p>
-        </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="admin-badge"><div class="admin-badge-dot"></div>ADMIN ACCESS</div>
+      <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
     </div>
+  </div>
 
-    <div class="col-md-3">
-        <div class="card-glass p-4 text-center">
-            <h3>{{ total_resumes }}</h3>
-            <p>Total Resumes</p>
-        </div>
+  <!-- ── SYSTEM HEALTH ── -->
+  <div class="sec-label fade-in delay-1">System Health</div>
+  <div class="health-grid fade-in delay-1" id="healthGrid">
+    <div class="health-item"><div class="health-status hs-ok"></div><div><div class="health-name">Database</div><div class="health-detail">Loading…</div></div></div>
+    <div class="health-item"><div class="health-status hs-ok"></div><div><div class="health-name">Coding Module</div><div class="health-detail">Loading…</div></div></div>
+    <div class="health-item"><div class="health-status hs-ok"></div><div><div class="health-name">Job Engine</div><div class="health-detail">Loading…</div></div></div>
+    <div class="health-item"><div class="health-status hs-ok"></div><div><div class="health-name">AI Services</div><div class="health-detail">Loading…</div></div></div>
+  </div>
+
+  <!-- ── KPI ROW 1: USERS ── -->
+  <div class="sec-label fade-in delay-2">Platform Overview</div>
+  <div class="kpi-grid" style="margin-bottom:14px;">
+    <div class="kpi-card kpi-glow-neon fade-in delay-2">
+      <div class="kpi-icon" style="background:rgba(91,107,255,.12)">👥</div>
+      <div class="kpi-num" id="kTotalUsers">—</div>
+      <div class="kpi-label">Total Users</div>
+      <div class="kpi-delta kpi-up" id="kUsersDelta">+0 this week</div>
     </div>
-
-    <div class="col-md-3">
-        <div class="card-glass p-4 text-center">
-            <h3>${{ revenue }}</h3>
-            <p>Estimated Revenue</p>
-        </div>
+    <div class="kpi-card kpi-glow-cyan fade-in delay-3">
+      <div class="kpi-icon" style="background:rgba(0,229,200,.1)">⭐</div>
+      <div class="kpi-num" id="kProUsers">—</div>
+      <div class="kpi-label">Pro Subscribers</div>
+      <div class="kpi-delta kpi-neutral" id="kConvRate">0% conversion</div>
     </div>
+    <div class="kpi-card kpi-glow-green fade-in delay-4">
+      <div class="kpi-icon" style="background:rgba(34,197,94,.1)">💰</div>
+      <div class="kpi-num" id="kMRR">—</div>
+      <div class="kpi-label">Monthly Revenue</div>
+      <div class="kpi-delta kpi-up" id="kARR">$0 ARR</div>
+    </div>
+    <div class="kpi-card kpi-glow-amber fade-in delay-5">
+      <div class="kpi-icon" style="background:rgba(255,181,71,.1)">📈</div>
+      <div class="kpi-num" id="kGrowth">—</div>
+      <div class="kpi-label">WoW Growth</div>
+      <div class="kpi-delta" id="kGrowthBadge">Calculating…</div>
+    </div>
+  </div>
 
-</div>
+  <!-- ── KPI ROW 2: PLATFORM ── -->
+  <div class="kpi-grid fade-in delay-3" style="margin-bottom:28px;">
+    <div class="kpi-card kpi-glow-purple">
+      <div class="kpi-icon" style="background:rgba(168,85,247,.1)">📄</div>
+      <div class="kpi-num" id="kResumes">—</div>
+      <div class="kpi-label">Resumes Uploaded</div>
+      <div class="kpi-delta kpi-neutral" id="kAvgScore">Avg: 0 pts</div>
+    </div>
+    <div class="kpi-card kpi-glow-cyan">
+      <div class="kpi-icon" style="background:rgba(0,229,200,.1)">💼</div>
+      <div class="kpi-num" id="kJobs">—</div>
+      <div class="kpi-label">Job Listings</div>
+      <div class="kpi-delta kpi-neutral" id="kApps">0 applications</div>
+    </div>
+    <div class="kpi-card kpi-glow-neon">
+      <div class="kpi-icon" style="background:rgba(91,107,255,.12)">⚡</div>
+      <div class="kpi-num" id="kSubmissions">—</div>
+      <div class="kpi-label">Code Submissions</div>
+      <div class="kpi-delta kpi-up" id="kAccRate">0% accepted</div>
+    </div>
+    <div class="kpi-card kpi-glow-green">
+      <div class="kpi-icon" style="background:rgba(34,197,94,.1)">✅</div>
+      <div class="kpi-num" id="kSolved">—</div>
+      <div class="kpi-label">Problems Solved</div>
+      <div class="kpi-delta kpi-up" id="kSolvedSub">across all users</div>
+    </div>
+  </div>
+
+  <!-- ── ROW 1: USER GROWTH + SUBSCRIPTION PIE ── -->
+  <div class="sec-label fade-in">User Analytics</div>
+  <div class="chart-grid-3 fade-in delay-1">
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div>
+          <div class="chart-card-title">User Growth (Last 30 Days)</div>
+          <div class="chart-card-sub">Daily registrations + cumulative total</div>
+        </div>
+        <div class="mini-stats">
+          <div class="mini-stat"><div class="mini-stat-n" id="mg7d" style="color:var(--cyan)">—</div><div class="mini-stat-l">7d New</div></div>
+          <div class="mini-stat" style="margin-left:16px"><div class="mini-stat-n" id="mg30d" style="color:var(--neon)">—</div><div class="mini-stat-l">30d New</div></div>
+        </div>
+      </div>
+      <div class="chart-wrap-lg"><canvas id="userGrowthChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div>
+          <div class="chart-card-title">Subscription Split</div>
+          <div class="chart-card-sub">Free vs Pro vs Enterprise</div>
+        </div>
+      </div>
+      <div class="chart-wrap-lg"><canvas id="subPieChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ── ROW 2: REVENUE ── -->
+  <div class="sec-label fade-in">Revenue Intelligence</div>
+  <div class="chart-grid-full fade-in delay-1">
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div>
+          <div class="chart-card-title">Revenue Trend (Last 12 Months)</div>
+          <div class="chart-card-sub">Monthly recurring + annual contract revenue</div>
+        </div>
+        <div class="mini-stats">
+          <div class="mini-stat"><div class="mini-stat-n" id="revMRR" style="color:var(--green)">—</div><div class="mini-stat-l">MRR</div></div>
+          <div class="mini-stat" style="margin-left:20px"><div class="mini-stat-n" id="revARR" style="color:var(--cyan)">—</div><div class="mini-stat-l">ARR</div></div>
+          <div class="mini-stat" style="margin-left:20px"><div class="mini-stat-n" id="revConv" style="color:var(--amber)">—</div><div class="mini-stat-l">Conv Rate</div></div>
+        </div>
+      </div>
+      <div class="chart-wrap-lg"><canvas id="revenueChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ── ROW 3: PLATFORM ACTIVITY + CODING STATUS ── -->
+  <div class="sec-label fade-in">Platform Activity</div>
+  <div class="chart-grid-2 fade-in delay-1">
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div>
+          <div class="chart-card-title">Activity (Last 14 Days)</div>
+          <div class="chart-card-sub">Resume uploads + Code submissions daily</div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="activityChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div>
+          <div class="chart-card-title">Submission Status Distribution</div>
+          <div class="chart-card-sub">Accepted · Wrong Answer · TLE · Error</div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="submissionStatusChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ── ROW 4: TOP SKILLS + RESUME SCORES ── -->
+  <div class="sec-label fade-in">Skills & Resume Intelligence</div>
+  <div class="chart-grid-2 fade-in delay-1">
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div>
+          <div class="chart-card-title">🔥 Top Skills Across Platform</div>
+          <div class="chart-card-sub">Most common skills from all user resumes</div>
+        </div>
+      </div>
+      <div id="topSkillsBars" class="skill-bars" style="margin-top:4px"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div>
+          <div class="chart-card-title">Resume Score Distribution</div>
+          <div class="chart-card-sub">Breakdown of ATS/skill scores</div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="resumeScoreChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ── ROW 5: JOB STATS ── -->
+  <div class="sec-label fade-in">Jobs & Applications</div>
+  <div class="chart-grid-2 fade-in delay-1">
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div>
+          <div class="chart-card-title">Top Job Sources</div>
+          <div class="chart-card-sub">Where job listings are coming from</div>
+        </div>
+      </div>
+      <div class="chart-wrap-sm"><canvas id="jobSourceChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div>
+          <div class="chart-card-title">Top Roles in Demand</div>
+          <div class="chart-card-sub">Most common job roles on platform</div>
+        </div>
+      </div>
+      <div class="chart-wrap-sm"><canvas id="jobRolesChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ── RECENT USERS TABLE ── -->
+  <div class="sec-label fade-in">Recent Registrations</div>
+  <div class="data-table-card fade-in delay-1">
+    <div class="dtc-header">
+      <div class="dtc-title">Latest 10 Users</div>
+      <div style="font-size:12.5px;color:var(--txt3)" id="tableRefreshed">—</div>
+    </div>
+    <div class="dtc-body">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Plan</th>
+            <th>Verified</th>
+            <th>Role</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody">
+          <tr><td colspan="6" style="text-align:center;color:var(--txt3);padding:24px">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── CODING TOP SUBMITTERS ── -->
+  <div class="sec-label fade-in">Coding Practice Leaders</div>
+  <div class="chart-card fade-in delay-1" style="margin-bottom:24px">
+    <div class="chart-card-head">
+      <div class="chart-card-title">🏆 Top Submitters</div>
+      <div class="chart-card-sub">Most active code practice users</div>
+    </div>
+    <div id="topSubmitters" style="padding:4px 0"></div>
+  </div>
+
+</div><!-- end wrap -->
+</div><!-- end admin-root -->
+
+<script>
+// ══════════════════════════════════════════════════
+//  CHART.JS GLOBAL CONFIG
+// ══════════════════════════════════════════════════
+Chart.defaults.color = 'rgba(255,255,255,.38)';
+Chart.defaults.borderColor = 'rgba(255,255,255,.06)';
+Chart.defaults.font.family = '"DM Sans",sans-serif';
+
+const COLORS = {
+  neon:'#5b6bff',cyan:'#00e5c8',green:'#22c55e',
+  amber:'#ffb547',red:'#ff5757',purple:'#a855f7',blue:'#38bdf8'
+};
+
+function chartDefaults(type){
+  return {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{color:'rgba(255,255,255,.45)',font:{size:11},padding:12,boxWidth:10}},
+      tooltip:{backgroundColor:'rgba(10,10,20,.95)',borderColor:'rgba(255,255,255,.1)',
+        borderWidth:1,titleColor:'#fff',bodyColor:'rgba(255,255,255,.65)',padding:10,cornerRadius:8}
+    },
+    scales: type==='pie'||type==='doughnut' ? {} : {
+      x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.35)',font:{size:11}}},
+      y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.35)',font:{size:11}}}
+    }
+  };
+}
+
+let charts = {};
+function makeChart(id, config){
+  if(charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id);
+  if(!ctx) return;
+  charts[id] = new Chart(ctx, config);
+}
+
+// ══════════════════════════════════════════════════
+//  LOAD ALL DATA
+// ══════════════════════════════════════════════════
+async function loadAll(){
+  document.getElementById('lastUpdated').textContent = 'Refreshing…';
+  await Promise.all([
+    loadStats(),
+    loadUserGrowth(),
+    loadRevenue(),
+    loadActivity(),
+    loadSubPie(),
+    loadTopSkills(),
+    loadCodingStats(),
+    loadResumeStats(),
+    loadJobStats(),
+    loadRecentUsers(),
+    loadHealth(),
+  ]);
+  document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+  document.getElementById('tableRefreshed').textContent = 'Updated ' + new Date().toLocaleTimeString();
+}
+
+// ── CORE STATS ──
+async function loadStats(){
+  const d = await api('/api/admin/stats');
+  if(!d) return;
+  const u = d.users, r = d.revenue, p = d.platform;
+
+  setText('kTotalUsers', u.total.toLocaleString());
+  setText('kProUsers', u.pro.toLocaleString());
+  setText('kMRR', '$'+r.mrr.toLocaleString());
+  setText('kGrowth', (u.growth_rate>0?'+':'')+u.growth_rate+'%');
+  setText('kResumes', p.resumes.toLocaleString());
+  setText('kJobs', p.jobs.toLocaleString());
+  setText('kSubmissions', p.submissions.toLocaleString());
+  setText('kSolved', p.solved.toLocaleString());
+
+  setText('kUsersDelta', `+${u.new_7d} this week`);
+  setText('kConvRate', r.conversion_rate+'% conversion');
+  setText('kARR', '$'+r.arr.toLocaleString()+' ARR');
+  setText('kApps', p.applications.toLocaleString()+' applications');
+
+  const gb = document.getElementById('kGrowthBadge');
+  gb.textContent = u.growth_rate >= 0 ? '↑ Growing' : '↓ Declining';
+  gb.className = 'kpi-delta '+(u.growth_rate >= 0 ? 'kpi-up' : 'kpi-down');
+
+  setText('mg7d', u.new_7d.toLocaleString());
+  setText('mg30d', u.new_30d.toLocaleString());
+  setText('revMRR', '$'+r.mrr.toLocaleString());
+  setText('revARR', '$'+r.arr.toLocaleString());
+  setText('revConv', r.conversion_rate+'%');
+}
+
+// ── USER GROWTH CHART ──
+async function loadUserGrowth(){
+  const d = await api('/api/admin/user-growth');
+  if(!d) return;
+  makeChart('userGrowthChart', {
+    type:'bar',
+    data:{
+      labels:d.labels,
+      datasets:[
+        {type:'bar',label:'Daily New Users',data:d.daily,
+         backgroundColor:'rgba(91,107,255,.35)',borderColor:COLORS.neon,borderWidth:1.5,borderRadius:4},
+        {type:'line',label:'Cumulative Total',data:d.cumulative,
+         borderColor:COLORS.cyan,backgroundColor:'rgba(0,229,200,.08)',
+         borderWidth:2,pointRadius:0,tension:.4,fill:true,yAxisID:'y1'}
+      ]
+    },
+    options:{...chartDefaults('bar'),
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.3)',font:{size:10},maxRotation:45}},
+        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.35)',font:{size:11}}},
+        y1:{position:'right',grid:{display:false},ticks:{color:'rgba(0,229,200,.5)',font:{size:10}}}
+      }
+    }
+  });
+}
+
+// ── REVENUE CHART ──
+async function loadRevenue(){
+  const d = await api('/api/admin/revenue-chart');
+  if(!d) return;
+  makeChart('revenueChart', {
+    type:'line',
+    data:{
+      labels:d.labels,
+      datasets:[{
+        label:'Monthly Revenue ($)',
+        data:d.revenue,
+        borderColor:COLORS.green,
+        backgroundColor:'rgba(34,197,94,.1)',
+        borderWidth:2.5,pointRadius:4,pointHoverRadius:7,
+        pointBackgroundColor:COLORS.green,fill:true,tension:.4
+      }]
+    },
+    options:{...chartDefaults('line')}
+  });
+}
+
+// ── PLATFORM ACTIVITY ──
+async function loadActivity(){
+  const d = await api('/api/admin/platform-activity');
+  if(!d) return;
+  makeChart('activityChart', {
+    type:'bar',
+    data:{
+      labels:d.labels,
+      datasets:[
+        {label:'Resumes',data:d.resumes,backgroundColor:'rgba(168,85,247,.4)',borderColor:COLORS.purple,borderWidth:1.5,borderRadius:4},
+        {label:'Code Submissions',data:d.submissions,backgroundColor:'rgba(0,229,200,.3)',borderColor:COLORS.cyan,borderWidth:1.5,borderRadius:4}
+      ]
+    },
+    options:{...chartDefaults('bar')}
+  });
+}
+
+// ── SUBSCRIPTION PIE ──
+async function loadSubPie(){
+  const d = await api('/api/admin/subscription-breakdown');
+  if(!d) return;
+  makeChart('subPieChart', {
+    type:'doughnut',
+    data:{labels:d.labels,datasets:[{data:d.values,backgroundColor:d.colors,
+      borderColor:'rgba(0,0,0,.4)',borderWidth:2,hoverOffset:8}]},
+    options:{...chartDefaults('doughnut'),cutout:'65%',
+      plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,.45)',padding:14,font:{size:11}}}}}
+  });
+}
+
+// ── CODING STATS ──
+async function loadCodingStats(){
+  const d = await api('/api/admin/coding-stats');
+  if(!d) return;
+
+  setText('kAccRate', d.acceptance_rate+'% accepted');
+
+  // Submission status donut
+  if(d.status_values && d.status_values.length){
+    makeChart('submissionStatusChart', {
+      type:'doughnut',
+      data:{labels:d.status_labels,datasets:[{data:d.status_values,
+        backgroundColor:d.status_colors,borderColor:'rgba(0,0,0,.4)',borderWidth:2,hoverOffset:8}]},
+      options:{...chartDefaults('doughnut'),cutout:'60%',
+        plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,.45)',padding:10,font:{size:11}}}}}
+    });
+  }
+
+  // Top submitters
+  const wrap = document.getElementById('topSubmitters');
+  if(d.top_submitters && d.top_submitters.length){
+    const maxSubs = Math.max(...d.top_submitters.map(u=>u.submissions));
+    wrap.innerHTML = d.top_submitters.map((u,i)=>`
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+        <div style="width:24px;height:24px;border-radius:50%;background:${['#5b6bff','#00e5c8','#22c55e','#ffb547','#a855f7'][i]};
+          display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">${i+1}</div>
+        <div style="flex:1">
+          <div style="font-size:13.5px;font-weight:600;color:#fff">${u.name}</div>
+          <div style="height:5px;background:rgba(255,255,255,.07);border-radius:100px;margin-top:5px;">
+            <div style="height:100%;border-radius:100px;background:linear-gradient(90deg,#5b6bff,#00e5c8);width:${Math.round(u.submissions/maxSubs*100)}%;transition:width .8s;"></div>
+          </div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#00e5c8;font-weight:600">${u.submissions} subs</div>
+      </div>`).join('');
+  } else {
+    wrap.innerHTML = '<div style="padding:18px;color:rgba(255,255,255,.25);font-size:13px">No submission data yet.</div>';
+  }
+}
+
+// ── RESUME STATS ──
+async function loadResumeStats(){
+  const d = await api('/api/admin/resume-stats');
+  if(!d) return;
+  setText('kAvgScore', 'Avg: '+d.avg_score+' pts');
+  const buckets = d.buckets || {};
+  makeChart('resumeScoreChart', {
+    type:'bar',
+    data:{
+      labels:['0–25','26–50','51–75','76–100'],
+      datasets:[{
+        label:'Resumes',
+        data:[buckets['0-25']||0,buckets['26-50']||0,buckets['51-75']||0,buckets['76-100']||0],
+        backgroundColor:['rgba(255,87,87,.5)','rgba(255,181,71,.5)','rgba(91,107,255,.5)','rgba(34,197,94,.5)'],
+        borderColor:['#ff5757','#ffb547','#5b6bff','#22c55e'],
+        borderWidth:1.5,borderRadius:6
+      }]
+    },
+    options:{...chartDefaults('bar'),plugins:{legend:{display:false}}}
+  });
+}
+
+// ── JOB STATS ──
+async function loadJobStats(){
+  const d = await api('/api/admin/job-stats');
+  if(!d) return;
+  setText('kApps', (d.total_apps||0).toLocaleString()+' applications');
+
+  if(d.top_sources && d.top_sources.length){
+    makeChart('jobSourceChart', {
+      type:'bar',
+      data:{
+        labels:d.top_sources.map(s=>s.source),
+        datasets:[{label:'Jobs',data:d.top_sources.map(s=>s.count),
+          backgroundColor:'rgba(56,189,248,.4)',borderColor:'#38bdf8',borderWidth:1.5,borderRadius:6}]
+      },
+      options:{...chartDefaults('bar'),plugins:{legend:{display:false}}}
+    });
+  }
+
+  if(d.top_roles && d.top_roles.length){
+    makeChart('jobRolesChart', {
+      type:'bar',
+      data:{
+        labels:d.top_roles.map(r=>r.role.length>20?r.role.substring(0,20)+'…':r.role),
+        datasets:[{label:'Listings',data:d.top_roles.map(r=>r.count),
+          backgroundColor:'rgba(168,85,247,.4)',borderColor:'#a855f7',borderWidth:1.5,borderRadius:6}]
+      },
+      options:{...chartDefaults('bar'),indexAxis:'y',plugins:{legend:{display:false}},
+        scales:{
+          x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.35)',font:{size:10}}},
+          y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.35)',font:{size:10}}}
+        }
+      }
+    });
+  }
+}
+
+// ── TOP SKILLS BARS ──
+async function loadTopSkills(){
+  const d = await api('/api/admin/top-skills');
+  if(!d || !d.labels || !d.labels.length) return;
+  const maxVal = Math.max(...d.counts);
+  const container = document.getElementById('topSkillsBars');
+  const colors = ['#5b6bff','#00e5c8','#22c55e','#ffb547','#ff5757',
+                  '#a855f7','#38bdf8','#5b6bff','#00e5c8','#22c55e'];
+  container.innerHTML = d.labels.slice(0,10).map((skill,i)=>`
+    <div class="skill-bar-row">
+      <div class="skill-bar-name">${skill}</div>
+      <div class="skill-bar-track">
+        <div class="skill-bar-fill" style="width:${Math.round(d.counts[i]/maxVal*100)}%;background:${colors[i%colors.length]}"></div>
+      </div>
+      <div class="skill-bar-num">${d.counts[i]}</div>
+    </div>`).join('');
+}
+
+// ── HEALTH ──
+async function loadHealth(){
+  const d = await api('/api/admin/health');
+  if(!d) return;
+  const checks = d.checks;
+  const items  = Object.values(checks);
+  const grid   = document.getElementById('healthGrid');
+  const statusCls = s => s==='ok'?'hs-ok':s==='warning'?'hs-warn':'hs-err';
+  grid.innerHTML = items.map(c=>`
+    <div class="health-item fade-in">
+      <div class="health-status ${statusCls(c.status)}"></div>
+      <div>
+        <div class="health-name">${c.label}</div>
+        <div class="health-detail">${c.detail||c.status}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── RECENT USERS TABLE ──
+async function loadRecentUsers(){
+  const d = await api('/api/admin/recent-users');
+  if(!d) return;
+  const planBadge = p => p==='pro'?'plan-pro':p==='enterprise'?'plan-ent':'plan-free';
+  const planLabel = p => p==='pro'?'Pro':p==='enterprise'?'Enterprise':'Free';
+  document.getElementById('usersTableBody').innerHTML = d.map(u=>`
+    <tr>
+      <td style="font-weight:600">${u.name}</td>
+      <td style="color:rgba(255,255,255,.5);font-family:'JetBrains Mono',monospace;font-size:12.5px">${u.email}</td>
+      <td><span class="plan-badge ${planBadge(u.plan)}">${planLabel(u.plan)}</span></td>
+      <td><span class="${u.verified?'verified-yes':'verified-no'}">${u.verified?'✓ Verified':'○ Unverified'}</span></td>
+      <td style="color:rgba(255,255,255,.4);font-size:12.5px">${u.role||'user'}</td>
+      <td style="color:rgba(255,255,255,.35);font-size:12.5px;font-family:'JetBrains Mono',monospace">${u.joined}</td>
+    </tr>`).join('');
+}
+
+// ── UTILS ──
+async function api(url){
+  try{
+    const r = await fetch(url);
+    if(!r.ok) return null;
+    return await r.json();
+  }catch(e){ console.error(url, e); return null; }
+}
+function setText(id, val){
+  const el = document.getElementById(id);
+  if(el) el.textContent = val;
+}
+
+// ── AUTO-REFRESH every 60 seconds ──
+loadAll();
+setInterval(loadAll, 60000);
+</script>
 
 {% endblock %}

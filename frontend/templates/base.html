@@ -7,87 +7,233 @@
 <title>PathPilot AI</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+<!-- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"> -->
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-
+:root {
+  --neon: #5b6bff;
+  --cyan: #00e5c8;
+  --amber: #ffb547;
+  --rim: rgba(255,255,255,0.06);
+  --font-d: 'Syne', sans-serif;
+  --font-b: 'DM Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; }
 body {
-    font-family: 'Inter', sans-serif;
-    background: radial-gradient(circle at top, #1e293b, #0f172a 70%);
-    color: #e2e8f0;
-    margin: 0;
+  font-family: var(--font-b) !important;
+  color: #fff !important;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* NAVBAR */
 .navbar {
-    background: rgba(15, 23, 42, 0.92);
-    backdrop-filter: blur(12px);
+  background: rgba(0,0,0,.9) !important;
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--rim);
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  min-height: 64px;
 }
+.navbar .container { height: 64px; }
 
+/* LOGO */
 .navbar-brand {
-    font-weight: 700;
-    letter-spacing: 0.5px;
+  font-family: var(--font-d) !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  letter-spacing: -.3px;
+  color: #fff !important;
+  display: flex; align-items: center; gap: 9px;
+  padding: 0 !important; margin-right: 32px !important;
+  text-decoration: none;
 }
+.nb-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--neon), var(--cyan));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+  box-shadow: 0 0 14px rgba(91,107,255,.45);
+}
+.nb-name { color: #fff; }
+.nb-dot { color: rgba(255,255,255,.28); font-weight: 300; }
 
+/* NAV LINKS */
+.navbar-nav { gap: 1px; }
 .nav-link {
-    color: #cbd5e1 !important;
-    font-weight: 500;
+  font-family: var(--font-b) !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  color: rgba(255,255,255,.55) !important;
+  padding: 6px 12px !important;
+  border-radius: 7px;
+  transition: color .2s, background .2s !important;
+  white-space: nowrap;
 }
-
 .nav-link:hover {
-    color: #38bdf8 !important;
+  color: #fff !important;
+  background: rgba(255,255,255,.07) !important;
 }
 
+/* DROPDOWN */
 .dropdown-menu {
-    background-color: #1e293b;
-    border: 1px solid rgba(255,255,255,0.05);
+  background: rgba(8,8,8,.97) !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  border-radius: 14px !important;
+  padding: 8px !important;
+  backdrop-filter: blur(24px);
+  box-shadow: 0 20px 50px rgba(0,0,0,.8) !important;
+  min-width: 200px;
+  margin-top: 6px !important;
 }
-
 .dropdown-item {
-    color: #cbd5e1;
+  font-family: var(--font-b) !important;
+  font-size: 13.5px !important;
+  color: rgba(255,255,255,.55) !important;
+  border-radius: 8px !important;
+  padding: 9px 14px !important;
+  transition: background .2s, color .2s !important;
 }
-
 .dropdown-item:hover {
-    background-color: #334155;
-    color: white;
+  background: rgba(255,255,255,.07) !important;
+  color: #fff !important;
+}
+.dropdown-toggle::after { border-top-color: rgba(255,255,255,.4) !important; }
+
+/* Admin */
+.nav-link.text-warning {
+  color: var(--amber) !important;
+  background: rgba(255,181,71,.07) !important;
+}
+.nav-link.text-warning:hover { background: rgba(255,181,71,.14) !important; }
+
+/* LOGOUT BUTTON */
+.btn.btn-outline-light.btn-sm {
+  font-family: var(--font-b) !important;
+  font-size: 13px !important; font-weight: 500 !important;
+  padding: 6px 18px !important; border-radius: 8px !important;
+  border: 1px solid rgba(255,255,255,.15) !important;
+  background: transparent !important;
+  color: rgba(255,255,255,.6) !important;
+  transition: all .2s !important;
+}
+.btn.btn-outline-light.btn-sm:hover {
+  background: rgba(255,255,255,.08) !important;
+  color: #fff !important;
+  border-color: rgba(255,255,255,.25) !important;
 }
 
-/* BUTTONS */
-.btn-primary {
-    background: linear-gradient(135deg, #3b82f6, #6366f1);
-    border: none;
+/* GET STARTED BUTTON */
+.btn.btn-primary.btn-sm {
+  font-family: var(--font-b) !important;
+  font-size: 13px !important; font-weight: 600 !important;
+  padding: 7px 20px !important; border-radius: 8px !important;
+  border: none !important;
+  background: linear-gradient(135deg, var(--neon), #3a4dff) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(91,107,255,.4) !important;
+  transition: all .2s !important;
+}
+.btn.btn-primary.btn-sm:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 24px rgba(91,107,255,.55) !important;
+  opacity: 1 !important;
 }
 
-.btn-primary:hover {
-    opacity: 0.9;
+/* TOGGLER */
+.navbar-toggler {
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: 8px !important;
+}
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,0.6)' stroke-linecap='round' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
 }
 
 /* GLASS CARD */
 .card-glass {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px;
-    backdrop-filter: blur(12px);
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
 }
 
 /* PAGE */
 .page-wrapper {
-    margin-top: 90px;
-    padding: 40px 20px;
+  margin-top: 64px;
+  position: relative; z-index: 1;
 }
 
 /* FOOTER */
 .footer {
-    margin-top: 60px;
-    padding: 30px 0;
-    text-align: center;
-    font-size: 14px;
-    color: #94a3b8;
-    border-top: 1px solid rgba(255,255,255,0.05);
+  margin-top: 60px; padding: 28px 0;
+  text-align: center; font-size: 13px;
+  color: rgba(255,255,255,.2);
+  border-top: 1px solid var(--rim);
+  font-family: var(--font-b);
 }
+/* ── PathPilot Logo ── */
 
+a.navbar-brand.pp-logo{
+  padding:0!important;margin-right:24px!important;
+  display:inline-flex!important;align-items:center;
+  gap:0;text-decoration:none!important;
+}
+.pp-icon{
+  width:38px;height:38px;border-radius:10px;
+  background:linear-gradient(145deg,#1c1248 0%,#0e0822 100%);
+  border:1.5px solid rgba(91,107,255,.55);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;position:relative;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(91,107,255,.12),0 4px 20px rgba(91,107,255,.22);
+  transition:box-shadow .22s,border-color .22s;
+}
+.pp-icon::before{
+  content:"";position:absolute;inset:0;
+  background:conic-gradient(from 0deg at 50% 50%,
+    rgba(91,107,255,.2) 0deg,rgba(0,229,200,.08) 90deg,
+    rgba(91,107,255,.2) 180deg,rgba(168,85,247,.06) 270deg,
+    rgba(91,107,255,.2) 360deg);
+  animation:pp-spin 9s linear infinite;
+}
+@keyframes pp-spin{to{transform:rotate(360deg)}}
+.pp-icon svg{position:relative;z-index:1;}
+.pp-orbit{animation:pp-orb 5.5s linear infinite;transform-origin:12px 12px;}
+@keyframes pp-orb{to{transform:rotate(360deg)}}
+.pp-pulse{animation:pp-p 2.4s ease-in-out infinite;}
+@keyframes pp-p{0%,100%{opacity:1}50%{opacity:.3}}
+.pp-word{
+  margin-left:11px;display:flex;align-items:baseline;
+  font-family:'Syne','DM Sans',system-ui,sans-serif;
+  line-height:1;white-space:nowrap;
+}
+.pp-w-path{font-size:18px;font-weight:800;color:#fff;letter-spacing:-.5px;}
+.pp-w-pilot{font-size:18px;font-weight:300;color:rgba(255,255,255,.58);letter-spacing:-.3px;}
+.pp-w-dot{
+  font-size:11px;font-weight:800;color:#00e5c8;
+  letter-spacing:.8px;margin-left:1px;
+  animation:pp-dot 2.8s ease-in-out infinite;
+}
+@keyframes pp-dot{
+  0%,100%{opacity:1;text-shadow:0 0 8px rgba(0,229,200,.5)}
+  50%{opacity:.6;text-shadow:0 0 16px rgba(0,229,200,.9)}
+}
+a.navbar-brand.pp-logo:hover .pp-icon{
+  box-shadow:0 0 0 1px rgba(91,107,255,.3),0 6px 28px rgba(91,107,255,.4);
+  border-color:rgba(91,107,255,.75);
+}
+a.navbar-brand.pp-logo:hover .pp-w-pilot{color:rgba(255,255,255,.82);}
+@keyframes pp-orb-rev { to { transform: rotate(-360deg); } }
+@keyframes pp-arrow-glow { 0%,100%{opacity:.85} 50%{opacity:1} }
+
+/* Mobile */
+@media(max-width:576px){
+  .pp-icon{width:34px;height:34px;border-radius:9px;}
+  .pp-word{margin-left:9px;}
+  .pp-w-path,.pp-w-pilot{font-size:15px;}
+  .pp-w-dot{font-size:9.5px;}
+}
+/* ─────────────────────────────────────── */
 </style>
-
 </head>
 <body>
 
@@ -95,8 +241,42 @@ body {
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm">
 <div class="container">
 
-<a class="navbar-brand" href="/">🚀 PathPilot AI</a>
-
+<!-- <a class="navbar-brand" href="/">🚀 PathPilot AI</a> -->
+<a class="navbar-brand pp-logo" href="/">
+  <div class="pp-icon">
+    <svg width="24" height="24" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="19" cy="19" r="15" stroke="rgba(91,107,255,.18)" stroke-width=".6" stroke-dasharray="2 3"/>
+      <g style="animation:pp-orb-rev 18s linear infinite;transform-origin:19px 19px">
+        <circle cx="19" cy="19" r="11" fill="none" stroke="rgba(91,107,255,.28)" stroke-width=".55" stroke-dasharray="3.5 5"/>
+      </g>
+      <g style="animation:pp-orb 12s linear infinite;transform-origin:19px 19px">
+        <circle cx="19" cy="19" r="7.5" fill="none" stroke="rgba(0,229,200,.18)" stroke-width=".5" stroke-dasharray="2 4"/>
+      </g>
+      <circle cx="19" cy="3.5"  r="1.5" fill="#5b6bff" class="pp-pulse"/>
+      <circle cx="34.5" cy="19" r="1.2" fill="#5b6bff" opacity=".7"/>
+      <circle cx="19" cy="34.5" r="1"   fill="#5b6bff" opacity=".55"/>
+      <circle cx="3.5"  cy="19" r="1.2" fill="#5b6bff" opacity=".7"/>
+      <line x1="19"  y1="5.5"  x2="19"   y2="11.5" stroke="rgba(91,107,255,.38)" stroke-width=".55"/>
+      <line x1="33"  y1="19"   x2="27"   y2="19"   stroke="rgba(91,107,255,.28)" stroke-width=".55"/>
+      <line x1="19"  y1="33"   x2="19"   y2="27"   stroke="rgba(91,107,255,.22)" stroke-width=".5"/>
+      <line x1="5.5" y1="19"   x2="11.5" y2="19"   stroke="rgba(91,107,255,.28)" stroke-width=".55"/>
+      <circle cx="30" cy="8"  r=".85" fill="rgba(91,107,255,.5)" class="pp-pulse"/>
+      <circle cx="30" cy="30" r=".85" fill="rgba(91,107,255,.4)"/>
+      <circle cx="8"  cy="8"  r=".85" fill="rgba(91,107,255,.4)"/>
+      <circle cx="8"  cy="30" r=".85" fill="rgba(91,107,255,.35)"/>
+      <path d="M19 9.5 L22 16.5 L19 15 L16 16.5 Z" fill="#5b6bff" class="pp-pulse"/>
+      <path d="M19 15 L20.5 21 L19 20 L17.5 21 Z" fill="rgba(91,107,255,.35)"/>
+      <circle cx="19" cy="19" r="4.5" fill="#5b6bff" opacity=".1"/>
+      <circle cx="19" cy="19" r="3"   fill="#0f0822"/>
+      <circle cx="19" cy="19" r="2.2" fill="#5b6bff" opacity=".7" class="pp-pulse"/>
+      <circle cx="19" cy="19" r="1.3" fill="#00e5c8" class="pp-pulse"/>
+      <circle cx="19" cy="19" r=".65" fill="#fff" opacity=".95"/>
+    </svg>
+  </div>
+  <div class="pp-word">
+    <span class="pp-w-path">Path</span><span class="pp-w-pilot">Pilot</span><span class="pp-w-dot">.AI</span>
+  </div>
+</a>
 <button class="navbar-toggler" type="button"
         data-bs-toggle="collapse"
         data-bs-target="#navbarNav">
@@ -108,6 +288,9 @@ body {
 
 <li class="nav-item">
 <a class="nav-link" href="/">Home</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="/about">About</a>
 </li>
 
 {% if session.get('user_id') %}
@@ -130,21 +313,68 @@ body {
 <li class="nav-item">
 <a class="nav-link" href="/upload">Upload</a>
 </li>
-
 <li class="nav-item">
-<a class="nav-link" href="/jobs">Jobs</a>
+<a class="nav-link" href="/resume-ai">AI Resume Analyzer</a>
 </li>
+<li class="nav-item">
+<a class="nav-link" href="/resume-builder">
+Resume Builder
+</a>
+</li>
+<!-- <li class="nav-item">
+    <a class="nav-link" href="/billing">Billing</a>
+</li> -->
+{% if session.get('user_id') %}
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+    👤 My Profile
+  </a>
+  <ul class="dropdown-menu dropdown-menu-dark">
+    <li><a class="dropdown-item" href="/profile">My Profile</a></li>
+    <li><a class="dropdown-item" href="/edit-profile">Edit Profile</a></li>
+    <li><a class="dropdown-item" href="/feed">Feed</a></li>
+    <li><a class="dropdown-item" href="/certificates">Certificates</a></li>
+    <li><hr class="dropdown-divider"></li>
+    
+  </ul>
+</li>
+{% endif %}
+
+
 
 <li class="nav-item dropdown">
 <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
 Career Tools
+
 </a>
 <ul class="dropdown-menu dropdown-menu-end shadow">
 <li><a class="dropdown-item" href="/roadmap">Career Roadmap</a></li>
 <li><a class="dropdown-item" href="/salary">Salary Insights</a></li>
 <li><a class="dropdown-item" href="/market">Market Intelligence</a></li>
 <li><a class="dropdown-item" href="/resume-history">Resume History</a></li>
-<li><a class="dropdown-item" href="/applications">Applications</a></li>
+<li class="nav-item">
+<a class="nav-link" href="/jobs">Jobs</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="/job-analyzer">
+Job Analyzer
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="/saved-jobs">Saved Jobs</a>
+</li>
+<li><a class="dropdown-item" href="/practice">⚡ Code Practice</a></li>
+<li><a class="dropdown-item" href="/interview">🎯 Interview Simulator</a></li>
+<li><a class="dropdown-item" href="/ai-recruiter">🎙️ AI Recruiter</a></li>
+<li class="nav-item">
+<a class="nav-link" href="/vidcode">
+⚡VidCode</a>
+</li>
+
+<!-- <li><a class="dropdown-item" href="/applications">Applications</a></li> -->
+<!-- <li><a class="dropdown-item" href="/pricing">Pricing</a></li> -->
+
+</li>
 </ul>
 </li>
 
@@ -155,7 +385,9 @@ Career Tools
 {% else %}
 
 <!-- GUEST NAV -->
-
+<!-- <li class="nav-item">
+    <a class="nav-link" href="/pricing">Pricing</a>
+</li> -->
 <li class="nav-item">
 <a class="nav-link" href="/login">Login</a>
 </li>

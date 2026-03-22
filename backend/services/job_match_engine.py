@@ -1,8 +1,56 @@
 from backend.models import JobPosting, User
 from backend.extensions import db
+import re
 
 
 class JobMatchEngine:
+
+    # ==========================================
+    # GLOBAL SKILL LIBRARY (for job description parsing)
+    # ==========================================
+    GLOBAL_SKILLS = {
+
+        # Programming
+        "python","java","c++","c","javascript","typescript","go","rust",
+
+        # Data / AI
+        "machine learning","deep learning","data science","pandas","numpy",
+        "tensorflow","pytorch","scikit-learn","nlp","matplotlib","seaborn",
+
+        # Backend
+        "flask","django","spring","node.js","express","fastapi",
+
+        # Frontend
+        "html","css","react","angular","vue","next.js","tailwind","bootstrap",
+
+        # Database
+        "mysql","postgresql","mongodb","sqlite","oracle","redis",
+
+        # Cloud
+        "aws","azure","gcp","docker","kubernetes","terraform",
+
+        # DevOps
+        "jenkins","ci/cd","linux","bash","git","github","gitlab",
+
+        # Big Data
+        "spark","hadoop","kafka","airflow","databricks","snowflake"
+    }
+
+    # ==========================================
+    # Extract Skills from Job Description
+    # ==========================================
+    def extract_job_skills(self, description):
+
+        text = description.lower()
+
+        extracted = set()
+
+        for skill in self.GLOBAL_SKILLS:
+
+            if re.search(r"\b" + re.escape(skill) + r"\b", text):
+                extracted.add(skill)
+
+        return list(extracted)
 
     # ==========================================
     # Calculate Match Score
@@ -34,15 +82,45 @@ class JobMatchEngine:
     # ==========================================
     def get_fit_level(self, score):
 
-        if score >= 70:
+        if score >= 80:
             return "Strong"
+        elif score >= 60:
+            return "Competitive"
         elif score >= 40:
             return "Medium"
         else:
             return "Weak"
 
     # ==========================================
-    # Get Job Matches (MAIN METHOD)
+    # Deep Resume vs Job Comparison
+    # ==========================================
+    def deep_job_match(self, resume_skills, job_description):
+
+        job_skills = self.extract_job_skills(job_description)
+
+        resume_set = {s.lower() for s in resume_skills}
+        job_set = {s.lower() for s in job_skills}
+
+        matched = resume_set.intersection(job_set)
+        missing = job_set - resume_set
+
+        if len(job_set) == 0:
+            score = 0
+        else:
+            score = round((len(matched) / len(job_set)) * 100, 2)
+
+        eligibility = self.get_fit_level(score)
+
+        return {
+            "score": score,
+            "matched_skills": list(matched),
+            "missing_skills": list(missing),
+            "job_skills": job_skills,
+            "eligibility": eligibility
+        }
+
+    # ==========================================
+    # Get Job Matches (MAIN METHOD - UNCHANGED)
     # ==========================================
     def get_job_matches(self, user_id, role_filter=None, fit_filter=None, sort="desc"):
 

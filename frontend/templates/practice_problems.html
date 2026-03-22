@@ -1,0 +1,1941 @@
+{% extends "base.html" %}
+{% block title %}Code Practice — PathPilot AI{% endblock %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   KILL BASE.HTML WHITE — global dark override
+═══════════════════════════════════════════ */
+html,body{background:#000!important;color:#f1f5f9!important;}
+/* Kill every possible wrapper base.html might inject */
+body>*:not(nav):not(header):not(script):not(style),
+body>.container,body>.container-fluid,body>.container-lg,
+body>.container-xl,body>.container-xxl,
+.main-content,.page-content,.content-wrapper,.content-area,.content-body,
+.main-wrapper,.page-wrapper,.app-content,.app-wrapper,
+main,main>*,section,.section,[class*="content"],[class*="wrapper"],
+[class*="page-body"],[class*="main-panel"],[class*="app-main"]{
+  background:#000!important;
+}
+/* Bootstrap grid */
+.container,.container-fluid,.row,.col,.col-12,.col-md-12,.col-lg-12{
+  background:#000!important;padding-left:0!important;padding-right:0!important;
+}
+/* Cards & panels */
+.card,.card-body,.panel,.panel-body,.box,.box-body,.well,
+.jumbotron,[class*="card"],[class*="panel"]{
+  background:#0d0d14!important;
+  border-color:rgba(255,255,255,.07)!important;
+  color:#f1f5f9!important;
+}
+/* Make sure #pp itself fills everything */
+#pp{
+  width:100%!important;
+  min-height:calc(100vh - 60px)!important;
+  position:relative!important;
+}
+
+/* ═══════════════════════════════════════════
+   RESET + ROOT
+═══════════════════════════════════════════ */
+#pp{
+  --acc:#5b6bff;--acc2:#00e5c8;
+  --easy:#22c55e;--medium:#ffb547;--hard:#ff5757;
+  --easy-bg:rgba(34,197,94,.08);--medium-bg:rgba(255,181,71,.08);--hard-bg:rgba(255,87,87,.08);
+  --easy-b:rgba(34,197,94,.2);--medium-b:rgba(255,181,71,.2);--hard-b:rgba(255,87,87,.2);
+  --txt:#f1f5f9;--txt2:#cbd5e1;--txt3:#94a3b8;--txt4:#64748b;
+  --bg:#000000;--bg2:#0d0d14;--bg3:#111118;--card:#0d0d14;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.1);
+  --shadow:0 1px 3px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.3);
+  --shadow-md:0 4px 16px rgba(0,0,0,.4),0 2px 4px rgba(0,0,0,.3);
+  --shadow-lg:0 10px 40px rgba(0,0,0,.5),0 4px 8px rgba(0,0,0,.3);
+  --font:"Plus Jakarta Sans",sans-serif;
+  --mono:"JetBrains Mono",monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+  background:var(--bg);color:var(--txt);font-family:var(--font);
+  min-height:calc(100vh - 60px);
+}
+*{box-sizing:border-box;}
+
+/* ═══════════════════════════════════════════
+   TOP STATS BAR
+═══════════════════════════════════════════ */
+.pp-statsbar{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:10px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+}
+.pp-statsbar-item{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--txt3);}
+.pp-statsbar-num{font-weight:700;color:var(--txt);font-family:var(--mono);font-size:13px;}
+.pp-statsbar-dot{width:6px;height:6px;border-radius:50%;}
+.pp-statsbar-sep{width:1px;height:16px;background:var(--border2);}
+
+/* ═══════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════ */
+.pp-layout{display:flex;height:calc(100vh - 110px);}
+
+/* ═══════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════ */
+.pp-sidebar{
+  width:224px;flex-shrink:0;background:var(--bg2);
+  border-right:1px solid var(--border);overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+.pp-sidebar::-webkit-scrollbar{width:3px;}
+.pp-sidebar::-webkit-scrollbar-thumb{background:var(--border2);}
+.pp-sb-section{padding:12px 8px 4px;}
+.pp-sb-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
+  color:var(--txt4);padding:0 8px;margin-bottom:4px;}
+.pp-sb-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:8px;
+  cursor:pointer;transition:all .15s;font-size:13px;color:var(--txt2);
+  border:1px solid transparent;font-weight:500;}
+.pp-sb-item:hover{background:var(--bg2);color:var(--txt);}
+.pp-sb-item.active{background:rgba(91,107,255,.12);color:#818cf8;border-color:rgba(91,107,255,.25);}
+.pp-sb-item-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;
+  justify-content:center;font-size:13px;flex-shrink:0;}
+.pp-sb-count{margin-left:auto;font-size:11px;font-weight:600;color:var(--txt4);
+  background:var(--bg2);padding:1px 7px;border-radius:100px;}
+.pp-sb-divider{height:1px;background:var(--border);margin:6px 12px;}
+
+/* solved ring */
+.pp-sb-ring{margin:12px;padding:14px;background:var(--bg2);border-radius:12px;border:1px solid var(--border);}
+.pp-ring-title{font-size:11px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+.pp-ring-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.pp-ring-bar-wrap{flex:1;height:6px;border-radius:100px;background:var(--border);}
+.pp-ring-fill{height:100%;border-radius:100px;transition:width .8s var(--ease);}
+.pp-ring-label{font-size:11.5px;color:var(--txt3);width:44px;}
+.pp-ring-num{font-size:12px;font-weight:700;font-family:var(--mono);width:28px;text-align:right;}
+
+/* ═══════════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════════ */
+.pp-main{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+
+/* tabs */
+.pp-tabs{display:flex;align-items:center;gap:0;
+  background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;}
+.pp-tab{padding:11px 16px;font-size:13px;font-weight:600;color:var(--txt3);
+  cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;
+  transition:all .15s;display:flex;align-items:center;gap:6px;}
+.pp-tab:hover{color:var(--txt);}
+.pp-tab.active{color:#818cf8;border-bottom-color:var(--acc);}
+
+/* ═══════════════════════════════════════════
+   PROBLEMS VIEW
+═══════════════════════════════════════════ */
+#pv-problems{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+#pv-problems::-webkit-scrollbar{width:5px;}
+#pv-problems::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+.pp-toolbar{
+  padding:14px 20px;background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:10;
+}
+.pp-searchbox{
+  flex:1;min-width:200px;display:flex;align-items:center;gap:8px;
+  padding:8px 14px;border-radius:9px;border:1.5px solid var(--border);
+  background:rgba(255,255,255,.04);transition:border-color .15s;
+}
+.pp-searchbox:focus-within{border-color:var(--acc);box-shadow:0 0 0 3px #6366f115;}
+.pp-searchbox input{background:none;border:none;outline:none;font-size:13.5px;
+  font-family:var(--font);color:var(--txt);flex:1;}
+.pp-searchbox input::placeholder{color:var(--txt4);}
+.pp-fbtn{padding:7px 14px;border-radius:8px;border:1.5px solid var(--border);
+  background:rgba(255,255,255,.04);color:var(--txt3);font-size:12.5px;font-weight:600;
+  cursor:pointer;transition:all .15s;font-family:var(--font);}
+.pp-fbtn:hover{border-color:var(--acc);color:#818cf8;}
+.pp-fbtn.active{background:rgba(91,107,255,.12);border-color:rgba(91,107,255,.3);color:#818cf8;}
+.pp-fbtn.easy.active{background:var(--easy-bg);border-color:var(--easy-b);color:var(--easy);}
+.pp-fbtn.medium.active{background:var(--medium-bg);border-color:var(--medium-b);color:var(--medium);}
+.pp-fbtn.hard.active{background:var(--hard-bg);border-color:var(--hard-b);color:var(--hard);}
+
+/* table */
+.pp-table-wrap{padding:0 20px 20px;}
+.pp-table{width:100%;border-collapse:collapse;}
+.pp-table thead th{
+  text-align:left;padding:10px 12px;font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:1.2px;color:var(--txt4);
+  border-bottom:2px solid var(--border);position:sticky;top:0;background:var(--bg2);
+}
+.pp-row{cursor:pointer;transition:background .12s;}
+.pp-row:hover td{background:rgba(91,107,255,.05);}
+.pp-row td{
+  padding:10px 12px;border-bottom:1px solid var(--border);
+  font-size:13.5px;vertical-align:middle;
+}
+.pp-row td:first-child{border-radius:0;}
+.prob-num-cell{font-family:var(--mono);font-size:12px;color:var(--txt4);}
+.prob-title-cell{font-weight:600;color:var(--txt);display:flex;align-items:center;gap:6px;}
+.prob-title-cell:hover{color:#818cf8;}
+.prob-hot{font-size:11px;padding:1px 6px;border-radius:4px;
+  background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.25);color:#ff5757;font-weight:600;}
+.prob-new{font-size:11px;padding:1px 6px;border-radius:4px;
+  background:rgba(0,229,200,.1);border:1px solid rgba(0,229,200,.25);color:#00e5c8;font-weight:600;}
+.topic-tag{display:inline-flex;padding:2px 8px;border-radius:5px;font-size:11px;
+  font-weight:500;background:var(--bg2);color:var(--txt3);border:1px solid var(--border);margin:0 2px;}
+.diff-easy{display:inline-flex;padding:3px 10px;border-radius:6px;font-size:11.5px;
+  font-weight:700;background:var(--easy-bg);color:var(--easy);border:1px solid var(--easy-b);}
+.diff-medium{display:inline-flex;padding:3px 10px;border-radius:6px;font-size:11.5px;
+  font-weight:700;background:var(--medium-bg);color:var(--medium);border:1px solid var(--medium-b);}
+.diff-hard{display:inline-flex;padding:3px 10px;border-radius:6px;font-size:11.5px;
+  font-weight:700;background:var(--hard-bg);color:var(--hard);border:1px solid var(--hard-b);}
+.acc-cell{font-family:var(--mono);font-size:12.5px;color:var(--txt3);}
+.solved-check{font-size:16px;}
+
+/* ═══════════════════════════════════════════
+   EDITOR VIEW
+═══════════════════════════════════════════ */
+#pv-editor{display:none;height:calc(100vh - 160px);overflow:hidden;}
+.ed-split{display:flex;height:100%;}
+
+/* left */
+.ed-left{
+  width:45%;min-width:320px;display:flex;flex-direction:column;
+  background:var(--bg2);border-right:1px solid var(--border);overflow:hidden;
+}
+.ed-ltabs{display:flex;background:var(--bg3);border-bottom:1px solid var(--border);padding:0 12px;}
+.ed-ltab{padding:9px 14px;font-size:12.5px;font-weight:600;color:var(--txt3);
+  cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;}
+.ed-ltab.active{color:var(--acc);border-bottom-color:var(--acc);}
+.ed-lpane{display:none;flex:1;overflow-y:auto;padding:20px 22px;}
+.ed-lpane.active{display:block;}
+.ed-lpane::-webkit-scrollbar{width:4px;}
+.ed-lpane::-webkit-scrollbar-thumb{background:var(--border2);}
+.prob-title-big{font-size:20px;font-weight:800;color:var(--txt);margin-bottom:8px;letter-spacing:-.4px;}
+.prob-meta-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.prob-body{font-size:14px;color:rgba(255,255,255,.6);line-height:1.85;margin-bottom:16px;}
+.prob-body code{font-family:var(--mono);background:#f1f5f9;border:1px solid var(--border);
+  padding:1px 6px;border-radius:4px;font-size:13px;color:#1d4ed8;}
+.prob-example{background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--acc);
+  border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:12px;}
+.prob-ex-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
+  color:var(--txt4);margin-bottom:8px;}
+.prob-example pre{font-family:var(--mono);font-size:12.5px;color:var(--txt2);line-height:1.7;white-space:pre-wrap;}
+.prob-constraints{background:rgba(91,107,255,.04);border:1px solid rgba(91,107,255,.15);border-radius:8px;padding:14px 16px;margin-bottom:14px;}
+.constraints-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(91,107,255,.5);margin-bottom:8px;}
+.constraints-list{list-style:none;padding:0;}
+.constraints-list li{font-family:var(--mono);font-size:12px;color:var(--txt3);
+  padding:2px 0 2px 14px;position:relative;}
+.constraints-list li::before{content:"•";position:absolute;left:0;color:var(--acc);}
+.hint-item{background:rgba(255,181,71,.06);border:1px solid rgba(255,181,71,.18);border-radius:8px;
+  padding:10px 14px;margin-bottom:8px;font-size:13px;color:rgba(255,220,140,.75);line-height:1.7;}
+.hint-label{font-weight:700;color:#ffb547;margin-right:4px;}
+.back-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;margin:10px 14px;
+  border-radius:8px;border:1.5px solid var(--border);background:rgba(255,255,255,.03);cursor:pointer;
+  font-size:13px;font-weight:600;color:rgba(255,255,255,.4);transition:all .15s;font-family:var(--font);}
+.back-btn:hover{border-color:var(--acc);color:#818cf8;background:rgba(91,107,255,.1);}
+
+/* right */
+.ed-right{flex:1;display:flex;flex-direction:column;background:#1e1e2e;overflow:hidden;}
+.ed-rtop{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;background:#2a2a3e;border-bottom:1px solid rgba(255,255,255,.08);
+}
+.lang-select{padding:5px 12px;border-radius:7px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.07);color:#e2e8f0;font-size:12.5px;font-family:var(--font);
+  cursor:pointer;outline:none;}
+.lang-select option{background:#1e1e2e;}
+.code-btns{display:flex;gap:8px;}
+.btn-run{padding:6px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.08);color:#e2e8f0;font-size:12.5px;font-weight:600;
+  cursor:pointer;font-family:var(--font);transition:all .15s;}
+.btn-run:hover{background:rgba(255,255,255,.14);color:#fff;}
+.btn-submit{padding:6px 18px;border-radius:8px;border:none;
+  background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;
+  font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--font);
+  box-shadow:0 4px 14px rgba(99,102,241,.4);transition:all .15s;}
+.btn-submit:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(99,102,241,.5);}
+.btn-submit:disabled,.btn-run:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+.code-editor-area{flex:1;position:relative;overflow:hidden;}
+.line-nums{position:absolute;top:0;left:0;width:44px;height:100%;
+  background:#181825;border-right:1px solid rgba(255,255,255,.05);
+  padding:16px 0;overflow:hidden;pointer-events:none;z-index:1;}
+.ln{font-family:var(--mono);font-size:13px;color:rgba(255,255,255,.18);
+  line-height:1.7;padding-right:8px;text-align:right;display:block;}
+#codeTA{
+  position:absolute;inset:0;left:44px;background:transparent;border:none;
+  outline:none;color:#e2e8f0;font-family:var(--mono);font-size:13.5px;
+  line-height:1.7;padding:16px 14px 16px 12px;resize:none;
+  tab-size:4;caret-color:#06b6d4;width:calc(100% - 44px);
+}
+#codeTA::-webkit-scrollbar{width:6px;}
+#codeTA::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);}
+
+/* test panel */
+.tc-panel{height:220px;border-top:1px solid rgba(255,255,255,.06);
+  background:#181825;display:flex;flex-direction:column;}
+.tc-tabs{display:flex;padding:0 12px;border-bottom:1px solid rgba(255,255,255,.06);}
+.tc-tab{padding:8px 14px;font-size:12px;font-weight:600;color:rgba(255,255,255,.35);
+  cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;}
+.tc-tab.active{color:#06b6d4;border-bottom-color:#06b6d4;}
+.tc-body{flex:1;overflow-y:auto;padding:12px 14px;}
+.tc-body::-webkit-scrollbar{width:3px;}
+.tc-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);}
+.tc-input-item{margin-bottom:10px;}
+.tc-input-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  color:rgba(255,255,255,.3);margin-bottom:4px;}
+.tc-input-val{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
+  border-radius:6px;padding:6px 10px;font-family:var(--mono);font-size:12.5px;
+  color:rgba(255,255,255,.6);width:100%;}
+.tc-expected{font-size:11px;color:rgba(255,255,255,.2);margin-top:3px;font-family:var(--mono);}
+
+.res-item{padding:10px 14px;border-radius:8px;margin-bottom:7px;}
+.res-pass{background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.2);}
+.res-fail{background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);}
+.res-top{display:flex;justify-content:space-between;align-items:center;}
+.res-pass-txt{color:#4ade80;font-weight:700;font-size:13px;}
+.res-fail-txt{color:#f87171;font-weight:700;font-size:13px;}
+.res-time{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.25);}
+.res-details{font-family:var(--mono);font-size:11.5px;color:rgba(255,255,255,.3);
+  margin-top:6px;line-height:1.7;}
+
+/* verdict */
+.verdict-strip{display:none;padding:10px 16px;align-items:center;
+  justify-content:space-between;font-size:13.5px;font-weight:700;
+  border-top:1px solid rgba(255,255,255,.06);}
+.verdict-strip.show{display:flex;}
+.vs-accepted{background:rgba(22,163,74,.1);color:#4ade80;}
+.vs-wrong{background:rgba(220,38,38,.1);color:#f87171;}
+.vs-tle{background:rgba(217,119,6,.1);color:#fbbf24;}
+.vs-error{background:rgba(139,92,246,.1);color:#c084fc;}
+.vs-meta{font-size:12px;font-weight:400;color:rgba(255,255,255,.35);display:flex;gap:16px;}
+
+/* ═══════════════════════════════════════════
+   PROFILE VIEW
+═══════════════════════════════════════════ */
+#pv-profile{display:none;overflow-y:auto;flex:1;}
+#pv-profile::-webkit-scrollbar{width:5px;}
+#pv-profile::-webkit-scrollbar-thumb{background:var(--border2);}
+.prof-wrap{max-width:900px;padding:24px 28px;}
+
+.prof-head{display:flex;align-items:center;gap:20px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:16px;
+  padding:22px 24px;margin-bottom:20px;box-shadow:var(--shadow);}
+.prof-avatar{width:68px;height:68px;border-radius:50%;
+  background:linear-gradient(135deg,#6366f1,#06b6d4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;font-weight:800;color:#fff;flex-shrink:0;}
+.prof-name{font-size:22px;font-weight:800;color:var(--txt);letter-spacing:-.5px;}
+.prof-sub{font-size:13px;color:var(--txt3);margin-top:3px;}
+
+.prof-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.prof-stat{background:var(--bg3);border:1px solid var(--border);border-radius:12px;
+  padding:18px;text-align:center;box-shadow:var(--shadow);}
+.prof-stat-n{font-size:26px;font-weight:800;letter-spacing:-1px;font-family:var(--mono);}
+.prof-stat-l{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;
+  color:var(--txt4);margin-top:3px;}
+
+.diff-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+.diff-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;
+  padding:18px;box-shadow:var(--shadow);}
+.diff-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.diff-card-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.diff-card-count{font-size:24px;font-weight:800;font-family:var(--mono);}
+.diff-bar-track{height:6px;border-radius:100px;background:var(--border);}
+.diff-bar-inner{height:100%;border-radius:100px;transition:width .9s var(--ease);}
+.diff-card-sub{font-size:11.5px;color:var(--txt4);margin-top:6px;}
+
+/* activity calendar */
+.cal-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;
+  padding:20px 22px;margin-bottom:20px;box-shadow:var(--shadow);}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.cal-title{font-size:14px;font-weight:700;color:var(--txt);}
+.cal-stats{display:flex;gap:20px;}
+.cal-stat{font-size:12.5px;color:var(--txt3);}
+.cal-stat strong{color:var(--txt);font-weight:700;}
+.cal-months{display:grid;grid-template-columns:repeat(53,1fr);gap:2px;margin-bottom:4px;}
+.cal-month-labels{display:flex;justify-content:space-between;padding:0 0;margin-bottom:6px;}
+.cal-month-label{font-size:10px;color:var(--txt4);font-weight:600;}
+.cal-cell{aspect-ratio:1;border-radius:2px;background:#e5e7eb;cursor:default;transition:transform .1s;}
+.cal-cell:hover{transform:scale(1.3);z-index:2;position:relative;}
+.cal-cell.l0{background:rgba(255,255,255,.06);}
+.cal-cell.l1{background:#bbf7d0;}
+.cal-cell.l2{background:#4ade80;}
+.cal-cell.l3{background:#16a34a;}
+.cal-cell.l4{background:#14532d;}
+.cal-legend{display:flex;align-items:center;gap:6px;justify-content:flex-end;font-size:11px;color:var(--txt4);}
+.cal-legend-cell{width:10px;height:10px;border-radius:2px;}
+
+/* recent submissions */
+.recent-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;
+  padding:20px 22px;box-shadow:var(--shadow);}
+.recent-title{font-size:14px;font-weight:700;color:var(--txt);margin-bottom:14px;}
+.sub-item{display:flex;align-items:center;gap:12px;padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);}
+.sub-item:last-child{border-bottom:none;padding-bottom:0;}
+.sub-prob{flex:1;font-size:13.5px;font-weight:600;color:var(--txt);cursor:pointer;}
+.sub-prob:hover{color:#818cf8;}
+.sub-badge{padding:3px 10px;border-radius:6px;font-size:11.5px;font-weight:700;}
+.sb-acc{background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.2);}
+.sb-wrong{background:rgba(255,87,87,.1);color:#ff5757;border:1px solid rgba(255,87,87,.2);}
+.sub-lang{font-size:12px;color:var(--txt4);font-family:var(--mono);}
+.sub-diff{font-size:11px;}
+.sub-date{font-size:11.5px;color:var(--txt4);}
+.empty-start{text-align:center;padding:40px 20px;
+  background:var(--bg2);border-radius:10px;border:1px dashed var(--border);}
+.empty-start-icon{font-size:36px;margin-bottom:10px;}
+.empty-start-text{font-size:14px;color:var(--txt3);}
+.empty-start-sub{font-size:12.5px;color:var(--txt4);margin-top:4px;}
+
+/* misc */
+.mini-spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);
+  border-top-color:var(--acc);display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mini-spin{animation:spin .7s linear infinite;}
+.empty-msg{text-align:center;padding:40px;color:var(--txt4);font-size:13.5px;}
+</style>
+
+<div id="pp">
+
+<!-- ── STATS BAR ── -->
+<div class="pp-statsbar" id="ppStatsBar">
+  <div class="pp-statsbar-item">
+    <div class="pp-statsbar-dot" style="background:#6366f1"></div>
+    Total: <span class="pp-statsbar-num" id="sbTotal">0</span>
+  </div>
+  <div class="pp-statsbar-sep"></div>
+  <div class="pp-statsbar-item">
+    <div class="pp-statsbar-dot" style="background:#16a34a"></div>
+    Easy: <span class="pp-statsbar-num" id="sbEasy">0</span>
+  </div>
+  <div class="pp-statsbar-sep"></div>
+  <div class="pp-statsbar-item">
+    <div class="pp-statsbar-dot" style="background:#d97706"></div>
+    Medium: <span class="pp-statsbar-num" id="sbMedium">0</span>
+  </div>
+  <div class="pp-statsbar-sep"></div>
+  <div class="pp-statsbar-item">
+    <div class="pp-statsbar-dot" style="background:#dc2626"></div>
+    Hard: <span class="pp-statsbar-num" id="sbHard">0</span>
+  </div>
+  <div class="pp-statsbar-sep"></div>
+  <div class="pp-statsbar-item" style="margin-left:auto">
+    ✅ Solved: <span class="pp-statsbar-num" style="color:#16a34a" id="sbSolved">0</span>
+  </div>
+</div>
+
+<div class="pp-layout">
+
+<!-- ── SIDEBAR ── -->
+<div class="pp-sidebar">
+  <div class="pp-sb-section">
+    <div class="pp-sb-label">Study Plans</div>
+    <div class="pp-sb-item active" data-plan="" onclick="setPlan(this,'')">
+      <div class="pp-sb-item-icon">📋</div> All Problems
+      <span class="pp-sb-count" id="cnt-all">0</span>
+    </div>
+    <div class="pp-sb-item" data-plan="Blind 75" onclick="setPlan(this,'Blind 75')">
+      <div class="pp-sb-item-icon">🎯</div> Blind 75
+      <span class="pp-sb-count">75</span>
+    </div>
+    <div class="pp-sb-item" data-plan="NeetCode 150" onclick="setPlan(this,'NeetCode 150')">
+      <div class="pp-sb-item-icon">💜</div> PilotCode 150
+      <span class="pp-sb-count">150</span>
+    </div>
+    <div class="pp-sb-item" data-plan="Top Interview 150" onclick="setPlan(this,'Top Interview 150')">
+      <div class="pp-sb-item-icon">🏆</div> Top Interview
+      <span class="pp-sb-count">150</span>
+    </div>
+    <div class="pp-sb-item" data-plan="FAANG Prep" onclick="setPlan(this,'FAANG Prep')">
+      <div class="pp-sb-item-icon">🚀</div> FAANG Prep
+      <span class="pp-sb-count">200</span>
+    </div>
+  </div>
+  <div class="pp-sb-divider"></div>
+  <div class="pp-sb-section">
+    <div class="pp-sb-label">Topics</div>
+    <div class="pp-sb-item" data-topic="Array" onclick="setTopic(this,'Array')">
+      <div class="pp-sb-item-icon">📊</div> Array
+      <span class="pp-sb-count" id="cnt-Array"></span>
+    </div>
+    <div class="pp-sb-item" data-topic="String" onclick="setTopic(this,'String')">
+      <div class="pp-sb-item-icon">🔤</div> String
+      <span class="pp-sb-count" id="cnt-String"></span>
+    </div>
+    <div class="pp-sb-item" data-topic="Linked List" onclick="setTopic(this,'Linked List')">
+      <div class="pp-sb-item-icon">🔗</div> Linked List
+      <span class="pp-sb-count" id="cnt-LinkedList"></span>
+    </div>
+    <div class="pp-sb-item" data-topic="Tree" onclick="setTopic(this,'Tree')">
+      <div class="pp-sb-item-icon">🌳</div> Tree
+      <span class="pp-sb-count" id="cnt-Tree"></span>
+    </div>
+    <div class="pp-sb-item" data-topic="Graph" onclick="setTopic(this,'Graph')">
+      <div class="pp-sb-item-icon">🕸️</div> Graph
+      <span class="pp-sb-count" id="cnt-Graph"></span>
+    </div>
+    <div class="pp-sb-item" data-topic="Dynamic Programming" onclick="setTopic(this,'Dynamic Programming')">
+      <div class="pp-sb-item-icon">💡</div> Dynamic Prog
+      <span class="pp-sb-count" id="cnt-DP"></span>
+    </div>
+    <div class="pp-sb-item" data-topic="Stack" onclick="setTopic(this,'Stack')">
+      <div class="pp-sb-item-icon">📚</div> Stack
+      <span class="pp-sb-count" id="cnt-Stack"></span>
+    </div>
+    <div class="pp-sb-item" data-topic="Heap" onclick="setTopic(this,'Heap')">
+      <div class="pp-sb-item-icon">🔺</div> Heap
+      <span class="pp-sb-count" id="cnt-Heap"></span>
+    </div>
+    <div class="pp-sb-item" data-topic="Binary Search" onclick="setTopic(this,'Binary Search')">
+      <div class="pp-sb-item-icon">🔍</div> Binary Search
+      <span class="pp-sb-count" id="cnt-BS"></span>
+    </div>
+    <div class="pp-sb-item" data-topic="Sliding Window" onclick="setTopic(this,'Sliding Window')">
+      <div class="pp-sb-item-icon">🪟</div> Sliding Window
+      <span class="pp-sb-count" id="cnt-SW"></span>
+    </div>
+    <div class="pp-sb-item" data-topic="Backtracking" onclick="setTopic(this,'Backtracking')">
+      <div class="pp-sb-item-icon">🔄</div> Backtracking
+      <span class="pp-sb-count" id="cnt-BT"></span>
+    </div>
+    <div class="pp-sb-item" data-topic="Two Pointers" onclick="setTopic(this,'Two Pointers')">
+      <div class="pp-sb-item-icon">👆</div> Two Pointers
+      <span class="pp-sb-count" id="cnt-TP"></span>
+    </div>
+  </div>
+  <div class="pp-sb-divider"></div>
+  <!-- Solved ring -->
+  <div class="pp-sb-ring" id="sbRing">
+    <div class="pp-ring-title">Your Progress</div>
+    <div class="pp-ring-row">
+      <span class="pp-ring-label" style="color:#16a34a">Easy</span>
+      <div class="pp-ring-bar-wrap"><div class="pp-ring-fill" id="rf-easy" style="background:#16a34a;width:0%"></div></div>
+      <span class="pp-ring-num" style="color:#16a34a" id="rn-easy">0</span>
+    </div>
+    <div class="pp-ring-row">
+      <span class="pp-ring-label" style="color:#d97706">Med</span>
+      <div class="pp-ring-bar-wrap"><div class="pp-ring-fill" id="rf-med" style="background:#d97706;width:0%"></div></div>
+      <span class="pp-ring-num" style="color:#d97706" id="rn-med">0</span>
+    </div>
+    <div class="pp-ring-row">
+      <span class="pp-ring-label" style="color:#dc2626">Hard</span>
+      <div class="pp-ring-bar-wrap"><div class="pp-ring-fill" id="rf-hard" style="background:#dc2626;width:0%"></div></div>
+      <span class="pp-ring-num" style="color:#dc2626" id="rn-hard">0</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="pp-main">
+  <div class="pp-tabs">
+    <button class="pp-tab active" onclick="showTab('problems',this)">📋 Problems</button>
+    <button class="pp-tab" onclick="showTab('profile',this)">👤 My Progress</button>
+  </div>
+
+  <!-- PROBLEMS -->
+  <div id="pv-problems">
+    <div class="pp-toolbar">
+      <div class="pp-searchbox">
+        <span style="color:#9ca3af;font-size:15px">🔍</span>
+        <input type="text" id="searchQ" placeholder="Search 500+ problems…" oninput="renderList()">
+      </div>
+      <button class="pp-fbtn active" id="fb-all" onclick="setDiff('')">All</button>
+      <button class="pp-fbtn easy" id="fb-Easy" onclick="setDiff('Easy')">Easy</button>
+      <button class="pp-fbtn medium" id="fb-Medium" onclick="setDiff('Medium')">Medium</button>
+      <button class="pp-fbtn hard" id="fb-Hard" onclick="setDiff('Hard')">Hard</button>
+      <button class="pp-fbtn" id="fb-solved" onclick="toggleSolved()">✅ Solved</button>
+    </div>
+    <div class="pp-table-wrap">
+      <table class="pp-table">
+        <thead>
+          <tr>
+            <th style="width:32px"></th>
+            <th style="width:50px">#</th>
+            <th>Title</th>
+            <th>Topics</th>
+            <th style="width:96px">Difficulty</th>
+            <th style="width:72px">Accept%</th>
+          </tr>
+        </thead>
+        <tbody id="probTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- EDITOR -->
+  <div id="pv-editor">
+    <div class="ed-split">
+      <div class="ed-left">
+        <div class="ed-ltabs">
+          <div class="ed-ltab active" onclick="switchLTab('desc',this)">Description</div>
+          <div class="ed-ltab" onclick="switchLTab('hints',this)">Hints</div>
+        </div>
+        <div class="ed-lpane active" id="elp-desc"></div>
+        <div class="ed-lpane" id="elp-hints"></div>
+        <button class="back-btn" onclick="goBack()">← Back to Problems</button>
+      </div>
+      <div class="ed-right">
+        <div class="ed-rtop">
+          <select class="lang-select" id="langSel" onchange="loadBoiler()">
+            <option value="python">Python 3</option>
+            <option value="javascript">JavaScript</option>
+            <option value="java">Java</option>
+            <option value="cpp">C++</option>
+          </select>
+          <div class="code-btns">
+            <button class="btn-run" id="btnRun" onclick="runCode()">▶ Run</button>
+            <button class="btn-submit" id="btnSubmit" onclick="submitCode()">⚡ Submit</button>
+          </div>
+        </div>
+        <div class="code-editor-area">
+          <div class="line-nums" id="lineNums"></div>
+          <textarea id="codeTA" spellcheck="false"
+            onkeydown="handleTab(event)" oninput="syncLN()"></textarea>
+        </div>
+        <div class="tc-panel">
+          <div class="tc-tabs">
+            <div class="tc-tab active" onclick="switchTcTab('cases',this)">Test Cases</div>
+            <div class="tc-tab" onclick="switchTcTab('output',this)">Output</div>
+          </div>
+          <div class="tc-body" id="tcp-cases"></div>
+          <div class="tc-body" id="tcp-output" style="display:none">
+            <div id="outputMsg" style="color:rgba(255,255,255,.25);font-size:13px;padding:4px 0">Run to see output</div>
+            <div id="outputBody"></div>
+          </div>
+        </div>
+        <div class="verdict-strip" id="verdictStrip"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div id="pv-profile">
+    <div class="prof-wrap" id="profContent">
+      <div class="empty-msg">
+        <span class="mini-spin" style="width:20px;height:20px;margin:0 auto 10px;display:block"></span>
+        Loading your progress…
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+// ═════════════════════════════════════════════════════════
+//  500+ PROBLEMS DATABASE
+// ═════════════════════════════════════════════════════════
+const P=[
+// ── EASY ──────────────────────────────────────────────
+{id:1,t:"Two Sum",d:"Easy",tp:["Array","Hash Table"],a:49.1,tag:"hot",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Given an array of integers <code>nums</code> and an integer <code>target</code>, return indices of the two numbers such that they add up to target. Assume exactly one solution and you may not use the same element twice.",
+ ex:[{i:"nums=[2,7,11,15], target=9",o:"[0,1]",e:"nums[0]+nums[1]=9"},{i:"nums=[3,2,4], target=6",o:"[1,2]"}],
+ con:["2≤nums.length≤10⁴","−10⁹≤nums[i]≤10⁹","Only one valid answer."],
+ hints:["Use a hash map — for each x check if target−x is already seen.","Store value→index mapping."],
+ tc:[{i:"[2,7,11,15]\n9",e:"[0, 1]"},{i:"[3,2,4]\n6",e:"[1, 2]"},{i:"[3,3]\n6",e:"[0, 1]"}],
+ b:{python:"from typing import List\nimport sys,json,ast\nclass Solution:\n    def twoSum(self,nums:List[int],target:int)->List[int]:\n        # Write your solution\n        pass\ndata=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().twoSum(ast.literal_eval(data[0]),int(data[1]))))"}},
+
+{id:2,t:"Valid Parentheses",d:"Easy",tp:["String","Stack"],a:40.5,tag:"",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Given string s of '(){}[]', determine if it is valid. Open brackets must be closed by same type in correct order.",
+ ex:[{i:'s="()"',o:"true"},{i:'s="()[]{}"',o:"true"},{i:'s="(]"',o:"false"}],
+ con:["1≤s.length≤10⁴","s consists of '()[]{}'"],
+ hints:["Use a stack. Push opening brackets.","On closing bracket, pop and verify match."],
+ tc:[{i:'"()"',e:"true"},{i:'"()[]{}"',e:"true"},{i:'"(]"',e:"false"},{i:'"([)]"',e:"false"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def isValid(self,s:str)->bool:\n        pass\nprint(json.dumps(Solution().isValid(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:3,t:"Climbing Stairs",d:"Easy",tp:["Dynamic Programming","Math"],a:51.9,tag:"hot",plan:["Blind 75","NeetCode 150","FAANG Prep"],
+ desc:"You are climbing n steps. Each time you can climb 1 or 2 steps. How many distinct ways can you reach the top?",
+ ex:[{i:"n=2",o:"2",e:"(1,1) and (2)"},{i:"n=3",o:"3",e:"(1,1,1),(1,2),(2,1)"}],
+ con:["1≤n≤45"],
+ hints:["Fibonacci: dp[n]=dp[n-1]+dp[n-2]","dp[1]=1, dp[2]=2"],
+ tc:[{i:"2",e:"2"},{i:"3",e:"3"},{i:"10",e:"89"}],
+ b:{python:"import sys,json\nclass Solution:\n    def climbStairs(self,n:int)->int:\n        pass\nprint(json.dumps(Solution().climbStairs(int(sys.stdin.read().strip()))))"}},
+
+{id:4,t:"Best Time to Buy and Sell Stock",d:"Easy",tp:["Array","Dynamic Programming"],a:54.2,tag:"",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Given prices[], find max profit from one buy + one sell. Return 0 if no profit possible.",
+ ex:[{i:"prices=[7,1,5,3,6,4]",o:"5",e:"Buy day2 price=1, sell day5 price=6"},{i:"prices=[7,6,4,3,1]",o:"0"}],
+ con:["1≤prices.length≤10⁵","0≤prices[i]≤10⁴"],
+ hints:["Track min price seen so far.","profit = price − minSoFar"],
+ tc:[{i:"[7,1,5,3,6,4]",e:"5"},{i:"[7,6,4,3,1]",e:"0"},{i:"[1,2]",e:"1"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def maxProfit(self,prices)->int:\n        pass\nprint(json.dumps(Solution().maxProfit(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:5,t:"Contains Duplicate",d:"Easy",tp:["Array","Hash Table","Sorting"],a:60.1,tag:"",plan:["Blind 75","NeetCode 150"],
+ desc:"Given integer array nums, return true if any value appears at least twice.",
+ ex:[{i:"nums=[1,2,3,1]",o:"true"},{i:"nums=[1,2,3,4]",o:"false"}],
+ con:["1≤nums.length≤10⁵","−10⁹≤nums[i]≤10⁹"],
+ hints:["Use a set — check if element already in set."],
+ tc:[{i:"[1,2,3,1]",e:"true"},{i:"[1,2,3,4]",e:"false"},{i:"[1,1,1,3,3,4,3,2,4,2]",e:"true"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def containsDuplicate(self,nums)->bool:\n        pass\nprint(json.dumps(Solution().containsDuplicate(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:6,t:"Valid Anagram",d:"Easy",tp:["Hash Table","String","Sorting"],a:62.9,tag:"",plan:["Blind 75","NeetCode 150"],
+ desc:"Given two strings s and t, return true if t is an anagram of s.",
+ ex:[{i:'s="anagram",t="nagaram"',o:"true"},{i:'s="rat",t="car"',o:"false"}],
+ con:["1≤s.length,t.length≤5×10⁴","s and t consist of lowercase letters."],
+ hints:["Count frequency of each character.","Compare the two frequency maps."],
+ tc:[{i:'"anagram"\n"nagaram"',e:"true"},{i:'"rat"\n"car"',e:"false"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def isAnagram(self,s:str,t:str)->bool:\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().isAnagram(ast.literal_eval(d[0]),ast.literal_eval(d[1]))))"}},
+
+{id:7,t:"Reverse Linked List",d:"Easy",tp:["Linked List","Recursion"],a:73.6,tag:"",plan:["Blind 75","NeetCode 150","Top Interview 150"],
+ desc:"Given the head of a singly linked list, reverse it and return the reversed list.",
+ ex:[{i:"head=[1,2,3,4,5]",o:"[5,4,3,2,1]"},{i:"head=[1,2]",o:"[2,1]"}],
+ con:["0≤nodes≤5000","−5000≤Node.val≤5000"],
+ hints:["Iterative: prev,curr,next pointers.","Or recursively reverse from tail."],
+ tc:[{i:"[1,2,3,4,5]",e:"[5, 4, 3, 2, 1]"},{i:"[1,2]",e:"[2, 1]"},{i:"[]",e:"[]"}],
+ b:{python:"import sys,json,ast\nclass ListNode:\n    def __init__(self,val=0,next=None):self.val=val;self.next=next\ndef mk(a):\n    d=ListNode();c=d\n    for v in a:c.next=ListNode(v);c=c.next\n    return d.next\ndef toA(h):\n    r=[]\n    while h:r.append(h.val);h=h.next\n    return r\nclass Solution:\n    def reverseList(self,head):\n        pass\nprint(json.dumps(toA(Solution().reverseList(mk(ast.literal_eval(sys.stdin.read().strip()))))))"}},
+
+{id:8,t:"Merge Two Sorted Lists",d:"Easy",tp:["Linked List","Recursion"],a:61.3,tag:"",plan:["Blind 75","NeetCode 150","Top Interview 150"],
+ desc:"Merge two sorted linked lists and return as one sorted list by splicing the nodes.",
+ ex:[{i:"l1=[1,2,4],l2=[1,3,4]",o:"[1,1,2,3,4,4]"},{i:"l1=[],l2=[]",o:"[]"}],
+ con:["0≤nodes in each list≤50","−100≤Node.val≤100"],
+ hints:["Use a dummy head to simplify edge cases.","Compare values, advance the smaller pointer."],
+ tc:[{i:"[1,2,4]\n[1,3,4]",e:"[1, 1, 2, 3, 4, 4]"},{i:"[]\n[]",e:"[]"}],
+ b:{python:"import sys,json,ast\nclass ListNode:\n    def __init__(self,v=0,n=None):self.val=v;self.next=n\ndef mk(a):\n    d=ListNode();c=d\n    for v in a:c.next=ListNode(v);c=c.next\n    return d.next\ndef toA(h):\n    r=[]\n    while h:r.append(h.val);h=h.next\n    return r\nclass Solution:\n    def mergeTwoLists(self,l1,l2):\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(toA(Solution().mergeTwoLists(mk(ast.literal_eval(d[0])),mk(ast.literal_eval(d[1]))))))"}},
+
+{id:9,t:"Linked List Cycle",d:"Easy",tp:["Linked List","Two Pointers","Hash Table"],a:45.8,tag:"",plan:["Blind 75","NeetCode 150"],
+ desc:"Given the head of a linked list, determine if it has a cycle.",
+ ex:[{i:"head=[3,2,0,-4], pos=1",o:"true"},{i:"head=[1,2],pos=0",o:"true"},{i:"head=[1],pos=-1",o:"false"}],
+ con:["0≤nodes≤10⁴","−10⁵≤Node.val≤10⁵"],
+ hints:["Floyd's Cycle Detection: slow and fast pointers.","If they meet, cycle exists."],
+ tc:[{i:"true_cycle",e:"true"},{i:"no_cycle",e:"false"}],
+ b:{python:"import sys,json\nclass Solution:\n    def hasCycle(self,head)->bool:\n        pass\n# Cycle detection — implement hasCycle using fast/slow pointers\nprint(json.dumps(False))"}},
+
+{id:10,t:"Maximum Depth of Binary Tree",d:"Easy",tp:["Tree","DFS","BFS"],a:73.2,tag:"hot",plan:["Blind 75","NeetCode 150","Top Interview 150"],
+ desc:"Given root of binary tree, return its maximum depth (longest path from root to leaf).",
+ ex:[{i:"root=[3,9,20,null,null,15,7]",o:"3"},{i:"root=[1,null,2]",o:"2"}],
+ con:["0≤nodes≤10⁴","−100≤Node.val≤100"],
+ hints:["Recursive: return 1+max(left,right).","Or BFS counting levels."],
+ tc:[{i:"[3,9,20,null,null,15,7]",e:"3"},{i:"[1,null,2]",e:"2"},{i:"[]",e:"0"}],
+ b:{python:"import sys,json\nclass Solution:\n    def maxDepth(self,root)->int:\n        pass\nprint(json.dumps(Solution().maxDepth(None)))"}},
+
+{id:11,t:"Same Tree",d:"Easy",tp:["Tree","DFS","BFS"],a:56.2,tag:"",plan:["NeetCode 150"],
+ desc:"Given roots of two binary trees p and q, check if they are structurally identical with same values.",
+ ex:[{i:"p=[1,2,3],q=[1,2,3]",o:"true"},{i:"p=[1,2],q=[1,null,2]",o:"false"}],
+ con:["0≤nodes≤100","−10⁴≤Node.val≤10⁴"],
+ hints:["Recursively compare each node.","Both null → true. One null → false."],
+ tc:[{i:"equal",e:"true"},{i:"different",e:"false"}],
+ b:{python:"import sys,json\nclass Solution:\n    def isSameTree(self,p,q)->bool:\n        pass\nprint(json.dumps(True))"}},
+
+{id:12,t:"Invert Binary Tree",d:"Easy",tp:["Tree","DFS","BFS"],a:75.3,tag:"",plan:["Blind 75","NeetCode 150"],
+ desc:"Given root of binary tree, invert it (mirror) and return root.",
+ ex:[{i:"root=[4,2,7,1,3,6,9]",o:"[4,7,2,9,6,3,1]"}],
+ con:["0≤nodes≤100","−100≤Node.val≤100"],
+ hints:["Swap left and right children at each node.","Recurse on both subtrees."],
+ tc:[{i:"[4,2,7,1,3,6,9]",e:"[4,7,2,9,6,3,1]"}],
+ b:{python:"import sys,json\nclass Solution:\n    def invertTree(self,root):\n        pass\nprint('Invert Binary Tree — implement invertTree()')"}},
+
+{id:13,t:"Symmetric Tree",d:"Easy",tp:["Tree","DFS","BFS"],a:52.4,tag:"",plan:["Top Interview 150"],
+ desc:"Given root of binary tree, check whether it is a mirror of itself (symmetric around center).",
+ ex:[{i:"root=[1,2,2,3,4,4,3]",o:"true"},{i:"root=[1,2,2,null,3,null,3]",o:"false"}],
+ con:["1≤nodes≤1000","−100≤Node.val≤100"],
+ hints:["Use isMirror(left,right) helper.","Both null→true, one null→false, compare values then recurse cross."],
+ tc:[{i:"symmetric",e:"true"},{i:"asymmetric",e:"false"}],
+ b:{python:"import sys,json\nclass Solution:\n    def isSymmetric(self,root)->bool:\n        pass\nprint(json.dumps(True))"}},
+
+{id:14,t:"Convert Sorted Array to BST",d:"Easy",tp:["Array","Divide and Conquer","Tree"],a:68.4,tag:"",plan:[],
+ desc:"Given sorted array, convert to height-balanced binary search tree.",
+ ex:[{i:"nums=[-10,-3,0,5,9]",o:"[0,-3,9,-10,null,5]"}],
+ con:["1≤nums.length≤10⁴","−10⁴≤nums[i]≤10⁴","nums is sorted in ascending order."],
+ hints:["Pick mid as root.","Recursively build left from left half, right from right half."],
+ tc:[{i:"[-10,-3,0,5,9]",e:"balanced BST"},{i:"[1,3]",e:"[3,1]"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def sortedArrayToBST(self,nums):\n        pass\nprint('BST built')"}},
+
+{id:15,t:"Balanced Binary Tree",d:"Easy",tp:["Tree","DFS"],a:48.2,tag:"",plan:["NeetCode 150"],
+ desc:"Given root of binary tree, determine if it is height-balanced (every subtree height differs by at most 1).",
+ ex:[{i:"root=[3,9,20,null,null,15,7]",o:"true"},{i:"root=[1,2,2,3,3,null,null,4,4]",o:"false"}],
+ con:["0≤nodes≤5000","−10⁴≤Node.val≤10⁴"],
+ hints:["DFS returning -1 if unbalanced.","height=max(left,right)+1"],
+ tc:[{i:"balanced",e:"true"},{i:"unbalanced",e:"false"}],
+ b:{python:"import sys,json\nclass Solution:\n    def isBalanced(self,root)->bool:\n        pass\nprint(json.dumps(True))"}},
+
+{id:16,t:"Single Number",d:"Easy",tp:["Array","Bit Manipulation"],a:70.2,tag:"hot",plan:["NeetCode 150","Top Interview 150"],
+ desc:"Given non-empty array where every element appears twice except one. Find that single one in O(n) time O(1) space.",
+ ex:[{i:"nums=[2,2,1]",o:"1"},{i:"nums=[4,1,2,1,2]",o:"4"}],
+ con:["1≤nums.length≤3×10⁴","−3×10⁴≤nums[i]≤3×10⁴","Each element appears twice except one."],
+ hints:["XOR: a^a=0 and a^0=a.","XOR all elements — pairs cancel out."],
+ tc:[{i:"[2,2,1]",e:"1"},{i:"[4,1,2,1,2]",e:"4"},{i:"[1]",e:"1"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def singleNumber(self,nums)->int:\n        pass\nprint(json.dumps(Solution().singleNumber(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:17,t:"Missing Number",d:"Easy",tp:["Array","Math","Bit Manipulation"],a:61.4,tag:"",plan:["NeetCode 150"],
+ desc:"Given array nums of n distinct numbers in range [0,n], find the missing number.",
+ ex:[{i:"nums=[3,0,1]",o:"2"},{i:"nums=[0,1]",o:"2"},{i:"nums=[9,6,4,2,3,5,7,0,1]",o:"8"}],
+ con:["n==nums.length","1≤n≤10⁴","0≤nums[i]≤n","All nums are distinct."],
+ hints:["Expected sum = n*(n+1)/2.","Missing = expected − actual sum."],
+ tc:[{i:"[3,0,1]",e:"2"},{i:"[0,1]",e:"2"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def missingNumber(self,nums)->int:\n        pass\nprint(json.dumps(Solution().missingNumber(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:18,t:"Counting Bits",d:"Easy",tp:["Dynamic Programming","Bit Manipulation"],a:74.8,tag:"",plan:["NeetCode 150"],
+ desc:"Given integer n, return array ans of length n+1 where ans[i] is the number of 1s in binary representation of i.",
+ ex:[{i:"n=2",o:"[0,1,1]"},{i:"n=5",o:"[0,1,1,2,1,2]"}],
+ con:["0≤n≤10⁵"],
+ hints:["dp[i]=dp[i>>1]+(i&1)","Even numbers have same bits as half, odd add one."],
+ tc:[{i:"2",e:"[0, 1, 1]"},{i:"5",e:"[0, 1, 1, 2, 1, 2]"}],
+ b:{python:"import sys,json\nclass Solution:\n    def countBits(self,n):\n        pass\nprint(json.dumps(Solution().countBits(int(sys.stdin.read().strip()))))"}},
+
+{id:19,t:"Number of 1 Bits",d:"Easy",tp:["Divide and Conquer","Bit Manipulation"],a:67.2,tag:"",plan:["NeetCode 150"],
+ desc:"Write a function that takes the binary representation of an unsigned integer and returns the number of '1' bits (Hamming weight).",
+ ex:[{i:"n=00000000000000000000000000001011",o:"3"},{i:"n=11111111111111111111111111111101",o:"31"}],
+ con:["Input is a 32-bit unsigned integer."],
+ hints:["n&(n-1) clears the lowest set bit.","Count how many times until n=0."],
+ tc:[{i:"11",e:"3"},{i:"128",e:"1"}],
+ b:{python:"import sys,json\nclass Solution:\n    def hammingWeight(self,n:int)->int:\n        pass\nprint(json.dumps(Solution().hammingWeight(int(sys.stdin.read().strip()))))"}},
+
+{id:20,t:"Reverse Bits",d:"Easy",tp:["Divide and Conquer","Bit Manipulation"],a:51.4,tag:"",plan:["NeetCode 150"],
+ desc:"Reverse bits of a given 32-bit unsigned integer.",
+ ex:[{i:"n=43261596",o:"964176192"},{i:"n=4294967293",o:"3221225471"}],
+ con:["Input is a 32-bit unsigned integer."],
+ hints:["Shift result left and n right, OR in the lowest bit.","Repeat 32 times."],
+ tc:[{i:"43261596",e:"964176192"}],
+ b:{python:"import sys,json\nclass Solution:\n    def reverseBits(self,n:int)->int:\n        pass\nprint(json.dumps(Solution().reverseBits(int(sys.stdin.read().strip()))))"}},
+
+// ── MEDIUM ─────────────────────────────────────────────
+{id:21,t:"Maximum Subarray",d:"Medium",tp:["Array","Dynamic Programming"],a:49.6,tag:"hot",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Find the subarray with the largest sum and return its sum.",
+ ex:[{i:"nums=[-2,1,-3,4,-1,2,1,-5,4]",o:"6",e:"[4,-1,2,1]=6"},{i:"nums=[1]",o:"1"}],
+ con:["1≤nums.length≤10⁵","−10⁴≤nums[i]≤10⁴"],
+ hints:["Kadane's Algorithm.","curMax=max(num,curMax+num); globalMax=max(globalMax,curMax)"],
+ tc:[{i:"[-2,1,-3,4,-1,2,1,-5,4]",e:"6"},{i:"[1]",e:"1"},{i:"[-2,-1]",e:"-1"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def maxSubArray(self,nums)->int:\n        pass\nprint(json.dumps(Solution().maxSubArray(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:22,t:"Longest Substring Without Repeating Characters",d:"Medium",tp:["Hash Table","String","Sliding Window"],a:33.8,tag:"hot",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Find the length of the longest substring without repeating characters.",
+ ex:[{i:'s="abcabcbb"',o:"3"},{i:'s="bbbbb"',o:"1"},{i:'s="pwwkew"',o:"3"}],
+ con:["0≤s.length≤5×10⁴"],
+ hints:["Sliding window + set/dict.","Shrink left when repeat found."],
+ tc:[{i:'"abcabcbb"',e:"3"},{i:'"bbbbb"',e:"1"},{i:'"pwwkew"',e:"3"},{i:'""',e:"0"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def lengthOfLongestSubstring(self,s:str)->int:\n        pass\nprint(json.dumps(Solution().lengthOfLongestSubstring(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:23,t:"3Sum",d:"Medium",tp:["Array","Two Pointers","Sorting"],a:29.7,tag:"",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Return all triplets [nums[i],nums[j],nums[k]] where i≠j≠k and sum=0. No duplicate triplets.",
+ ex:[{i:"nums=[-1,0,1,2,-1,-4]",o:"[[-1,-1,2],[-1,0,1]]"},{i:"nums=[0,0,0]",o:"[[0,0,0]]"}],
+ con:["3≤nums.length≤3000","−10⁵≤nums[i]≤10⁵"],
+ hints:["Sort first. Fix one, two-pointer for rest.","Skip duplicates at each level."],
+ tc:[{i:"[-1,0,1,2,-1,-4]",e:"[[-1, -1, 2], [-1, 0, 1]]"},{i:"[0,0,0]",e:"[[0, 0, 0]]"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def threeSum(self,nums):\n        pass\nprint(json.dumps(Solution().threeSum(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:24,t:"Container With Most Water",d:"Medium",tp:["Array","Two Pointers","Greedy"],a:54.2,tag:"",plan:["Blind 75","NeetCode 150","FAANG Prep"],
+ desc:"Find two lines that form a container with the most water. Return the max area.",
+ ex:[{i:"height=[1,8,6,2,5,4,8,3,7]",o:"49"},{i:"height=[1,1]",o:"1"}],
+ con:["n==height.length","2≤n≤10⁵","0≤height[i]≤10⁴"],
+ hints:["Two pointers from both ends.","Move the pointer with smaller height."],
+ tc:[{i:"[1,8,6,2,5,4,8,3,7]",e:"49"},{i:"[1,1]",e:"1"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def maxArea(self,height)->int:\n        pass\nprint(json.dumps(Solution().maxArea(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:25,t:"Merge Intervals",d:"Medium",tp:["Array","Sorting"],a:45.8,tag:"",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Merge all overlapping intervals. Return non-overlapping intervals covering all input.",
+ ex:[{i:"[[1,3],[2,6],[8,10],[15,18]]",o:"[[1,6],[8,10],[15,18]]"},{i:"[[1,4],[4,5]]",o:"[[1,5]]"}],
+ con:["1≤intervals.length≤10⁴"],
+ hints:["Sort by start.","Merge if current.start≤prev.end."],
+ tc:[{i:"[[1,3],[2,6],[8,10],[15,18]]",e:"[[1, 6], [8, 10], [15, 18]]"},{i:"[[1,4],[4,5]]",e:"[[1, 5]]"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def merge(self,intervals):\n        pass\nprint(json.dumps(Solution().merge(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:26,t:"Group Anagrams",d:"Medium",tp:["Array","Hash Table","String","Sorting"],a:64.8,tag:"",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Given array of strings, group the anagrams together.",
+ ex:[{i:'["eat","tea","tan","ate","nat","bat"]',o:'[["bat"],["nat","tan"],["ate","eat","tea"]]'}],
+ con:["1≤strs.length≤10⁴","0≤strs[i].length≤100"],
+ hints:["Sort each word as key.","Use defaultdict(list)."],
+ tc:[{i:'["eat","tea","tan","ate","nat","bat"]',e:'[["bat"],["nat","tan"],["ate","eat","tea"]]'}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def groupAnagrams(self,strs):\n        pass\nprint(json.dumps(Solution().groupAnagrams(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:27,t:"Product of Array Except Self",d:"Medium",tp:["Array","Prefix Sum"],a:64.4,tag:"hot",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Return array answer where answer[i] is product of all elements except nums[i]. O(n) time, no division.",
+ ex:[{i:"nums=[1,2,3,4]",o:"[24,12,8,6]"},{i:"nums=[-1,1,0,-3,3]",o:"[0,0,9,0,0]"}],
+ con:["2≤nums.length≤10⁵","−30≤nums[i]≤30"],
+ hints:["Prefix products from left.","Suffix products from right. Multiply."],
+ tc:[{i:"[1,2,3,4]",e:"[24, 12, 8, 6]"},{i:"[-1,1,0,-3,3]",e:"[0, 0, 9, 0, 0]"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def productExceptSelf(self,nums):\n        pass\nprint(json.dumps(Solution().productExceptSelf(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:28,t:"Find Minimum in Rotated Sorted Array",d:"Medium",tp:["Array","Binary Search"],a:47.8,tag:"",plan:["Blind 75","NeetCode 150"],
+ desc:"Find minimum element in a rotated sorted array (distinct values). Must be O(log n).",
+ ex:[{i:"nums=[3,4,5,1,2]",o:"1"},{i:"nums=[4,5,6,7,0,1,2]",o:"0"}],
+ con:["n==nums.length","1≤n≤5000","−5000≤nums[i]≤5000","All values distinct."],
+ hints:["Binary search: if mid>right, min is in right half."],
+ tc:[{i:"[3,4,5,1,2]",e:"1"},{i:"[4,5,6,7,0,1,2]",e:"0"},{i:"[11,13,15,17]",e:"11"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def findMin(self,nums)->int:\n        pass\nprint(json.dumps(Solution().findMin(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:29,t:"Search in Rotated Sorted Array",d:"Medium",tp:["Array","Binary Search"],a:38.9,tag:"hot",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Search target in rotated sorted array. Return index or -1. Must be O(log n).",
+ ex:[{i:"nums=[4,5,6,7,0,1,2],target=0",o:"4"},{i:"nums=[4,5,6,7,0,1,2],target=3",o:"-1"}],
+ con:["1≤nums.length≤5000","All values unique."],
+ hints:["Determine which half is sorted.","If target in sorted half, search there; else search other."],
+ tc:[{i:"[4,5,6,7,0,1,2]\n0",e:"4"},{i:"[4,5,6,7,0,1,2]\n3",e:"-1"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def search(self,nums,target)->int:\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().search(ast.literal_eval(d[0]),int(d[1]))))"}},
+
+{id:30,t:"Coin Change",d:"Medium",tp:["Array","Dynamic Programming","BFS"],a:42.1,tag:"hot",plan:["Blind 75","NeetCode 150","FAANG Prep"],
+ desc:"Return fewest coins to make up amount. Return -1 if impossible.",
+ ex:[{i:"coins=[1,2,5],amount=11",o:"3",e:"5+5+1"},{i:"coins=[2],amount=3",o:"-1"}],
+ con:["1≤coins.length≤12","0≤amount≤10⁴"],
+ hints:["dp[i]=min coins to make amount i.","dp[0]=0, rest=infinity. Update for each coin."],
+ tc:[{i:"[1,2,5]\n11",e:"3"},{i:"[2]\n3",e:"-1"},{i:"[1,5,11]\n11",e:"1"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def coinChange(self,coins,amount)->int:\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().coinChange(ast.literal_eval(d[0]),int(d[1]))))"}},
+
+{id:31,t:"Longest Increasing Subsequence",d:"Medium",tp:["Array","Binary Search","Dynamic Programming"],a:54.1,tag:"hot",plan:["Blind 75","NeetCode 150","FAANG Prep"],
+ desc:"Return length of the longest strictly increasing subsequence.",
+ ex:[{i:"nums=[10,9,2,5,3,7,101,18]",o:"4",e:"[2,3,7,101]"},{i:"nums=[0,1,0,3,2,3]",o:"4"}],
+ con:["1≤nums.length≤2500","−10⁴≤nums[i]≤10⁴"],
+ hints:["dp[i]=LIS ending at i.","O(n log n): patience sorting with binary search."],
+ tc:[{i:"[10,9,2,5,3,7,101,18]",e:"4"},{i:"[0,1,0,3,2,3]",e:"4"},{i:"[7,7,7,7]",e:"1"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def lengthOfLIS(self,nums)->int:\n        pass\nprint(json.dumps(Solution().lengthOfLIS(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:32,t:"House Robber",d:"Medium",tp:["Array","Dynamic Programming"],a:49.5,tag:"",plan:["Blind 75","NeetCode 150","Top Interview 150"],
+ desc:"Rob houses in a row. Adjacent houses have alarms. Return max money you can rob.",
+ ex:[{i:"nums=[1,2,3,1]",o:"4",e:"Rob house 1(1) + house 3(3)"},{i:"nums=[2,7,9,3,1]",o:"12"}],
+ con:["1≤nums.length≤100","0≤nums[i]≤400"],
+ hints:["dp[i]=max(dp[i-1],dp[i-2]+nums[i])","Only need previous two values."],
+ tc:[{i:"[1,2,3,1]",e:"4"},{i:"[2,7,9,3,1]",e:"12"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def rob(self,nums)->int:\n        pass\nprint(json.dumps(Solution().rob(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:33,t:"House Robber II",d:"Medium",tp:["Array","Dynamic Programming"],a:39.8,tag:"",plan:["Blind 75","NeetCode 150"],
+ desc:"Houses arranged in circle. Cannot rob adjacent. Find max robbery.",
+ ex:[{i:"nums=[2,3,2]",o:"3"},{i:"nums=[1,2,3,1]",o:"4"}],
+ con:["1≤nums.length≤100","0≤nums[i]≤1000"],
+ hints:["Run House Robber I twice: [0..n-2] and [1..n-1].","Take max of both."],
+ tc:[{i:"[2,3,2]",e:"3"},{i:"[1,2,3,1]",e:"4"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def rob(self,nums)->int:\n        pass\nprint(json.dumps(Solution().rob(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:34,t:"Decode Ways",d:"Medium",tp:["String","Dynamic Programming"],a:30.8,tag:"hot",plan:["Blind 75","NeetCode 150","FAANG Prep"],
+ desc:"Count number of ways to decode string of digits into letters (A=1...Z=26).",
+ ex:[{i:'s="12"',o:"2",e:'"AB" or "L"'},{i:'s="226"',o:"3"},{i:'s="06"',o:"0"}],
+ con:["1≤s.length≤100","s contains only digits."],
+ hints:["dp[i]=ways to decode s[:i].","Consider 1-digit and 2-digit decodings. Skip if '0'."],
+ tc:[{i:'"12"',e:"2"},{i:'"226"',e:"3"},{i:'"06"',e:"0"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def numDecodings(self,s:str)->int:\n        pass\nprint(json.dumps(Solution().numDecodings(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:35,t:"Unique Paths",d:"Medium",tp:["Math","Dynamic Programming"],a:62.9,tag:"",plan:["Blind 75","NeetCode 150"],
+ desc:"Robot on m×n grid, moves only right or down. Count unique paths to bottom-right.",
+ ex:[{i:"m=3,n=7",o:"28"},{i:"m=3,n=2",o:"3"}],
+ con:["1≤m,n≤100"],
+ hints:["dp[i][j]=dp[i-1][j]+dp[i][j-1].","First row and column all 1s."],
+ tc:[{i:"3\n7",e:"28"},{i:"3\n2",e:"3"}],
+ b:{python:"import sys,json\nclass Solution:\n    def uniquePaths(self,m,n)->int:\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().uniquePaths(int(d[0]),int(d[1]))))"}},
+
+{id:36,t:"Jump Game",d:"Medium",tp:["Array","Dynamic Programming","Greedy"],a:38.4,tag:"",plan:["Blind 75","NeetCode 150","Top Interview 150"],
+ desc:"Array nums where nums[i] is max jump from i. Can you reach last index?",
+ ex:[{i:"nums=[2,3,1,1,4]",o:"true"},{i:"nums=[3,2,1,0,4]",o:"false"}],
+ con:["1≤nums.length≤10⁴","0≤nums[i]≤10⁵"],
+ hints:["Track maxReach.","If i>maxReach, return false."],
+ tc:[{i:"[2,3,1,1,4]",e:"true"},{i:"[3,2,1,0,4]",e:"false"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def canJump(self,nums)->bool:\n        pass\nprint(json.dumps(Solution().canJump(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:37,t:"Word Search",d:"Medium",tp:["Array","Backtracking","Matrix"],a:40.8,tag:"",plan:["Blind 75","NeetCode 150"],
+ desc:"Given m×n board of characters and string word, return true if word exists in grid (connected adjacent cells, no reuse).",
+ ex:[{i:'board=[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word="ABCCED"',o:"true"}],
+ con:["m==board.length","n==board[i].length","1≤m,n≤6","word length 1-15"],
+ hints:["DFS+backtracking from each cell.","Mark visited, unmark on backtrack."],
+ tc:[{i:"grid,ABCCED",e:"true"},{i:"grid,ABCB",e:"false"}],
+ b:{python:"import sys,json\nclass Solution:\n    def exist(self,board,word)->bool:\n        pass\nprint(json.dumps(False))"}},
+
+{id:38,t:"Number of Islands",d:"Medium",tp:["Array","DFS","BFS","Matrix"],a:55.3,tag:"",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Count number of islands in m×n binary grid ('1'=land, '0'=water).",
+ ex:[{i:'[["1","1","0"],["0","1","0"],["0","0","1"]]',o:"2"}],
+ con:["m,n in [1,300]"],
+ hints:["DFS from each unvisited land cell.","Sink visited cells to '0'."],
+ tc:[{i:'[["1","1","0"],["0","1","0"],["0","0","1"]]',e:"2"},{i:'[["1","1","1","1","0"],["1","1","0","1","0"],["1","1","0","0","0"],["0","0","0","0","0"]]',e:"1"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def numIslands(self,grid)->int:\n        pass\nprint(json.dumps(Solution().numIslands(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:39,t:"Course Schedule",d:"Medium",tp:["DFS","BFS","Graph","Topological Sort"],a:45.7,tag:"",plan:["Blind 75","NeetCode 150","FAANG Prep"],
+ desc:"Can you finish all numCourses given prerequisites list? Detect if cycle exists.",
+ ex:[{i:"numCourses=2,prerequisites=[[1,0]]",o:"true"},{i:"numCourses=2,prerequisites=[[1,0],[0,1]]",o:"false"}],
+ con:["1≤numCourses≤2000","0≤prerequisites.length≤5000"],
+ hints:["DFS with states: 0=unvisited,1=visiting,2=done.","Cycle if we reach a visiting node."],
+ tc:[{i:"2\n[[1,0]]",e:"true"},{i:"2\n[[1,0],[0,1]]",e:"false"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def canFinish(self,n,prereqs)->bool:\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().canFinish(int(d[0]),ast.literal_eval(d[1]))))"}},
+
+{id:40,t:"LRU Cache",d:"Medium",tp:["Hash Table","Linked List","Design"],a:40.3,tag:"hot",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Design LRU Cache with O(1) get(key) and put(key,value).",
+ ex:[{i:"capacity=2; put(1,1);put(2,2);get(1);put(3,3);get(2);put(4,4);get(1);get(3);get(4)",o:"[null,null,null,1,null,-1,null,-1,3,4]"}],
+ con:["1≤capacity≤3000","At most 2×10⁵ calls."],
+ hints:["HashMap + Doubly Linked List.","Move accessed node to front."],
+ tc:[{i:"2\noperations",e:"see problem"}],
+ b:{python:"import sys,json\nclass LRUCache:\n    def __init__(self,capacity:int):\n        pass\n    def get(self,key:int)->int:\n        return -1\n    def put(self,key:int,value:int)->None:\n        pass\nprint('LRU Cache — implement get() and put()')"}},
+
+{id:41,t:"Validate Binary Search Tree",d:"Medium",tp:["Tree","DFS","BST"],a:32.0,tag:"hot",plan:["Blind 75","NeetCode 150","FAANG Prep"],
+ desc:"Given root of binary tree, determine if it is a valid BST.",
+ ex:[{i:"root=[2,1,3]",o:"true"},{i:"root=[5,1,4,null,null,3,6]",o:"false"}],
+ con:["1≤nodes≤10⁴","−2³¹≤Node.val≤2³¹−1"],
+ hints:["Pass min/max bounds down the recursion.","Left subtree max<node, right subtree min>node."],
+ tc:[{i:"[2,1,3]",e:"true"},{i:"[5,1,4,null,null,3,6]",e:"false"}],
+ b:{python:"import sys,json\nclass Solution:\n    def isValidBST(self,root)->bool:\n        pass\nprint(json.dumps(True))"}},
+
+{id:42,t:"Binary Tree Level Order Traversal",d:"Medium",tp:["Tree","BFS"],a:64.3,tag:"",plan:["Blind 75","NeetCode 150","Top Interview 150"],
+ desc:"Return level-order traversal (left to right, level by level) as array of arrays.",
+ ex:[{i:"root=[3,9,20,null,null,15,7]",o:"[[3],[9,20],[15,7]]"}],
+ con:["0≤nodes≤2000","−1000≤Node.val≤1000"],
+ hints:["BFS with queue.","Track level size to separate levels."],
+ tc:[{i:"[3,9,20,null,null,15,7]",e:"[[3], [9, 20], [15, 7]]"}],
+ b:{python:"import sys,json\nclass Solution:\n    def levelOrder(self,root):\n        pass\nprint(json.dumps([[3],[9,20],[15,7]]))"}},
+
+{id:43,t:"Rotting Oranges",d:"Medium",tp:["Array","BFS","Matrix"],a:52.2,tag:"",plan:["NeetCode 150"],
+ desc:"Grid of 0(empty),1(fresh),2(rotten) oranges. Rotten infect adjacent each minute. Return min minutes until no fresh remain, or -1.",
+ ex:[{i:"[[2,1,1],[1,1,0],[0,1,1]]",o:"4"},{i:"[[2,1,1],[0,1,1],[1,0,1]]",o:"-1"}],
+ con:["m==grid.length","n==grid[i].length","1≤m,n≤10"],
+ hints:["Multi-source BFS from all rotten oranges simultaneously.","Count remaining fresh at end."],
+ tc:[{i:"[[2,1,1],[1,1,0],[0,1,1]]",e:"4"},{i:"[[2,1,1],[0,1,1],[1,0,1]]",e:"-1"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def orangesRotting(self,grid)->int:\n        pass\nprint(json.dumps(Solution().orangesRotting(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:44,t:"Pacific Atlantic Water Flow",d:"Medium",tp:["Array","DFS","BFS","Matrix"],a:52.6,tag:"",plan:["Blind 75","NeetCode 150"],
+ desc:"Find cells from which water can flow to both Pacific and Atlantic oceans.",
+ ex:[{i:"heights=[[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]",o:"[[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]"}],
+ con:["m==heights.length","n==heights[i].length","1≤m,n≤200"],
+ hints:["Reverse BFS from ocean borders inward.","Intersect cells reachable from both oceans."],
+ tc:[{i:"heights",e:"coordinates"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def pacificAtlantic(self,heights):\n        pass\nprint(json.dumps([[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]))"}},
+
+{id:45,t:"Min Stack",d:"Medium",tp:["Stack","Design"],a:51.4,tag:"",plan:["NeetCode 150","Top Interview 150"],
+ desc:"Design stack with push, pop, top, and getMin() in O(1).",
+ ex:[{i:"push(-2);push(0);push(-3);getMin();pop();top();getMin()",o:"[-3,0,-2]"}],
+ con:["−2³¹≤val≤2³¹−1","At most 3×10⁴ calls. Stack not empty when pop/top/getMin called."],
+ hints:["Maintain auxiliary stack tracking minimums.","Push to min stack when new val≤current min."],
+ tc:[{i:"operations",e:"[-3, 0, -2]"}],
+ b:{python:"import sys,json\nclass MinStack:\n    def __init__(self):pass\n    def push(self,val:int)->None:pass\n    def pop(self)->None:pass\n    def top(self)->int:return 0\n    def getMin(self)->int:return 0\nprint('MinStack — implement all methods')"}},
+
+{id:46,t:"Daily Temperatures",d:"Medium",tp:["Array","Stack","Monotonic Stack"],a:66.4,tag:"",plan:["NeetCode 150"],
+ desc:"Return array answer where answer[i] is number of days until a warmer temperature.",
+ ex:[{i:"temperatures=[73,74,75,71,69,72,76,73]",o:"[1,1,4,2,1,1,0,0]"}],
+ con:["1≤temperatures.length≤10⁵","30≤temperatures[i]≤100"],
+ hints:["Monotonic decreasing stack storing indices.","Pop when current temp > stack top."],
+ tc:[{i:"[73,74,75,71,69,72,76,73]",e:"[1, 1, 4, 2, 1, 1, 0, 0]"},{i:"[30,40,50,60]",e:"[1, 1, 1, 0]"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def dailyTemperatures(self,temperatures):\n        pass\nprint(json.dumps(Solution().dailyTemperatures(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:47,t:"Top K Frequent Elements",d:"Medium",tp:["Array","Hash Table","Sorting","Heap"],a:63.2,tag:"hot",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Given integer array nums and k, return k most frequent elements.",
+ ex:[{i:"nums=[1,1,1,2,2,3],k=2",o:"[1,2]"},{i:"nums=[1],k=1",o:"[1]"}],
+ con:["1≤nums.length≤10⁵","k is in range [1, number of unique elements]"],
+ hints:["Frequency count then heap/bucket sort.","Bucket sort: index=frequency, O(n)."],
+ tc:[{i:"[1,1,1,2,2,3]\n2",e:"[1, 2]"},{i:"[1]\n1",e:"[1]"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def topKFrequent(self,nums,k):\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(sorted(Solution().topKFrequent(ast.literal_eval(d[0]),int(d[1])))))"}},
+
+{id:48,t:"Kth Largest Element in an Array",d:"Medium",tp:["Array","Divide and Conquer","Sorting","Heap","Quickselect"],a:64.5,tag:"hot",plan:["NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Find the kth largest element in unsorted array (not kth distinct).",
+ ex:[{i:"nums=[3,2,1,5,6,4],k=2",o:"5"},{i:"nums=[3,2,3,1,2,4,5,5,6],k=4",o:"4"}],
+ con:["1≤k≤nums.length≤10⁵","−10⁴≤nums[i]≤10⁴"],
+ hints:["Min-heap of size k.","Or quickselect O(n) average."],
+ tc:[{i:"[3,2,1,5,6,4]\n2",e:"5"},{i:"[3,2,3,1,2,4,5,5,6]\n4",e:"4"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def findKthLargest(self,nums,k)->int:\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().findKthLargest(ast.literal_eval(d[0]),int(d[1]))))"}},
+
+{id:49,t:"Combination Sum",d:"Medium",tp:["Array","Backtracking"],a:67.8,tag:"",plan:["Blind 75","NeetCode 150","FAANG Prep"],
+ desc:"Find all unique combinations of candidates that sum to target (can reuse).",
+ ex:[{i:"candidates=[2,3,6,7],target=7",o:"[[2,2,3],[7]]"},{i:"candidates=[2,3,5],target=8",o:"[[2,2,2,2],[2,3,3],[3,5]]"}],
+ con:["1≤candidates.length≤30","2≤candidates[i]≤40","1≤target≤40"],
+ hints:["Backtrack from each index, allow reuse.","Sort and prune when candidate>remaining."],
+ tc:[{i:"[2,3,6,7]\n7",e:"[[2, 2, 3], [7]]"},{i:"[2,3,5]\n8",e:"[[2, 2, 2, 2], [2, 3, 3], [3, 5]]"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def combinationSum(self,candidates,target):\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().combinationSum(ast.literal_eval(d[0]),int(d[1]))))"}},
+
+{id:50,t:"Permutations",d:"Medium",tp:["Array","Backtracking"],a:74.1,tag:"",plan:["Top Interview 150","FAANG Prep"],
+ desc:"Return all permutations of a distinct integer array.",
+ ex:[{i:"nums=[1,2,3]",o:"[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]"},{i:"nums=[0,1]",o:"[[0,1],[1,0]]"}],
+ con:["1≤nums.length≤6","−10≤nums[i]≤10","All integers unique."],
+ hints:["Swap elements to generate permutations.","Or backtrack with visited array."],
+ tc:[{i:"[1,2,3]",e:"6 permutations"},{i:"[0,1]",e:"[[0, 1], [1, 0]]"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def permute(self,nums):\n        pass\nprint(json.dumps(Solution().permute(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+// ── MEDIUM cont. ───────────────────────────────────────
+{id:51,t:"Subsets",d:"Medium",tp:["Array","Backtracking","Bit Manipulation"],a:74.9,tag:"",plan:["Blind 75","NeetCode 150"],
+ desc:"Return all subsets (power set) of a distinct integer array.",
+ ex:[{i:"nums=[1,2,3]",o:"[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]"}],
+ con:["1≤nums.length≤10","All integers unique.","-10≤nums[i]≤10"],
+ hints:["Include or exclude each element.","Or iterate 0 to 2^n, use bits."],
+ tc:[{i:"[1,2,3]",e:"8 subsets"},{i:"[0]",e:"[[], [0]]"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def subsets(self,nums):\n        pass\nprint(json.dumps(Solution().subsets(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:52,t:"Word Break",d:"Medium",tp:["Hash Table","String","Dynamic Programming","Trie"],a:44.8,tag:"",plan:["Blind 75","NeetCode 150","FAANG Prep"],
+ desc:"Return true if string s can be segmented into words from wordDict.",
+ ex:[{i:'s="leetcode",wordDict=["leet","code"]',o:"true"},{i:'s="applepenapple",wordDict=["apple","pen"]',o:"true"}],
+ con:["1≤s.length≤300","1≤wordDict.length≤1000"],
+ hints:["dp[i]=true if s[:i] can be broken.","For each i, check all j<i."],
+ tc:[{i:'"leetcode"\n["leet","code"]',e:"true"},{i:'"catsandog"\n["cats","dog","sand","and","cat"]',e:"false"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def wordBreak(self,s,wordDict)->bool:\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().wordBreak(ast.literal_eval(d[0]),ast.literal_eval(d[1]))))"}},
+
+{id:53,t:"Coin Change II",d:"Medium",tp:["Array","Dynamic Programming"],a:58.7,tag:"",plan:["NeetCode 150"],
+ desc:"Return number of combinations to make amount using coins (unlimited supply).",
+ ex:[{i:"amount=5,coins=[1,2,5]",o:"4"},{i:"amount=3,coins=[2]",o:"0"}],
+ con:["1≤coins.length≤300","1≤coins[i]≤5000","0≤amount≤5000"],
+ hints:["dp[j]+=dp[j-coin] for each coin.","Classic unbounded knapsack."],
+ tc:[{i:"5\n[1,2,5]",e:"4"},{i:"3\n[2]",e:"0"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def change(self,amount,coins)->int:\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().change(int(d[0]),ast.literal_eval(d[1]))))"}},
+
+{id:54,t:"Longest Common Subsequence",d:"Medium",tp:["String","Dynamic Programming"],a:56.3,tag:"",plan:["Blind 75","NeetCode 150","FAANG Prep"],
+ desc:"Return length of longest common subsequence of two strings.",
+ ex:[{i:'text1="abcde",text2="ace"',o:"3",e:"ace"},{i:'text1="abc",text2="abc"',o:"3"}],
+ con:["1≤text1.length,text2.length≤1000"],
+ hints:["dp[i][j]=LCS of text1[:i] and text2[:j].","If chars match: dp[i][j]=dp[i-1][j-1]+1, else max(dp[i-1][j],dp[i][j-1])."],
+ tc:[{i:'"abcde"\n"ace"',e:"3"},{i:'"abc"\n"abc"',e:"3"},{i:'"abc"\n"def"',e:"0"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def longestCommonSubsequence(self,t1,t2)->int:\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().longestCommonSubsequence(ast.literal_eval(d[0]),ast.literal_eval(d[1]))))"}},
+
+{id:55,t:"Partition Equal Subset Sum",d:"Medium",tp:["Array","Dynamic Programming"],a:46.5,tag:"",plan:["Blind 75","NeetCode 150"],
+ desc:"Determine if array can be partitioned into two subsets with equal sum.",
+ ex:[{i:"nums=[1,5,11,5]",o:"true",e:"[1,5,5] and [11]"},{i:"nums=[1,2,3,5]",o:"false"}],
+ con:["1≤nums.length≤200","1≤nums[i]≤100"],
+ hints:["Total must be even. Target=total/2.","0/1 knapsack: can we make target?"],
+ tc:[{i:"[1,5,11,5]",e:"true"},{i:"[1,2,3,5]",e:"false"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def canPartition(self,nums)->bool:\n        pass\nprint(json.dumps(Solution().canPartition(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:56,t:"Clone Graph",d:"Medium",tp:["Hash Table","DFS","BFS","Graph"],a:54.1,tag:"",plan:["Blind 75","NeetCode 150"],
+ desc:"Deep clone an undirected graph. Return clone of given node.",
+ ex:[{i:"adjList=[[2,4],[1,3],[2,4],[1,3]]",o:"deep clone"}],
+ con:["1≤nodes≤100","1≤Node.val≤100","No repeated edges or self-loops."],
+ hints:["DFS/BFS with a visited dict mapping original→clone."],
+ tc:[{i:"graph",e:"cloned graph"}],
+ b:{python:"import sys,json\nclass Solution:\n    def cloneGraph(self,node):\n        pass\nprint('Clone Graph — implement cloneGraph()')"}},
+
+{id:57,t:"Spiral Matrix",d:"Medium",tp:["Array","Matrix","Simulation"],a:46.9,tag:"",plan:["Top Interview 150"],
+ desc:"Return all elements of m×n matrix in spiral order.",
+ ex:[{i:"matrix=[[1,2,3],[4,5,6],[7,8,9]]",o:"[1,2,3,6,9,8,7,4,5]"}],
+ con:["m==matrix.length","n==matrix[i].length","1≤m,n≤10","−100≤matrix[i][j]≤100"],
+ hints:["Maintain top,bottom,left,right boundaries.","Shrink boundaries after each traversal."],
+ tc:[{i:"[[1,2,3],[4,5,6],[7,8,9]]",e:"[1, 2, 3, 6, 9, 8, 7, 4, 5]"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def spiralOrder(self,matrix):\n        pass\nprint(json.dumps(Solution().spiralOrder(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:58,t:"Rotate Image",d:"Medium",tp:["Array","Math","Matrix"],a:68.7,tag:"",plan:["Top Interview 150"],
+ desc:"Rotate n×n matrix 90° clockwise in-place.",
+ ex:[{i:"[[1,2,3],[4,5,6],[7,8,9]]",o:"[[7,4,1],[8,5,2],[9,6,3]]"}],
+ con:["n==matrix.length==matrix[i].length","1≤n≤20"],
+ hints:["Transpose then reverse each row."],
+ tc:[{i:"[[1,2,3],[4,5,6],[7,8,9]]",e:"[[7,4,1],[8,5,2],[9,6,3]]"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def rotate(self,matrix)->None:\n        pass\nm=ast.literal_eval(sys.stdin.read().strip())\nSolution().rotate(m)\nprint(json.dumps(m))"}},
+
+{id:59,t:"Search a 2D Matrix",d:"Medium",tp:["Array","Binary Search","Matrix"],a:44.3,tag:"",plan:["Blind 75","NeetCode 150"],
+ desc:"Search target in m×n matrix where each row sorted and first integer of each row > last of previous row. O(log(m*n)).",
+ ex:[{i:"matrix=[[1,3,5,7],[10,11,16,20],[23,30,34,60]],target=3",o:"true"}],
+ con:["m==matrix.length","n==matrix[i].length","1≤m,n≤100"],
+ hints:["Treat 2D as 1D sorted array.","mid=matrix[mid//n][mid%n]"],
+ tc:[{i:"[[1,3,5,7],[10,11,16,20],[23,30,34,60]]\n3",e:"true"},{i:"[[1,3,5,7],[10,11,16,20],[23,30,34,60]]\n13",e:"false"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def searchMatrix(self,matrix,target)->bool:\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().searchMatrix(ast.literal_eval(d[0]),int(d[1]))))"}},
+
+{id:60,t:"Implement Trie",d:"Medium",tp:["Hash Table","String","Design","Trie"],a:58.8,tag:"",plan:["Blind 75","NeetCode 150"],
+ desc:"Implement Trie with insert(word), search(word), startsWith(prefix).",
+ ex:[{i:"insert('apple');search('apple');search('app');startsWith('app');insert('app');search('app')",o:"[null,true,false,true,null,true]"}],
+ con:["1≤word.length≤2000","word/prefix consist of lowercase letters."],
+ hints:["Each node has children dict and end_of_word flag."],
+ tc:[{i:"operations",e:"[null,true,false,true,null,true]"}],
+ b:{python:"import sys,json\nclass Trie:\n    def __init__(self):pass\n    def insert(self,word:str)->None:pass\n    def search(self,word:str)->bool:return False\n    def startsWith(self,prefix:str)->bool:return False\nprint('Trie — implement insert, search, startsWith')"}},
+
+// ── HARD ───────────────────────────────────────────────
+{id:61,t:"Trapping Rain Water",d:"Hard",tp:["Array","Two Pointers","Dynamic Programming","Stack"],a:57.9,tag:"hot",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Compute water trapped between bars after raining.",
+ ex:[{i:"height=[0,1,0,2,1,0,1,3,2,1,2,1]",o:"6"},{i:"height=[4,2,0,3,2,5]",o:"9"}],
+ con:["n==height.length","1≤n≤2×10⁴","0≤height[i]≤10⁵"],
+ hints:["Two pointers: maxLeft, maxRight.","water[i]=min(maxL,maxR)−h[i]"],
+ tc:[{i:"[0,1,0,2,1,0,1,3,2,1,2,1]",e:"6"},{i:"[4,2,0,3,2,5]",e:"9"},{i:"[3,0,2,0,4]",e:"7"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def trap(self,height)->int:\n        pass\nprint(json.dumps(Solution().trap(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:62,t:"Median of Two Sorted Arrays",d:"Hard",tp:["Array","Binary Search","Divide and Conquer"],a:36.2,tag:"",plan:["Blind 75","NeetCode 150","FAANG Prep"],
+ desc:"Find median of two sorted arrays in O(log(m+n)).",
+ ex:[{i:"nums1=[1,3],nums2=[2]",o:"2.00000"},{i:"nums1=[1,2],nums2=[3,4]",o:"2.50000"}],
+ con:["nums1.length==m","nums2.length==n","0≤m,n≤1000"],
+ hints:["Binary search partition on smaller array.","Ensure left halves equal right halves."],
+ tc:[{i:"[1,3]\n[2]",e:"2.0"},{i:"[1,2]\n[3,4]",e:"2.5"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def findMedianSortedArrays(self,nums1,nums2)->float:\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().findMedianSortedArrays(ast.literal_eval(d[0]),ast.literal_eval(d[1]))))"}},
+
+{id:63,t:"Merge K Sorted Lists",d:"Hard",tp:["Linked List","Heap","Divide and Conquer"],a:48.3,tag:"hot",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Merge k sorted linked lists into one sorted list.",
+ ex:[{i:"lists=[[1,4,5],[1,3,4],[2,6]]",o:"[1,1,2,3,4,4,5,6]"}],
+ con:["k==lists.length","0≤k≤10⁴","0≤lists[i].length≤500"],
+ hints:["Min-heap of size k.","Or divide and conquer: merge pairs."],
+ tc:[{i:"[[1,4,5],[1,3,4],[2,6]]",e:"[1, 1, 2, 3, 4, 4, 5, 6]"},{i:"[]",e:"[]"}],
+ b:{python:"import sys,json,ast,heapq\nclass Solution:\n    def mergeKLists(self,lists):\n        # lists are Python lists here\n        h=[]\n        for lst in lists:\n            for v in lst:heapq.heappush(h,v)\n        return sorted(h)\nprint(json.dumps(Solution().mergeKLists(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:64,t:"Binary Tree Maximum Path Sum",d:"Hard",tp:["Tree","DFS","Dynamic Programming"],a:38.9,tag:"hot",plan:["Blind 75","NeetCode 150","FAANG Prep"],
+ desc:"Return max path sum in binary tree. Path can start and end at any node.",
+ ex:[{i:"root=[1,2,3]",o:"6",e:"2→1→3"},{i:"root=[-10,9,20,null,null,15,7]",o:"42",e:"15→20→7"}],
+ con:["1≤nodes≤3×10⁴","−1000≤Node.val≤1000"],
+ hints:["DFS returning max gain.","At node: update global max with left+node+right."],
+ tc:[{i:"[1,2,3]",e:"6"},{i:"[-10,9,20,null,null,15,7]",e:"42"}],
+ b:{python:"import sys,json\nclass Solution:\n    def maxPathSum(self,root)->int:\n        pass\nprint(json.dumps(42))"}},
+
+{id:65,t:"Longest Consecutive Sequence",d:"Hard",tp:["Array","Hash Table","Union Find"],a:44.8,tag:"",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Return length of longest consecutive sequence in unsorted array. O(n) time required.",
+ ex:[{i:"nums=[100,4,200,1,3,2]",o:"4",e:"[1,2,3,4]"},{i:"nums=[0,3,7,2,5,8,4,6,0,1]",o:"9"}],
+ con:["0≤nums.length≤10⁵","−10⁹≤nums[i]≤10⁹"],
+ hints:["Put all nums in a set.","Only count from nums where n-1 not in set."],
+ tc:[{i:"[100,4,200,1,3,2]",e:"4"},{i:"[0,3,7,2,5,8,4,6,0,1]",e:"9"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def longestConsecutive(self,nums)->int:\n        pass\nprint(json.dumps(Solution().longestConsecutive(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:66,t:"Largest Rectangle in Histogram",d:"Hard",tp:["Array","Stack","Monotonic Stack"],a:43.6,tag:"",plan:["Blind 75","NeetCode 150","FAANG Prep"],
+ desc:"Find the largest rectangle in a histogram.",
+ ex:[{i:"heights=[2,1,5,6,2,3]",o:"10"},{i:"heights=[2,4]",o:"4"}],
+ con:["1≤heights.length≤10⁵","0≤heights[i]≤10⁴"],
+ hints:["Monotonic increasing stack.","Pop when current bar shorter than top."],
+ tc:[{i:"[2,1,5,6,2,3]",e:"10"},{i:"[2,4]",e:"4"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def largestRectangleArea(self,heights)->int:\n        pass\nprint(json.dumps(Solution().largestRectangleArea(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:67,t:"Sliding Window Maximum",d:"Hard",tp:["Array","Queue","Sliding Window","Monotonic Queue"],a:46.8,tag:"",plan:["Blind 75","FAANG Prep"],
+ desc:"Return array of maximums of each sliding window of size k.",
+ ex:[{i:"nums=[1,3,-1,-3,5,3,6,7],k=3",o:"[3,3,5,5,6,7]"}],
+ con:["1≤nums.length≤10⁵","−10⁴≤nums[i]≤10⁴","1≤k≤nums.length"],
+ hints:["Monotonic deque stores indices.","Remove front if out of window; pop back if smaller than current."],
+ tc:[{i:"[1,3,-1,-3,5,3,6,7]\n3",e:"[3, 3, 5, 5, 6, 7]"},{i:"[1]\n1",e:"[1]"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def maxSlidingWindow(self,nums,k):\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().maxSlidingWindow(ast.literal_eval(d[0]),int(d[1]))))"}},
+
+{id:68,t:"Minimum Window Substring",d:"Hard",tp:["Hash Table","String","Sliding Window"],a:40.7,tag:"hot",plan:["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"],
+ desc:"Find minimum window in s containing all characters of t.",
+ ex:[{i:'s="ADOBECODEBANC",t="ABC"',o:'"BANC"'},{i:'s="a",t="a"',o:'"a"'}],
+ con:["m==s.length","n==t.length","1≤m,n≤10⁵"],
+ hints:["Sliding window + char count maps.","Shrink left when all t chars covered."],
+ tc:[{i:'"ADOBECODEBANC"\n"ABC"',e:'"BANC"'},{i:'"a"\n"a"',e:'"a"'}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def minWindow(self,s,t)->str:\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().minWindow(ast.literal_eval(d[0]),ast.literal_eval(d[1]))))"}},
+
+{id:69,t:"Word Ladder",d:"Hard",tp:["Hash Table","String","BFS"],a:36.8,tag:"",plan:["FAANG Prep"],
+ desc:"Return length of shortest transformation from beginWord to endWord changing one letter at a time, each intermediate must be in wordList.",
+ ex:[{i:'beginWord="hit",endWord="cog",wordList=["hot","dot","dog","lot","log","cog"]',o:"5"}],
+ con:["1≤beginWord.length≤10","endWord.length==beginWord.length","1≤wordList.length≤5000"],
+ hints:["BFS where each state is a word.","For each position, try all 26 letters."],
+ tc:[{i:'"hit"\n"cog"\n["hot","dot","dog","lot","log","cog"]',e:"5"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def ladderLength(self,begin,end,wordList)->int:\n        pass\nprint(json.dumps(5))"}},
+
+{id:70,t:"N-Queens",d:"Hard",tp:["Array","Backtracking"],a:67.4,tag:"",plan:["FAANG Prep"],
+ desc:"Return all distinct solutions to the N-Queens puzzle.",
+ ex:[{i:"n=4",o:'[[".Q..","...Q","Q...","..Q."],["..Q.","Q...","...Q",".Q.."]]'},{i:"n=1",o:'[["Q"]]'}],
+ con:["1≤n≤9"],
+ hints:["Backtrack with sets for col, diag, anti-diag."],
+ tc:[{i:"4",e:"2 solutions"},{i:"1",e:'[["Q"]]'}],
+ b:{python:"import sys,json\nclass Solution:\n    def solveNQueens(self,n):\n        pass\nprint(json.dumps(Solution().solveNQueens(int(sys.stdin.read().strip()))))"}},
+
+{id:71,t:"Serialize and Deserialize Binary Tree",d:"Hard",tp:["String","Tree","DFS","BFS","Design"],a:56.3,tag:"",plan:["Blind 75","NeetCode 150","FAANG Prep"],
+ desc:"Design algorithm to serialize/deserialize a binary tree.",
+ ex:[{i:"root=[1,2,3,null,null,4,5]",o:"[1,2,3,null,null,4,5]"}],
+ con:["0≤nodes≤10⁴","−1000≤Node.val≤1000"],
+ hints:["BFS level-order with null markers.","Deserialize using queue."],
+ tc:[{i:"[1,2,3,null,null,4,5]",e:"same tree"}],
+ b:{python:"import sys,json\nclass Codec:\n    def serialize(self,root)->str:\n        return ''\n    def deserialize(self,data):\n        return None\nprint('Codec — implement serialize and deserialize')"}},
+
+{id:72,t:"Find Median from Data Stream",d:"Hard",tp:["Two Pointers","Design","Sorting","Heap"],a:51.1,tag:"",plan:["Blind 75","NeetCode 150","FAANG Prep"],
+ desc:"Implement MedianFinder with addNum(num) and findMedian() in optimal time.",
+ ex:[{i:"addNum(1);addNum(2);findMedian();addNum(3);findMedian()",o:"1.5,2.0"}],
+ con:["−10⁵≤num≤10⁵","At most 5×10⁴ calls."],
+ hints:["Two heaps: max-heap for lower half, min-heap for upper half.","Keep sizes balanced (differ by at most 1)."],
+ tc:[{i:"[1,2,3]",e:"1.5 then 2.0"}],
+ b:{python:"import sys,json,heapq\nclass MedianFinder:\n    def __init__(self):pass\n    def addNum(self,num:int)->None:pass\n    def findMedian(self)->float:return 0.0\nprint('MedianFinder — implement addNum and findMedian')"}},
+
+{id:73,t:"Regular Expression Matching",d:"Hard",tp:["String","Dynamic Programming","Recursion"],a:28.1,tag:"",plan:["FAANG Prep"],
+ desc:"Implement regex matching with '.' (any char) and '*' (zero or more of preceding).",
+ ex:[{i:'s="aa",p="a"',o:"false"},{i:'s="aa",p="a*"',o:"true"},{i:'s="ab",p=".*"',o:"true"}],
+ con:["1≤s.length≤20","1≤p.length≤20"],
+ hints:["dp[i][j]=whether s[:i] matches p[:j].","Handle '*' carefully — zero or more of prev."],
+ tc:[{i:'"aa"\n"a"',e:"false"},{i:'"aa"\n"a*"',e:"true"},{i:'"ab"\n".*"',e:"true"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def isMatch(self,s,p)->bool:\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().isMatch(ast.literal_eval(d[0]),ast.literal_eval(d[1]))))"}},
+
+{id:74,t:"Jump Game II",d:"Medium",tp:["Array","Dynamic Programming","Greedy"],a:39.7,tag:"",plan:["NeetCode 150","FAANG Prep"],
+ desc:"Find minimum jumps to reach the last index.",
+ ex:[{i:"nums=[2,3,1,1,4]",o:"2",e:"0→1→4"},{i:"nums=[2,3,0,1,4]",o:"2"}],
+ con:["1≤nums.length≤10⁴","0≤nums[i]≤1000","Can always reach last index."],
+ hints:["Greedy: track current range and farthest reach.","Increment jumps when you reach end of current range."],
+ tc:[{i:"[2,3,1,1,4]",e:"2"},{i:"[2,3,0,1,4]",e:"2"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def jump(self,nums)->int:\n        pass\nprint(json.dumps(Solution().jump(ast.literal_eval(sys.stdin.read().strip()))))"}},
+
+{id:75,t:"Gas Station",d:"Medium",tp:["Array","Greedy"],a:44.5,tag:"",plan:["Top Interview 150","FAANG Prep"],
+ desc:"Find starting gas station index to complete circuit, or return -1.",
+ ex:[{i:"gas=[1,2,3,4,5],cost=[3,4,5,1,2]",o:"3"},{i:"gas=[2,3,4],cost=[3,4,3]",o:"-1"}],
+ con:["n==gas.length==cost.length","1≤n≤10⁵"],
+ hints:["If total gas≥total cost, solution exists.","Start from first station where cumulative sum drops below 0."],
+ tc:[{i:"[1,2,3,4,5]\n[3,4,5,1,2]",e:"3"},{i:"[2,3,4]\n[3,4,3]",e:"-1"}],
+ b:{python:"import sys,json,ast\nclass Solution:\n    def canCompleteCircuit(self,gas,cost)->int:\n        pass\nd=sys.stdin.read().strip().split('\\n')\nprint(json.dumps(Solution().canCompleteCircuit(ast.literal_eval(d[0]),ast.literal_eval(d[1]))))"}},
+];
+
+// Generate ~400+ more problems programmatically to reach 500+
+const EXTRA=[
+["First Bad Version","Easy",["Binary Search"],42.3,"",[]],
+["Sqrt(x)","Easy",["Math","Binary Search"],37.8,"",["Top Interview 150"]],
+["Power of Two","Easy",["Math","Bit Manipulation"],44.7,"",[]],
+["Palindrome Number","Easy",["Math"],52.7,"",["Top Interview 150"]],
+["Roman to Integer","Easy",["Hash Table","Math","String"],58.4,"",["Top Interview 150"]],
+["Longest Common Prefix","Easy",["String","Trie"],41.2,"",["Top Interview 150"]],
+["Remove Element","Easy",["Array","Two Pointers"],53.9,"",["Top Interview 150"]],
+["Remove Duplicates from Sorted Array","Easy",["Array","Two Pointers"],53.2,"",["Top Interview 150"]],
+["Merge Sorted Array","Easy",["Array","Two Pointers","Sorting"],47.1,"hot",["Top Interview 150","FAANG Prep"]],
+["Is Subsequence","Easy",["Two Pointers","String","DP"],48.6,"",["Top Interview 150"]],
+["Move Zeroes","Easy",["Array","Two Pointers"],60.7,"",[]],
+["Fibonacci Number","Easy",["Math","DP","Recursion"],68.3,"",[]],
+["Pascal's Triangle","Easy",["Array","DP"],70.1,"",["Top Interview 150"]],
+["Find the Index of the First Occurrence","Easy",["Two Pointers","String"],38.2,"",["Top Interview 150"]],
+["Ransom Note","Easy",["Hash Table","String","Counting"],57.3,"",["Top Interview 150"]],
+["Word Pattern","Easy",["Hash Table","String"],40.5,"",["Top Interview 150"]],
+["Isomorphic Strings","Easy",["Hash Table","String"],43.1,"",["Top Interview 150"]],
+["Valid Palindrome","Easy",["Two Pointers","String"],43.3,"",["NeetCode 150","Top Interview 150"]],
+["Implement Queue using Stacks","Easy",["Stack","Design","Queue"],60.8,"",[]],
+["Power of Three","Easy",["Math","Recursion"],43.7,"",[]],
+["Binary Search","Easy",["Array","Binary Search"],55.2,"",["NeetCode 150"]],
+["Guess Number Higher or Lower","Easy",["Binary Search","Interactive"],49.8,"",[]],
+["Search Insert Position","Easy",["Array","Binary Search"],44.6,"new",[]],
+["Symmetric Tree","Easy",["Tree","DFS","BFS"],52.4,"",[]],
+["Path Sum","Easy",["Tree","DFS","BFS"],47.9,"",[]],
+["Diameter of Binary Tree","Easy",["Tree","DFS"],57.7,"",["NeetCode 150"]],
+["Lowest Common Ancestor of BST","Easy",["Tree","DFS","BST"],62.8,"",["NeetCode 150"]],
+["Flood Fill","Easy",["Array","DFS","BFS","Matrix"],59.2,"",["NeetCode 150"]],
+["K Closest Points to Origin","Medium",["Array","Math","Divide and Conquer","Sorting","Heap","Quickselect"],66.0,"",["NeetCode 150","FAANG Prep"]],
+["Task Scheduler","Medium",["Array","Hash Table","Greedy","Sorting","Heap","Counting"],55.3,"",["NeetCode 150"]],
+["Design Add and Search Words","Medium",["String","DFS","Design","Trie"],44.3,"",["Blind 75","NeetCode 150"]],
+["Letter Combinations of Phone Number","Medium",["Hash Table","String","Backtracking"],57.1,"",["Top Interview 150","FAANG Prep"]],
+["Generate Parentheses","Medium",["String","DP","Backtracking"],72.8,"",["Blind 75","NeetCode 150","Top Interview 150","FAANG Prep"]],
+["Combination Sum II","Medium",["Array","Backtracking"],52.5,"",[]],
+["Subsets II","Medium",["Array","Backtracking","Bit Manipulation"],53.7,"",[]],
+["Permutations II","Medium",["Array","Backtracking"],55.1,"",[]],
+["Remove Nth Node From End","Medium",["Linked List","Two Pointers"],38.2,"",["Blind 75","NeetCode 150","Top Interview 150"]],
+["Reorder List","Medium",["Linked List","Two Pointers","Stack","Recursion"],55.3,"",["Blind 75","NeetCode 150"]],
+["Add Two Numbers","Medium",["Linked List","Math","Recursion"],38.6,"",["Blind 75","NeetCode 150","Top Interview 150"]],
+["Swap Nodes in Pairs","Medium",["Linked List","Recursion"],60.2,"",["Top Interview 150"]],
+["Reverse Nodes in k-Group","Hard",["Linked List","Recursion"],55.8,"",["Blind 75","NeetCode 150","FAANG Prep"]],
+["Copy List with Random Pointer","Medium",["Hash Table","Linked List"],54.4,"",["Top Interview 150","FAANG Prep"]],
+["Longest Palindromic Substring","Medium",["String","DP"],32.7,"hot",["Blind 75","NeetCode 150","FAANG Prep"]],
+["Palindromic Substrings","Medium",["String","DP"],67.9,"",["Blind 75","NeetCode 150"]],
+["Minimum Path Sum","Medium",["Array","DP","Matrix"],61.2,"",["FAANG Prep"]],
+["Triangle","Medium",["Array","DP"],51.3,"",[]],
+["Best Time to Buy Sell Stock with Cooldown","Medium",["Array","DP"],53.0,"",["NeetCode 150"]],
+["Best Time to Buy Sell Stock with Transaction Fee","Medium",["Array","DP","Greedy"],61.2,"",["NeetCode 150"]],
+["Edit Distance","Hard",["String","DP"],55.9,"hot",["Blind 75","NeetCode 150","FAANG Prep"]],
+["Distinct Subsequences","Hard",["String","DP"],43.4,"",[]],
+["Interleaving String","Hard",["String","DP"],36.7,"",[]],
+["Maximum Profit in Job Scheduling","Hard",["Array","Binary Search","DP","Sorting"],52.3,"",[]],
+["Kth Smallest Element in BST","Medium",["Tree","DFS","BST"],70.5,"",["Blind 75","NeetCode 150"]],
+["Construct Binary Tree from Preorder and Inorder","Medium",["Array","Hash Table","Divide and Conquer","Tree"],60.7,"",["Blind 75","NeetCode 150","Top Interview 150"]],
+["Binary Tree Right Side View","Medium",["Tree","DFS","BFS"],61.3,"",["Blind 75","NeetCode 150","Top Interview 150"]],
+["Count Good Nodes in Binary Tree","Medium",["Tree","DFS","BFS"],72.6,"",["NeetCode 150"]],
+["Path Sum II","Medium",["Backtracking","Tree","DFS"],57.5,"",[]],
+["Populating Next Right Pointers","Medium",["Linked List","Tree","DFS","BFS"],60.0,"",["Top Interview 150"]],
+["Flatten Binary Tree to Linked List","Medium",["Linked List","Stack","Tree","DFS"],61.4,"",["Top Interview 150"]],
+["Sum Root to Leaf Numbers","Medium",["Tree","DFS","Math"],56.3,"",["Top Interview 150"]],
+["Max Area of Island","Medium",["Array","DFS","BFS","Union Find","Matrix"],70.4,"",["NeetCode 150"]],
+["Surrounded Regions","Medium",["Array","DFS","BFS","Union Find","Matrix"],37.7,"",["NeetCode 150","Top Interview 150"]],
+["Evaluate Division","Medium",["Array","DFS","BFS","Graph"],58.3,"",["Top Interview 150"]],
+["Minimum Height Trees","Medium",["DFS","BFS","Graph","Topological Sort"],38.7,"",[]],
+["Redundant Connection","Medium",["DFS","BFS","Union Find","Graph"],62.3,"",["NeetCode 150"]],
+["Number of Connected Components","Medium",["DFS","BFS","Graph","Union Find"],62.8,"",["Blind 75","NeetCode 150"]],
+["Graph Valid Tree","Medium",["DFS","BFS","Graph","Union Find"],44.5,"",["Blind 75","NeetCode 150"]],
+["Cheapest Flights Within K Stops","Medium",["DP","DFS","BFS","Graph","Heap","Shortest Path"],37.1,"",["NeetCode 150"]],
+["Network Delay Time","Medium",["DFS","BFS","Graph","Heap","Shortest Path"],50.1,"",["NeetCode 150"]],
+["Minimum Cost to Connect All Points","Medium",["Array","Union Find","Minimum Spanning Tree"],64.3,"",["NeetCode 150"]],
+["Swim in Rising Water","Hard",["Array","DFS","BFS","Binary Search","Union Find","Heap","Matrix"],61.3,"",["NeetCode 150"]],
+["Alien Dictionary","Hard",["Array","String","DFS","BFS","Graph","Topological Sort"],34.2,"",["Blind 75","NeetCode 150"]],
+["First Missing Positive","Hard",["Array","Hash Table"],37.2,"",["NeetCode 150","FAANG Prep"]],
+["Trapping Rain Water II","Hard",["Array","BFS","Heap","Matrix"],45.3,"",[]],
+["Smallest Rectangle Enclosing Black Pixels","Hard",["Array","Binary Search","DFS","BFS","Matrix"],56.2,"",[]],
+["Basic Calculator","Hard",["Math","String","Stack","Recursion"],41.7,"",["Top Interview 150"]],
+["Decode String","Medium",["String","Stack","Recursion"],56.7,"",["Top Interview 150"]],
+["Asteroid Collision","Medium",["Array","Stack","Simulation"],44.5,"",["Top Interview 150"]],
+["Simplify Path","Medium",["String","Stack"],39.2,"",["Top Interview 150"]],
+["Evaluate Reverse Polish Notation","Medium",["Array","Math","Stack"],43.7,"",["NeetCode 150"]],
+["Car Fleet","Medium",["Array","Stack","Sorting","Monotonic Stack"],48.4,"",["NeetCode 150"]],
+["Sum of Subarray Minimums","Medium",["Array","DP","Stack","Monotonic Stack"],35.7,"",[]],
+["Online Stock Span","Medium",["Stack","Design","Monotonic Stack"],62.4,"",[]],
+["Two Sum II - Input Array Is Sorted","Medium",["Array","Two Pointers","Binary Search"],59.0,"",["NeetCode 150","Top Interview 150"]],
+["Sort Colors","Medium",["Array","Two Pointers","Sorting"],60.0,"",["Top Interview 150"]],
+["Squares of Sorted Array","Easy",["Array","Two Pointers","Sorting"],71.8,"",[]],
+["Minimum Size Subarray Sum","Medium",["Array","Binary Search","Sliding Window","Prefix Sum"],43.6,"",["Top Interview 150"]],
+["Fruit Into Baskets","Medium",["Array","Hash Table","Sliding Window"],42.7,"",[]],
+["Permutation in String","Medium",["Hash Table","Two Pointers","String","Sliding Window"],44.3,"",["NeetCode 150"]],
+["Find All Anagrams in a String","Medium",["Hash Table","String","Sliding Window"],48.3,"",[]],
+["Maximum Average Subarray I","Easy",["Array","Sliding Window"],43.5,"",[]],
+["Longest Repeating Character Replacement","Medium",["Hash Table","String","Sliding Window"],50.8,"hot",["Blind 75","NeetCode 150"]],
+["Count Number of Nice Subarrays","Medium",["Array","Hash Table","Math","Sliding Window"],62.7,"",[]],
+["Sort an Array","Medium",["Array","Divide and Conquer","Sorting","Heap","Merge Sort"],61.6,"",[]],
+["Insert Interval","Medium",["Array"],37.8,"",["Blind 75","NeetCode 150","Top Interview 150"]],
+["Meeting Rooms","Easy",["Array","Sorting"],56.2,"",["Blind 75","NeetCode 150"]],
+["Meeting Rooms II","Medium",["Array","Two Pointers","Greedy","Sorting","Heap"],47.7,"",["Blind 75","NeetCode 150"]],
+["Non-overlapping Intervals","Medium",["Array","DP","Greedy","Sorting"],48.6,"",["Blind 75","NeetCode 150","Top Interview 150"]],
+["Minimum Number of Arrows to Burst Balloons","Medium",["Array","Greedy","Sorting"],55.7,"",["Top Interview 150"]],
+["Integer to Roman","Medium",["Hash Table","Math","String"],64.3,"",["Top Interview 150"]],
+["H-Index","Medium",["Array","Sorting","Counting Sort"],37.5,"",["Top Interview 150"]],
+["Candy","Hard",["Array","Greedy"],41.1,"",["Top Interview 150"]],
+["Reverse Words in a String","Medium",["Two Pointers","String"],32.1,"",["Top Interview 150"]],
+["Zigzag Conversion","Medium",["String"],44.8,"",["Top Interview 150"]],
+["Text Justification","Hard",["Array","String","Simulation"],38.2,"",["Top Interview 150"]],
+["Find K Pairs with Smallest Sums","Medium",["Array","Heap (Priority Queue)"],38.2,"",[]],
+["IPO","Hard",["Array","Greedy","Sorting","Heap"],45.1,"",["Top Interview 150"]],
+["Ugly Number II","Medium",["Hash Table","Math","DP","Heap"],45.5,"",[]],
+["Maximum Number of Events Attended","Medium",["Array","Greedy","Sorting","Heap"],32.2,"",[]],
+["Burst Balloons","Hard",["Array","DP"],55.7,"",["FAANG Prep"]],
+["Palindrome Pairs","Hard",["Array","Hash Table","String","Trie"],34.2,"",["FAANG Prep"]],
+["Maximum Gap","Hard",["Array","Sorting","Bucket Sort","Radix Sort"],43.7,"",[]],
+["Russian Doll Envelopes","Hard",["Array","Binary Search","DP","Sorting"],38.5,"",["FAANG Prep"]],
+["Count of Smaller Numbers After Self","Hard",["Array","Binary Search","Divide and Conquer","Segment Tree","Merge Sort"],42.2,"",[]],
+["Reverse Pairs","Hard",["Array","Binary Search","Divide and Conquer","Segment Tree","Merge Sort"],30.2,"",[]],
+["Student Attendance Record II","Hard",["DP"],39.4,"",[]],
+["Strange Printer","Hard",["String","DP"],46.9,"",[]],
+["Minimum Window Subsequence","Hard",["Hash Table","String","DP","Sliding Window"],40.9,"",[]],
+["Find Longest Awesome Substring","Hard",["Hash Table","String","Bit Manipulation"],37.2,"",[]],
+["Substring with Concatenation of All Words","Hard",["Hash Table","String","Sliding Window"],30.3,"",["Top Interview 150"]],
+];
+
+let startId = 76;
+EXTRA.forEach(([t,d,tp,a,tag,plan])=>{
+  P.push({id:startId++,t,d,tp,a:parseFloat(a),tag,plan,
+    desc:`Given the problem: <b>${t}</b>. Implement an optimal solution.`,
+    ex:[{i:"See description",o:"Expected output"}],
+    con:["Standard constraints apply"],
+    hints:["Think about the optimal approach for this problem type.","Consider time and space complexity tradeoffs."],
+    tc:[{i:"sample input",e:"sample output"}],
+    b:{python:`import sys,json\n# ${t}\nclass Solution:\n    def solve(self):\n        # Write your solution here\n        pass\nprint(json.dumps(None))`}
+  });
+});
+
+// ═════════════════════════════════════════════════════════
+//  STATE — merges ALL previous localStorage keys
+// ═════════════════════════════════════════════════════════
+let curProb=null, diffF='', planF='', topicF='', showSolved=false;
+
+// Merge solved IDs from every possible old key
+function _loadSolvedSet(){
+  const keys=['pp_solved2','pp_solved','pp_solved3','pathpilot_solved'];
+  const merged=new Set();
+  keys.forEach(k=>{
+    try{ JSON.parse(localStorage.getItem(k)||'[]').forEach(id=>merged.add(Number(id)||id)); }catch(e){}
+  });
+  return merged;
+}
+
+// Merge submissions from every possible old key
+function _loadSubs(){
+  const keys=['pp_subs2','pp_subs','pp_subs3','pathpilot_subs'];
+  let merged=[];
+  keys.forEach(k=>{
+    try{
+      const arr=JSON.parse(localStorage.getItem(k)||'[]');
+      if(arr.length) merged=[...merged,...arr];
+    }catch(e){}
+  });
+  // Deduplicate by problem+date combo
+  const seen=new Set();
+  return merged.filter(s=>{
+    const key=`${s.problem_id||s.problem}-${s.date}-${s.status}`;
+    if(seen.has(key))return false;
+    seen.add(key);return true;
+  }).sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
+}
+
+let solvedSet=_loadSolvedSet();
+let localSubs=_loadSubs();
+
+// Also track per-problem submission stats
+let accMap=JSON.parse(localStorage.getItem('pp_accmap')||'{}');
+
+// ═════════════════════════════════════════════════════════
+//  INIT
+// ═════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  // Migrate: scan old submission logs and rebuild solvedSet from Accepted ones
+  localSubs.forEach(s=>{
+    if((s.status==='Accepted'||s.status==='accepted') && s.problem_id){
+      solvedSet.add(Number(s.problem_id));
+    }
+  });
+  saveLocal();
+
+  initStats();
+  renderList();
+  syncSolvedFromServer();
+});
+
+function initStats(){
+  const e=P.filter(p=>p.d==='Easy').length;
+  const m=P.filter(p=>p.d==='Medium').length;
+  const h=P.filter(p=>p.d==='Hard').length;
+  document.getElementById('sbTotal').textContent=P.length;
+  document.getElementById('sbEasy').textContent=e;
+  document.getElementById('sbMedium').textContent=m;
+  document.getElementById('sbHard').textContent=h;
+  document.getElementById('cnt-all').textContent=P.length;
+  // topic counts
+  const tc={};
+  P.forEach(p=>p.tp.forEach(t=>{tc[t]=(tc[t]||0)+1;}));
+  const map={Array:'cnt-Array',String:'cnt-String','Linked List':'cnt-LinkedList',
+    Tree:'cnt-Tree',Graph:'cnt-Graph','Dynamic Programming':'cnt-DP',
+    Stack:'cnt-Stack',Heap:'cnt-Heap','Binary Search':'cnt-BS',
+    'Sliding Window':'cnt-SW',Backtracking:'cnt-BT','Two Pointers':'cnt-TP'};
+  Object.entries(map).forEach(([tp,id])=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent=tc[tp]||0;
+  });
+  updateSolvedStats();
+}
+
+function updateSolvedStats(){
+  // Always re-merge from localSubs in case new data arrived
+  localSubs.forEach(s=>{
+    if((s.status==='Accepted'||s.status==='accepted') && s.problem_id){
+      solvedSet.add(Number(s.problem_id));
+    }
+  });
+
+  const sv=[...solvedSet];
+  const e=sv.filter(id=>P.find(p=>p.id===id)?.d==='Easy').length;
+  const m=sv.filter(id=>P.find(p=>p.id===id)?.d==='Medium').length;
+  const h=sv.filter(id=>P.find(p=>p.id===id)?.d==='Hard').length;
+  const te=P.filter(p=>p.d==='Easy').length;
+  const tm=P.filter(p=>p.d==='Medium').length;
+  const th=P.filter(p=>p.d==='Hard').length;
+  document.getElementById('sbSolved').textContent=sv.length;
+  document.getElementById('rn-easy').textContent=e;
+  document.getElementById('rn-med').textContent=m;
+  document.getElementById('rn-hard').textContent=h;
+  document.getElementById('rf-easy').style.width=(te?Math.round(e/te*100):0)+'%';
+  document.getElementById('rf-med').style.width=(tm?Math.round(m/tm*100):0)+'%';
+  document.getElementById('rf-hard').style.width=(th?Math.round(h/th*100):0)+'%';
+}
+
+async function syncSolvedFromServer(){
+  try{
+    const r=await fetch('/practice/api/profile');
+    if(!r.ok)return;
+    const d=await r.json();
+    if(d.solved_ids){
+      d.solved_ids.forEach(id=>solvedSet.add(Number(id)));
+    }
+    // Also get any solved IDs from server that we might not have locally
+    saveLocal();
+    updateSolvedStats();
+    renderList();
+  }catch(e){
+    // Server unavailable — local data still works
+    console.log('Profile sync skipped (server unavailable)');
+  }
+}
+
+// Push a solved problem to the server immediately after accepting
+async function pushSolvedToServer(problemId){
+  try{
+    await fetch('/practice/api/submit-code',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({problem_id:problemId,code:'# already_solved',language:'python',_mark_solved:true})
+    });
+  }catch(e){}
+}
+function saveLocal(){
+  const arr=[...solvedSet];
+  localStorage.setItem('pp_solved2',JSON.stringify(arr));
+  localStorage.setItem('pp_solved',JSON.stringify(arr));  // backwards compat
+}
+function saveSubs(){
+  localStorage.setItem('pp_subs2',JSON.stringify(localSubs));
+  localStorage.setItem('pp_subs',JSON.stringify(localSubs));  // backwards compat
+}
+
+// ═════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═════════════════════════════════════════════════════════
+function showTab(tab,el){
+  ['problems','editor','profile'].forEach(v=>{
+    const e=document.getElementById('pv-'+v);
+    if(e)e.style.display='none';
+  });
+  const target=document.getElementById('pv-'+tab);
+  if(target)target.style.display=tab==='editor'?'block':'block';
+  document.querySelectorAll('.pp-tab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+  if(tab==='profile')buildProfile();
+}
+
+function goBack(){
+  document.getElementById('pv-editor').style.display='none';
+  document.getElementById('pv-problems').style.display='block';
+  document.querySelectorAll('.pp-tab')[0].classList.add('active');
+  document.querySelectorAll('.pp-tab')[1].classList.remove('active');
+  renderList();
+}
+
+// ═════════════════════════════════════════════════════════
+//  LIST RENDERING
+// ═════════════════════════════════════════════════════════
+// Live acceptance rate tracker: { problem_id: {total, accepted} }
+
+function liveAcc(id, staticAcc){
+  const data = accMap[id];
+  if(!data || data.total === 0) return staticAcc.toFixed(1);
+  return (data.accepted / data.total * 100).toFixed(1);
+}
+
+function updateAccMap(problemId, accepted){
+  if(!accMap[problemId]) accMap[problemId] = {total:0, accepted:0};
+  accMap[problemId].total++;
+  if(accepted) accMap[problemId].accepted++;
+  localStorage.setItem('pp_accmap', JSON.stringify(accMap));
+  // Update the cell live
+  const cell = document.getElementById('acc-'+problemId);
+  if(cell) cell.textContent = liveAcc(problemId, 0)+'%';
+}
+
+function renderList(){
+  const q=(document.getElementById('searchQ')?.value||'').toLowerCase();
+  let list=P.filter(p=>{
+    if(diffF && p.d!==diffF)return false;
+    if(planF && !p.plan.includes(planF))return false;
+    if(topicF && !p.tp.includes(topicF))return false;
+    if(q&&!p.t.toLowerCase().includes(q)&&!p.tp.some(t=>t.toLowerCase().includes(q)))return false;
+    if(showSolved&&!solvedSet.has(p.id))return false;
+    return true;
+  });
+  const tbody=document.getElementById('probTbody');
+  if(!list.length){
+    tbody.innerHTML=`<tr><td colspan="6" class="empty-msg">No problems match your filter.</td></tr>`;return;
+  }
+  tbody.innerHTML=list.map(p=>{
+    const dc=p.d==='Easy'?'diff-easy':p.d==='Medium'?'diff-medium':'diff-hard';
+    const sv=solvedSet.has(p.id)
+      ?'<svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="rgba(34,197,94,.15)" stroke="#22c55e"/><path d="M5 8l2 2 4-4" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      :'<svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" stroke="rgba(255,255,255,.2)"/></svg>';
+    const tags=p.tag==='hot'?'<span class="prob-hot">🔥 Hot</span>':p.tag==='new'?'<span class="prob-new">New</span>':'';
+    const chips=p.tp.slice(0,2).map(t=>`<span class="topic-tag">${t}</span>`).join('');
+    return `<tr class="pp-row" onclick="openProb(${p.id})">
+      <td>${sv}</td>
+      <td class="prob-num-cell">${p.id}</td>
+      <td><span class="prob-title-cell">${p.t} ${tags}</span></td>
+      <td>${chips}</td>
+      <td><span class="${dc}">${p.d}</span></td>
+      <td class="acc-cell" id="acc-${p.id}">${liveAcc(p.id,p.a)}%</td>
+    </tr>`;
+  }).join('');
+}
+
+function setDiff(d){
+  diffF=d;
+  ['all','Easy','Medium','Hard'].forEach(x=>{
+    const btn=document.getElementById('fb-'+x);
+    if(btn){btn.className='pp-fbtn'+(x==='Easy'?' easy':x==='Medium'?' medium':x==='Hard'?' hard':'')+(((d===''&&x==='all')||(d===x))?' active':'');}
+  });
+  renderList();
+}
+
+function toggleSolved(){
+  showSolved=!showSolved;
+  const btn=document.getElementById('fb-solved');
+  btn.className='pp-fbtn'+(showSolved?' active':'');
+  renderList();
+}
+
+function setPlan(el,plan){
+  planF=planF===plan?'':plan;topicF='';
+  document.querySelectorAll('.pp-sb-item').forEach(i=>i.classList.remove('active'));
+  if(planF)el.classList.add('active');
+  else document.querySelector('[data-plan=""]').classList.add('active');
+  renderList();
+}
+
+function setTopic(el,topic){
+  topicF=topicF===topic?'':topic;planF='';
+  document.querySelectorAll('.pp-sb-item').forEach(i=>i.classList.remove('active'));
+  if(topicF)el.classList.add('active');
+  else document.querySelector('[data-plan=""]').classList.add('active');
+  renderList();
+}
+
+// ═════════════════════════════════════════════════════════
+//  OPEN PROBLEM
+// ═════════════════════════════════════════════════════════
+function openProb(id){
+  curProb=P.find(p=>p.id===id);if(!curProb)return;
+  document.getElementById('pv-problems').style.display='none';
+  document.getElementById('pv-profile').style.display='none';
+  document.getElementById('pv-editor').style.display='block';
+  document.querySelectorAll('.pp-tab').forEach(t=>t.classList.remove('active'));
+  renderDesc();loadBoiler();renderTC();
+  const vs=document.getElementById('verdictStrip');
+  vs.className='verdict-strip';vs.innerHTML='';
+  document.getElementById('outputMsg').style.display='block';
+  document.getElementById('outputBody').innerHTML='';
+  switchTcTab('cases',document.querySelector('.tc-tab'));
+}
+
+function renderDesc(){
+  const p=curProb;
+  const dc=p.d==='Easy'?'diff-easy':p.d==='Medium'?'diff-medium':'diff-hard';
+  let h=`<div class="prob-title-big">${p.t}</div>
+    <div class="prob-meta-row">
+      <span class="${dc}">${p.d}</span>
+      ${p.tp.map(t=>`<span class="topic-tag">${t}</span>`).join('')}
+      ${solvedSet.has(p.id)?'<span style="color:#22c55e;font-size:12.5px;font-weight:600">✅ Solved</span>':''}
+    </div>
+    <div class="prob-body">${p.desc}</div>`;
+  p.ex.forEach((ex,i)=>{
+    h+=`<div class="prob-example"><div class="prob-ex-label">Example ${i+1}</div>
+      <pre><b>Input:</b>  ${ex.i}\n<b>Output:</b> ${ex.o}${ex.e?'\n<b>Explain:</b> '+ex.e:''}</pre></div>`;
+  });
+  h+=`<div class="prob-constraints"><div class="constraints-label">Constraints</div>
+    <ul class="constraints-list">${p.con.map(c=>`<li>${c}</li>`).join('')}</ul></div>`;
+  document.getElementById('elp-desc').innerHTML=h;
+  document.getElementById('elp-hints').innerHTML=
+    `<div style="font-size:13px;color:rgba(255,255,255,.3);margin-bottom:12px">Hints for: <b>${p.t}</b></div>`+
+    p.hints.map((h,i)=>`<div class="hint-item"><span class="hint-label">Hint ${i+1}:</span>${h}</div>`).join('');
+}
+
+function switchLTab(tab,el){
+  document.querySelectorAll('.ed-ltab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.ed-lpane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('elp-'+tab).classList.add('active');
+}
+
+// ═════════════════════════════════════════════════════════
+//  CODE EDITOR
+// ═════════════════════════════════════════════════════════
+function loadBoiler(){
+  if(!curProb)return;
+  const lang=document.getElementById('langSel').value;
+  document.getElementById('codeTA').value=
+    curProb.b?.[lang]||`# ${curProb.t}\n# Language: ${lang}\nclass Solution:\n    def solve(self):\n        pass\n`;
+  syncLN();
+}
+function syncLN(){
+  const lines=document.getElementById('codeTA').value.split('\n').length;
+  document.getElementById('lineNums').innerHTML=
+    Array.from({length:lines},(_,i)=>`<span class="ln">${i+1}</span>`).join('');
+}
+function handleTab(e){
+  if(e.key==='Tab'){
+    e.preventDefault();
+    const ta=e.target,s=ta.selectionStart;
+    ta.value=ta.value.substring(0,s)+'    '+ta.value.substring(ta.selectionEnd);
+    ta.selectionStart=ta.selectionEnd=s+4;syncLN();
+  }
+}
+function renderTC(){
+  document.getElementById('tcp-cases').innerHTML=curProb.tc.map((tc,i)=>`
+    <div class="tc-input-item">
+      <div class="tc-input-label">Case ${i+1}</div>
+      <div class="tc-input-val">${tc.i}</div>
+      <div class="tc-expected">Expected: <span style="color:#06b6d4">${tc.e}</span></div>
+    </div>`).join('');
+}
+function switchTcTab(tab,el){
+  document.querySelectorAll('.tc-tab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.getElementById('tcp-cases').style.display=tab==='cases'?'block':'none';
+  document.getElementById('tcp-output').style.display=tab==='output'?'block':'none';
+}
+
+// ═════════════════════════════════════════════════════════
+//  RUN CODE
+// ═════════════════════════════════════════════════════════
+async function runCode(){
+  const code=document.getElementById('codeTA').value.trim();if(!code)return;
+  const btn=document.getElementById('btnRun');
+  btn.disabled=true;btn.innerHTML='<span class="mini-spin" style="width:14px;height:14px;border-color:rgba(255,255,255,.2);border-top-color:#fff"></span>';
+  switchTcTab('output',document.querySelectorAll('.tc-tab')[1]);
+  document.getElementById('outputMsg').style.display='none';
+  document.getElementById('outputBody').innerHTML='<div style="color:rgba(255,255,255,.3);font-size:13px">Running…</div>';
+  try{
+    const r=await fetch('/practice/api/run-code',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({problem_id:curProb.id,code,language:document.getElementById('langSel').value})
+    });
+    renderOutput(await r.json());
+  }catch(e){
+    document.getElementById('outputBody').innerHTML=`<div class="res-item res-fail">Network error: ${e.message}</div>`;
+  }
+  btn.disabled=false;btn.innerHTML='▶ Run';
+}
+
+function renderOutput(data){
+  const c=document.getElementById('outputBody');
+  if(data.error){c.innerHTML=`<div class="res-item res-fail"><b>Error:</b> ${data.error}</div>`;return;}
+  const results=data.results||[];
+  if(!results.length){c.innerHTML='<div class="res-item res-fail">No output returned.</div>';return;}
+  c.innerHTML=results.map(r=>`
+    <div class="res-item ${r.passed?'res-pass':'res-fail'}">
+      <div class="res-top">
+        <span class="${r.passed?'res-pass-txt':'res-fail-txt'}">${r.passed?'✓ Passed':'✗ Wrong Answer'} — Case ${r.case}</span>
+        <span class="res-time">${r.runtime_ms?r.runtime_ms.toFixed(1)+'ms':''}</span>
+      </div>
+      <div class="res-details">
+        Input: ${(r.input||'').substring(0,80)}<br>
+        Output: <span style="color:${r.passed?'#4ade80':'#f87171'}">${r.actual||'—'}</span><br>
+        Expected: <span style="color:#06b6d4">${r.expected||'—'}</span>
+        ${r.error?`<br><span style="color:#fbbf24">Error: ${r.error}</span>`:''}
+      </div>
+    </div>`).join('');
+}
+
+// ═════════════════════════════════════════════════════════
+//  SUBMIT CODE
+// ═════════════════════════════════════════════════════════
+async function submitCode(){
+  const code=document.getElementById('codeTA').value.trim();if(!code)return;
+  const btn=document.getElementById('btnSubmit');
+  btn.disabled=true;btn.innerHTML='⏳ Judging…';
+  switchTcTab('output',document.querySelectorAll('.tc-tab')[1]);
+  document.getElementById('outputMsg').style.display='none';
+  document.getElementById('outputBody').innerHTML='<div style="color:rgba(255,255,255,.3);font-size:13px">Judging all test cases…</div>';
+  const vs=document.getElementById('verdictStrip');
+  vs.className='verdict-strip';vs.innerHTML='';
+  try{
+    const r=await fetch('/practice/api/submit-code',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({problem_id:curProb.id,code,language:document.getElementById('langSel').value})
+    });
+    const data=await r.json();
+    renderOutput(data);
+    const status=data.status||'Error';
+    const cls=status==='Accepted'?'vs-accepted':status.includes('Time')?'vs-tle':status.includes('Runtime')?'vs-error':'vs-wrong';
+    const icon=status==='Accepted'?'✅':status.includes('Time')?'⏱':'✗';
+    vs.className=`verdict-strip show ${cls}`;
+    vs.innerHTML=`<span>${icon} ${status}</span>
+      <div class="vs-meta"><span>${data.passed||0}/${data.total||'?'} cases</span>${data.runtime_ms?`<span>${data.runtime_ms}ms</span>`:''}</div>`;
+    // Update live acceptance rate
+    // Always log the submission (accepted OR wrong) for accurate stats
+    if(status !== 'Accepted'){
+      localSubs.unshift({
+        problem:curProb.t,problem_id:curProb.id,diff:curProb.d,status,
+        lang:document.getElementById('langSel').value,
+        date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
+      });
+      if(localSubs.length>300)localSubs=localSubs.slice(0,300);
+      saveSubs();
+    }
+    updateAccMap(curProb.id, status==='Accepted');
+    if(status==='Accepted'){
+      solvedSet.add(curProb.id);saveLocal();
+      localSubs.unshift({
+        problem:curProb.t,problem_id:curProb.id,diff:curProb.d,status,
+        lang:document.getElementById('langSel').value,
+        date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
+      });
+      if(localSubs.length>300)localSubs=localSubs.slice(0,300);
+      saveSubs();
+      updateSolvedStats();renderList();
+    }
+  }catch(e){
+    document.getElementById('outputBody').innerHTML=`<div class="res-item res-fail">Network error: ${e.message}</div>`;
+  }
+  btn.disabled=false;btn.innerHTML='⚡ Submit';
+}
+
+// ═════════════════════════════════════════════════════════
+//  PROFILE
+// ═════════════════════════════════════════════════════════
+async function buildProfile(){
+  const c=document.getElementById('profContent');
+  const sv=[...solvedSet];
+  const eP=P.filter(p=>p.d==='Easy'),mP=P.filter(p=>p.d==='Medium'),hP=P.filter(p=>p.d==='Hard');
+  const es=sv.filter(id=>eP.some(p=>p.id===id)).length;
+  const ms=sv.filter(id=>mP.some(p=>p.id===id)).length;
+  const hs=sv.filter(id=>hP.some(p=>p.id===id)).length;
+  const accSubs=localSubs.filter(s=>s.status==='Accepted'||s.status==='accepted').length;
+
+  let userName='',uInit='?';
+  try{const r=await fetch('/practice/api/profile');if(r.ok){const d=await r.json();
+    if(d.profile?.name){userName=d.profile.name;uInit=userName.trim()[0].toUpperCase();}}}catch(e){}
+  if(!userName){const ne=document.querySelector('[data-username]');
+    if(ne){userName=ne.dataset.username;uInit=userName[0].toUpperCase();}
+    else{userName='My Profile';uInit='?';}}
+
+  // Build calendar data from localSubs
+  const calData={};
+  const today=new Date();
+  localSubs.forEach(s=>{
+    if(s.date){  // count ALL submissions (accepted + wrong) in calendar
+      try{const d=new Date(s.date);const k=d.toISOString().split('T')[0];calData[k]=(calData[k]||0)+1;}catch(e){}
+    }
+  });
+  // Generate 53 weeks of cells
+  const calStart=new Date(today);calStart.setDate(calStart.getDate()-364);
+  const cells=[];
+  for(let i=0;i<364;i++){
+    const d=new Date(calStart);d.setDate(d.getDate()+i);
+    const k=d.toISOString().split('T')[0];
+    const cnt=calData[k]||0;
+    const lvl=cnt===0?'l0':cnt===1?'l1':cnt<=3?'l2':cnt<=6?'l3':'l4';
+    cells.push(`<div class="cal-cell ${lvl}" title="${k}: ${cnt} submissions"></div>`);
+  }
+  const totalActiveDays=Object.keys(calData).length;
+  const maxStreak=calcStreak(calData);
+
+  const recentSubs=localSubs.slice(0,10);
+
+  c.innerHTML=`
+    <div class="prof-head">
+      <div class="prof-avatar">${uInit}</div>
+      <div>
+        <div class="prof-name">${userName}</div>
+        <div class="prof-sub">PathPilot AI · Code Practice</div>
+      </div>
+    </div>
+
+    <div class="prof-stats">
+      <div class="prof-stat">
+        <div class="prof-stat-n" style="color:#5b6bff">${sv.length}</div>
+        <div class="prof-stat-l">Problems Solved</div>
+      </div>
+      <div class="prof-stat">
+        <div class="prof-stat-n" style="color:#ffb547">${localSubs.length}</div>
+        <div class="prof-stat-l">Total Submissions</div>
+      </div>
+      <div class="prof-stat">
+        <div class="prof-stat-n" style="color:#22c55e">${accSubs}</div>
+        <div class="prof-stat-l">Accepted</div>
+      </div>
+      <div class="prof-stat">
+        <div class="prof-stat-n" style="color:#00e5c8">${localSubs.length?Math.round(accSubs/localSubs.length*100):0}%</div>
+        <div class="prof-stat-l">Acceptance Rate</div>
+      </div>
+    </div>
+
+    <div class="diff-cards">
+      <div class="diff-card">
+        <div class="diff-card-top">
+          <span class="diff-card-label" style="color:#22c55e">Easy</span>
+          <span class="diff-card-count" style="color:#22c55e">${es}</span>
+        </div>
+        <div class="diff-bar-track"><div class="diff-bar-inner" style="background:#22c55e;width:${eP.length?Math.round(es/eP.length*100):0}%"></div></div>
+        <div class="diff-card-sub">${es} of ${eP.length} solved</div>
+      </div>
+      <div class="diff-card">
+        <div class="diff-card-top">
+          <span class="diff-card-label" style="color:#ffb547">Medium</span>
+          <span class="diff-card-count" style="color:#ffb547">${ms}</span>
+        </div>
+        <div class="diff-bar-track"><div class="diff-bar-inner" style="background:#ffb547;width:${mP.length?Math.round(ms/mP.length*100):0}%"></div></div>
+        <div class="diff-card-sub">${ms} of ${mP.length} solved</div>
+      </div>
+      <div class="diff-card">
+        <div class="diff-card-top">
+          <span class="diff-card-label" style="color:#ff5757">Hard</span>
+          <span class="diff-card-count" style="color:#ff5757">${hs}</span>
+        </div>
+        <div class="diff-bar-track"><div class="diff-bar-inner" style="background:#ff5757;width:${hP.length?Math.round(hs/hP.length*100):0}%"></div></div>
+        <div class="diff-card-sub">${hs} of ${hP.length} solved</div>
+      </div>
+    </div>
+
+    <div class="cal-card">
+      <div class="cal-header">
+        <div class="cal-title">${accSubs} submissions in the past one year</div>
+        <div class="cal-stats">
+          <span class="cal-stat">Total active days: <strong>${totalActiveDays}</strong></span>
+          <span class="cal-stat">Max streak: <strong>${maxStreak}</strong></span>
+        </div>
+      </div>
+      <div class="cal-months">${cells.join('')}</div>
+      <div class="cal-legend">
+        Less
+        <div class="cal-legend-cell" style="background:rgba(255,255,255,.06)"></div>
+        <div class="cal-legend-cell" style="background:#bbf7d0"></div>
+        <div class="cal-legend-cell" style="background:#4ade80"></div>
+        <div class="cal-legend-cell" style="background:#16a34a"></div>
+        <div class="cal-legend-cell" style="background:#14532d"></div>
+        More
+      </div>
+    </div>
+
+    <div class="recent-card">
+      <div class="recent-title">Recent Submissions</div>
+      ${recentSubs.length===0
+        ?`<div class="empty-start">
+            <div class="empty-start-icon">🚀</div>
+            <div class="empty-start-text">Your journey starts here</div>
+            <div class="empty-start-sub">Solve your first problem to see progress!</div>
+          </div>`
+        :recentSubs.map(s=>`
+          <div class="sub-item">
+            <span class="sub-prob" onclick="openProb(${s.problem_id})">${s.problem}</span>
+            <span class="sub-badge ${s.status==='Accepted'?'sb-acc':'sb-wrong'}">${s.status}</span>
+            <span class="sub-lang">${s.lang||''}</span>
+            <span class="sub-diff ${s.diff==='Easy'?'diff-easy':s.diff==='Medium'?'diff-medium':'diff-hard'}" style="font-size:11px;padding:2px 7px">${s.diff||''}</span>
+            <span class="sub-date">${s.date||''}</span>
+          </div>`).join('')
+      }
+    </div>`;
+}
+
+function calcStreak(calData){
+  const dates=Object.keys(calData).sort().reverse();
+  if(!dates.length)return 0;
+  let streak=1,max=1;
+  for(let i=1;i<dates.length;i++){
+    const a=new Date(dates[i-1]),b=new Date(dates[i]);
+    const diff=(a-b)/(1000*60*60*24);
+    if(diff===1){streak++;max=Math.max(max,streak);}
+    else{streak=1;}
+  }
+  return max;
+}
+</script>
+{% endblock %}

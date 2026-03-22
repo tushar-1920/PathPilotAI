@@ -62,6 +62,7 @@ def login():
 
         session["user_id"] = user.id
         session["role"] = user.role
+        
 
         return redirect("/dashboard")
 

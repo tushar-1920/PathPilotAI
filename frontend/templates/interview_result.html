@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;--red:#ff5757;--font-d:"Syne",sans-serif;--font-b:"DM Sans",sans-serif;--ease:cubic-bezier(.16,1,.3,1);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#000!important;color:#fff!important;font-family:var(--font-b);}
+.ir-page{min-height:100vh;background:#000;position:relative;}
+.ir-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 50% at 50% 10%,rgba(91,107,255,.12) 0%,transparent 60%);}
+.ir-grid{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:60px 60px;}
+.ir-body{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:48px 22px 100px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scoreCount{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+@keyframes barGrow{from{width:0}}
+
+/* ── HERO RESULT ── */
+.ir-hero{text-align:center;padding:0 0 48px;animation:fadeUp .6s ease both;}
+.ir-verdict-badge{display:inline-flex;align-items:center;gap:9px;padding:10px 28px;border-radius:100px;font-family:var(--font-d);font-size:16px;font-weight:800;letter-spacing:-.3px;margin-bottom:24px;border:2px solid;}
+.ir-score-display{font-family:var(--font-d);font-size:clamp(64px,10vw,110px);font-weight:800;letter-spacing:-6px;line-height:1;margin-bottom:8px;animation:scoreCount .8s var(--ease) both;}
+.ir-score-sub{font-size:15px;color:rgba(255,255,255,.35);font-weight:300;margin-bottom:24px;}
+.ir-summary{font-size:16px;color:rgba(255,255,255,.5);font-weight:300;line-height:1.82;max-width:620px;margin:0 auto 32px;}
+.ir-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.ir-retry-btn{padding:14px 32px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--neon),#3a4aff);color:#fff;font-family:var(--font-b);font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 6px 24px rgba(91,107,255,.4);text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+.ir-share-btn{padding:14px 28px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:rgba(255,255,255,.65);font-family:var(--font-b);font-size:15px;font-weight:500;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+
+/* ── READINESS METER ── */
+.ir-readiness{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.09);border-radius:20px;padding:28px 32px;margin-bottom:20px;animation:fadeUp .6s .05s ease both;}
+.ir-readiness-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.ir-readiness-title{font-family:var(--font-d);font-size:18px;font-weight:700;color:#fff;}
+.ir-readiness-pct{font-family:var(--font-d);font-size:32px;font-weight:800;letter-spacing:-1.5px;}
+.ir-readiness-track{height:14px;border-radius:100px;background:rgba(255,255,255,.07);overflow:hidden;}
+.ir-readiness-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--neon),var(--cyan));animation:barGrow 1.4s var(--ease) both;}
+
+/* ── METRICS GRID ── */
+.ir-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;animation:fadeUp .6s .1s ease both;}
+.ir-metric-box{padding:22px 18px;border-radius:16px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);text-align:center;}
+.ir-metric-val{font-family:var(--font-d);font-size:28px;font-weight:800;letter-spacing:-1px;margin-bottom:5px;}
+.ir-metric-lbl{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.3);}
+
+/* ── STRENGTH / GAP ── */
+.ir-two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;animation:fadeUp .6s .15s ease both;}
+.ir-insight-box{padding:22px 20px;border-radius:16px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);}
+.ir-insight-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;}
+.ir-insight-val{font-size:14.5px;color:rgba(255,255,255,.58);font-weight:300;line-height:1.7;}
+
+/* ── NEXT STEPS ── */
+.ir-steps{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:28px 32px;margin-bottom:20px;animation:fadeUp .6s .2s ease both;}
+.ir-steps-title{font-family:var(--font-d);font-size:18px;font-weight:700;color:#fff;margin-bottom:18px;}
+.ir-step-item{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.ir-step-item:last-child{border-bottom:none;}
+.ir-step-num{width:28px;height:28px;border-radius:8px;background:rgba(91,107,255,.15);border:1px solid rgba(91,107,255,.25);color:#818cf8;font-family:var(--font-d);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ir-step-text{font-size:14px;color:rgba(255,255,255,.55);font-weight:300;line-height:1.6;padding-top:3px;}
+
+/* ── Q&A BREAKDOWN ── */
+.ir-breakdown{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:28px 32px;animation:fadeUp .6s .25s ease both;}
+.ir-breakdown-title{font-family:var(--font-d);font-size:18px;font-weight:700;color:#fff;margin-bottom:22px;}
+.ir-qa-item{padding:18px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.ir-qa-item:last-child{border-bottom:none;padding-bottom:0;}
+.ir-qa-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;}
+.ir-qa-qnum{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.3);}
+.ir-qa-score{display:flex;align-items:center;gap:6px;font-family:var(--font-d);font-size:15px;font-weight:800;}
+.ir-qa-q{font-size:14.5px;color:rgba(255,255,255,.6);margin-bottom:6px;line-height:1.55;}
+.ir-qa-verdict{font-size:12.5px;color:rgba(255,255,255,.3);font-style:italic;}
+.ir-score-bar{height:5px;border-radius:100px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:8px;}
+.ir-score-bar-fill{height:100%;border-radius:100px;animation:barGrow 1s var(--ease) both;}
+
+@media(max-width:700px){.ir-metrics{grid-template-columns:1fr 1fr;}.ir-two-col{grid-template-columns:1fr;}.ir-body{padding:32px 16px 80px;}}
+</style>
+
+<div class="ir-page">
+<div class="ir-glow"></div>
+<div class="ir-grid"></div>
+<div class="ir-body">
+
+  <!-- HERO -->
+  <div class="ir-hero">
+    <div class="ir-verdict-badge" style="background:{{ report.verdict_color }}18;border-color:{{ report.verdict_color }}40;color:{{ report.verdict_color }}">
+      {{ report.overall_verdict }}
+    </div>
+    <div class="ir-score-display" style="color:{{ report.verdict_color }}">
+      {{ report.avg_score }}<span style="font-size:40%;color:rgba(255,255,255,.3);letter-spacing:-2px">/10</span>
+    </div>
+    <div class="ir-score-sub">Average score · {{ report.total_score }} / {{ report.max_score }} total points · {{ (report.total_time // 60) }}m {{ (report.total_time % 60) }}s</div>
+    <div class="ir-summary">{{ report.performance_summary }}</div>
+    <div class="ir-actions">
+      <a href="/interview" class="ir-retry-btn">🔄 Practice Again</a>
+      <a href="/dashboard" class="ir-share-btn">📊 Go to Dashboard</a>
+    </div>
+  </div>
+
+  <!-- READINESS METER -->
+  <div class="ir-readiness">
+    <div class="ir-readiness-header">
+      <div class="ir-readiness-title">🎯 Interview Readiness</div>
+      <div class="ir-readiness-pct" style="color:{{ report.verdict_color }}">{{ report.readiness_percent }}%</div>
+    </div>
+    <div class="ir-readiness-track">
+      <div class="ir-readiness-fill" style="width:{{ report.readiness_percent }}%;background:linear-gradient(90deg,{{ report.verdict_color }},var(--cyan))"></div>
+    </div>
+  </div>
+
+  <!-- METRICS -->
+  <div class="ir-metrics">
+    <div class="ir-metric-box">
+      <div class="ir-metric-val" style="color:var(--cyan)">{{ report.avg_score }}</div>
+      <div class="ir-metric-lbl">Avg Score / 10</div>
+    </div>
+    <div class="ir-metric-box">
+      <div class="ir-metric-val" style="color:var(--neon)">{{ report.qa_history | length }}</div>
+      <div class="ir-metric-lbl">Questions Answered</div>
+    </div>
+    <div class="ir-metric-box">
+      <div class="ir-metric-val" style="color:var(--amber)">{{ (report.total_time // 60) }}m</div>
+      <div class="ir-metric-lbl">Time Taken</div>
+    </div>
+  </div>
+
+  <!-- STRENGTH / GAP -->
+  <div class="ir-two-col">
+    <div class="ir-insight-box">
+      <div class="ir-insight-lbl" style="color:rgba(34,197,94,.6)">💪 Top Strength</div>
+      <div class="ir-insight-val">{{ report.top_strength }}</div>
+    </div>
+    <div class="ir-insight-box">
+      <div class="ir-insight-lbl" style="color:rgba(255,87,87,.6)">⚡ Critical Gap</div>
+      <div class="ir-insight-val">{{ report.critical_gap }}</div>
+    </div>
+  </div>
+
+  <!-- NEXT STEPS -->
+  <div class="ir-steps">
+    <div class="ir-steps-title">🚀 Your Action Plan</div>
+    {% for step in report.next_steps %}
+    <div class="ir-step-item">
+      <div class="ir-step-num">{{ loop.index }}</div>
+      <div class="ir-step-text">{{ step }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Q&A BREAKDOWN -->
+  <div class="ir-breakdown">
+    <div class="ir-breakdown-title">📋 Question-by-Question Breakdown</div>
+    {% for qa in report.qa_history %}
+    {% set sc = qa.score | default(0) %}
+    {% set col = "#22c55e" if sc >= 8 else "#00e5c8" if sc >= 6 else "#ffb547" if sc >= 4 else "#ff5757" %}
+    <div class="ir-qa-item">
+      <div class="ir-qa-header">
+        <div class="ir-qa-qnum">Question {{ loop.index }}</div>
+        <div class="ir-qa-score" style="color:{{ col }}">{{ qa.badge | default("") }} {{ sc }}/10</div>
+      </div>
+      <div class="ir-qa-q">{{ qa.question | truncate(120) }}</div>
+      <div class="ir-qa-verdict">{{ qa.verdict | default("") }} — {{ qa.strength | default("") }}</div>
+      <div class="ir-score-bar">
+        <div class="ir-score-bar-fill" style="width:{{ (sc / 10 * 100)|int }}%;background:{{ col }};animation-delay:{{ loop.index0 * 0.1 }}s"></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+</div>
+{% endblock %}

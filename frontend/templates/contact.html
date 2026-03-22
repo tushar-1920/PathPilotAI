@@ -1,0 +1,532 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --neon:   #5b6bff;
+  --cyan:   #00e5c8;
+  --green:  #22c55e;
+  --purple: #a855f7;
+  --amber:  #ffb547;
+  --blue:   #38bdf8;
+  --rim:    rgba(255,255,255,0.06);
+  --glass:  rgba(255,255,255,0.028);
+  --font-d: 'Syne', sans-serif;
+  --font-b: 'DM Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #000 !important; color: #fff !important; font-family: var(--font-b); -webkit-font-smoothing: antialiased; }
+footer, .footer, .site-footer, .main-footer, #footer { display: none !important; }
+
+/* ── PAGE ── */
+.ct-page { min-height: 100vh; background: #000; position: relative; overflow-x: hidden; }
+
+.ct-glow {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 55% 40% at 15% 20%,  rgba(0,229,200,.09)  0%, transparent 65%),
+    radial-gradient(ellipse 45% 40% at 85% 75%,  rgba(91,107,255,.08) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 30% at 50% 55%,  rgba(255,181,71,.04) 0%, transparent 65%);
+}
+.ct-grid {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.ct-body { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 72px 40px 140px; }
+
+/* ── HEADER ── */
+.ct-head { text-align: center; margin-bottom: 80px; animation: fadeUp .7s ease both; }
+
+.ct-logo-wrap {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 76px; height: 76px; border-radius: 22px; margin-bottom: 28px;
+  background: linear-gradient(135deg, rgba(0,229,200,.2), rgba(91,107,255,.12));
+  border: 1px solid rgba(0,229,200,.3);
+  box-shadow: 0 0 40px rgba(0,229,200,.2), 0 0 80px rgba(91,107,255,.08);
+  animation: cyanPulse 3s ease-in-out infinite;
+  position: relative; overflow: hidden;
+}
+.ct-logo-wrap::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,.07),transparent); }
+@keyframes cyanPulse {
+  0%,100% { box-shadow: 0 0 40px rgba(0,229,200,.18); }
+  50%      { box-shadow: 0 0 70px rgba(0,229,200,.45), 0 0 130px rgba(91,107,255,.2); }
+}
+
+.ct-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 20px; border-radius: 100px;
+  background: rgba(0,229,200,.08); border: 1px solid rgba(0,229,200,.22);
+  font-size: 11px; font-weight: 600; color: #2dd4bf;
+  letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 24px;
+}
+.ct-eyebrow-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #2dd4bf; box-shadow: 0 0 10px #2dd4bf;
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.12} }
+
+.ct-title {
+  font-family: var(--font-d);
+  font-size: clamp(40px, 5.5vw, 72px);
+  font-weight: 200; letter-spacing: -3.5px;
+  color: rgba(255,255,255,.7); line-height: 1.04; margin-bottom: 22px;
+}
+.ct-title strong { font-weight: 800; color: #fff; display: block; }
+.ct-title .grad {
+  background: linear-gradient(110deg, var(--cyan) 0%, var(--neon) 70%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.ct-sub {
+  font-size: 16px; color: rgba(255,255,255,.3); font-weight: 300;
+  line-height: 1.78; max-width: 520px; margin: 0 auto;
+}
+
+/* ── CONTACT OPTIONS ROW ── */
+.ct-options {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  margin-bottom: 64px; animation: fadeUp .7s .1s ease both;
+}
+.ct-option {
+  background: rgba(255,255,255,.022);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 20px; padding: 32px 28px;
+  text-align: center; position: relative; overflow: hidden;
+  transition: transform .3s, border-color .3s;
+  cursor: pointer;
+}
+.ct-option::before {
+  content:''; position:absolute; top:0; left:15%; right:15%; height:1px;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+  opacity: 0; transition: opacity .3s;
+}
+.ct-option:hover { transform: translateY(-4px); }
+.ct-option:hover::before { opacity: .4; }
+
+.ct-opt1:hover { border-color: rgba(0,229,200,.3); }
+.ct-opt1::before { color: #00e5c8; }
+.ct-opt2:hover { border-color: rgba(91,107,255,.3); }
+.ct-opt2::before { color: #5b6bff; }
+.ct-opt3:hover { border-color: rgba(255,181,71,.3); }
+.ct-opt3::before { color: #ffb547; }
+
+.ct-opt-icon { font-size: 36px; margin-bottom: 14px; display: block; }
+.ct-opt-name { font-family: var(--font-d); font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.ct-opt-desc { font-size: 13.5px; color: rgba(255,255,255,.35); line-height: 1.65; font-weight: 300; margin-bottom: 18px; }
+.ct-opt-action {
+  display: inline-block; font-size: 13px; font-weight: 600;
+  padding: 8px 20px; border-radius: 8px; text-decoration: none;
+  transition: opacity .2s;
+}
+.ct-opt-action:hover { opacity: .8; }
+.ct-a1 { background: rgba(0,229,200,.1); border: 1px solid rgba(0,229,200,.25); color: #2dd4bf; }
+.ct-a2 { background: rgba(91,107,255,.1); border: 1px solid rgba(91,107,255,.25); color: #818cf8; }
+.ct-a3 { background: rgba(255,181,71,.1); border: 1px solid rgba(255,181,71,.25); color: #ffb547; }
+
+/* ── MAIN LAYOUT ── */
+.ct-main { display: grid; grid-template-columns: 1fr 1.1fr; gap: 40px; }
+
+/* ── LEFT — INFO ── */
+.ct-info { display: flex; flex-direction: column; gap: 20px; }
+
+.ct-info-card {
+  background: rgba(255,255,255,.022);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 20px; padding: 28px 28px;
+  animation: fadeUp .6s ease both;
+}
+.ct-info-head { display: flex; align-items: center; gap: 13px; margin-bottom: 16px; }
+.ct-info-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+}
+.ct-info-title { font-family: var(--font-d); font-size: 16px; font-weight: 700; color: #fff; }
+.ct-info-sub { font-size: 12px; color: rgba(255,255,255,.25); margin-top: 1px; }
+.ct-info-body { font-size: 13.5px; color: rgba(255,255,255,.4); line-height: 1.72; font-weight: 300; }
+.ct-info-link {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 12px;
+  font-size: 13px; font-weight: 600; color: var(--cyan); text-decoration: none;
+  transition: color .2s;
+}
+.ct-info-link:hover { color: #fff; }
+
+/* Response time badge */
+.ct-resp-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 16px; border-radius: 100px;
+  background: rgba(34,197,94,.08); border: 1px solid rgba(34,197,94,.18);
+  font-size: 12px; color: #4ade80; margin-top: 8px;
+}
+.ct-resp-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 8px #4ade80; animation: blink 1.8s infinite; }
+
+/* ── RIGHT — FORM ── */
+.ct-form-wrap {
+  background: rgba(255,255,255,.022);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 22px; padding: 40px 36px;
+  position: relative; overflow: hidden;
+  animation: fadeUp .7s .12s ease both;
+}
+.ct-form-wrap::before {
+  content:''; position:absolute; top:0; left:10%; right:10%; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(0,229,200,.4), rgba(91,107,255,.3), transparent);
+}
+
+.ct-form-title {
+  font-family: var(--font-d); font-size: 22px; font-weight: 700;
+  color: #fff; letter-spacing: -.5px; margin-bottom: 6px;
+}
+.ct-form-sub { font-size: 14px; color: rgba(255,255,255,.3); font-weight: 300; margin-bottom: 32px; }
+
+.ct-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.ct-field { margin-bottom: 16px; }
+.ct-label {
+  display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 2px; color: rgba(255,255,255,.28); margin-bottom: 9px;
+}
+.ct-input, .ct-select, .ct-textarea {
+  width: 100%; padding: 13px 18px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 12px; color: #fff;
+  font-family: var(--font-b); font-size: 14.5px; font-weight: 400; outline: none;
+  transition: border-color .25s, box-shadow .25s, background .25s;
+  -webkit-text-fill-color: #fff;
+}
+.ct-select {
+  appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba(255,255,255,0.3)' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat; background-position: right 16px center; background-size: 13px;
+  padding-right: 44px;
+}
+.ct-select option { background: #0a0a10; }
+.ct-textarea { min-height: 130px; resize: vertical; }
+.ct-input::placeholder, .ct-textarea::placeholder { color: rgba(255,255,255,.22); -webkit-text-fill-color: rgba(255,255,255,.22); }
+.ct-input:focus, .ct-select:focus, .ct-textarea:focus {
+  border-color: rgba(0,229,200,.4);
+  box-shadow: 0 0 0 3px rgba(0,229,200,.08);
+  background: rgba(255,255,255,.07);
+}
+.ct-input:-webkit-autofill,
+.ct-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #0d0d0d inset !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+.ct-submit {
+  width: 100%; padding: 15px; border-radius: 12px; border: none;
+  background: linear-gradient(135deg, var(--cyan), var(--neon));
+  color: #000; font-family: var(--font-b); font-size: 15px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+  box-shadow: 0 8px 32px rgba(0,229,200,.25);
+  transition: transform .2s, box-shadow .2s, opacity .2s;
+  margin-top: 8px; letter-spacing: .1px;
+}
+.ct-submit:hover { transform: translateY(-2px); box-shadow: 0 14px 48px rgba(0,229,200,.45); }
+.ct-submit:active { transform: translateY(0); }
+
+/* ── SUCCESS STATE ── */
+.ct-success {
+  display: none; text-align: center; padding: 48px 20px;
+}
+.ct-success-icon { font-size: 56px; margin-bottom: 18px; animation: bounceIn .5s ease both; }
+@keyframes bounceIn { 0%{transform:scale(.5);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+.ct-success-title { font-family: var(--font-d); font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+.ct-success-sub { font-size: 14px; color: rgba(255,255,255,.35); font-weight: 300; line-height: 1.7; }
+
+/* ── FAQ MINI ── */
+.ct-faq { margin-top: 64px; animation: fadeUp .7s .2s ease both; }
+.ct-faq-title {
+  font-family: var(--font-d); font-size: 11px; font-weight: 600;
+  letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,.28);
+  display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
+}
+.ct-faq-title::after { content:''; flex:1; height:1px; background:var(--rim); }
+.ct-faq-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.ct-faq-item {
+  background: rgba(255,255,255,.022);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 16px; padding: 24px;
+  transition: border-color .3s;
+}
+.ct-faq-item:hover { border-color: rgba(0,229,200,.2); }
+.ct-faq-q { font-family: var(--font-d); font-size: 14.5px; font-weight: 700; color: #fff; margin-bottom: 10px; letter-spacing: -.2px; }
+.ct-faq-a { font-size: 13.5px; color: rgba(255,255,255,.38); line-height: 1.72; font-weight: 300; }
+
+/* ── ANIM ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .ct-body { padding: 48px 20px 100px; }
+  .ct-options { grid-template-columns: 1fr; }
+  .ct-main { grid-template-columns: 1fr; }
+  .ct-form-row { grid-template-columns: 1fr; }
+  .ct-faq-grid { grid-template-columns: 1fr; }
+  .ct-form-wrap { padding: 30px 24px; }
+}
+</style>
+
+<div class="ct-page">
+<div class="ct-glow"></div>
+<div class="ct-grid"></div>
+
+<div class="ct-body">
+
+  <!-- ── HEADER ── -->
+  <div class="ct-head">
+    <div style="display:flex;justify-content:center;margin-bottom:8px">
+      <div class="ct-logo-wrap">
+        <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:relative;z-index:1">
+          <path d="M10 20 Q10 10 19 10 Q28 10 28 20" stroke="#00e5c8" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <circle cx="19" cy="24" r="6" stroke="#5b6bff" stroke-width="1.5"/>
+          <circle cx="19" cy="24" r="2.5" fill="#00e5c8" opacity=".85"/>
+          <path d="M4 19 L9 19M29 19 L34 19M19 4 L19 9" stroke="#00e5c8" stroke-width="1.2" stroke-linecap="round" opacity=".5"/>
+        </svg>
+      </div>
+    </div>
+    <div class="ct-eyebrow"><div class="ct-eyebrow-dot"></div>Get In Touch</div>
+    <div class="ct-title">
+      We'd love to<br>
+      <strong>hear from you</strong><br>
+      <span class="grad">anytime, anywhere</span>
+    </div>
+    <div class="ct-sub">
+      Whether you have a question about the platform, need support, want to partner with us, or just want to say hello — we're here and we reply fast.
+    </div>
+  </div>
+
+  <!-- ── CONTACT OPTIONS ── -->
+  <div class="ct-options">
+    <div class="ct-option ct-opt1">
+      <span class="ct-opt-icon">💬</span>
+      <div class="ct-opt-name">Live Support</div>
+      <div class="ct-opt-desc">Chat with our team in real time. Available Monday–Friday, 9am–6pm IST.</div>
+      <a href="#" class="ct-opt-action ct-a1">Open Chat →</a>
+    </div>
+    <div class="ct-option ct-opt2">
+      <span class="ct-opt-icon">✉️</span>
+      <div class="ct-opt-name">Send Email</div>
+      <div class="ct-opt-desc">Prefer email? Write to us and we'll respond within 24 hours.</div>
+      <a href="mailto:hello@pathpilot.ai" class="ct-opt-action ct-a2">hello@pathpilot.ai →</a>
+    </div>
+    <div class="ct-option ct-opt3">
+      <span class="ct-opt-icon">🤝</span>
+      <div class="ct-opt-name">Partnerships</div>
+      <div class="ct-opt-desc">Interested in partnering, integrating, or collaborating with PathPilot?</div>
+      <a href="mailto:partners@pathpilot.ai" class="ct-opt-action ct-a3">partners@pathpilot.ai →</a>
+    </div>
+  </div>
+
+  <!-- ── MAIN LAYOUT ── -->
+  <div class="ct-main">
+
+    <!-- LEFT — CONTACT INFO ── -->
+    <div class="ct-info">
+
+      <div class="ct-info-card" style="animation-delay:.05s">
+        <div class="ct-info-head">
+          <div class="ct-info-icon" style="background:rgba(0,229,200,.1);border:1px solid rgba(0,229,200,.2)">📍</div>
+          <div>
+            <div class="ct-info-title">Our Office</div>
+            <div class="ct-info-sub">Headquartered in Bangalore</div>
+          </div>
+        </div>
+        <div class="ct-info-body">
+          PathPilot Technologies Pvt. Ltd.<br>
+          Koramangala, Bangalore — 560034<br>
+          Karnataka, India
+        </div>
+        <a href="https://maps.google.com" target="_blank" class="ct-info-link">View on Maps →</a>
+      </div>
+
+      <div class="ct-info-card" style="animation-delay:.1s">
+        <div class="ct-info-head">
+          <div class="ct-info-icon" style="background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.2)">⏰</div>
+          <div>
+            <div class="ct-info-title">Response Time</div>
+            <div class="ct-info-sub">We take response times seriously</div>
+          </div>
+        </div>
+        <div class="ct-info-body">
+          General queries: within <strong style="color:#fff">24 hours</strong><br>
+          Support tickets: within <strong style="color:#fff">4 hours</strong><br>
+          Partnerships: within <strong style="color:#fff">48 hours</strong>
+        </div>
+        <div class="ct-resp-badge"><div class="ct-resp-dot"></div>Team online now</div>
+      </div>
+
+      <div class="ct-info-card" style="animation-delay:.15s">
+        <div class="ct-info-head">
+          <div class="ct-info-icon" style="background:rgba(255,181,71,.1);border:1px solid rgba(255,181,71,.2)">🔗</div>
+          <div>
+            <div class="ct-info-title">Social & Community</div>
+            <div class="ct-info-sub">Follow us for updates</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+          <a href="#" class="ct-info-link" style="color:rgba(255,255,255,.5)">
+            <span style="font-size:16px">𝕏</span> @PathPilotAI on X (Twitter)
+          </a>
+          <a href="https://www.linkedin.com/in/tushar-b5b431296/" target="_blank" class="ct-info-link" style="color:rgba(255,255,255,.5)">
+            <span style="font-size:16px">in</span> PathPilot on LinkedIn
+          </a>
+          <a href="#" class="ct-info-link" style="color:rgba(255,255,255,.5)">
+            <span style="font-size:16px">⌥</span> PathPilot on GitHub
+          </a>
+        </div>
+      </div>
+
+      <div class="ct-info-card" style="animation-delay:.2s;background:linear-gradient(135deg,rgba(0,229,200,.04),rgba(91,107,255,.04));border-color:rgba(0,229,200,.12)">
+        <div class="ct-info-head">
+          <div class="ct-info-icon" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2)">🚀</div>
+          <div>
+            <div class="ct-info-title">Looking to join us?</div>
+            <div class="ct-info-sub">We're hiring across all roles</div>
+          </div>
+        </div>
+        <div class="ct-info-body">We're a remote-first team always looking for exceptional people. If you're passionate about AI and careers, we'd love to meet you.</div>
+        <a href="/careers" class="ct-info-link" style="color:var(--green)">View Open Positions →</a>
+      </div>
+
+    </div><!-- /ct-info -->
+
+    <!-- RIGHT — FORM ── -->
+    <div class="ct-form-wrap">
+      <div id="ctFormContent">
+        <div class="ct-form-title">Send us a message</div>
+        <div class="ct-form-sub">Fill out the form and we'll get back to you as soon as possible.</div>
+
+        <div class="ct-form-row">
+          <div>
+            <label class="ct-label">First Name</label>
+            <input type="text" id="ctFirstName" class="ct-input" placeholder="Rahul" autocomplete="given-name">
+          </div>
+          <div>
+            <label class="ct-label">Last Name</label>
+            <input type="text" id="ctLastName" class="ct-input" placeholder="Mehta" autocomplete="family-name">
+          </div>
+        </div>
+
+        <div class="ct-field">
+          <label class="ct-label">Email Address</label>
+          <input type="email" id="ctEmail" class="ct-input" placeholder="rahul@example.com" autocomplete="email">
+        </div>
+
+        <div class="ct-field">
+          <label class="ct-label">Subject</label>
+          <select id="ctSubject" class="ct-select">
+            <option value="">Select a topic...</option>
+            <option>General Question</option>
+            <option>Technical Support</option>
+            <option>Billing & Subscription</option>
+            <option>Feature Request</option>
+            <option>Partnership Inquiry</option>
+            <option>Press & Media</option>
+            <option>Report a Bug</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="ct-field">
+          <label class="ct-label">Message</label>
+          <textarea id="ctMessage" class="ct-textarea" placeholder="Tell us what's on your mind — we read every message personally..."></textarea>
+        </div>
+
+        <button class="ct-submit" onclick="submitContact()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
+          </svg>
+          Send Message
+        </button>
+
+        <div style="margin-top:14px;font-size:12px;color:rgba(255,255,255,.18);text-align:center">
+          🔐 We never share your data · Replies within 24 hours
+        </div>
+      </div>
+
+      <!-- SUCCESS STATE -->
+      <div class="ct-success" id="ctSuccess">
+        <div class="ct-success-icon">✅</div>
+        <div class="ct-success-title">Message Sent!</div>
+        <div class="ct-success-sub">
+          Thank you for reaching out. A member of our team will reply to your email within 24 hours.<br><br>
+          <span style="color:rgba(255,255,255,.22)">In the meantime, check out our Help Center for instant answers.</span>
+        </div>
+        <a href="#" style="display:inline-block;margin-top:24px;color:var(--cyan);font-size:14px;font-weight:600;text-decoration:none">← Back to Contact</a>
+      </div>
+    </div><!-- /ct-form-wrap -->
+
+  </div><!-- /ct-main -->
+
+  <!-- ── FAQ MINI ── -->
+  <div class="ct-faq">
+    <div class="ct-faq-title">Common Questions</div>
+    <div class="ct-faq-grid">
+
+      <div class="ct-faq-item">
+        <div class="ct-faq-q">How long does it take to get a reply?</div>
+        <div class="ct-faq-a">We aim to reply to all general inquiries within 24 hours. Support tickets are prioritized and typically resolved within 4 hours during business hours.</div>
+      </div>
+
+      <div class="ct-faq-item">
+        <div class="ct-faq-q">I found a bug in PathPilot. How do I report it?</div>
+        <div class="ct-faq-a">Use the form above and select "Report a Bug" from the subject dropdown. Detailed bug reports (screenshots, steps to reproduce) help us fix issues much faster.</div>
+      </div>
+
+      <div class="ct-faq-item">
+        <div class="ct-faq-q">Can I request a feature or suggest an improvement?</div>
+        <div class="ct-faq-a">Absolutely — we love user-driven product development. Select "Feature Request" in the form and describe what you need. The best features have come from our users.</div>
+      </div>
+
+      <div class="ct-faq-item">
+        <div class="ct-faq-q">I'm interested in integrating PathPilot into my platform.</div>
+        <div class="ct-faq-a">We have a developer API and partnership program. Reach out via our Partnerships email or select "Partnership Inquiry" in the form above and we'll set up a call.</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+function submitContact() {
+  const firstName = document.getElementById('ctFirstName').value.trim()
+  const email = document.getElementById('ctEmail').value.trim()
+  const message = document.getElementById('ctMessage').value.trim()
+
+  if (!firstName || !email || !message) {
+    // Highlight empty fields
+    if (!firstName) document.getElementById('ctFirstName').style.borderColor = 'rgba(255,87,87,.5)'
+    if (!email)     document.getElementById('ctEmail').style.borderColor    = 'rgba(255,87,87,.5)'
+    if (!message)   document.getElementById('ctMessage').style.borderColor  = 'rgba(255,87,87,.5)'
+    return
+  }
+
+  // Animate submit
+  const btn = document.querySelector('.ct-submit')
+  btn.textContent = '⏳ Sending...'
+  btn.disabled = true
+  btn.style.opacity = '.7'
+
+  // Simulate send (replace with actual backend call if needed)
+  setTimeout(() => {
+    document.getElementById('ctFormContent').style.display = 'none'
+    document.getElementById('ctSuccess').style.display = 'block'
+  }, 1200)
+}
+
+// Reset border on input
+document.querySelectorAll('.ct-input, .ct-textarea').forEach(el => {
+  el.addEventListener('input', () => el.style.borderColor = '')
+})
+</script>
+
+{% endblock %}

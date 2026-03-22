@@ -1,0 +1,570 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;--red:#ff5757;--purple:#a855f7;--font-d:"Syne",sans-serif;--font-b:"DM Sans",sans-serif;--ease:cubic-bezier(.16,1,.3,1);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#000!important;color:#fff!important;font-family:var(--font-b);height:100%;}
+.is-page{min-height:100vh;background:#000;display:flex;flex-direction:column;position:relative;}
+.is-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 50% 40% at 5% 10%,rgba(91,107,255,.1) 0%,transparent 65%),radial-gradient(ellipse 40% 35% at 95% 90%,rgba(0,229,200,.07) 0%,transparent 60%);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes recPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,87,87,.4)}70%{box-shadow:0 0 0 8px rgba(255,87,87,0)}}
+@keyframes scoreIn{from{opacity:0;transform:scale(.8) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes barGrow{from{width:0}}
+@keyframes timerWarn{0%,100%{color:#fff}50%{color:var(--red)}}
+
+/* ── TOP BAR ── */
+.is-topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(0,0,0,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.07);padding:12px 24px;display:flex;align-items:center;gap:16px;}
+.is-type-badge{display:flex;align-items:center;gap:8px;padding:6px 16px;border-radius:100px;font-size:12.5px;font-weight:700;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);}
+.is-progress-wrap{flex:1;display:flex;align-items:center;gap:12px;}
+.is-progress-track{flex:1;height:6px;border-radius:100px;background:rgba(255,255,255,.08);overflow:hidden;}
+.is-progress-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--neon),var(--cyan));width:0;transition:width .6s var(--ease);}
+.is-progress-text{font-size:12.5px;color:rgba(255,255,255,.4);white-space:nowrap;font-family:var(--font-d);font-weight:700;}
+.is-abandon-btn{padding:7px 14px;border-radius:8px;border:1px solid rgba(255,87,87,.2);background:rgba(255,87,87,.06);color:rgba(255,87,87,.7);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .2s;}
+.is-abandon-btn:hover{background:rgba(255,87,87,.14);}
+
+/* ── MAIN BODY ── */
+.is-body{position:relative;z-index:1;max-width:820px;margin:80px auto 0;padding:32px 22px 120px;width:100%;}
+
+/* ── LOADING STATE ── */
+.is-loading{text-align:center;padding:80px 20px;animation:fadeUp .4s ease both;}
+.is-loading-spinner{width:52px;height:52px;border:3px solid rgba(255,255,255,.06);border-top-color:var(--cyan);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 20px;}
+.is-loading-text{font-size:15px;color:rgba(255,255,255,.3);font-weight:300;}
+
+/* ── QUESTION CARD ── */
+.is-q-card{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.09);border-radius:22px;padding:32px 36px;margin-bottom:20px;position:relative;overflow:hidden;animation:fadeUp .5s ease both;}
+.is-q-card::before{content:"";position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(91,107,255,.3),rgba(0,229,200,.2),transparent);}
+.is-q-num{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:rgba(255,255,255,.25);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.is-q-text{font-family:var(--font-d);font-size:clamp(18px,2.5vw,24px);font-weight:700;color:#fff;letter-spacing:-.5px;line-height:1.4;margin-bottom:18px;}
+
+/* AI Avatar + speaker */
+.is-ai-row{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.is-ai-avatar{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,rgba(91,107,255,.35),rgba(0,229,200,.2));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.is-speak-btn{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:9px;border:1px solid rgba(0,229,200,.22);background:rgba(0,229,200,.07);color:rgba(0,229,200,.8);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.is-speak-btn:hover{background:rgba(0,229,200,.15);}
+.is-speak-btn.speaking{color:var(--cyan);border-color:var(--cyan);animation:pulse 1s ease-in-out infinite;}
+
+/* Hint */
+.is-hint{background:rgba(255,181,71,.06);border:1px solid rgba(255,181,71,.18);border-radius:12px;padding:12px 16px;font-size:13px;color:rgba(255,181,71,.75);font-weight:300;margin-bottom:16px;display:none;}
+.is-hint.show{display:block;}
+.is-hint-toggle{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:rgba(255,181,71,.6);cursor:pointer;margin-bottom:10px;}
+
+/* ── TIMER ── */
+.is-timer-wrap{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.is-timer-track{flex:1;height:8px;border-radius:100px;background:rgba(255,255,255,.07);overflow:hidden;}
+.is-timer-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--green),var(--cyan));width:100%;transition:width 1s linear,background .5s;}
+.is-timer-num{font-family:var(--font-d);font-size:22px;font-weight:800;color:#fff;letter-spacing:-1px;min-width:50px;text-align:right;}
+.is-timer-num.warn{animation:timerWarn .5s ease-in-out infinite;}
+
+/* ── ANSWER AREA ── */
+.is-answer-card{background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:24px;margin-bottom:16px;animation:fadeUp .5s .05s ease both;}
+.is-answer-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.28);margin-bottom:12px;}
+.is-textarea{width:100%;min-height:120px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px;color:#fff;font-family:var(--font-b);font-size:15px;resize:none;outline:none;line-height:1.72;transition:border-color .2s;}
+.is-textarea:focus{border-color:rgba(91,107,255,.45);box-shadow:0 0 0 3px rgba(91,107,255,.1);}
+.is-textarea::placeholder{color:rgba(255,255,255,.18);}
+.is-char-count{font-size:11.5px;color:rgba(255,255,255,.2);text-align:right;margin-top:6px;}
+
+/* Voice recording */
+.is-voice-row{display:flex;align-items:center;gap:10px;margin-top:12px;}
+.is-record-btn{display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;border:1px solid rgba(255,87,87,.25);background:rgba(255,87,87,.07);color:rgba(255,87,87,.8);font-family:var(--font-b);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .2s;}
+.is-record-btn.recording{background:rgba(255,87,87,.15);border-color:var(--red);color:var(--red);animation:recPulse 1.5s infinite;}
+.is-record-dot{width:8px;height:8px;border-radius:50%;background:var(--red);}
+.is-record-btn.recording .is-record-dot{animation:pulse .8s ease-in-out infinite;}
+.is-voice-status{font-size:12.5px;color:rgba(255,255,255,.3);}
+
+/* Action buttons */
+.is-actions{display:flex;gap:10px;animation:fadeUp .5s .1s ease both;}
+.is-submit-btn{flex:1;padding:16px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--neon),#3a4aff);color:#fff;font-family:var(--font-b);font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 6px 24px rgba(91,107,255,.4);transition:transform .2s,box-shadow .2s;}
+.is-submit-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(91,107,255,.6);}
+.is-submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.is-skip-btn{padding:16px 22px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.4);font-family:var(--font-b);font-size:14px;cursor:pointer;transition:all .2s;}
+.is-skip-btn:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);}
+
+/* ── EVALUATION CARD ── */
+.is-eval-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:28px 32px;margin-bottom:20px;animation:scoreIn .5s var(--ease) both;position:relative;overflow:hidden;}
+.is-eval-score-row{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+.is-score-ring{width:80px;height:80px;flex-shrink:0;position:relative;}
+.is-score-ring svg{transform:rotate(-90deg);}
+.is-score-ring-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.is-score-big{font-family:var(--font-d);font-size:22px;font-weight:800;color:#fff;letter-spacing:-1px;line-height:1;}
+.is-score-max{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.5px;}
+.is-eval-info{flex:1;}
+.is-eval-verdict{font-family:var(--font-d);font-size:20px;font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:4px;}
+.is-eval-badge{display:inline-flex;padding:3px 12px;border-radius:100px;font-size:11.5px;font-weight:700;margin-bottom:8px;}
+.is-eval-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.is-eval-box{padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);}
+.is-eval-box-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.3);margin-bottom:6px;}
+.is-eval-box-val{font-size:13.5px;color:rgba(255,255,255,.6);font-weight:300;line-height:1.6;}
+.is-ideal-points{margin-bottom:16px;}
+.is-ideal-title{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(0,229,200,.55);margin-bottom:8px;}
+.is-ideal-point{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;color:rgba(255,255,255,.5);margin-bottom:6px;font-weight:300;}
+.is-ideal-point::before{content:"→";color:var(--cyan);flex-shrink:0;font-size:12px;margin-top:2px;}
+.is-next-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--cyan),var(--neon));color:#000;font-family:var(--font-b);font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 6px 22px rgba(0,229,200,.3);transition:transform .2s;}
+.is-next-btn:hover{transform:translateY(-2px);}
+
+/* ── FINISH CARD ── */
+.is-finish-card{text-align:center;padding:40px 30px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.09);border-radius:22px;animation:scoreIn .5s ease both;}
+.is-finish-title{font-family:var(--font-d);font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:-1.5px;color:#fff;margin-bottom:8px;}
+.is-finish-btn{padding:16px 40px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--neon),#3a4aff);color:#fff;font-family:var(--font-b);font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 6px 28px rgba(91,107,255,.4);margin-top:20px;}
+
+.is-spin{width:20px;height:20px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;}
+@media(max-width:700px){.is-eval-grid{grid-template-columns:1fr;}.is-q-card,.is-answer-card,.is-eval-card{padding:20px 16px;}.is-body{padding:24px 14px 100px;}}
+</style>
+
+<div class="is-page">
+<div class="is-glow"></div>
+
+<!-- TOPBAR -->
+<div class="is-topbar">
+  <div class="is-type-badge">
+    <span>{{ config.get("icon","🎯") }}</span>
+    <span style="color:{{ config.get('color','#5b6bff') }}">{{ config.get("label","Interview") }}</span>
+    <span style="color:rgba(255,255,255,.3);font-size:11px">· {{ level|title }}</span>
+  </div>
+  <div class="is-progress-wrap">
+    <div class="is-progress-track">
+      <div class="is-progress-fill" id="progressFill"></div>
+    </div>
+    <div class="is-progress-text" id="progressText">0 / {{ total_questions }}</div>
+  </div>
+  <button class="is-abandon-btn" onclick="abandonConfirm()">✕ Quit</button>
+</div>
+
+<!-- MAIN -->
+<div class="is-body">
+
+  <!-- LOADING -->
+  <div id="loadingState" class="is-loading">
+    <div class="is-loading-spinner"></div>
+    <div class="is-loading-text" id="loadingText">Preparing your first question...</div>
+  </div>
+
+  <!-- QUESTION -->
+  <div id="questionState" style="display:none">
+    <div class="is-q-card" id="qCard">
+      <div class="is-q-num">
+        <span id="qNumLabel">Question 1 of {{ total_questions }}</span>
+        <span id="qBadge"></span>
+      </div>
+      <div class="is-ai-row">
+        <div class="is-ai-avatar">🤖</div>
+        <button class="is-speak-btn" id="speakBtn" onclick="speakQuestion()">
+          🔊 <span id="speakLabel">Listen to Question</span>
+        </button>
+        <button class="is-hint-toggle" id="hintToggle" onclick="toggleHint()" style="display:none">💡 Show Hint</button>
+      </div>
+      <div class="is-q-text" id="qText">Loading question...</div>
+      <div class="is-hint" id="hintBox"></div>
+      <div class="is-timer-wrap">
+        <div class="is-timer-track">
+          <div class="is-timer-fill" id="timerFill"></div>
+        </div>
+        <div class="is-timer-num" id="timerNum">03:00</div>
+      </div>
+    </div>
+
+    <div class="is-answer-card">
+      <div class="is-answer-label">Your Answer</div>
+      <textarea class="is-textarea" id="answerBox" placeholder="Type your answer here... Be clear and structured. Use examples where possible." oninput="updateCharCount()"></textarea>
+      <div class="is-char-count" id="charCount">0 characters</div>
+      <div class="is-voice-row">
+        <button class="is-record-btn" id="recordBtn" onclick="toggleRecording()">
+          <div class="is-record-dot"></div>
+          <span id="recordLabel">🎤 Record Answer</span>
+        </button>
+        <div class="is-voice-status" id="voiceStatus"></div>
+      </div>
+    </div>
+
+    <div class="is-actions">
+      <button class="is-submit-btn" id="submitBtn" onclick="submitAnswer()">
+        Submit Answer →
+      </button>
+      <button class="is-skip-btn" onclick="skipQuestion()">Skip ⏭️</button>
+    </div>
+  </div>
+
+  <!-- EVALUATION -->
+  <div id="evalState" style="display:none">
+    <div class="is-eval-card" id="evalCard">
+      <div class="is-eval-score-row">
+        <div class="is-score-ring">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="7"/>
+            <circle cx="40" cy="40" r="32" fill="none" stroke-width="7" stroke-linecap="round"
+                    stroke-dasharray="201" id="scoreCircle" stroke-dashoffset="201"/>
+          </svg>
+          <div class="is-score-ring-num">
+            <div class="is-score-big" id="scoreNum">—</div>
+            <div class="is-score-max">/10</div>
+          </div>
+        </div>
+        <div class="is-eval-info">
+          <div class="is-eval-verdict" id="evalBadge">—</div>
+          <div class="is-eval-badge" id="verdictBadge"></div>
+          <div id="followUpText" style="font-size:13px;color:rgba(255,255,255,.35);font-style:italic;"></div>
+        </div>
+      </div>
+      <div class="is-eval-grid">
+        <div class="is-eval-box">
+          <div class="is-eval-box-lbl">✅ Strength</div>
+          <div class="is-eval-box-val" id="strengthVal">—</div>
+        </div>
+        <div class="is-eval-box">
+          <div class="is-eval-box-lbl">🎯 Improve</div>
+          <div class="is-eval-box-val" id="improveVal">—</div>
+        </div>
+      </div>
+      <div class="is-ideal-points">
+        <div class="is-ideal-title">💡 What a Great Answer Covers</div>
+        <div id="idealPointsList"></div>
+      </div>
+      <button class="is-next-btn" id="nextBtn" onclick="nextQuestion()">
+        Next Question →
+      </button>
+    </div>
+  </div>
+
+  <!-- FINISH -->
+  <div id="finishState" style="display:none">
+    <div class="is-finish-card">
+      <div style="font-size:56px;margin-bottom:16px;">🎉</div>
+      <div class="is-finish-title">Interview Complete!</div>
+      <div style="font-size:15px;color:rgba(255,255,255,.4);margin-top:8px;">Generating your full performance report...</div>
+      <div style="margin-top:20px"><span class="is-spin"></span></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+const TOTAL = {{ total_questions }};
+let currentQ = 0, questionStartTime = 0, timerInterval = null, timerSeconds = 180;
+let mediaRecorder = null, audioChunks = [], isRecording = false;
+let isSpeaking = false, audioEl = null;
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener("load", () => loadNextQuestion());
+
+async function loadNextQuestion() {
+  show("loadingState");
+  hide("questionState"); hide("evalState");
+  document.getElementById("loadingText").textContent =
+    currentQ === 0 ? "Preparing your first question..." : "Loading next question...";
+
+  const r = await fetch("/api/interview/question", {method:"POST"}).then(r=>r.json());
+  if (r.done) { finishInterview(); return; }
+
+  currentQ = r.question_num;
+  updateProgress(currentQ, TOTAL);
+
+  document.getElementById("qNumLabel").textContent = `Question ${currentQ} of ${TOTAL}`;
+  document.getElementById("qText").textContent = r.question;
+  document.getElementById("answerBox").value = "";
+  document.getElementById("charCount").textContent = "0 characters";
+  document.getElementById("qBadge").textContent = "";
+
+  // Hint (coding only)
+  const hintBox    = document.getElementById("hintBox");
+  const hintToggle = document.getElementById("hintToggle");
+  if (r.hint) {
+    hintBox.textContent = "💡 " + r.hint;
+    hintToggle.style.display = "flex";
+    hintBox.classList.remove("show");
+  } else {
+    hintToggle.style.display = "none";
+    hintBox.classList.remove("show");
+  }
+
+  questionStartTime = Date.now();
+  startTimer(180);
+
+  hide("loadingState");
+  show("questionState");
+
+  // Auto-speak question
+  setTimeout(() => speakQuestion(), 400);
+}
+
+// ── TIMER ─────────────────────────────────────────────────────
+function startTimer(seconds) {
+  clearInterval(timerInterval);
+  timerSeconds = seconds;
+  const fill = document.getElementById("timerFill");
+  const num  = document.getElementById("timerNum");
+  fill.style.width = "100%";
+
+  timerInterval = setInterval(() => {
+    timerSeconds--;
+    const pct = (timerSeconds / seconds) * 100;
+    fill.style.width = pct + "%";
+    fill.style.background = timerSeconds > 60 ? "linear-gradient(90deg,var(--green),var(--cyan))" :
+                            timerSeconds > 30 ? "linear-gradient(90deg,var(--amber),var(--green))" :
+                                                "linear-gradient(90deg,var(--red),var(--amber))";
+    const m = String(Math.floor(timerSeconds/60)).padStart(2,"0");
+    const s = String(timerSeconds%60).padStart(2,"0");
+    num.textContent = `${m}:${s}`;
+    num.classList.toggle("warn", timerSeconds <= 30);
+    if (timerSeconds <= 0) { clearInterval(timerInterval); submitAnswer(true); }
+  }, 1000);
+}
+
+// ── SPEAK QUESTION ────────────────────────────────────────────
+async function speakQuestion() {
+  const text    = document.getElementById("qText").textContent;
+  const btn     = document.getElementById("speakBtn");
+  const label   = document.getElementById("speakLabel");
+  if (isSpeaking) { if(audioEl){audioEl.pause();audioEl=null;} isSpeaking=false; btn.classList.remove("speaking"); label.textContent="Listen to Question"; return; }
+  btn.classList.add("speaking"); label.textContent = "Speaking..."; isSpeaking = true;
+  try {
+    const resp = await fetch("/api/interview/tts", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text})});
+    const blob = await resp.blob();
+    audioEl = new Audio(URL.createObjectURL(blob));
+    audioEl.play();
+    audioEl.onended = () => { isSpeaking=false; btn.classList.remove("speaking"); label.textContent="Listen to Question"; };
+  } catch(e) { isSpeaking=false; btn.classList.remove("speaking"); label.textContent="Listen to Question"; }
+}
+
+// ── VOICE RECORDING ───────────────────────────────────────────
+function getSupportedMimeType() {
+  // Find the best supported audio format for this browser
+  const types = [
+    "audio/webm;codecs=opus",
+    "audio/webm",
+    "audio/ogg;codecs=opus",
+    "audio/ogg",
+    "audio/mp4",
+  ];
+  for (const type of types) {
+    if (MediaRecorder.isTypeSupported(type)) return type;
+  }
+  return "";  // browser default
+}
+
+function mimeToExt(mimeType) {
+  if (mimeType.includes("ogg"))  return "ogg";
+  if (mimeType.includes("mp4"))  return "mp4";
+  return "webm";  // default
+}
+
+async function toggleRecording() {
+  const btn    = document.getElementById("recordBtn");
+  const label  = document.getElementById("recordLabel");
+  const status = document.getElementById("voiceStatus");
+
+  if (!isRecording) {
+    // ── Start recording ──
+    try {
+      const stream   = await navigator.mediaDevices.getUserMedia({audio: true, video: false});
+      const mimeType = getSupportedMimeType();
+      const options  = mimeType ? {mimeType} : {};
+
+      mediaRecorder = new MediaRecorder(stream, options);
+      audioChunks   = [];
+
+      mediaRecorder.ondataavailable = e => {
+        if (e.data && e.data.size > 0) audioChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        btn.classList.remove("recording");
+        label.textContent = "🎤 Record Answer";
+
+        if (audioChunks.length === 0) {
+          status.textContent = "⚠️ No audio captured. Try again.";
+          return;
+        }
+
+        const usedMime = mediaRecorder.mimeType || mimeType || "audio/webm";
+        const ext      = mimeToExt(usedMime);
+        const blob     = new Blob(audioChunks, {type: usedMime});
+
+        if (blob.size < 1000) {
+          status.textContent = "⚠️ Recording too short. Speak for at least 2 seconds.";
+          return;
+        }
+
+        status.textContent = "🔄 Transcribing your answer...";
+        status.style.color = "rgba(0,229,200,.7)";
+
+        const fd = new FormData();
+        fd.append("audio", blob, `answer.${ext}`);
+
+        try {
+          const resp = await fetch("/api/interview/stt", {method:"POST", body:fd});
+          const data = await resp.json();
+
+          if (data.success && data.text) {
+            const box = document.getElementById("answerBox");
+            // APPEND to existing text if any, don't overwrite
+            const existing = box.value.trim();
+            box.value = existing ? existing + " " + data.text : data.text;
+            updateCharCount();
+            status.textContent = "✅ Transcribed! You can edit or add more.";
+            status.style.color = "rgba(34,197,94,.8)";
+            box.focus();
+          } else {
+            status.textContent = "⚠️ " + (data.error || "Could not transcribe. Speak clearly and try again.");
+            status.style.color = "rgba(255,181,71,.8)";
+          }
+        } catch(e) {
+          console.error("STT error:", e);
+          status.textContent = "⚠️ Network error. Check connection and try again.";
+          status.style.color = "rgba(255,87,87,.8)";
+        }
+      };
+
+      // Collect data every 250ms for reliability
+      mediaRecorder.start(250);
+      isRecording = true;
+      btn.classList.add("recording");
+      label.textContent = "⏹ Stop Recording";
+      status.textContent = "🔴 Listening... speak now";
+      status.style.color = "rgba(255,87,87,.8)";
+
+    } catch(e) {
+      console.error("Mic error:", e);
+      if (e.name === "NotAllowedError") {
+        status.textContent = "⚠️ Microphone permission denied. Allow mic in browser settings.";
+      } else if (e.name === "NotFoundError") {
+        status.textContent = "⚠️ No microphone found. Connect a mic and try again.";
+      } else {
+        status.textContent = "⚠️ Could not access microphone: " + e.message;
+      }
+      status.style.color = "rgba(255,87,87,.8)";
+    }
+
+  } else {
+    // ── Stop recording ──
+    isRecording = false;
+    label.textContent = "⏳ Processing...";
+    status.textContent = "⏳ Stopping recording...";
+    mediaRecorder.stop();
+    mediaRecorder.stream.getTracks().forEach(t => t.stop());
+  }
+}
+
+function updateCharCount() {
+  const c = document.getElementById("answerBox").value.length;
+  document.getElementById("charCount").textContent = `${c} character${c!==1?"s":""}`;
+}
+
+function toggleHint() {
+  const hb = document.getElementById("hintBox");
+  hb.classList.toggle("show");
+  document.getElementById("hintToggle").textContent = hb.classList.contains("show") ? "💡 Hide Hint" : "💡 Show Hint";
+}
+
+// ── SUBMIT ANSWER ─────────────────────────────────────────────
+async function submitAnswer(autoSubmit=false) {
+  clearInterval(timerInterval);
+  if (isRecording) { mediaRecorder.stop(); isRecording=false; await new Promise(r=>setTimeout(r,1500)); }
+
+  const answer    = document.getElementById("answerBox").value.trim();
+  const timeTaken = Math.round((Date.now() - questionStartTime) / 1000);
+  const submitBtn = document.getElementById("submitBtn");
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = `<span class="is-spin"></span> Evaluating...`;
+
+  hide("questionState");
+  show("loadingState");
+  document.getElementById("loadingText").textContent = "AI is evaluating your answer...";
+
+  const r = await fetch("/api/interview/answer", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({answer, time_taken: timeTaken})
+  }).then(r=>r.json());
+
+  submitBtn.disabled = false;
+  submitBtn.textContent = "Submit Answer →";
+
+  showEvaluation(r.evaluation, r.questions_left);
+}
+
+async function skipQuestion() {
+  clearInterval(timerInterval);
+  const timeTaken = Math.round((Date.now() - questionStartTime) / 1000);
+  hide("questionState");
+  show("loadingState");
+  document.getElementById("loadingText").textContent = "Recording skip...";
+  await fetch("/api/interview/answer", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({answer:"", time_taken: timeTaken})
+  });
+  if (currentQ >= TOTAL) finishInterview();
+  else loadNextQuestion();
+}
+
+function showEvaluation(ev, questionsLeft) {
+  hide("loadingState");
+  show("evalState");
+
+  const score   = ev.score || 0;
+  const maxScore= ev.max_score || 10;
+  const pct     = score / maxScore;
+  const color   = score>=8 ? "#22c55e" : score>=6 ? "#00e5c8" : score>=4 ? "#ffb547" : "#ff5757";
+
+  // Animate score ring
+  const circle  = document.getElementById("scoreCircle");
+  const dashLen = 201;
+  circle.style.stroke = color;
+  setTimeout(() => { circle.style.strokeDashoffset = dashLen - (pct * dashLen); circle.style.transition = "stroke-dashoffset 1s var(--ease)"; }, 100);
+
+  document.getElementById("scoreNum").textContent  = score;
+  document.getElementById("evalBadge").textContent = (ev.badge||"") + " " + (ev.verdict||"");
+  document.getElementById("evalBadge").style.color  = color;
+
+  const vBadge = document.getElementById("verdictBadge");
+  vBadge.textContent = ev.verdict || "";
+  vBadge.style.cssText = `background:${color}18;border:1px solid ${color}30;color:${color}`;
+
+  document.getElementById("strengthVal").textContent = ev.strength || "—";
+  document.getElementById("improveVal").textContent  = ev.improvement || "—";
+  document.getElementById("followUpText").textContent = ev.follow_up ? `💭 Follow-up: ${ev.follow_up}` : "";
+
+  // Ideal points
+  const points = (ev.ideal_points || "—").split("|").filter(p=>p.trim());
+  document.getElementById("idealPointsList").innerHTML =
+    points.map(p=>`<div class="is-ideal-point">${p.trim()}</div>`).join("");
+
+  const nextBtn = document.getElementById("nextBtn");
+  if (currentQ >= TOTAL || questionsLeft <= 0) {
+    nextBtn.textContent = "🏁 View Final Report";
+    nextBtn.onclick = finishInterview;
+  } else {
+    nextBtn.textContent = `Next Question (${questionsLeft} left) →`;
+    nextBtn.onclick = nextQuestion;
+  }
+}
+
+function nextQuestion() {
+  if (currentQ >= TOTAL) finishInterview();
+  else loadNextQuestion();
+}
+
+async function finishInterview() {
+  hide("evalState"); hide("questionState");
+  show("finishState");
+  const r = await fetch("/api/interview/finish",{method:"POST"}).then(r=>r.json());
+  if (r.redirect) window.location.href = r.redirect;
+}
+
+function updateProgress(current, total) {
+  const pct = (current / total) * 100;
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progressText").textContent = `${current} / ${total}`;
+}
+
+function show(id) { document.getElementById(id).style.display="block"; }
+function hide(id) { document.getElementById(id).style.display="none"; }
+
+function abandonConfirm() {
+  if (confirm("Quit this interview? Your progress will be lost.")) {
+    fetch("/api/interview/abandon",{method:"POST"}).then(()=>window.location.href="/interview");
+  }
+}
+</script>
+{% endblock %}

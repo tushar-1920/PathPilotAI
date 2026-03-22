@@ -14,3 +14,17 @@ def dashboard():
 @main_routes.route("/roadmap")
 def roadmap_page():
     return render_template("roadmap.html")
+@main_routes.route("/about")
+def about():
+    return render_template("about.html")
+@main_routes.route("/contact")
+def contact():
+    return render_template("contact.html")
+@main_routes.route("/blog")
+def blog():
+    return render_template("blog.html")
+
+@main_routes.route("/careers")
+def careers():
+    return render_template("careers.html")
+

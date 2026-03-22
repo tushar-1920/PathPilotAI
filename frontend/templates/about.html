@@ -1,0 +1,928 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --neon:   #5b6bff;
+  --cyan:   #00e5c8;
+  --green:  #22c55e;
+  --amber:  #ffb547;
+  --red:    #ff5757;
+  --purple: #a855f7;
+  --blue:   #38bdf8;
+  --rim:    rgba(255,255,255,0.06);
+  --glass:  rgba(255,255,255,0.028);
+  --font-d: 'Syne', sans-serif;
+  --font-b: 'DM Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #000 !important; color: #fff !important; font-family: var(--font-b); }
+
+.ab-page { min-height: 100vh; background: #000; position: relative; overflow-x: hidden; width: 100%; }
+
+/* ── AMBIENT ── */
+.ab-glow {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 5%  5%,  rgba(91,107,255,.12)  0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 95% 90%, rgba(0,229,200,.09)   0%, transparent 60%),
+    radial-gradient(ellipse 40% 35% at 50% 50%, rgba(168,85,247,.05)  0%, transparent 65%);
+}
+.ab-grid {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.ab-body { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 0 40px 140px; }
+
+/* ── HERO ── */
+.ab-hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 120px 20px 100px;
+  position: relative;
+}
+
+/* Floating orbs */
+.ab-orb {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  animation: orbFloat ease-in-out infinite;
+}
+.ab-orb-1 {
+  width: 320px; height: 320px; top: 10%; left: -8%;
+  background: radial-gradient(circle, rgba(91,107,255,.15) 0%, transparent 70%);
+  animation-duration: 8s;
+}
+.ab-orb-2 {
+  width: 250px; height: 250px; top: 20%; right: -5%;
+  background: radial-gradient(circle, rgba(0,229,200,.1) 0%, transparent 70%);
+  animation-duration: 11s; animation-delay: -3s;
+}
+.ab-orb-3 {
+  width: 180px; height: 180px; bottom: 15%; left: 15%;
+  background: radial-gradient(circle, rgba(168,85,247,.1) 0%, transparent 70%);
+  animation-duration: 9s; animation-delay: -5s;
+}
+@keyframes orbFloat {
+  0%,100% { transform: translateY(0px) scale(1); }
+  50%      { transform: translateY(-30px) scale(1.05); }
+}
+
+/* Logo hero badge */
+.ab-hero-logo {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 96px; height: 96px; border-radius: 28px; margin-bottom: 32px;
+  background: linear-gradient(135deg, rgba(91,107,255,.25), rgba(0,229,200,.15));
+  border: 1px solid rgba(91,107,255,.35);
+  box-shadow: 0 0 60px rgba(91,107,255,.3), 0 0 120px rgba(0,229,200,.15), inset 0 1px 0 rgba(255,255,255,.1);
+  animation: heroPulse 3.5s ease-in-out infinite;
+  position: relative; overflow: hidden;
+}
+.ab-hero-logo::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.1), transparent);
+}
+@keyframes heroPulse {
+  0%,100% { box-shadow: 0 0 60px rgba(91,107,255,.3), 0 0 120px rgba(0,229,200,.15); }
+  50%      { box-shadow: 0 0 90px rgba(91,107,255,.55), 0 0 180px rgba(0,229,200,.3); }
+}
+
+.ab-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 20px; border-radius: 100px;
+  background: rgba(91,107,255,.08); border: 1px solid rgba(91,107,255,.22);
+  font-size: 11px; font-weight: 600; color: #818cf8;
+  letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 28px;
+  animation: fadeUp .7s ease both;
+}
+.ab-eyebrow-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #818cf8; box-shadow: 0 0 10px #818cf8;
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.15} }
+
+.ab-hero-title {
+  font-family: var(--font-d);
+  font-size: clamp(42px, 6.5vw, 88px);
+  font-weight: 800; letter-spacing: -4px;
+  color: #fff; line-height: .98; margin-bottom: 8px;
+  animation: fadeUp .7s .08s ease both;
+}
+.ab-hero-title span {
+  background: linear-gradient(110deg, var(--cyan) 0%, var(--neon) 50%, var(--purple) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.ab-hero-sub-title {
+  font-family: var(--font-d);
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 300; letter-spacing: -2px;
+  color: rgba(255,255,255,.3); margin-bottom: 30px;
+  animation: fadeUp .7s .14s ease both;
+}
+
+.ab-hero-desc {
+  font-size: 17px; color: rgba(255,255,255,.35);
+  font-weight: 300; line-height: 1.85; max-width: 640px;
+  animation: fadeUp .7s .2s ease both;
+}
+.ab-hero-desc strong { color: rgba(255,255,255,.65); font-weight: 500; }
+
+/* Hero stats row */
+.ab-hero-stats {
+  display: flex; gap: 40px; justify-content: center;
+  flex-wrap: wrap; margin-top: 56px;
+  animation: fadeUp .7s .28s ease both;
+}
+.ab-hero-stat {
+  text-align: center;
+}
+.ab-hero-stat-val {
+  font-family: var(--font-d); font-size: 40px;
+  font-weight: 800; letter-spacing: -2px; color: #fff;
+  background: linear-gradient(135deg, #fff, rgba(255,255,255,.6));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.ab-hero-stat-lbl {
+  font-size: 12px; color: rgba(255,255,255,.28);
+  text-transform: uppercase; letter-spacing: 2px; margin-top: 4px;
+}
+
+/* Scroll hint */
+.ab-scroll-hint {
+  position: absolute; bottom: 40px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  animation: fadeUp .7s .5s ease both;
+}
+.ab-scroll-line {
+  width: 1px; height: 50px;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,.3), transparent);
+  animation: scrollLine 2s ease-in-out infinite;
+}
+@keyframes scrollLine { 0%,100%{opacity:.3;transform:scaleY(.5)} 50%{opacity:1;transform:scaleY(1)} }
+.ab-scroll-lbl { font-size: 10px; color: rgba(255,255,255,.2); letter-spacing: 3px; text-transform: uppercase; }
+
+/* ── SECTION COMMONS ── */
+.ab-section { padding: 80px 0; }
+
+.ab-sec-eyebrow {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 2.5px; color: rgba(255,255,255,.28);
+  display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+}
+.ab-sec-eyebrow::after { content:''; flex:1; height:1px; background:var(--rim); }
+
+.ab-sec-title {
+  font-family: var(--font-d);
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 700; letter-spacing: -2px;
+  color: #fff; margin-bottom: 16px; line-height: 1.05;
+}
+.ab-sec-desc {
+  font-size: 16px; color: rgba(255,255,255,.35);
+  font-weight: 300; line-height: 1.8; max-width: 660px;
+}
+.ab-sec-desc strong { color: rgba(255,255,255,.65); font-weight: 500; }
+
+/* ── DIV ── */
+.ab-div {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.07) 25%, rgba(255,255,255,.07) 75%, transparent);
+}
+
+/* ── CARD ── */
+.ab-card {
+  background: var(--glass);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 22px; position: relative; overflow: hidden;
+  transition: border-color .3s, transform .3s;
+}
+.ab-card::before {
+  content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(91,107,255,.25), rgba(0,229,200,.15), transparent);
+}
+.ab-card:hover { border-color: rgba(255,255,255,.14); transform: translateY(-4px); }
+.ab-card-inner { padding: 36px 38px; }
+
+/* ── PROBLEM CARDS ── */
+.ab-problem-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-top: 48px; }
+.ab-prob-card {
+  padding: 34px 30px; border-radius: 20px;
+  background: var(--glass); border: 1px solid rgba(255,255,255,.07);
+  position: relative; overflow: hidden;
+  transition: border-color .3s, transform .3s;
+  animation: fadeUp .6s ease both;
+}
+.ab-prob-card:hover { border-color: rgba(255,255,255,.14); transform: translateY(-5px); }
+.ab-prob-icon {
+  width: 52px; height: 52px; border-radius: 15px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; margin-bottom: 20px;
+}
+.ab-prob-title {
+  font-family: var(--font-d); font-size: 18px; font-weight: 700;
+  color: #fff; letter-spacing: -.4px; margin-bottom: 12px;
+}
+.ab-prob-desc { font-size: 14.5px; color: rgba(255,255,255,.4); font-weight: 300; line-height: 1.75; }
+
+/* ── TECH STACK ── */
+.ab-tech-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-top: 44px; }
+.ab-tech-pill {
+  padding: 26px 20px; border-radius: 18px; text-align: center;
+  background: var(--glass); border: 1px solid rgba(255,255,255,.07);
+  transition: border-color .3s, transform .3s;
+  animation: fadeUp .5s ease both;
+}
+.ab-tech-pill:hover { border-color: rgba(255,255,255,.16); transform: translateY(-4px); }
+.ab-tech-icon { font-size: 30px; margin-bottom: 12px; display: block; }
+.ab-tech-name { font-family: var(--font-d); font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -.3px; }
+.ab-tech-role { font-size: 12px; color: rgba(255,255,255,.28); margin-top: 5px; font-weight: 300; }
+
+/* ── TEAM ── */
+.ab-team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; }
+
+.ab-team-card {
+  padding: 0; border-radius: 26px;
+  background: var(--glass); border: 1px solid rgba(255,255,255,.08);
+  position: relative; overflow: hidden;
+  transition: border-color .3s, transform .3s;
+  animation: fadeUp .7s ease both;
+}
+.ab-team-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 200px;
+  opacity: 0; transition: opacity .4s;
+}
+.ab-team-card:nth-child(1)::before { background: radial-gradient(ellipse at 50% 0%, rgba(91,107,255,.18) 0%, transparent 70%); }
+.ab-team-card:nth-child(2)::before { background: radial-gradient(ellipse at 50% 0%, rgba(0,229,200,.15) 0%, transparent 70%); }
+.ab-team-card:hover { border-color: rgba(255,255,255,.16); transform: translateY(-6px); }
+.ab-team-card:hover::before { opacity: 1; }
+
+.ab-team-top {
+  padding: 44px 40px 30px;
+  display: flex; align-items: center; gap: 28px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  position: relative; z-index: 1;
+}
+
+.ab-team-avatar {
+  width: 100px; height: 100px; border-radius: 24px;
+  object-fit: cover; flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,.1);
+  box-shadow: 0 10px 40px rgba(0,0,0,.5);
+}
+
+/* Avatar fallback (initials) */
+.ab-team-avatar-fallback {
+  width: 100px; height: 100px; border-radius: 24px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-d); font-size: 32px; font-weight: 800;
+  border: 2px solid rgba(255,255,255,.1);
+  box-shadow: 0 10px 40px rgba(0,0,0,.5);
+}
+.ab-team-avatar-fallback-1 { background: linear-gradient(135deg, rgba(91,107,255,.4), rgba(0,229,200,.2)); color: #fff; }
+.ab-team-avatar-fallback-2 { background: linear-gradient(135deg, rgba(0,229,200,.4), rgba(34,197,94,.2)); color: #fff; }
+
+.ab-team-info { flex: 1; }
+.ab-team-name {
+  font-family: var(--font-d); font-size: 24px; font-weight: 800;
+  color: #fff; letter-spacing: -.8px; margin-bottom: 5px;
+}
+.ab-team-role-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 14px; border-radius: 100px;
+  font-size: 11.5px; font-weight: 600; margin-bottom: 14px;
+}
+.role-founder { background: rgba(91,107,255,.12); border: 1px solid rgba(91,107,255,.25); color: #818cf8; }
+.role-co     { background: rgba(0,229,200,.1);   border: 1px solid rgba(0,229,200,.22);  color: rgba(0,229,200,.9); }
+
+.ab-team-tags { display: flex; gap: 7px; flex-wrap: wrap; }
+.ab-team-tag {
+  padding: 4px 12px; border-radius: 100px;
+  font-size: 11px; font-weight: 500;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  color: rgba(255,255,255,.35);
+}
+
+.ab-team-body { padding: 28px 40px 30px; position: relative; z-index: 1; }
+.ab-team-bio {
+  font-size: 15px; color: rgba(255,255,255,.42);
+  font-weight: 300; line-height: 1.85; margin-bottom: 28px;
+}
+
+/* Social links */
+.ab-socials { display: flex; gap: 10px; flex-wrap: wrap; }
+.ab-social-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 18px; border-radius: 11px;
+  font-family: var(--font-b); font-size: 13px; font-weight: 600;
+  text-decoration: none; transition: transform .18s, box-shadow .18s, background .18s;
+  border: 1px solid transparent;
+}
+.ab-social-btn:hover { transform: translateY(-2px); }
+
+.ab-social-github {
+  background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.12); color: rgba(255,255,255,.8);
+}
+.ab-social-github:hover { background: rgba(255,255,255,.13); box-shadow: 0 4px 20px rgba(0,0,0,.4); color: #fff; }
+
+.ab-social-linkedin {
+  background: rgba(10,102,194,.15); border-color: rgba(10,102,194,.3); color: #60a5fa;
+}
+.ab-social-linkedin:hover { background: rgba(10,102,194,.25); box-shadow: 0 4px 20px rgba(10,102,194,.3); }
+
+.ab-social-twitter {
+  background: rgba(29,155,240,.1); border-color: rgba(29,155,240,.25); color: #60c8f5;
+}
+.ab-social-twitter:hover { background: rgba(29,155,240,.2); box-shadow: 0 4px 20px rgba(29,155,240,.25); }
+
+.ab-social-email {
+  background: rgba(34,197,94,.08); border-color: rgba(34,197,94,.2); color: rgba(134,239,172,.9);
+}
+.ab-social-email:hover { background: rgba(34,197,94,.16); box-shadow: 0 4px 20px rgba(34,197,94,.2); }
+
+/* ── TIMELINE ── */
+.ab-timeline { position: relative; padding-left: 0; margin-top: 48px; }
+.ab-timeline::before {
+  content: ''; position: absolute;
+  left: 28px; top: 0; bottom: 0; width: 2px;
+  background: linear-gradient(180deg, var(--neon), var(--cyan), var(--green), rgba(255,255,255,.05));
+  border-radius: 2px;
+}
+.ab-timeline-item {
+  display: flex; align-items: flex-start; gap: 24px;
+  margin-bottom: 36px; position: relative;
+  animation: fadeUp .6s ease both;
+}
+.ab-tl-dot {
+  width: 56px; height: 56px; border-radius: 16px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-d); font-size: 13px; font-weight: 800;
+  letter-spacing: -.5px; position: relative; z-index: 1;
+  box-shadow: 0 0 0 4px #000;
+}
+.ab-tl-body {
+  flex: 1; padding: 26px 30px; border-radius: 18px;
+  background: var(--glass); border: 1px solid rgba(255,255,255,.07);
+  margin-top: 6px;
+  transition: border-color .3s;
+}
+.ab-tl-body:hover { border-color: rgba(255,255,255,.14); }
+.ab-tl-year {
+  font-family: var(--font-d); font-size: 22px; font-weight: 800;
+  letter-spacing: -1px; margin-bottom: 8px;
+}
+.ab-tl-desc { font-size: 15px; color: rgba(255,255,255,.45); font-weight: 300; line-height: 1.7; }
+
+/* ── PROJECT JOURNEY ── */
+.ab-journey-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; margin-top: 44px; position: relative; }
+.ab-journey-grid::before {
+  content: ''; position: absolute;
+  top: 50%; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent);
+  transform: translateY(-50%); z-index: 0;
+}
+.ab-journey-step {
+  text-align: center; padding: 0 16px; position: relative; z-index: 1;
+  animation: fadeUp .5s ease both;
+}
+.ab-journey-num {
+  width: 56px; height: 56px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-d); font-size: 20px; font-weight: 800;
+  margin: 0 auto 18px; border: 1px solid rgba(255,255,255,.1);
+  background: #000;
+}
+.ab-journey-title { font-family: var(--font-d); font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 8px; letter-spacing: -.3px; }
+.ab-journey-desc  { font-size: 13px; color: rgba(255,255,255,.28); font-weight: 300; line-height: 1.6; }
+
+/* ── ROADMAP ── */
+.ab-roadmap-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-top: 44px; }
+.ab-roadmap-card {
+  padding: 28px 24px; border-radius: 20px;
+  background: var(--glass); border: 1px solid rgba(255,255,255,.07);
+  text-align: center; position: relative; overflow: hidden;
+  transition: border-color .3s, transform .3s;
+  animation: fadeUp .5s ease both;
+}
+.ab-roadmap-card:hover { border-color: rgba(255,255,255,.16); transform: translateY(-5px); }
+.ab-roadmap-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.ab-roadmap-card:nth-child(1)::before { background: linear-gradient(90deg, var(--green), rgba(34,197,94,.3)); }
+.ab-roadmap-card:nth-child(2)::before { background: linear-gradient(90deg, var(--cyan),  rgba(0,229,200,.3));  }
+.ab-roadmap-card:nth-child(3)::before { background: linear-gradient(90deg, var(--neon),  rgba(91,107,255,.3)); }
+.ab-roadmap-card:nth-child(4)::before { background: linear-gradient(90deg, var(--purple), rgba(168,85,247,.3)); }
+
+.ab-phase-badge {
+  display: inline-flex; padding: 3px 12px; border-radius: 100px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+  margin-bottom: 14px;
+}
+.phase-1 { background: rgba(34,197,94,.1);  border:1px solid rgba(34,197,94,.2);  color: #4ade80; }
+.phase-2 { background: rgba(0,229,200,.1);  border:1px solid rgba(0,229,200,.2);  color: var(--cyan); }
+.phase-3 { background: rgba(91,107,255,.1); border:1px solid rgba(91,107,255,.2); color: #818cf8; }
+.phase-4 { background: rgba(168,85,247,.1); border:1px solid rgba(168,85,247,.2); color: #c084fc; }
+
+.ab-roadmap-title { font-family: var(--font-d); font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -.3px; margin-bottom: 8px; }
+.ab-roadmap-desc  { font-size: 13.5px; color: rgba(255,255,255,.35); font-weight: 300; line-height: 1.6; }
+.ab-roadmap-status {
+  display: inline-flex; align-items: center; gap: 5px;
+  margin-top: 14px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,.25);
+}
+.ab-status-dot { width: 5px; height: 5px; border-radius: 50%; }
+
+/* ── OPEN SOURCE CARD ── */
+.ab-oss-card {
+  padding: 50px 54px; border-radius: 24px;
+  background: var(--glass); border: 1px solid rgba(255,255,255,.08);
+  display: flex; align-items: center; gap: 50px;
+  margin-top: 48px; position: relative; overflow: hidden;
+}
+.ab-oss-card::before {
+  content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent);
+}
+.ab-oss-left { flex: 1; }
+.ab-oss-icon { font-size: 52px; margin-bottom: 18px; display: block; }
+.ab-oss-title { font-family: var(--font-d); font-size: 26px; font-weight: 700; color: #fff; letter-spacing: -.8px; margin-bottom: 12px; }
+.ab-oss-desc  { font-size: 15px; color: rgba(255,255,255,.38); font-weight: 300; line-height: 1.8; }
+.ab-github-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 15px 32px; border-radius: 13px;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+  color: #fff; font-family: var(--font-b); font-size: 15px; font-weight: 600;
+  text-decoration: none; transition: background .2s, box-shadow .2s, transform .18s;
+  white-space: nowrap; flex-shrink: 0;
+}
+.ab-github-btn:hover {
+  background: rgba(255,255,255,.13);
+  box-shadow: 0 8px 30px rgba(0,0,0,.4);
+  transform: translateY(-2px); color: #fff;
+}
+
+/* ── CTA ── */
+.ab-cta {
+  margin-top: 80px; border-radius: 28px;
+  background: linear-gradient(135deg, rgba(91,107,255,.15), rgba(0,229,200,.08));
+  border: 1px solid rgba(91,107,255,.2);
+  padding: 90px 60px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.ab-cta::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 60% at 30% 50%, rgba(91,107,255,.12) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 50% at 70% 50%, rgba(0,229,200,.08) 0%, transparent 65%);
+}
+.ab-cta-content { position: relative; z-index: 1; }
+.ab-cta-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 18px; border-radius: 100px;
+  background: rgba(91,107,255,.1); border: 1px solid rgba(91,107,255,.22);
+  font-size: 10.5px; font-weight: 600; color: #818cf8;
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px;
+}
+.ab-cta-title {
+  font-family: var(--font-d);
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 700; letter-spacing: -2px; color: #fff;
+  margin-bottom: 18px; line-height: 1.05;
+}
+.ab-cta-desc { font-size: 16px; color: rgba(255,255,255,.35); font-weight: 300; line-height: 1.75; max-width: 500px; margin: 0 auto 36px; }
+.ab-cta-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 18px 44px; border-radius: 14px;
+  background: linear-gradient(135deg, var(--neon), #3a4aff);
+  color: #fff; font-family: var(--font-b); font-size: 16px; font-weight: 700;
+  text-decoration: none; box-shadow: 0 8px 36px rgba(91,107,255,.4);
+  transition: transform .2s, box-shadow .2s;
+}
+.ab-cta-btn:hover { transform: translateY(-3px); box-shadow: 0 16px 50px rgba(91,107,255,.6); color: #fff; }
+
+/* ── ANIM ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .ab-body { padding: 0 20px 100px; }
+  .ab-problem-grid { grid-template-columns: 1fr; }
+  .ab-tech-grid { grid-template-columns: 1fr 1fr; }
+  .ab-team-grid { grid-template-columns: 1fr; }
+  .ab-roadmap-grid { grid-template-columns: 1fr 1fr; }
+  .ab-journey-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+  .ab-journey-grid::before { display: none; }
+  .ab-oss-card { flex-direction: column; text-align: center; padding: 36px 28px; }
+  .ab-cta { padding: 60px 28px; }
+  .ab-team-top { flex-direction: column; text-align: center; }
+  .ab-socials { justify-content: center; }
+  .ab-hero-stats { gap: 24px; }
+}
+@media(max-width:500px){
+  .ab-roadmap-grid { grid-template-columns: 1fr; }
+  .ab-tech-grid { grid-template-columns: 1fr 1fr; }
+  .ab-hero-title { letter-spacing: -2.5px; }
+}
+</style>
+
+<div class="ab-page">
+<div class="ab-glow"></div>
+<div class="ab-grid"></div>
+
+<div class="ab-body">
+
+  <!-- ══════════════════════════════════
+       HERO
+  ══════════════════════════════════ -->
+  <div class="ab-hero">
+    <div class="ab-orb ab-orb-1"></div>
+    <div class="ab-orb ab-orb-2"></div>
+    <div class="ab-orb ab-orb-3"></div>
+
+    <!-- Logo -->
+    <div class="ab-hero-logo">
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Compass needle -->
+        <circle cx="26" cy="26" r="20" stroke="rgba(91,107,255,.4)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <circle cx="26" cy="26" r="12" stroke="rgba(0,229,200,.3)" stroke-width="1"/>
+        <circle cx="26" cy="26" r="3.5" fill="#00e5c8">
+          <animate attributeName="r" values="3.5;5;3.5" dur="2.5s" repeatCount="indefinite"/>
+        </circle>
+        <!-- North pointer -->
+        <path d="M26 26 L26 8" stroke="url(#pg1)" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- South pointer -->
+        <path d="M26 26 L26 36" stroke="rgba(255,255,255,.2)" stroke-width="2" stroke-linecap="round"/>
+        <!-- East pointer -->
+        <path d="M26 26 L38 26" stroke="rgba(255,255,255,.15)" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- West pointer -->
+        <path d="M26 26 L14 26" stroke="rgba(255,255,255,.15)" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- North dot -->
+        <circle cx="26" cy="8" r="3" fill="#5b6bff">
+          <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <!-- Cardinal N -->
+        <text x="26" y="4.5" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="4" font-family="sans-serif" font-weight="700">N</text>
+        <defs>
+          <linearGradient id="pg1" x1="26" y1="8" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#5b6bff"/>
+            <stop offset="100%" stop-color="#00e5c8"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="ab-eyebrow"><div class="ab-eyebrow-dot"></div>AI Career Intelligence Platform</div>
+    <div class="ab-hero-title"><span>PathPilot AI</span></div>
+    <div class="ab-hero-sub-title">Navigate your career with intelligence</div>
+    <div class="ab-hero-desc">
+      <strong>PathPilot AI</strong> is an AI-powered Career Intelligence Platform designed to help students and professionals make smarter career decisions using <strong>real job market data, resume intelligence, and AI forecasting</strong>.
+    </div>
+
+    <div class="ab-hero-stats">
+      <div class="ab-hero-stat">
+        <div class="ab-hero-stat-val">8+</div>
+        <div class="ab-hero-stat-lbl">AI Features</div>
+      </div>
+      <div class="ab-hero-stat">
+        <div class="ab-hero-stat-val">4</div>
+        <div class="ab-hero-stat-lbl">Platform Phases</div>
+      </div>
+      <div class="ab-hero-stat">
+        <div class="ab-hero-stat-val">3yr</div>
+        <div class="ab-hero-stat-lbl">In Development</div>
+      </div>
+      <div class="ab-hero-stat">
+        <div class="ab-hero-stat-val">2</div>
+        <div class="ab-hero-stat-lbl">Founders</div>
+      </div>
+    </div>
+
+    <div class="ab-scroll-hint">
+      <div class="ab-scroll-line"></div>
+      <div class="ab-scroll-lbl">Scroll</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       MISSION
+  ══════════════════════════════════ -->
+  <div class="ab-div"></div>
+  <div class="ab-section">
+    <div class="ab-sec-eyebrow">Our Purpose</div>
+    <div class="ab-sec-title">Built with a mission<br>that matters</div>
+    <div class="ab-sec-desc">
+      Our mission is to empower individuals with <strong>data-driven career intelligence</strong>. Instead of guessing which skills are important, professionals should be able to analyze real job markets and understand exactly how to grow their careers — backed by AI.
+    </div>
+
+    <!-- ── PROBLEM CARDS ── -->
+    <div style="margin-top:48px">
+      <div class="ab-sec-eyebrow" style="margin-bottom:16px">The Problem We're Solving</div>
+    </div>
+    <div class="ab-problem-grid">
+      <div class="ab-prob-card" style="animation-delay:.05s">
+        <div class="ab-prob-icon" style="background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.2)">🧩</div>
+        <div class="ab-prob-title">Skill Gap Confusion</div>
+        <div class="ab-prob-desc">Most professionals don't know which skills are in demand. They apply to hundreds of jobs blind — without understanding why they keep getting rejected.</div>
+      </div>
+      <div class="ab-prob-card" style="animation-delay:.12s">
+        <div class="ab-prob-icon" style="background:rgba(255,181,71,.1);border:1px solid rgba(255,181,71,.2)">📉</div>
+        <div class="ab-prob-title">No Market Intelligence</div>
+        <div class="ab-prob-desc">Students build careers without understanding real industry demand. Years are spent learning skills the market no longer needs.</div>
+      </div>
+      <div class="ab-prob-card" style="animation-delay:.19s">
+        <div class="ab-prob-icon" style="background:rgba(91,107,255,.12);border:1px solid rgba(91,107,255,.22)">🔮</div>
+        <div class="ab-prob-title">Career Uncertainty</div>
+        <div class="ab-prob-desc">Professionals struggle to predict which technologies will dominate the future — and end up investing in paths that lead nowhere.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SOLUTION
+  ══════════════════════════════════ -->
+  <div class="ab-div"></div>
+  <div class="ab-section">
+    <div class="ab-sec-eyebrow">The Solution</div>
+    <div class="ab-sec-title">One platform.<br>Complete career clarity.</div>
+    <div class="ab-sec-desc">
+      PathPilot AI analyzes resumes, job descriptions, and market trends to generate actionable career insights. The platform combines <strong>resume intelligence, job intelligence, market intelligence, and AI forecasting</strong> into a single unified experience.
+    </div>
+
+    <!-- TECH STACK -->
+    <div style="margin-top:52px">
+      <div class="ab-sec-eyebrow" style="margin-bottom:16px">Technology Stack</div>
+    </div>
+    <div class="ab-tech-grid">
+      <div class="ab-tech-pill" style="animation-delay:.04s">
+        <span class="ab-tech-icon">🐍</span>
+        <div class="ab-tech-name">Python</div>
+        <div class="ab-tech-role">Core Backend Language</div>
+      </div>
+      <div class="ab-tech-pill" style="animation-delay:.1s">
+        <span class="ab-tech-icon">⚗️</span>
+        <div class="ab-tech-name">Flask</div>
+        <div class="ab-tech-role">Web Framework</div>
+      </div>
+      <div class="ab-tech-pill" style="animation-delay:.16s">
+        <span class="ab-tech-icon">🗄️</span>
+        <div class="ab-tech-name">SQLAlchemy</div>
+        <div class="ab-tech-role">Database ORM</div>
+      </div>
+      <div class="ab-tech-pill" style="animation-delay:.22s">
+        <span class="ab-tech-icon">🤖</span>
+        <div class="ab-tech-name">OpenAI API</div>
+        <div class="ab-tech-role">AI Intelligence Engine</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       TEAM
+  ══════════════════════════════════ -->
+  <div class="ab-div"></div>
+  <div class="ab-section">
+    <div class="ab-sec-eyebrow">The Founders</div>
+    <div class="ab-sec-title">The minds behind<br>PathPilot AI</div>
+    <div class="ab-sec-desc">Two Computer Science students driven by the belief that career intelligence should be accessible to everyone — not just those with insider knowledge.</div>
+
+    <div class="ab-team-grid">
+
+      <!-- ── TUSHAR ── -->
+      <div class="ab-team-card" style="animation-delay:.05s">
+        <div class="ab-team-top">
+          <!-- ✅ url_for PRESERVED -->
+          <img src="{{ url_for('static', filename='images/tushar.jpg') }}"
+               class="ab-team-avatar"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="ab-team-avatar-fallback ab-team-avatar-fallback-1" style="display:none">T</div>
+          <div class="ab-team-info">
+            <div class="ab-team-name">Tushar</div>
+            <div class="ab-team-role-badge role-founder">✦ Founder & Developer</div>
+            <div class="ab-team-tags">
+              <span class="ab-team-tag">AI / ML</span>
+              <span class="ab-team-tag">SaaS Builder</span>
+              <span class="ab-team-tag">Full Stack</span>
+            </div>
+          </div>
+        </div>
+        <div class="ab-team-body">
+          <div class="ab-team-bio">
+            Tushar is a Computer Science and Engineering student deeply passionate about Artificial Intelligence and building AI-powered SaaS platforms. He developed PathPilot AI from the ground up to help students and professionals understand the future of work using data-driven career intelligence — combining real market data with the power of modern AI.
+          </div>
+          <div class="ab-socials">
+            <!-- ✅ href PRESERVED as original -->
+            <a href="https://github.com" class="ab-social-btn ab-social-github" target="_blank">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+              GitHub
+            </a>
+            <a href="https://linkedin.com" class="ab-social-btn ab-social-linkedin" target="_blank">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              LinkedIn
+            </a>
+            <a href="mailto:tusharmks9816@gmail.com" class="ab-social-btn ab-social-email">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Email
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PINKI ── -->
+      <div class="ab-team-card" style="animation-delay:.12s">
+        <div class="ab-team-top">
+          <!-- ✅ url_for PRESERVED -->
+          <img src="{{ url_for('static', filename='images/pinki.jpg') }}"
+               class="ab-team-avatar"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="ab-team-avatar-fallback ab-team-avatar-fallback-2" style="display:none">P</div>
+          <div class="ab-team-info">
+            <div class="ab-team-name">Pinki Dalal</div>
+            <div class="ab-team-role-badge role-co">✦ Co-Founder</div>
+            <div class="ab-team-tags">
+              <span class="ab-team-tag">Web Dev</span>
+              <span class="ab-team-tag">UI/UX</span>
+              <span class="ab-team-tag">Ideation</span>
+            </div>
+          </div>
+        </div>
+        <div class="ab-team-body">
+          <div class="ab-team-bio">
+            Pinki Dalal is a Computer Science student with a strong interest in web development and modern software technologies. She played a pivotal role in the ideation and development of PathPilot AI — contributing to product direction, user experience, and platform architecture alongside Tushar.
+          </div>
+          <div class="ab-socials">
+            <!-- ✅ LinkedIn href PRESERVED as original -->
+            <a href="https://www.linkedin.com/in/pinki-dalal-3b0b022b1/" class="ab-social-btn ab-social-linkedin" target="_blank">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              LinkedIn
+            </a>
+            <a href="https://github.com" class="ab-social-btn ab-social-github" target="_blank">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+              GitHub
+            </a>
+            <a href="mailto:p2270457@gmail.com" class="ab-social-btn ab-social-email">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Email
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       FOUNDER TIMELINE
+  ══════════════════════════════════ -->
+  <div class="ab-div"></div>
+  <div class="ab-section">
+    <div class="ab-sec-eyebrow">The Journey</div>
+    <div class="ab-sec-title">Founder's timeline</div>
+    <div class="ab-sec-desc">From curiosity to code — the story of how PathPilot AI was built from the ground up over three years of learning, building, and shipping.</div>
+
+    <div class="ab-timeline">
+      <div class="ab-timeline-item" style="animation-delay:.05s">
+        <div class="ab-tl-dot" style="background:rgba(91,107,255,.15);border:1px solid rgba(91,107,255,.3);color:#818cf8">23</div>
+        <div class="ab-tl-body">
+          <div class="ab-tl-year" style="color:#818cf8">2023</div>
+          <div class="ab-tl-desc">Started exploring Artificial Intelligence and Machine Learning. First experiments with neural networks, NLP models, and automation scripts — the spark that started everything.</div>
+        </div>
+      </div>
+      <div class="ab-timeline-item" style="animation-delay:.12s">
+        <div class="ab-tl-dot" style="background:rgba(0,229,200,.12);border:1px solid rgba(0,229,200,.25);color:var(--cyan)">24</div>
+        <div class="ab-tl-body">
+          <div class="ab-tl-year" style="color:var(--cyan)">2024</div>
+          <div class="ab-tl-desc">Built multiple AI and software projects — automation systems, ML models, and early SaaS prototypes. Each project deepened the understanding of how AI could solve real career problems.</div>
+        </div>
+      </div>
+      <div class="ab-timeline-item" style="animation-delay:.19s">
+        <div class="ab-tl-dot" style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:var(--green)">25</div>
+        <div class="ab-tl-body">
+          <div class="ab-tl-year" style="color:var(--green)">2025</div>
+          <div class="ab-tl-desc">Developed advanced AI platforms and production-ready SaaS applications. The idea for PathPilot AI crystallized — combining resume intelligence, job market data, and AI forecasting into one platform.</div>
+        </div>
+      </div>
+      <div class="ab-timeline-item" style="animation-delay:.26s">
+        <div class="ab-tl-dot" style="background:linear-gradient(135deg,rgba(91,107,255,.2),rgba(0,229,200,.2));border:1px solid rgba(91,107,255,.3);color:#fff">26</div>
+        <div class="ab-tl-body" style="border-color:rgba(91,107,255,.2)">
+          <div class="ab-tl-year" style="background:linear-gradient(110deg,var(--neon),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent">2026 — Launch 🚀</div>
+          <div class="ab-tl-desc">Launched PathPilot AI — a full AI Career Intelligence Platform. Resume analyzer, job matching, career forecasting, salary intelligence, and market analytics — all under one roof.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       PROJECT JOURNEY
+  ══════════════════════════════════ -->
+  <div class="ab-div"></div>
+  <div class="ab-section">
+    <div class="ab-sec-eyebrow">How It Was Built</div>
+    <div class="ab-sec-title">The project journey</div>
+
+    <div class="ab-journey-grid">
+      <div class="ab-journey-step" style="animation-delay:.04s">
+        <div class="ab-journey-num" style="background:rgba(91,107,255,.15);border-color:rgba(91,107,255,.2);color:#818cf8">01</div>
+        <div class="ab-journey-title">Idea & Research</div>
+        <div class="ab-journey-desc">Identifying the career intelligence gap. Deep market research into how AI could solve real hiring problems.</div>
+      </div>
+      <div class="ab-journey-step" style="animation-delay:.1s">
+        <div class="ab-journey-num" style="background:rgba(0,229,200,.12);border-color:rgba(0,229,200,.2);color:var(--cyan)">02</div>
+        <div class="ab-journey-title">AI System Design</div>
+        <div class="ab-journey-desc">Architecting the AI pipeline — resume parsing, skill extraction, job scoring, and market forecasting models.</div>
+      </div>
+      <div class="ab-journey-step" style="animation-delay:.16s">
+        <div class="ab-journey-num" style="background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.2);color:var(--green)">03</div>
+        <div class="ab-journey-title">Platform Development</div>
+        <div class="ab-journey-desc">Building the full-stack platform with Flask, SQLAlchemy, and OpenAI — from database design to UI.</div>
+      </div>
+      <div class="ab-journey-step" style="animation-delay:.22s">
+        <div class="ab-journey-num" style="background:rgba(255,181,71,.12);border-color:rgba(255,181,71,.2);color:var(--amber)">04</div>
+        <div class="ab-journey-title">Career Intelligence Engine</div>
+        <div class="ab-journey-desc">Integrating live market data, AI salary analysis, and real-time job matching into a complete intelligence layer.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       STARTUP ROADMAP
+  ══════════════════════════════════ -->
+  <div class="ab-div"></div>
+  <div class="ab-section">
+    <div class="ab-sec-eyebrow">What's Next</div>
+    <div class="ab-sec-title">Startup roadmap</div>
+    <div class="ab-sec-desc">PathPilot AI is being built in phases — each one expanding the platform's ability to give users an unfair career advantage.</div>
+
+    <div class="ab-roadmap-grid">
+      <div class="ab-roadmap-card" style="animation-delay:.04s">
+        <div class="ab-phase-badge phase-1">Phase 1</div>
+        <div class="ab-roadmap-title">Resume Intelligence</div>
+        <div class="ab-roadmap-desc">AI resume analysis, skill extraction, ATS scoring, and gap detection across all uploaded resumes.</div>
+        <div class="ab-roadmap-status"><div class="ab-status-dot" style="background:var(--green)"></div> Live Now</div>
+      </div>
+      <div class="ab-roadmap-card" style="animation-delay:.1s">
+        <div class="ab-phase-badge phase-2">Phase 2</div>
+        <div class="ab-roadmap-title">Job Market Intelligence</div>
+        <div class="ab-roadmap-desc">Real-time job matching, company salary leaderboards, and live market skill demand analysis.</div>
+        <div class="ab-roadmap-status"><div class="ab-status-dot" style="background:var(--cyan)"></div> Live Now</div>
+      </div>
+      <div class="ab-roadmap-card" style="animation-delay:.16s">
+        <div class="ab-phase-badge phase-3">Phase 3</div>
+        <div class="ab-roadmap-title">Career Forecast AI</div>
+        <div class="ab-roadmap-desc">Predictive career risk scoring, market demand projections, and skill momentum forecasting.</div>
+        <div class="ab-roadmap-status"><div class="ab-status-dot" style="background:#818cf8"></div> In Progress</div>
+      </div>
+      <div class="ab-roadmap-card" style="animation-delay:.22s">
+        <div class="ab-phase-badge phase-4">Phase 4</div>
+        <div class="ab-roadmap-title">AI Career Twin</div>
+        <div class="ab-roadmap-desc">A simulated AI version of you — projecting your career 5 years forward with scenario modeling.</div>
+        <div class="ab-roadmap-status"><div class="ab-status-dot" style="background:rgba(255,255,255,.3)"></div> Coming Soon</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       OPEN SOURCE
+  ══════════════════════════════════ -->
+  <div class="ab-div"></div>
+  <div class="ab-section">
+    <div class="ab-sec-eyebrow">Open Source</div>
+    <div class="ab-sec-title">Built in public</div>
+    <div class="ab-oss-card">
+      <div class="ab-oss-left">
+        <span class="ab-oss-icon">⚡</span>
+        <div class="ab-oss-title">Open Source Development</div>
+        <div class="ab-oss-desc">PathPilot AI is being actively developed as an AI startup project using modern technologies. The project demonstrates real-world applications of AI in career analytics, job intelligence, and workforce forecasting — built transparently and shared with the community.</div>
+      </div>
+      <!-- ✅ href PRESERVED -->
+      <a href="https://github.com" class="ab-github-btn" target="_blank">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        View on GitHub
+      </a>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CTA
+  ══════════════════════════════════ -->
+  <div class="ab-cta">
+    <div class="ab-cta-content">
+      <div class="ab-cta-eyebrow">✦ Get Started Today</div>
+      <div class="ab-cta-title">Start your AI<br>career journey</div>
+      <div class="ab-cta-desc">Upload your resume and discover deep career insights powered by artificial intelligence — in seconds.</div>
+      <!-- ✅ href="/register" PRESERVED -->
+      <a href="/register" class="ab-cta-btn">
+        🚀 Get Started Free
+      </a>
+    </div>
+  </div>
+
+</div>
+</div>
+
+{% endblock %}

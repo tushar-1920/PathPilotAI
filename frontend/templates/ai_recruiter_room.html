@@ -1,0 +1,822 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--purple:#a855f7;--amber:#ffb547;--red:#ff5757;--font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#000!important;color:#fff!important;font-family:var(--font-b);overflow:hidden;}
+footer,.footer,.site-footer,.main-footer,#footer{display:none!important;}
+
+#ivroom{display:flex;flex-direction:column;height:calc(100vh - 60px);background:#07070f;overflow:hidden;}
+
+/* TOP BAR */
+.iv-top{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px;background:#0a0a14;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;z-index:50;}
+.iv-top-l{display:flex;align-items:center;gap:12px;}
+.iv-title{font-family:var(--font-d);font-size:14px;font-weight:700;color:#fff;}
+.iv-live{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--red);}
+.iv-live-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:livep 1.5s ease-in-out infinite;}
+@keyframes livep{0%,100%{box-shadow:0 0 0 0 rgba(255,87,87,.4)}50%{box-shadow:0 0 0 5px rgba(255,87,87,0)}}
+.iv-role-badge{font-size:11.5px;color:rgba(255,255,255,.35);padding:3px 10px;border-radius:5px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);}
+.iv-q-counter{font-size:12px;color:rgba(255,255,255,.3);}
+.iv-top-r{display:flex;align-items:center;gap:10px;}
+.iv-score-display{font-family:var(--font-d);font-size:13px;font-weight:700;padding:4px 12px;border-radius:7px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.6);}
+.end-iv-btn{padding:7px 16px;border-radius:8px;background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.25);color:var(--red);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);transition:all .2s;}
+.end-iv-btn:hover{background:rgba(255,87,87,.22);}
+
+/* MAIN */
+.iv-main{display:flex;flex:1;overflow:hidden;}
+
+/* LEFT: RECRUITER + USER VIDEO */
+.iv-left{width:280px;flex-shrink:0;background:#0a0a14;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;overflow:hidden;}
+
+/* Recruiter AI face */
+.recruiter-face{flex:0 0 220px;background:linear-gradient(135deg,rgba(168,85,247,.12),rgba(91,107,255,.08));border-bottom:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.recruiter-face::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,rgba(168,85,247,.15),transparent 65%);animation:rfglow 3s ease-in-out infinite;}
+@keyframes rfglow{0%,100%{opacity:.5}50%{opacity:1}}
+.rf-avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#6366f1);display:flex;align-items:center;justify-content:center;font-size:40px;border:2px solid rgba(168,85,247,.3);position:relative;z-index:1;box-shadow:0 0 30px rgba(168,85,247,.3);margin-bottom:12px;}
+.rf-avatar.speaking{animation:rfspeak .4s ease-in-out infinite alternate;}
+@keyframes rfspeak{from{box-shadow:0 0 20px rgba(168,85,247,.3)}to{box-shadow:0 0 50px rgba(168,85,247,.7),0 0 80px rgba(91,107,255,.3)}}
+.rf-name{font-family:var(--font-d);font-size:14px;font-weight:700;color:#fff;position:relative;z-index:1;}
+.rf-status{font-size:11.5px;color:rgba(255,255,255,.35);margin-top:3px;position:relative;z-index:1;}
+.rf-personality{font-size:10px;color:#c084fc;margin-top:5px;padding:2px 10px;border-radius:100px;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);position:relative;z-index:1;}
+
+/* Sound wave */
+.sound-wave{display:flex;align-items:center;gap:3px;margin-top:10px;height:28px;position:relative;z-index:1;}
+.sw-bar{width:3px;border-radius:2px;background:var(--purple);animation:swAnim 1.2s ease-in-out infinite;}
+.sw-bar:nth-child(2){animation-delay:.1s;height:12px;}
+.sw-bar:nth-child(3){animation-delay:.2s;height:20px;}
+.sw-bar:nth-child(4){animation-delay:.3s;height:28px;}
+.sw-bar:nth-child(5){animation-delay:.4s;height:20px;}
+.sw-bar:nth-child(6){animation-delay:.5s;height:12px;}
+.sw-bar:nth-child(7){animation-delay:.6s;height:8px;}
+@keyframes swAnim{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
+.sound-wave.paused .sw-bar{animation-play-state:paused;transform:scaleY(.3);}
+
+/* User video */
+.user-video-wrap{flex:1;padding:10px;display:flex;flex-direction:column;gap:8px;}
+.uv-tile{border-radius:10px;overflow:hidden;background:#000;border:1px solid rgba(255,255,255,.07);position:relative;aspect-ratio:4/3;}
+.uv-tile video{width:100%;height:100%;object-fit:cover;display:block;}
+.uv-tile-bar{position:absolute;bottom:0;left:0;right:0;padding:5px 8px;background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;align-items:center;justify-content:space-between;}
+.uv-name{font-size:11.5px;font-weight:600;color:#fff;}
+.face-status{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;}
+.fs-ok{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.2);}
+.fs-warn{background:rgba(255,181,71,.15);color:#ffb547;border:1px solid rgba(255,181,71,.2);}
+.fs-alert{background:rgba(255,87,87,.15);color:#ff5757;border:1px solid rgba(255,87,87,.2);}
+
+/* Face expression heatmap */
+.face-metrics{padding:10px;background:#0a0a14;}
+.fm-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.fm-label{font-size:10.5px;color:rgba(255,255,255,.35);font-weight:500;}
+.fm-bar-wrap{flex:1;margin:0 10px;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
+.fm-bar{height:100%;border-radius:2px;transition:width .5s ease;}
+.fm-val{font-size:10.5px;color:rgba(255,255,255,.4);width:28px;text-align:right;font-family:'JetBrains Mono',monospace;}
+
+/* CENTER: CONVERSATION */
+.iv-center{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+
+/* Conversation */
+.conv-area{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;}
+.conv-area::-webkit-scrollbar{width:4px;}
+.conv-area::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
+
+/* AI message bubble */
+.msg-ai{display:flex;gap:12px;align-items:flex-start;animation:msgIn .4s ease both;}
+.msg-user{display:flex;gap:12px;align-items:flex-start;flex-direction:row-reverse;animation:msgIn .4s ease both;}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.msg-ava{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:1px solid rgba(255,255,255,.1);}
+.msg-ava-ai{background:linear-gradient(135deg,var(--purple),#6366f1);}
+.msg-ava-user{background:linear-gradient(135deg,var(--neon),var(--cyan));}
+.msg-bubble{max-width:72%;padding:13px 16px;border-radius:14px;font-size:14.5px;line-height:1.7;position:relative;}
+.bubble-ai{background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.18);color:rgba(255,255,255,.85);border-bottom-left-radius:4px;}
+.bubble-user{background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.2);color:rgba(255,255,255,.85);border-bottom-right-radius:4px;}
+.msg-meta{font-size:10.5px;color:rgba(255,255,255,.22);margin-top:5px;}
+.msg-user .msg-meta{text-align:right;}
+
+/* Interrupt banner */
+.interrupt-banner{margin:8px 0;padding:12px 16px;border-radius:10px;background:rgba(255,87,87,.08);border:1px solid rgba(255,87,87,.2);color:#ff7b7b;font-size:13.5px;display:flex;align-items:center;gap:10px;animation:msgIn .3s ease both;}
+
+/* Typing indicator */
+.typing-ind{display:flex;align-items:center;gap:5px;padding:10px 14px;background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.12);border-radius:12px;width:fit-content;display:none;}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:#c084fc;animation:tyd .9s ease-in-out infinite;}
+.typing-dot:nth-child(2){animation-delay:.15s;}
+.typing-dot:nth-child(3){animation-delay:.3s;}
+@keyframes tyd{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+/* Input area */
+.iv-input-area{border-top:1px solid rgba(255,255,255,.07);background:#0a0a14;padding:14px 20px;flex-shrink:0;}
+.iv-input-row{display:flex;gap:10px;align-items:flex-end;}
+.iv-textarea{flex:1;padding:12px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#fff;font-family:var(--font-b);font-size:14px;outline:none;resize:none;min-height:48px;max-height:120px;transition:border-color .2s;line-height:1.6;}
+.iv-textarea:focus{border-color:rgba(168,85,247,.4);box-shadow:0 0 0 3px rgba(168,85,247,.08);}
+.iv-textarea::placeholder{color:rgba(255,255,255,.22);}
+.iv-send-btn{padding:12px 24px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--purple),#6366f1);color:#fff;font-family:var(--font-b);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s;white-space:nowrap;}
+.iv-send-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(168,85,247,.4);}
+.iv-send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
+.mic-btn{width:48px;height:48px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.mic-btn:hover{background:rgba(255,255,255,.08);color:#fff;}
+.mic-btn.recording{background:rgba(255,87,87,.15);border-color:rgba(255,87,87,.35);color:var(--red);animation:micpulse 1s ease-in-out infinite;}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,87,87,.3)}50%{box-shadow:0 0 0 8px rgba(255,87,87,0)}}
+.iv-hints{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.iv-hint{padding:5px 12px;border-radius:100px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);font-size:12px;color:rgba(255,255,255,.35);cursor:pointer;transition:all .2s;}
+.iv-hint:hover{background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.25);color:#c084fc;}
+
+/* RIGHT: LIVE METRICS */
+.iv-right{width:240px;flex-shrink:0;border-left:1px solid rgba(255,255,255,.07);background:#0a0a14;display:flex;flex-direction:column;overflow:hidden;}
+.ir-head{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.07);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.28);}
+.ir-body{flex:1;overflow-y:auto;padding:12px;}
+.ir-body::-webkit-scrollbar{width:3px;}
+.ir-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);}
+
+/* Live score meters */
+.score-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;margin-bottom:10px;}
+.sc-label{font-size:10.5px;font-weight:600;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.score-big{font-family:var(--font-d);font-size:42px;font-weight:800;line-height:1;margin-bottom:4px;}
+.score-sub{font-size:11px;color:rgba(255,255,255,.3);}
+.skill-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.sk-label{font-size:11.5px;color:rgba(255,255,255,.45);width:90px;flex-shrink:0;}
+.sk-track{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
+.sk-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.16,1,.3,1);}
+.sk-val{font-size:10.5px;color:rgba(255,255,255,.35);width:24px;text-align:right;font-family:'JetBrains Mono',monospace;}
+
+/* Face alerts */
+.face-alert-list{display:flex;flex-direction:column;gap:6px;}
+.fa-item{padding:7px 10px;border-radius:8px;font-size:11.5px;display:flex;align-items:center;gap:7px;}
+.fa-ok{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.15);color:#4ade80;}
+.fa-warn{background:rgba(255,181,71,.07);border:1px solid rgba(255,181,71,.15);color:#fbbf24;}
+.fa-bad{background:rgba(255,87,87,.07);border:1px solid rgba(255,87,87,.15);color:#f87171;}
+
+/* Progress */
+.progress-bar-wrap{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-top:10px;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:3px;transition:width .8s ease;}
+
+/* Toast */
+.iv-toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(255,87,87,.9);border-radius:10px;padding:10px 20px;font-size:13.5px;color:#fff;z-index:9999;display:none;font-weight:600;backdrop-filter:blur(10px);}
+.iv-toast.info{background:rgba(91,107,255,.9);}
+.iv-toast.success{background:rgba(34,197,94,.9);}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .7s linear infinite;display:inline-block;}
+</style>
+
+<script>
+const SESSION_ID    = {{ iv_session.id }};
+const ROLE          = "{{ iv_session.role }}";
+const LEVEL         = "{{ iv_session.level }}";
+const PERSONALITY   = "{{ iv_session.personality }}";
+const MAX_QUESTIONS = { fresher:6, intermediate:8, advanced:10, faang:12 }[LEVEL] || 8;
+</script>
+
+<div id="ivroom">
+
+  <!-- TOP BAR -->
+  <div class="iv-top">
+    <div class="iv-top-l">
+      <div class="iv-title">🎙️ AI Interview</div>
+      <div class="iv-live"><div class="iv-live-dot"></div>LIVE</div>
+      <div class="iv-role-badge">{{ iv_session.role }}</div>
+      <div class="iv-q-counter" id="qCounter">Question 1 / {{ max_questions }}</div>
+    </div>
+    <div class="iv-top-r">
+      <div class="iv-score-display" id="liveScoreDisplay">Score: —</div>
+      <button class="end-iv-btn" onclick="endInterview()">End Interview</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="iv-main">
+
+    <!-- LEFT: RECRUITER + USER CAMERA -->
+    <div class="iv-left">
+      <!-- Recruiter AI -->
+      <div class="recruiter-face">
+        <div class="rf-avatar" id="rfAvatar">
+          {{ {"friendly":"😊","strict":"😐","faang":"💀","startup":"🚀","balanced":"🎯"}.get(iv_session.personality, "🎯") }}
+        </div>
+        <div class="rf-name" id="rfName">
+          {{ {"friendly":"Sarah","strict":"Mr. Sharma","faang":"Alex","startup":"Rahul","balanced":"Priya"}.get(iv_session.personality,"Priya") }}
+        </div>
+        <div class="rf-status" id="rfStatus">Listening…</div>
+        <div class="rf-personality">
+          {{ {"friendly":"Friendly","strict":"Strict","faang":"FAANG","startup":"Startup","balanced":"Balanced"}.get(iv_session.personality,"Balanced") }} Recruiter
+        </div>
+        <div class="sound-wave paused" id="soundWave">
+          <div class="sw-bar" style="height:8px"></div>
+          <div class="sw-bar"></div>
+          <div class="sw-bar"></div>
+          <div class="sw-bar"></div>
+          <div class="sw-bar"></div>
+          <div class="sw-bar"></div>
+          <div class="sw-bar" style="height:8px"></div>
+        </div>
+      </div>
+
+      <!-- User camera -->
+      <div class="user-video-wrap">
+        <div class="uv-tile">
+          <video id="userVideo" autoplay muted playsinline></video>
+          <div class="uv-tile-bar">
+            <span class="uv-name" style="font-size:11px">You</span>
+            <span class="face-status fs-ok" id="faceStatusBadge">✓ Focused</span>
+          </div>
+        </div>
+        <!-- Face expression bars -->
+        <div class="face-metrics">
+          <div class="fm-row">
+            <span class="fm-label">Confidence</span>
+            <div class="fm-bar-wrap"><div class="fm-bar" id="fb-conf" style="width:70%;background:var(--green)"></div></div>
+            <span class="fm-val" id="fv-conf">70</span>
+          </div>
+          <div class="fm-row">
+            <span class="fm-label">Focus</span>
+            <div class="fm-bar-wrap"><div class="fm-bar" id="fb-focus" style="width:85%;background:var(--cyan)"></div></div>
+            <span class="fm-val" id="fv-focus">85</span>
+          </div>
+          <div class="fm-row">
+            <span class="fm-label">Stress</span>
+            <div class="fm-bar-wrap"><div class="fm-bar" id="fb-stress" style="width:20%;background:var(--amber)"></div></div>
+            <span class="fm-val" id="fv-stress">20</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER: CONVERSATION -->
+    <div class="iv-center">
+      <div class="conv-area" id="convArea">
+        <div class="typing-ind" id="typingInd">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+
+      <div class="iv-input-area">
+        <div class="iv-input-row">
+          <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="Voice input">🎤</button>
+          <textarea class="iv-textarea" id="answerInput"
+            placeholder="Type your answer here… or use the mic button to speak"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAnswer();}"></textarea>
+          <button class="iv-send-btn" id="sendBtn" onclick="sendAnswer()">
+            Send <span style="font-size:16px">→</span>
+          </button>
+        </div>
+        <div class="iv-hints" id="hintArea">
+          <span class="iv-hint" onclick="insertHint('Could you please clarify your question?')">Ask for clarification</span>
+          <span class="iv-hint" onclick="insertHint('Let me think for a moment…')">Need a moment</span>
+          <span class="iv-hint" onclick="insertHint('To give an example from my experience, ')">Give an example</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: LIVE METRICS -->
+    <div class="iv-right">
+      <div class="ir-head">Live Analysis</div>
+      <div class="ir-body">
+
+        <!-- Overall score -->
+        <div class="score-card">
+          <div class="sc-label">Overall Score</div>
+          <div class="score-big" id="overallScore" style="color:var(--neon)">—</div>
+          <div class="score-sub">Updated after each answer</div>
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" id="scorePBar" style="width:0%"></div></div>
+        </div>
+
+        <!-- Skill breakdown -->
+        <div class="score-card">
+          <div class="sc-label">Skill Breakdown</div>
+          <div class="skill-row"><span class="sk-label">Communication</span><div class="sk-track"><div class="sk-fill" id="sk-comm" style="width:0%;background:var(--cyan)"></div></div><span class="sk-val" id="sv-comm">—</span></div>
+          <div class="skill-row"><span class="sk-label">Technical</span><div class="sk-track"><div class="sk-fill" id="sk-tech" style="width:0%;background:var(--neon)"></div></div><span class="sk-val" id="sv-tech">—</span></div>
+          <div class="skill-row"><span class="sk-label">Confidence</span><div class="sk-track"><div class="sk-fill" id="sk-conf" style="width:0%;background:var(--green)"></div></div><span class="sk-val" id="sv-conf">—</span></div>
+          <div class="skill-row"><span class="sk-label">Clarity</span><div class="sk-track"><div class="sk-fill" id="sk-clar" style="width:0%;background:var(--amber)"></div></div><span class="sk-val" id="sv-clar">—</span></div>
+        </div>
+
+        <!-- Face/behavior alerts -->
+        <div class="score-card">
+          <div class="sc-label">Behavioral Monitor</div>
+          <div class="face-alert-list" id="alertList">
+            <div class="fa-item fa-ok">✓ Camera active</div>
+            <div class="fa-item fa-ok">✓ Good eye contact</div>
+            <div class="fa-item fa-ok">✓ No suspicious behavior</div>
+          </div>
+        </div>
+
+        <!-- Question progress -->
+        <div class="score-card">
+          <div class="sc-label">Progress</div>
+          <div style="font-size:24px;font-weight:800;font-family:var(--font-d);color:#fff" id="qProgress">0 / {{ max_questions }}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:3px">Questions answered</div>
+          <div class="progress-bar-wrap" style="margin-top:10px"><div class="progress-bar-fill" id="qPBar" style="width:0%"></div></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="iv-toast" id="ivToast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let questionNum    = 0;
+let interviewOver  = false;
+let isWaiting      = false;  // waiting for AI response
+let faceStream     = null;
+let faceInterval   = null;
+let speechSynth    = window.speechSynthesis;
+let speechRec      = null;
+let isRecording    = false;
+let currentVoice   = null;
+
+// Face tracking state
+let faceData = {
+  looking_away:        false,
+  suspicious:          false,
+  hesitation_detected: false,
+  confidence_score:    70,
+  focus_score:         85,
+  stress_score:        20,
+};
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+window.addEventListener("DOMContentLoaded", async () => {
+  await startCamera();
+  setupSpeechRec();
+  loadVoices();
+  loadOpeningMessage();
+});
+
+// ═══════════════════════════════════════════════════
+//  CAMERA + FACE DETECTION
+// ═══════════════════════════════════════════════════
+async function startCamera() {
+  try {
+    faceStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    document.getElementById("userVideo").srcObject = faceStream;
+    // Start face analysis loop
+    faceInterval = setInterval(analyzeFace, 2000);
+  } catch(e) {
+    showToast("⚠ Camera unavailable — face detection disabled", "info");
+  }
+}
+
+// Face analysis using canvas pixel data (no external library needed)
+function analyzeFace() {
+  const video   = document.getElementById("userVideo");
+  if (!video.videoWidth) return;
+
+  const canvas  = document.createElement("canvas");
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx     = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data      = imageData.data;
+
+  // Brightness analysis — if suddenly dark = looked away or covered camera
+  let brightness = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    brightness += (data[i] + data[i+1] + data[i+2]) / 3;
+  }
+  brightness = brightness / (data.length / 4);
+
+  // Center vs edges brightness diff (basic gaze estimation)
+  const centerBright  = getCenterBrightness(ctx, canvas.width, canvas.height);
+  const edgeBright    = brightness;
+  const lookingAway   = centerBright < edgeBright * 0.7;
+
+  // Sudden large brightness drop = looked away
+  const suspicious = brightness < 30;
+
+  // Update face state
+  faceData.looking_away        = lookingAway;
+  faceData.suspicious          = suspicious;
+  faceData.confidence_score    = Math.min(100, Math.max(20, 60 + Math.random() * 20));
+  faceData.focus_score         = lookingAway ? 30 : Math.min(100, Math.max(50, 75 + Math.random() * 15));
+  faceData.stress_score        = Math.min(80, Math.max(10, 20 + (lookingAway ? 30 : 0) + Math.random() * 10));
+
+  updateFaceUI();
+}
+
+function getCenterBrightness(ctx, w, h) {
+  const cx = w * 0.25, cy = h * 0.25;
+  const d  = ctx.getImageData(cx, cy, w * 0.5, h * 0.5).data;
+  let b = 0;
+  for (let i = 0; i < d.length; i += 4) b += (d[i] + d[i+1] + d[i+2]) / 3;
+  return b / (d.length / 4);
+}
+
+function updateFaceUI() {
+  const conf  = Math.round(faceData.confidence_score);
+  const focus = Math.round(faceData.focus_score);
+  const stress= Math.round(faceData.stress_score);
+
+  document.getElementById("fb-conf").style.width  = conf + "%";
+  document.getElementById("fb-focus").style.width = focus + "%";
+  document.getElementById("fb-stress").style.width= stress + "%";
+  document.getElementById("fv-conf").textContent  = conf;
+  document.getElementById("fv-focus").textContent = focus;
+  document.getElementById("fv-stress").textContent= stress;
+
+  const badge = document.getElementById("faceStatusBadge");
+  const alerts = document.getElementById("alertList");
+
+  if (faceData.suspicious) {
+    badge.className = "face-status fs-alert";
+    badge.textContent = "⚠ Alert";
+    addAlert("⚠ Suspicious behavior detected", "bad");
+  } else if (faceData.looking_away) {
+    badge.className = "face-status fs-warn";
+    badge.textContent = "⚠ Look at camera";
+    addAlert("👁 Looking away from camera", "warn");
+  } else {
+    badge.className = "face-status fs-ok";
+    badge.textContent = "✓ Focused";
+  }
+
+  // Update skill bars based on face
+  updateSkillBar("sk-conf", "sv-conf", conf);
+  updateSkillBar("sk-clar", "sv-clar", focus);
+}
+
+function addAlert(msg, type) {
+  const list = document.getElementById("alertList");
+  const item = document.createElement("div");
+  item.className = `fa-item fa-${type}`;
+  item.textContent = msg;
+  list.insertBefore(item, list.firstChild);
+  if (list.children.length > 6) list.removeChild(list.lastChild);
+}
+
+function updateSkillBar(barId, valId, value) {
+  const pct = Math.min(100, Math.max(0, value));
+  document.getElementById(barId).style.width = pct + "%";
+  document.getElementById(valId).textContent = Math.round(pct / 10);
+}
+
+// ═══════════════════════════════════════════════════
+//  TTS — AI SPEAKS
+// ═══════════════════════════════════════════════════
+function loadVoices() {
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = setVoice;
+  }
+  setVoice();
+}
+
+function setVoice() {
+  const voices = speechSynthesis.getVoices();
+  // Prefer a clear English voice
+  currentVoice = voices.find(v => v.lang === "en-GB" && v.name.includes("Female"))
+               || voices.find(v => v.lang === "en-US")
+               || voices[0];
+}
+
+function speak(text) {
+  if (!text || !speechSynth) return;
+  speechSynth.cancel();
+
+  const utt   = new SpeechSynthesisUtterance(text);
+  utt.voice   = currentVoice;
+  utt.rate    = PERSONALITY === "faang" ? 1.1 : PERSONALITY === "strict" ? 1.0 : 0.95;
+  utt.pitch   = PERSONALITY === "friendly" ? 1.1 : 0.95;
+  utt.volume  = 1;
+
+  // Animate recruiter avatar while speaking
+  const avatar   = document.getElementById("rfAvatar");
+  const sw       = document.getElementById("soundWave");
+  const status   = document.getElementById("rfStatus");
+
+  utt.onstart = () => {
+    avatar.classList.add("speaking");
+    sw.classList.remove("paused");
+    status.textContent = "Speaking…";
+  };
+  utt.onend = () => {
+    avatar.classList.remove("speaking");
+    sw.classList.add("paused");
+    status.textContent = "Listening…";
+  };
+
+  speechSynth.speak(utt);
+}
+
+// ═══════════════════════════════════════════════════
+//  SPEECH RECOGNITION — USER SPEAKS
+// ═══════════════════════════════════════════════════
+function setupSpeechRec() {
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRec) { document.getElementById("micBtn").style.display = "none"; return; }
+
+  speechRec = new SpeechRec();
+  speechRec.continuous    = true;
+  speechRec.interimResults= true;
+  speechRec.lang          = "en-IN";
+
+  speechRec.onresult = e => {
+    let transcript = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      transcript += e.results[i][0].transcript;
+    }
+    document.getElementById("answerInput").value = transcript;
+    // Detect hesitation from pauses
+    faceData.hesitation_detected = transcript.includes("um") || transcript.includes("uh") || transcript.includes("like");
+  };
+
+  speechRec.onerror = () => { stopRecording(); };
+}
+
+function toggleMic() {
+  if (isRecording) stopRecording();
+  else startRecording();
+}
+
+function startRecording() {
+  if (!speechRec) return;
+  isRecording = true;
+  speechSynth.cancel();  // stop AI speaking when user starts
+  speechRec.start();
+  document.getElementById("micBtn").className = "mic-btn recording";
+  document.getElementById("micBtn").textContent = "⏹";
+  showToast("🎤 Listening… Speak now", "info");
+}
+
+function stopRecording() {
+  isRecording = false;
+  if (speechRec) speechRec.stop();
+  document.getElementById("micBtn").className = "mic-btn";
+  document.getElementById("micBtn").textContent = "🎤";
+}
+
+// ═══════════════════════════════════════════════════
+//  CONVERSATION
+// ═══════════════════════════════════════════════════
+async function loadOpeningMessage() {
+  // Get the opening AI message (stored in session on creation)
+  // Show typing then fetch
+  showTyping(true);
+  document.getElementById("rfStatus").textContent = "Preparing…";
+
+  // Small delay for realism
+  await sleep(1200);
+
+  try {
+    const res = await fetch("/api/ai-recruiter/message", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        session_id: SESSION_ID,
+        message: "__init__",  // special init signal
+        face_data: faceData,
+      }),
+    });
+
+    // If session just started, ask for initial AI greeting via a different approach
+    // Instead, we'll use a hardcoded opener and let the first real message trigger AI
+  } catch(e) {}
+
+  // Use opening from session (set during creation)
+  const opener = "{{ iv_session.opening_message | default('') }}";
+  if (opener) {
+    showTyping(false);
+    addAIMessage(opener);
+    speak(opener);
+  } else {
+    showTyping(false);
+    const defaultOpener = `Hi! I'm your interviewer today. I'll be conducting a ${LEVEL} level interview for the ${ROLE} position. Let's start — could you please introduce yourself and walk me through your background?`;
+    addAIMessage(defaultOpener);
+    speak(defaultOpener);
+  }
+
+  questionNum = 1;
+  updateProgress();
+}
+
+async function sendAnswer() {
+  if (interviewOver || isWaiting) return;
+
+  const input = document.getElementById("answerInput");
+  const answer = input.value.trim();
+  if (!answer) { showToast("Please type your answer first", "info"); return; }
+
+  if (isRecording) stopRecording();
+  speechSynth.cancel();
+
+  // Display user message
+  addUserMessage(answer);
+  input.value = "";
+  input.style.height = "48px";
+
+  // Disable input while waiting
+  isWaiting = true;
+  document.getElementById("sendBtn").disabled = true;
+  document.getElementById("answerInput").disabled = true;
+
+  showTyping(true);
+  document.getElementById("rfStatus").textContent = "Thinking…";
+
+  try {
+    const res = await fetch("/api/ai-recruiter/message", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        session_id:     SESSION_ID,
+        message:        answer,
+        face_data:      faceData,
+        audio_features: {
+          long_pauses:      faceData.hesitation_detected,
+          very_slow_speech: false,
+        },
+      }),
+    });
+
+    const data = await res.json();
+    showTyping(false);
+
+    if (!data.success) throw new Error(data.error || "Failed");
+
+    // Handle interrupt first (if AI interrupts the user)
+    if (data.interrupt && data.interrupt_msg) {
+      addInterruptBanner(data.interrupt_msg);
+      await sleep(800);
+      speak(data.interrupt_msg);
+      await sleep(data.interrupt_msg.length * 60);  // wait for speech
+    }
+
+    // Show AI response
+    addAIMessage(data.ai_response);
+    speak(data.ai_response);
+
+    // Update live metrics
+    if (data.live_score !== undefined) {
+      updateScore(data.live_score);
+    }
+
+    questionNum = data.question_num || questionNum + 1;
+    updateProgress();
+
+    // Interview over
+    if (data.interview_over) {
+      interviewOver = true;
+      await sleep(3000);  // let AI finish speaking
+      showToast("✓ Interview complete! Generating your report…", "success");
+      await sleep(2000);
+      await generateReport();
+    }
+
+  } catch(e) {
+    showTyping(false);
+    showToast("Error: " + e.message);
+  }
+
+  isWaiting = false;
+  document.getElementById("sendBtn").disabled = false;
+  document.getElementById("answerInput").disabled = false;
+  document.getElementById("answerInput").focus();
+}
+
+function addAIMessage(text) {
+  const conv = document.getElementById("convArea");
+  const div  = document.createElement("div");
+  div.className = "msg-ai";
+  const personality_emoji = { friendly:"😊", strict:"😐", faang:"💀", startup:"🚀", balanced:"🎯" };
+  div.innerHTML = `
+    <div class="msg-ava msg-ava-ai">${personality_emoji[PERSONALITY]||"🎯"}</div>
+    <div>
+      <div class="msg-bubble bubble-ai">${escHTML(text)}</div>
+      <div class="msg-meta">${getTime()}</div>
+    </div>`;
+  conv.insertBefore(div, document.getElementById("typingInd"));
+  conv.scrollTop = conv.scrollHeight;
+}
+
+function addUserMessage(text) {
+  const conv = document.getElementById("convArea");
+  const div  = document.createElement("div");
+  div.className = "msg-user";
+  div.innerHTML = `
+    <div class="msg-ava msg-ava-user">👤</div>
+    <div>
+      <div class="msg-bubble bubble-user">${escHTML(text)}</div>
+      <div class="msg-meta">${getTime()}</div>
+    </div>`;
+  conv.insertBefore(div, document.getElementById("typingInd"));
+  conv.scrollTop = conv.scrollHeight;
+}
+
+function addInterruptBanner(text) {
+  const conv = document.getElementById("convArea");
+  const div  = document.createElement("div");
+  div.className = "interrupt-banner";
+  div.innerHTML = `<span style="font-size:18px">✋</span> <strong>Interruption:</strong> ${escHTML(text)}`;
+  conv.insertBefore(div, document.getElementById("typingInd"));
+  conv.scrollTop = conv.scrollHeight;
+}
+
+function showTyping(show) {
+  document.getElementById("typingInd").style.display = show ? "flex" : "none";
+  if (show) {
+    const conv = document.getElementById("convArea");
+    conv.scrollTop = conv.scrollHeight;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  SCORING UI
+// ═══════════════════════════════════════════════════
+function updateScore(score) {
+  const s = Math.round(score);
+  const color = s >= 70 ? "var(--green)" : s >= 50 ? "var(--amber)" : "var(--red)";
+  document.getElementById("overallScore").textContent    = s;
+  document.getElementById("overallScore").style.color   = color;
+  document.getElementById("scorePBar").style.width      = s + "%";
+  document.getElementById("liveScoreDisplay").textContent = `Score: ${s}`;
+
+  // Estimate skill breakdown from score (simulated)
+  const base = score / 10;
+  updateSkillBar("sk-comm", "sv-comm", Math.min(100, (base + 1) * 10));
+  updateSkillBar("sk-tech", "sv-tech", Math.min(100, base * 10));
+  updateSkillBar("sk-conf", "sv-conf", faceData.confidence_score);
+  updateSkillBar("sk-clar", "sv-clar", faceData.focus_score);
+}
+
+function updateProgress() {
+  const pct = Math.min(100, (questionNum / MAX_QUESTIONS) * 100);
+  document.getElementById("qProgress").textContent = `${questionNum} / ${MAX_QUESTIONS}`;
+  document.getElementById("qPBar").style.width     = pct + "%";
+  document.getElementById("qCounter").textContent  = `Question ${questionNum} / ${MAX_QUESTIONS}`;
+}
+
+// ═══════════════════════════════════════════════════
+//  END + REPORT
+// ═══════════════════════════════════════════════════
+async function endInterview() {
+  if (!confirm("End the interview now? Your report will be generated.")) return;
+  await generateReport();
+}
+
+async function generateReport() {
+  showToast("Generating your recruiter report…", "info");
+  speechSynth.cancel();
+  clearInterval(faceInterval);
+
+  try {
+    const res = await fetch("/api/ai-recruiter/evaluate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_id: SESSION_ID }),
+    });
+    const d = await res.json();
+    if (d.success && d.result_url) {
+      window.location.href = d.result_url;
+    } else {
+      window.location.href = `/ai-recruiter/result/${SESSION_ID}`;
+    }
+  } catch(e) {
+    window.location.href = `/ai-recruiter/result/${SESSION_ID}`;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════
+function insertHint(text) {
+  document.getElementById("answerInput").value = text;
+  document.getElementById("answerInput").focus();
+}
+
+function showToast(msg, type = "error") {
+  const t = document.getElementById("ivToast");
+  t.textContent = msg; t.className = "iv-toast " + type; t.style.display = "block";
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => t.style.display = "none", 3500);
+}
+
+function escHTML(s) {
+  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function getTime() {
+  return new Date().toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit" });
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// Cleanup on leave
+window.addEventListener("beforeunload", () => {
+  clearInterval(faceInterval);
+  speechSynth.cancel();
+  faceStream?.getTracks().forEach(t => t.stop());
+});
+
+// Auto-resize textarea
+document.getElementById("answerInput").addEventListener("input", function() {
+  this.style.height = "48px";
+  this.style.height = Math.min(this.scrollHeight, 120) + "px";
+});
+</script>
+{% endblock %}

@@ -1,0 +1,1375 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════════════════
+   DESIGN SYSTEM — Dark editor + white resume
+══════════════════════════════════════════ */
+:root {
+  --bg:       #0a0a0f;
+  --panel:    #0f0f17;
+  --surface:  #14141e;
+  --rim:      rgba(255,255,255,.07);
+  --rim2:     rgba(255,255,255,.12);
+  --accent:   #5b6bff;
+  --cyan:     #00e5c8;
+  --green:    #22c55e;
+  --amber:    #ffb547;
+  --red:      #ff5757;
+  --t80:      rgba(255,255,255,.80);
+  --t55:      rgba(255,255,255,.55);
+  --t35:      rgba(255,255,255,.35);
+  --t18:      rgba(255,255,255,.18);
+  --font-d:   'Syne', sans-serif;
+  --font-b:   'DM Sans', sans-serif;
+  --font-m:   'DM Mono', monospace;
+  --ease:     cubic-bezier(.16,1,.3,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg) !important; color: #fff !important; font-family: var(--font-b); }
+
+/* Page wrapper — wraps topbar + layout together */
+.rb-page-wrap {
+  display: flex; flex-direction: column;
+  height: calc(100vh - 56px); /* subtract base.html navbar height */
+  overflow: hidden;
+}
+
+/* ── TOPBAR ── */
+.rb-topbar {
+  height: 54px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--rim);
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: sticky; top: 0; left: 0; right: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+.rb-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-d); font-size: 15px; font-weight: 700;
+  color: #fff; letter-spacing: -.3px;
+}
+.rb-logo-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--cyan); box-shadow: 0 0 10px var(--cyan);
+  animation: dotPulse 2s ease-in-out infinite;
+}
+@keyframes dotPulse { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+.rb-topbar-center {
+  display: flex; align-items: center; gap: 8px;
+}
+.rb-tab {
+  padding: 6px 16px; border-radius: 7px;
+  font-size: 12.5px; font-weight: 500; cursor: pointer;
+  color: var(--t35); border: 1px solid transparent;
+  transition: all .2s; font-family: var(--font-b);
+  background: none;
+}
+.rb-tab.active {
+  background: rgba(91,107,255,.12);
+  border-color: rgba(91,107,255,.25);
+  color: #818cf8;
+}
+.rb-tab:hover:not(.active) { color: var(--t80); background: rgba(255,255,255,.04); }
+
+.rb-topbar-right { display: flex; align-items: center; gap: 8px; }
+.rb-save-indicator {
+  font-size: 11.5px; color: var(--t35); font-family: var(--font-m);
+  display: flex; align-items: center; gap: 6px;
+}
+.rb-save-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 6px var(--green);
+}
+
+.rb-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 18px; border-radius: 8px; border: none;
+  font-family: var(--font-b); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+.rb-btn-primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(91,107,255,.35);
+}
+.rb-btn-primary:hover { background: #4a5be8; transform: translateY(-1px); box-shadow: 0 8px 28px rgba(91,107,255,.5); }
+
+.rb-btn-ghost {
+  background: rgba(255,255,255,.05);
+  border: 1px solid var(--rim2);
+  color: var(--t55);
+}
+.rb-btn-ghost:hover { background: rgba(255,255,255,.09); color: #fff; }
+
+/* ── MAIN LAYOUT ── */
+.rb-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── LEFT SIDEBAR (Section Nav) ── */
+.rb-sidebar {
+  width: 200px;
+  background: var(--panel);
+  border-right: 1px solid var(--rim);
+  display: flex; flex-direction: column;
+  overflow-y: auto; flex-shrink: 0;
+}
+.rb-sidebar::-webkit-scrollbar { width: 4px; }
+.rb-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 4px; }
+
+.rb-sidebar-head {
+  padding: 16px 16px 10px;
+  font-size: 9.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 2.5px;
+  color: var(--t18);
+}
+.rb-section-nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px;
+  font-size: 12.5px; color: var(--t35); font-weight: 400;
+  cursor: pointer; border-left: 2px solid transparent;
+  transition: all .18s;
+}
+.rb-section-nav-item:hover { color: var(--t80); background: rgba(255,255,255,.03); }
+.rb-section-nav-item.active {
+  color: #818cf8; border-left-color: var(--accent);
+  background: rgba(91,107,255,.06);
+}
+.rb-section-nav-icon { font-size: 14px; flex-shrink: 0; }
+
+.rb-sidebar-divider {
+  height: 1px; background: var(--rim); margin: 8px 0;
+}
+
+.rb-score-box {
+  margin: 10px 12px;
+  padding: 14px 16px; border-radius: 12px;
+  background: rgba(34,197,94,.07); border: 1px solid rgba(34,197,94,.18);
+}
+.rb-score-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 2px;
+  color: rgba(34,197,94,.6); font-weight: 600; margin-bottom: 8px;
+}
+.rb-score-val {
+  font-family: var(--font-d); font-size: 28px; font-weight: 800;
+  color: var(--green); letter-spacing: -1px; line-height: 1;
+}
+.rb-score-sub { font-size: 11px; color: rgba(34,197,94,.5); margin-top: 4px; }
+
+/* ── EDITOR PANEL ── */
+.rb-editor {
+  flex: 0 0 420px;
+  background: var(--surface);
+  border-right: 1px solid var(--rim);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.rb-editor-head {
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid var(--rim);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.rb-editor-title {
+  font-family: var(--font-d); font-size: 14px; font-weight: 700;
+  color: #fff; letter-spacing: -.2px;
+}
+.rb-section-badge {
+  padding: 3px 10px; border-radius: 100px;
+  font-size: 10.5px; font-weight: 600; letter-spacing: .5px;
+  background: rgba(91,107,255,.1); border: 1px solid rgba(91,107,255,.2);
+  color: #818cf8;
+}
+
+.rb-editor-body {
+  flex: 1; overflow-y: auto; padding: 20px 24px 32px;
+}
+.rb-editor-body::-webkit-scrollbar { width: 4px; }
+.rb-editor-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 4px; }
+
+/* Form section panels */
+.rb-form-section {
+  display: none;
+  animation: sectionIn .3s var(--ease) both;
+}
+.rb-form-section.active { display: block; }
+@keyframes sectionIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* Form elements */
+.rb-field-group { margin-bottom: 18px; }
+.rb-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+
+.rb-label {
+  display: block; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1.8px;
+  color: var(--t35); margin-bottom: 7px;
+}
+.rb-input, .rb-textarea {
+  width: 100%;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 9px;
+  color: rgba(255,255,255,.78);
+  font-family: var(--font-b); font-size: 13.5px;
+  padding: 10px 14px;
+  outline: none; resize: vertical;
+  transition: border-color .2s, box-shadow .2s;
+}
+.rb-input:focus, .rb-textarea:focus {
+  border-color: rgba(91,107,255,.5);
+  box-shadow: 0 0 0 3px rgba(91,107,255,.1);
+}
+.rb-input::placeholder, .rb-textarea::placeholder { color: rgba(255,255,255,.2); }
+.rb-textarea { min-height: 90px; line-height: 1.7; }
+
+/* Dynamic list items */
+.rb-dyn-list { display: flex; flex-direction: column; gap: 12px; }
+.rb-dyn-item {
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 12px; padding: 16px;
+  position: relative; transition: border-color .2s;
+}
+.rb-dyn-item:hover { border-color: rgba(255,255,255,.12); }
+.rb-dyn-remove {
+  position: absolute; top: 10px; right: 10px;
+  width: 22px; height: 22px; border-radius: 6px;
+  background: rgba(255,87,87,.1); border: 1px solid rgba(255,87,87,.2);
+  color: rgba(255,87,87,.7); font-size: 13px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.rb-dyn-remove:hover { background: rgba(255,87,87,.2); color: var(--red); }
+
+.rb-add-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 16px; border-radius: 8px; cursor: pointer; border: none;
+  background: rgba(91,107,255,.08); border: 1px solid rgba(91,107,255,.18);
+  color: #818cf8; font-family: var(--font-b); font-size: 12.5px; font-weight: 600;
+  margin-top: 10px; transition: all .2s; width: 100%; justify-content: center;
+}
+.rb-add-btn:hover { background: rgba(91,107,255,.15); }
+
+.rb-section-hint {
+  font-size: 12px; color: var(--t18); line-height: 1.7;
+  margin-bottom: 16px; font-style: italic;
+  padding: 10px 14px; background: rgba(255,255,255,.02);
+  border-radius: 8px; border-left: 2px solid rgba(91,107,255,.3);
+}
+
+/* ── PREVIEW PANEL ── */
+.rb-preview {
+  flex: 1; background: #e8e8e8;
+  display: flex; align-items: flex-start;
+  justify-content: center; overflow-y: auto;
+  padding: 40px 24px;
+}
+.rb-preview::-webkit-scrollbar { width: 6px; }
+.rb-preview::-webkit-scrollbar-thumb { background: rgba(0,0,0,.2); border-radius: 4px; }
+
+/* ── THE RESUME PAPER ── */
+.resume-paper {
+  width: 750px; min-height: 970px;
+  background: #fff; color: #000;
+  box-shadow: 0 20px 80px rgba(0,0,0,.35), 0 4px 20px rgba(0,0,0,.2);
+  padding: 46px 54px;
+  font-family: 'Computer Modern', 'Latin Modern', 'Times New Roman', serif;
+  font-size: 10.5pt; line-height: 1.45;
+  border-radius: 2px;
+  position: relative;
+  animation: paperIn .5s var(--ease) both;
+}
+@keyframes paperIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── RESUME HEADER ── */
+.r-header { text-align: center; margin-bottom: 6px; }
+.r-name {
+  font-size: 22pt; font-weight: 900;
+  color: #000; letter-spacing: .5px;
+  font-family: 'Times New Roman', serif;
+  text-transform: uppercase; margin-bottom: 3px;
+  line-height: 1.1;
+}
+.r-title {
+  font-size: 10pt; font-weight: 700;
+  color: #000; margin-bottom: 5px;
+}
+.r-contact {
+  font-size: 9.5pt; color: #333; margin-bottom: 4px;
+}
+.r-contact a { color: #1a0dab; text-decoration: underline; }
+.r-links { font-size: 9.5pt; }
+.r-links a { color: #1a0dab; text-decoration: underline; margin: 0 2px; }
+
+/* ── RESUME SECTION ── */
+.r-section { margin-top: 10px; }
+.r-section-title {
+  font-size: 11.5pt; font-weight: 900;
+  color: #000; text-transform: uppercase;
+  letter-spacing: .3px;
+  border-bottom: 1.2px solid #000;
+  padding-bottom: 2px; margin-bottom: 7px;
+  font-family: 'Times New Roman', serif;
+}
+.r-body { font-size: 10pt; color: #111; line-height: 1.5; }
+.r-body p { margin-bottom: 3px; }
+
+/* Edu items */
+.r-edu-item { margin-bottom: 7px; }
+.r-edu-head {
+  display: flex; justify-content: space-between;
+  align-items: baseline; flex-wrap: wrap;
+}
+.r-edu-degree { font-weight: 700; font-size: 10pt; }
+.r-edu-year { font-weight: 700; font-size: 10pt; }
+.r-edu-school { font-size: 9.5pt; color: #333; }
+.r-edu-grade { font-size: 9.5pt; }
+
+/* Experience/Project items */
+.r-exp-item { margin-bottom: 8px; }
+.r-exp-head {
+  display: flex; justify-content: space-between;
+  align-items: baseline; flex-wrap: wrap;
+}
+.r-exp-company { font-weight: 700; font-size: 10pt; }
+.r-exp-date { font-weight: 700; font-size: 10pt; }
+.r-exp-role { font-size: 9.5pt; font-style: italic; color: #333; margin-bottom: 2px; }
+.r-exp-tech { font-size: 9.5pt; color: #111; margin-bottom: 2px; }
+.r-exp-desc { font-size: 9.5pt; color: #222; margin-bottom: 2px; font-style: italic; }
+
+/* Bullet lists */
+.r-bullets { margin: 3px 0 3px 0; padding-left: 0; list-style: none; }
+.r-bullets li {
+  padding-left: 14px; position: relative;
+  font-size: 9.5pt; color: #111; line-height: 1.5;
+  margin-bottom: 2px;
+}
+.r-bullets li::before {
+  content: '•'; position: absolute; left: 3px; color: #000; font-size: 9pt;
+}
+
+/* Skills */
+.r-skill-line { font-size: 9.5pt; color: #111; margin-bottom: 3px; }
+.r-skill-line strong { color: #000; }
+
+/* Honors / Certs */
+.r-list { margin: 3px 0; padding-left: 0; list-style: none; }
+.r-list li {
+  padding-left: 14px; position: relative;
+  font-size: 9.5pt; color: #111; line-height: 1.55;
+  margin-bottom: 2px;
+}
+.r-list li::before { content: '•'; position: absolute; left: 3px; color: #000; }
+.r-list a { color: #1a0dab; }
+
+/* ── EDITOR BOTTOM BAR ── */
+.rb-editor-foot {
+  padding: 14px 20px;
+  border-top: 1px solid var(--rim);
+  background: var(--panel);
+  flex-shrink: 0;
+  display: flex; gap: 10px; align-items: center;
+}
+.rb-editor-foot .rb-btn {
+  flex: 1; justify-content: center;
+  font-size: 13px; padding: 10px 12px;
+  border-radius: 9px;
+}
+.rb-toast {
+  position: fixed; bottom: 30px; right: 30px;
+  padding: 12px 20px; border-radius: 11px; z-index: 9999;
+  font-size: 13px; font-weight: 500;
+  background: #1a1a2e; border: 1px solid rgba(255,255,255,.12);
+  color: #fff; box-shadow: 0 8px 30px rgba(0,0,0,.5);
+  transform: translateY(80px); opacity: 0;
+  transition: all .35s var(--ease);
+  display: flex; align-items: center; gap: 9px;
+}
+.rb-toast.show { transform: translateY(0); opacity: 1; }
+
+/* ── PROGRESS BAR (generation) ── */
+.rb-progress-bar {
+  position: fixed; top: 54px; left: 0; right: 0; height: 2px; z-index: 200;
+  background: linear-gradient(90deg, var(--accent), var(--cyan));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .4s var(--ease);
+}
+.rb-progress-bar.active { transform: scaleX(.7); }
+.rb-progress-bar.done { transform: scaleX(1); }
+</style>
+
+<!-- ── PROGRESS BAR ── -->
+<div class="rb-progress-bar" id="progressBar"></div>
+
+<div class="rb-page-wrap">
+
+<!-- ══════════════════════════════════════════
+     TOPBAR
+══════════════════════════════════════════ -->
+<div class="rb-topbar">
+  <div class="rb-logo">
+    <div class="rb-logo-dot"></div>
+    PathPilot Resume Builder
+  </div>
+
+  <div class="rb-topbar-center">
+    <button class="rb-tab active" onclick="switchView('split', this)">⬜ Split View</button>
+    <button class="rb-tab" onclick="switchView('editor', this)">✏️ Editor</button>
+    <button class="rb-tab" onclick="switchView('preview', this)">👁 Preview</button>
+  </div>
+
+  <div class="rb-topbar-right">
+    <div class="rb-save-indicator">
+      <div class="rb-save-dot"></div>
+      <span id="saveStatus">Auto-saved</span>
+    </div>
+    <button class="rb-btn rb-btn-ghost" onclick="loadSampleData()">📋 Load Sample</button>
+    <button class="rb-btn rb-btn-primary" onclick="generateResume()">⬇ Download PDF</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MAIN LAYOUT
+══════════════════════════════════════════ -->
+<div class="rb-layout" id="rbLayout">
+
+  <!-- ── SECTION SIDEBAR ── -->
+  <div class="rb-sidebar" id="rbSidebar">
+    <div class="rb-sidebar-head">Sections</div>
+
+    <div class="rb-section-nav-item active" data-sec="personal" onclick="showSection('personal', this)">
+      <span class="rb-section-nav-icon">👤</span> Personal Info
+    </div>
+    <div class="rb-section-nav-item" data-sec="summary" onclick="showSection('summary', this)">
+      <span class="rb-section-nav-icon">📝</span> Summary
+    </div>
+    <div class="rb-section-nav-item" data-sec="education" onclick="showSection('education', this)">
+      <span class="rb-section-nav-icon">🎓</span> Education
+    </div>
+    <div class="rb-section-nav-item" data-sec="internship" onclick="showSection('internship', this)">
+      <span class="rb-section-nav-icon">💼</span> Internship
+    </div>
+    <div class="rb-section-nav-item" data-sec="projects" onclick="showSection('projects', this)">
+      <span class="rb-section-nav-icon">🚀</span> Projects
+    </div>
+    <div class="rb-section-nav-item" data-sec="skills" onclick="showSection('skills', this)">
+      <span class="rb-section-nav-icon">⚡</span> Skills
+    </div>
+    <div class="rb-section-nav-item" data-sec="honors" onclick="showSection('honors', this)">
+      <span class="rb-section-nav-icon">🏆</span> Honors
+    </div>
+    <div class="rb-section-nav-item" data-sec="certifications" onclick="showSection('certifications', this)">
+      <span class="rb-section-nav-icon">📜</span> Certifications
+    </div>
+
+    <div class="rb-sidebar-divider"></div>
+
+    <div class="rb-score-box">
+      <div class="rb-score-label">Resume Score</div>
+      <div class="rb-score-val" id="scoreVal">0%</div>
+      <div class="rb-score-sub" id="scoreMsg">Fill sections to score</div>
+    </div>
+  </div>
+
+  <!-- ── EDITOR ── -->
+  <div class="rb-editor" id="rbEditor">
+    <div class="rb-editor-head">
+      <div class="rb-editor-title" id="editorTitle">Personal Information</div>
+      <div class="rb-section-badge" id="editorBadge">1 / 8</div>
+    </div>
+
+    <div class="rb-editor-body">
+
+      <!-- ── PERSONAL ── -->
+      <div class="rb-form-section active" id="sec-personal">
+        <div class="rb-field-row">
+          <div>
+            <label class="rb-label">Full Name *</label>
+            <input class="rb-input" id="f-name" placeholder="e.g. TUSHAR" oninput="liveUpdate()">
+          </div>
+          <div>
+            <label class="rb-label">Professional Title *</label>
+            <input class="rb-input" id="f-title" placeholder="e.g. Aspiring Data Scientist" oninput="liveUpdate()">
+          </div>
+        </div>
+        <div class="rb-field-row">
+          <div>
+            <label class="rb-label">Email *</label>
+            <input class="rb-input" id="f-email" placeholder="your@email.com" oninput="liveUpdate()">
+          </div>
+          <div>
+            <label class="rb-label">Phone *</label>
+            <input class="rb-input" id="f-phone" placeholder="+91-XXXXXXXXXX" oninput="liveUpdate()">
+          </div>
+        </div>
+        <div class="rb-field-group">
+          <label class="rb-label">Location *</label>
+          <input class="rb-input" id="f-location" placeholder="e.g. Mohali, Punjab, India" oninput="liveUpdate()">
+        </div>
+        <div class="rb-field-row">
+          <div>
+            <label class="rb-label">LinkedIn URL</label>
+            <input class="rb-input" id="f-linkedin" placeholder="linkedin.com/in/..." oninput="liveUpdate()">
+          </div>
+          <div>
+            <label class="rb-label">GitHub URL</label>
+            <input class="rb-input" id="f-github" placeholder="github.com/..." oninput="liveUpdate()">
+          </div>
+        </div>
+        <div class="rb-field-row">
+          <div>
+            <label class="rb-label">Portfolio URL</label>
+            <input class="rb-input" id="f-portfolio" placeholder="yoursite.com" oninput="liveUpdate()">
+          </div>
+          <div>
+            <label class="rb-label">HackerRank URL</label>
+            <input class="rb-input" id="f-hackerrank" placeholder="hackerrank.com/..." oninput="liveUpdate()">
+          </div>
+        </div>
+        <div class="rb-field-group">
+          <label class="rb-label">LeetCode URL</label>
+          <input class="rb-input" id="f-leetcode" placeholder="leetcode.com/u/..." oninput="liveUpdate()">
+        </div>
+      </div>
+
+      <!-- ── SUMMARY ── -->
+      <div class="rb-form-section" id="sec-summary">
+        <div class="rb-section-hint">Write 3–5 sentences about your background, key skills, and career goals. Be specific and quantified where possible.</div>
+        <div class="rb-field-group">
+          <label class="rb-label">Profile Summary *</label>
+          <textarea class="rb-textarea" id="f-summary" rows="8" placeholder="Aspiring Data Scientist and Applied Machine Learning Engineer with hands-on experience in building end-to-end data science pipelines..." oninput="liveUpdate()" style="min-height:140px"></textarea>
+        </div>
+      </div>
+
+      <!-- ── EDUCATION ── -->
+      <div class="rb-form-section" id="sec-education">
+        <div class="rb-section-hint">Add your degrees from most recent to oldest.</div>
+        <div class="rb-dyn-list" id="edu-list"></div>
+        <button class="rb-add-btn" onclick="addEdu()">+ Add Education</button>
+      </div>
+
+      <!-- ── INTERNSHIP ── -->
+      <div class="rb-form-section" id="sec-internship">
+        <div class="rb-section-hint">Add internships and work experience. Include quantified achievements where possible.</div>
+        <div class="rb-dyn-list" id="intern-list"></div>
+        <button class="rb-add-btn" onclick="addIntern()">+ Add Internship / Experience</button>
+      </div>
+
+      <!-- ── PROJECTS ── -->
+      <div class="rb-form-section" id="sec-projects">
+        <div class="rb-section-hint">List your best 3–5 projects. Include GitHub links and the technologies used.</div>
+        <div class="rb-dyn-list" id="proj-list"></div>
+        <button class="rb-add-btn" onclick="addProject()">+ Add Project</button>
+      </div>
+
+      <!-- ── SKILLS ── -->
+      <div class="rb-form-section" id="sec-skills">
+        <div class="rb-section-hint">Group your skills by category. Each field becomes one line on the resume.</div>
+        <div class="rb-field-group">
+          <label class="rb-label">Programming Languages</label>
+          <input class="rb-input" id="f-skill-langs" placeholder="Python, SQL, HTML, CSS" oninput="liveUpdate()">
+        </div>
+        <div class="rb-field-group">
+          <label class="rb-label">Libraries & Frameworks</label>
+          <input class="rb-input" id="f-skill-libs" placeholder="Pandas, NumPy, Scikit-learn, TensorFlow, Flask" oninput="liveUpdate()">
+        </div>
+        <div class="rb-field-group">
+          <label class="rb-label">Databases</label>
+          <input class="rb-input" id="f-skill-dbs" placeholder="MySQL, Oracle, SQLite" oninput="liveUpdate()">
+        </div>
+        <div class="rb-field-group">
+          <label class="rb-label">Tools & Platforms</label>
+          <input class="rb-input" id="f-skill-tools" placeholder="Git, GitHub, VS Code, Jupyter Notebook" oninput="liveUpdate()">
+        </div>
+      </div>
+
+      <!-- ── HONORS ── -->
+      <div class="rb-form-section" id="sec-honors">
+        <div class="rb-section-hint">Add achievements, rankings, hackathon results, and awards. One per entry.</div>
+        <div class="rb-dyn-list" id="honor-list"></div>
+        <button class="rb-add-btn" onclick="addHonor()">+ Add Honor / Achievement</button>
+      </div>
+
+      <!-- ── CERTIFICATIONS ── -->
+      <div class="rb-form-section" id="sec-certifications">
+        <div class="rb-section-hint">Add certifications with their issuing organization and verification link.</div>
+        <div class="rb-dyn-list" id="cert-list"></div>
+        <button class="rb-add-btn" onclick="addCert()">+ Add Certification</button>
+      </div>
+
+    </div><!-- /editor-body -->
+
+    <!-- ── EDITOR BOTTOM ACTION BAR ── -->
+    <div class="rb-editor-foot">
+      <button class="rb-btn rb-btn-ghost" onclick="loadSampleData()">📋 Load Sample</button>
+      <button class="rb-btn rb-btn-primary" onclick="generateResume()">⬇ Download PDF</button>
+    </div>
+
+  </div><!-- /editor -->
+
+  <!-- ── PREVIEW ── -->
+  <div class="rb-preview" id="rbPreview">
+    <div class="resume-paper" id="resumePaper">
+
+      <!-- HEADER -->
+      <div class="r-header">
+        <div class="r-name" id="p-name">YOUR NAME</div>
+        <div class="r-title" id="p-title">Professional Title</div>
+        <div class="r-contact">
+          <span id="p-location">Location</span> |
+          <a id="p-email-link" href="#">email@example.com</a> |
+          <span id="p-phone">Phone</span>
+        </div>
+        <div class="r-links" id="p-links">
+          <a id="p-linkedin" href="#">LinkedIn</a> |
+          <a id="p-github" href="#">GitHub</a> |
+          <a id="p-portfolio" href="#">Portfolio</a> |
+          <a id="p-hackerrank" href="#">HackerRank</a> |
+          <a id="p-leetcode" href="#">LeetCode</a>
+        </div>
+      </div>
+
+      <!-- SUMMARY -->
+      <div class="r-section" id="ps-summary" style="display:none">
+        <div class="r-section-title">Profile Summary</div>
+        <div class="r-body"><p id="p-summary"></p></div>
+      </div>
+
+      <!-- EDUCATION -->
+      <div class="r-section" id="ps-education" style="display:none">
+        <div class="r-section-title">Education</div>
+        <div id="p-education-list" class="r-body"></div>
+      </div>
+
+      <!-- INTERNSHIP -->
+      <div class="r-section" id="ps-internship" style="display:none">
+        <div class="r-section-title">Internship</div>
+        <div id="p-internship-list" class="r-body"></div>
+      </div>
+
+      <!-- PROJECTS -->
+      <div class="r-section" id="ps-projects" style="display:none">
+        <div class="r-section-title">Projects</div>
+        <div id="p-projects-list" class="r-body"></div>
+      </div>
+
+      <!-- SKILLS -->
+      <div class="r-section" id="ps-skills" style="display:none">
+        <div class="r-section-title">Technical Skills</div>
+        <div class="r-body" id="p-skills-body"></div>
+      </div>
+
+      <!-- HONORS -->
+      <div class="r-section" id="ps-honors" style="display:none">
+        <div class="r-section-title">Honors &amp; Achievements</div>
+        <ul class="r-list" id="p-honors-list"></ul>
+      </div>
+
+      <!-- CERTIFICATIONS -->
+      <div class="r-section" id="ps-certifications" style="display:none">
+        <div class="r-section-title">Certifications</div>
+        <ul class="r-list" id="p-cert-list"></ul>
+      </div>
+
+    </div><!-- /resume-paper -->
+
+  </div><!-- /preview -->
+
+</div><!-- /layout -->
+
+<!-- Toast -->
+<div class="rb-toast" id="rbToast">✅ <span id="toastMsg">Saved</span></div>
+
+</div><!-- /rb-page-wrap -->
+
+<script>
+/* ════════════════════════════════════════
+   STATE
+════════════════════════════════════════ */
+let eduItems   = [];
+let internItems= [];
+let projItems  = [];
+let honorItems = [];
+let certItems  = [];
+
+/* ════════════════════════════════════════
+   SECTION NAV
+════════════════════════════════════════ */
+const sectionMeta = {
+  personal:       { title: 'Personal Information', badge: '1 / 8' },
+  summary:        { title: 'Profile Summary',      badge: '2 / 8' },
+  education:      { title: 'Education',            badge: '3 / 8' },
+  internship:     { title: 'Internship & Experience', badge: '4 / 8' },
+  projects:       { title: 'Projects',             badge: '5 / 8' },
+  skills:         { title: 'Technical Skills',     badge: '6 / 8' },
+  honors:         { title: 'Honors & Achievements', badge: '7 / 8' },
+  certifications: { title: 'Certifications',       badge: '8 / 8' },
+};
+
+function showSection(sec, el) {
+  document.querySelectorAll('.rb-form-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.rb-section-nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + sec).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('editorTitle').textContent  = sectionMeta[sec].title;
+  document.getElementById('editorBadge').textContent  = sectionMeta[sec].badge;
+}
+
+/* ════════════════════════════════════════
+   VIEW SWITCHING
+════════════════════════════════════════ */
+function switchView(mode, btn) {
+  const sidebar = document.getElementById('rbSidebar');
+  const editor  = document.getElementById('rbEditor');
+  const preview = document.getElementById('rbPreview');
+  document.querySelectorAll('.rb-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (mode === 'split') {
+    sidebar.style.display = ''; editor.style.display = ''; preview.style.display = '';
+    editor.style.flex = ''; preview.style.flex = '';
+  } else if (mode === 'editor') {
+    sidebar.style.display = ''; editor.style.display = ''; preview.style.display = 'none';
+    editor.style.flex = '1';
+  } else {
+    sidebar.style.display = 'none'; editor.style.display = 'none'; preview.style.display = 'flex';
+    preview.style.flex = '1';
+  }
+}
+
+/* ════════════════════════════════════════
+   EDUCATION ITEMS
+════════════════════════════════════════ */
+function addEdu(data={}) {
+  const id = 'edu-' + Date.now();
+  eduItems.push(id);
+  const el = document.createElement('div');
+  el.className = 'rb-dyn-item'; el.id = id;
+  el.innerHTML = `
+    <button class="rb-dyn-remove" onclick="removeItem('${id}', eduItems)">✕</button>
+    <div class="rb-field-group" style="margin-top:4px">
+      <label class="rb-label">Degree / Qualification *</label>
+      <input class="rb-input" id="${id}-degree" placeholder="Bachelor of Technology (Computer Science)" value="${data.degree||''}" oninput="liveUpdate()">
+    </div>
+    <div class="rb-field-row">
+      <div>
+        <label class="rb-label">Institution</label>
+        <input class="rb-input" id="${id}-school" placeholder="CGC University, Mohali" value="${data.school||''}" oninput="liveUpdate()">
+      </div>
+      <div>
+        <label class="rb-label">Year (e.g. 2023–2027)</label>
+        <input class="rb-input" id="${id}-year" placeholder="2023–2027" value="${data.year||''}" oninput="liveUpdate()">
+      </div>
+    </div>
+    <div class="rb-field-group">
+      <label class="rb-label">Grade / CGPA / Percentage</label>
+      <input class="rb-input" id="${id}-grade" placeholder="CGPA: 7.9 or Percentage: 80%" value="${data.grade||''}" oninput="liveUpdate()">
+    </div>`;
+  document.getElementById('edu-list').appendChild(el);
+}
+
+/* ════════════════════════════════════════
+   INTERNSHIP ITEMS
+════════════════════════════════════════ */
+function addIntern(data={}) {
+  const id = 'intern-' + Date.now();
+  internItems.push(id);
+  const el = document.createElement('div');
+  el.className = 'rb-dyn-item'; el.id = id;
+  el.innerHTML = `
+    <button class="rb-dyn-remove" onclick="removeItem('${id}', internItems)">✕</button>
+    <div class="rb-field-row" style="margin-top:4px">
+      <div>
+        <label class="rb-label">Company *</label>
+        <input class="rb-input" id="${id}-company" placeholder="CodexIntern" value="${data.company||''}" oninput="liveUpdate()">
+      </div>
+      <div>
+        <label class="rb-label">Role *</label>
+        <input class="rb-input" id="${id}-role" placeholder="Python Developer (Remote)" value="${data.role||''}" oninput="liveUpdate()">
+      </div>
+    </div>
+    <div class="rb-field-row">
+      <div>
+        <label class="rb-label">Duration</label>
+        <input class="rb-input" id="${id}-date" placeholder="Sep 2025 – Oct 2025" value="${data.date||''}" oninput="liveUpdate()">
+      </div>
+      <div>
+        <label class="rb-label">Short Description</label>
+        <input class="rb-input" id="${id}-desc" placeholder="One-line summary..." value="${data.desc||''}" oninput="liveUpdate()">
+      </div>
+    </div>
+    <div class="rb-field-group">
+      <label class="rb-label">Key Points (one per line)</label>
+      <textarea class="rb-textarea" id="${id}-bullets" placeholder="Developed project-based applications using Python&#10;Applied clean coding practices to improve performance&#10;Collaborated on debugging and testing" oninput="liveUpdate()">${data.bullets||''}</textarea>
+    </div>`;
+  document.getElementById('intern-list').appendChild(el);
+}
+
+/* ════════════════════════════════════════
+   PROJECT ITEMS
+════════════════════════════════════════ */
+function addProject(data={}) {
+  const id = 'proj-' + Date.now();
+  projItems.push(id);
+  const el = document.createElement('div');
+  el.className = 'rb-dyn-item'; el.id = id;
+  el.innerHTML = `
+    <button class="rb-dyn-remove" onclick="removeItem('${id}', projItems)">✕</button>
+    <div class="rb-field-row" style="margin-top:4px">
+      <div>
+        <label class="rb-label">Project Name *</label>
+        <input class="rb-input" id="${id}-name" placeholder="AI Skill Gap Analyzer" value="${data.name||''}" oninput="liveUpdate()">
+      </div>
+      <div>
+        <label class="rb-label">GitHub Link</label>
+        <input class="rb-input" id="${id}-github" placeholder="github.com/..." value="${data.github||''}" oninput="liveUpdate()">
+      </div>
+    </div>
+    <div class="rb-field-group">
+      <label class="rb-label">Technologies Used</label>
+      <input class="rb-input" id="${id}-tech" placeholder="Python, Flask, Scikit-learn, Pandas, MySQL" value="${data.tech||''}" oninput="liveUpdate()">
+    </div>
+    <div class="rb-field-group">
+      <label class="rb-label">Short Description</label>
+      <input class="rb-input" id="${id}-desc" placeholder="One-line about the project..." value="${data.desc||''}" oninput="liveUpdate()">
+    </div>
+    <div class="rb-field-group">
+      <label class="rb-label">Key Points (one per line)</label>
+      <textarea class="rb-textarea" id="${id}-bullets" placeholder="Built an end-to-end system to automatically parse resumes&#10;Designed a skill matching pipeline to identify missing skills&#10;Implemented role-fit scoring and personalized roadmap generation" oninput="liveUpdate()">${data.bullets||''}</textarea>
+    </div>`;
+  document.getElementById('proj-list').appendChild(el);
+}
+
+/* ════════════════════════════════════════
+   HONOR ITEMS
+════════════════════════════════════════ */
+function addHonor(data={}) {
+  const id = 'honor-' + Date.now();
+  honorItems.push(id);
+  const el = document.createElement('div');
+  el.className = 'rb-dyn-item'; el.id = id;
+  el.innerHTML = `
+    <button class="rb-dyn-remove" onclick="removeItem('${id}', honorItems)">✕</button>
+    <div class="rb-field-group" style="margin-top:4px">
+      <label class="rb-label">Achievement *</label>
+      <input class="rb-input" id="${id}-text" placeholder="Solved 300+ coding problems on LeetCode" value="${data.text||''}" oninput="liveUpdate()">
+    </div>`;
+  document.getElementById('honor-list').appendChild(el);
+}
+
+/* ════════════════════════════════════════
+   CERT ITEMS
+════════════════════════════════════════ */
+function addCert(data={}) {
+  const id = 'cert-' + Date.now();
+  certItems.push(id);
+  const el = document.createElement('div');
+  el.className = 'rb-dyn-item'; el.id = id;
+  el.innerHTML = `
+    <button class="rb-dyn-remove" onclick="removeItem('${id}', certItems)">✕</button>
+    <div class="rb-field-row" style="margin-top:4px">
+      <div>
+        <label class="rb-label">Certificate Name *</label>
+        <input class="rb-input" id="${id}-name" placeholder="The Ultimate Data Science Course" value="${data.name||''}" oninput="liveUpdate()">
+      </div>
+      <div>
+        <label class="rb-label">Issuer</label>
+        <input class="rb-input" id="${id}-issuer" placeholder="Udemy / HackerRank / Microsoft" value="${data.issuer||''}" oninput="liveUpdate()">
+      </div>
+    </div>
+    <div class="rb-field-group">
+      <label class="rb-label">Verification URL (optional)</label>
+      <input class="rb-input" id="${id}-url" placeholder="https://..." value="${data.url||''}" oninput="liveUpdate()">
+    </div>`;
+  document.getElementById('cert-list').appendChild(el);
+}
+
+/* ════════════════════════════════════════
+   REMOVE ITEM
+════════════════════════════════════════ */
+function removeItem(id, arr) {
+  const idx = arr.indexOf(id);
+  if (idx > -1) arr.splice(idx, 1);
+  document.getElementById(id).remove();
+  liveUpdate();
+}
+
+/* ════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════ */
+function val(id) {
+  const el = document.getElementById(id);
+  return el ? (el.value || '').trim() : '';
+}
+function esc(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function link(url, text) {
+  if (!url) return '';
+  const href = url.startsWith('http') ? url : 'https://' + url;
+  return `<a href="${esc(href)}" target="_blank">${esc(text)}</a>`;
+}
+function bullets(text) {
+  if (!text.trim()) return '';
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  return '<ul class="r-bullets">' + lines.map(l => `<li><strong>${esc(l.replace(/^\*+\s*/,'').replace(/^- /,'').replace(/^\. /,''))}</strong></li>`).join('') + '</ul>';
+}
+
+/* ════════════════════════════════════════
+   LIVE UPDATE — renders preview
+════════════════════════════════════════ */
+function liveUpdate() {
+  /* ── HEADER ── */
+  document.getElementById('p-name').textContent      = val('f-name')     || 'YOUR NAME';
+  document.getElementById('p-title').textContent     = val('f-title')    || 'Professional Title';
+  document.getElementById('p-phone').textContent     = val('f-phone')    || 'Phone';
+  document.getElementById('p-location').textContent  = val('f-location') || 'Location';
+
+  const emailEl = document.getElementById('p-email-link');
+  emailEl.textContent = val('f-email') || 'email@example.com';
+  emailEl.href = val('f-email') ? 'mailto:' + val('f-email') : '#';
+
+  /* Links row */
+  const links = [];
+  if (val('f-linkedin'))   links.push(link(val('f-linkedin'),   'LinkedIn'));
+  if (val('f-github'))     links.push(link(val('f-github'),     'GitHub'));
+  if (val('f-portfolio'))  links.push(link(val('f-portfolio'),  'Portfolio'));
+  if (val('f-hackerrank')) links.push(link(val('f-hackerrank'), 'HackerRank'));
+  if (val('f-leetcode'))   links.push(link(val('f-leetcode'),   'LeetCode'));
+  document.getElementById('p-links').innerHTML = links.join(' | ') || '';
+
+  /* ── SUMMARY ── */
+  const sumEl = document.getElementById('ps-summary');
+  const sumTxt = val('f-summary');
+  if (sumTxt) { document.getElementById('p-summary').textContent = sumTxt; sumEl.style.display=''; }
+  else sumEl.style.display='none';
+
+  /* ── EDUCATION ── */
+  let eduHtml = '';
+  for (const id of eduItems) {
+    const degree = esc(val(id+'-degree'));
+    const school = esc(val(id+'-school'));
+    const year   = esc(val(id+'-year'));
+    const grade  = esc(val(id+'-grade'));
+    if (!degree) continue;
+    eduHtml += `<div class="r-edu-item">
+      <div class="r-edu-head">
+        <span class="r-edu-degree">${degree}</span>
+        ${year ? `<span class="r-edu-year">${year}</span>` : ''}
+      </div>
+      ${school ? `<div class="r-edu-school">${school}</div>` : ''}
+      ${grade  ? `<div class="r-edu-grade">${grade}</div>` : ''}
+    </div>`;
+  }
+  const eduSec = document.getElementById('ps-education');
+  document.getElementById('p-education-list').innerHTML = eduHtml;
+  eduSec.style.display = eduHtml ? '' : 'none';
+
+  /* ── INTERNSHIP ── */
+  let internHtml = '';
+  for (const id of internItems) {
+    const company = esc(val(id+'-company'));
+    const role    = esc(val(id+'-role'));
+    const date    = esc(val(id+'-date'));
+    const desc    = esc(val(id+'-desc'));
+    const buls    = val(id+'-bullets');
+    if (!company) continue;
+    internHtml += `<div class="r-exp-item">
+      <div class="r-exp-head">
+        <span class="r-exp-company">${company}${role ? ` — ${role}` : ''}</span>
+        ${date ? `<span class="r-exp-date">${date}</span>` : ''}
+      </div>
+      ${desc ? `<div class="r-exp-desc">${desc}</div>` : ''}
+      ${bullets(buls)}
+    </div>`;
+  }
+  const internSec = document.getElementById('ps-internship');
+  document.getElementById('p-internship-list').innerHTML = internHtml;
+  internSec.style.display = internHtml ? '' : 'none';
+
+  /* ── PROJECTS ── */
+  let projHtml = '';
+  for (const id of projItems) {
+    const name   = esc(val(id+'-name'));
+    const gh     = val(id+'-github');
+    const tech   = esc(val(id+'-tech'));
+    const desc   = esc(val(id+'-desc'));
+    const buls   = val(id+'-bullets');
+    if (!name) continue;
+    projHtml += `<div class="r-exp-item">
+      <div class="r-exp-head">
+        <span class="r-exp-company">${name}</span>
+        ${gh ? `<span>${link(gh,'GitHub')}</span>` : ''}
+      </div>
+      ${tech ? `<div class="r-exp-tech"><strong>Technologies:</strong> ${tech}</div>` : ''}
+      ${desc ? `<div class="r-exp-desc">${desc}</div>` : ''}
+      ${bullets(buls)}
+    </div>`;
+  }
+  const projSec = document.getElementById('ps-projects');
+  document.getElementById('p-projects-list').innerHTML = projHtml;
+  projSec.style.display = projHtml ? '' : 'none';
+
+  /* ── SKILLS ── */
+  let skillsHtml = '';
+  const langs = val('f-skill-langs');
+  const libs   = val('f-skill-libs');
+  const dbs    = val('f-skill-dbs');
+  const tools  = val('f-skill-tools');
+  if (langs) skillsHtml += `<div class="r-skill-line"><strong>Programming Languages:</strong> ${esc(langs)}</div>`;
+  if (libs)  skillsHtml += `<div class="r-skill-line"><strong>Libraries &amp; Frameworks:</strong> ${esc(libs)}</div>`;
+  if (dbs)   skillsHtml += `<div class="r-skill-line"><strong>Databases:</strong> ${esc(dbs)}</div>`;
+  if (tools) skillsHtml += `<div class="r-skill-line"><strong>Tools &amp; Platforms:</strong> ${esc(tools)}</div>`;
+  const skillsSec = document.getElementById('ps-skills');
+  document.getElementById('p-skills-body').innerHTML = skillsHtml;
+  skillsSec.style.display = skillsHtml ? '' : 'none';
+
+  /* ── HONORS ── */
+  let honorsHtml = '';
+  for (const id of honorItems) {
+    const text = val(id+'-text');
+    if (text) honorsHtml += `<li>${esc(text)}</li>`;
+  }
+  const honorsSec = document.getElementById('ps-honors');
+  document.getElementById('p-honors-list').innerHTML = honorsHtml;
+  honorsSec.style.display = honorsHtml ? '' : 'none';
+
+  /* ── CERTS ── */
+  let certHtml = '';
+  for (const id of certItems) {
+    const name   = val(id+'-name');
+    const issuer = val(id+'-issuer');
+    const url    = val(id+'-url');
+    if (!name) continue;
+    certHtml += `<li>${esc(name)}${issuer ? ` — ${url ? link(url, issuer) : esc(issuer)}` : ''}</li>`;
+  }
+  const certSec = document.getElementById('ps-certifications');
+  document.getElementById('p-cert-list').innerHTML = certHtml;
+  certSec.style.display = certHtml ? '' : 'none';
+
+  /* Score update */
+  updateScore();
+  markSaved();
+}
+
+/* ════════════════════════════════════════
+   SCORE
+════════════════════════════════════════ */
+function updateScore() {
+  let score = 0;
+  if (val('f-name'))           score += 10;
+  if (val('f-title'))          score += 5;
+  if (val('f-email'))          score += 5;
+  if (val('f-phone'))          score += 5;
+  if (val('f-location'))       score += 5;
+  if (val('f-linkedin'))       score += 5;
+  if (val('f-github'))         score += 5;
+  if (val('f-summary'))        score += 10;
+  if (eduItems.length > 0)     score += 10;
+  if (internItems.length > 0)  score += 10;
+  if (projItems.length > 0)    score += 10;
+  if (val('f-skill-langs'))    score += 5;
+  if (val('f-skill-libs'))     score += 5;
+  if (honorItems.length > 0)   score += 5;
+  if (certItems.length > 0)    score += 5;
+
+  document.getElementById('scoreVal').textContent = score + '%';
+  let msg = 'Keep filling sections';
+  if (score >= 90) msg = 'Excellent resume!';
+  else if (score >= 70) msg = 'Looking great!';
+  else if (score >= 50) msg = 'Good progress';
+  else if (score >= 30) msg = 'Keep filling sections';
+  document.getElementById('scoreMsg').textContent = msg;
+
+  /* Color */
+  const box = document.querySelector('.rb-score-box');
+  const sv  = document.getElementById('scoreVal');
+  const ss  = document.getElementById('scoreMsg');
+  if (score >= 80) {
+    box.style.background = 'rgba(34,197,94,.07)'; box.style.borderColor='rgba(34,197,94,.18)';
+    sv.style.color='#22c55e'; ss.style.color='rgba(34,197,94,.5)';
+  } else if (score >= 50) {
+    box.style.background = 'rgba(255,181,71,.07)'; box.style.borderColor='rgba(255,181,71,.18)';
+    sv.style.color='#ffb547'; ss.style.color='rgba(255,181,71,.5)';
+  } else {
+    box.style.background = 'rgba(91,107,255,.07)'; box.style.borderColor='rgba(91,107,255,.18)';
+    sv.style.color='#818cf8'; ss.style.color='rgba(91,107,255,.5)';
+  }
+}
+
+/* ════════════════════════════════════════
+   SAVE INDICATOR
+════════════════════════════════════════ */
+let saveTimer;
+function markSaved() {
+  document.getElementById('saveStatus').textContent = 'Saving…';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    document.getElementById('saveStatus').textContent = 'Auto-saved';
+    saveToStorage();
+  }, 700);
+}
+
+function saveToStorage() {
+  try {
+    const d = collectData();
+    localStorage.setItem('pp_resume', JSON.stringify({
+      data: d,
+      eduItems, internItems, projItems, honorItems, certItems
+    }));
+  } catch(e) {}
+}
+
+/* ════════════════════════════════════════
+   TOAST
+════════════════════════════════════════ */
+function showToast(msg, type='success') {
+  const t = document.getElementById('rbToast');
+  const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '⏳';
+  t.innerHTML = `${icon} <span>${msg}</span>`;
+  t.style.borderColor = type === 'error' ? 'rgba(255,87,87,.3)' : type === 'success' ? 'rgba(34,197,94,.3)' : 'rgba(255,255,255,.12)';
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), type === 'error' ? 5000 : 3000);
+}
+
+/* ════════════════════════════════════════
+   COLLECT DATA
+════════════════════════════════════════ */
+function collectData() {
+  /* Education - raw text for LaTeX */
+  let eduLatex = '\\begin{itemize}[leftmargin=0pt, itemsep=6pt, topsep=4pt]\n';
+  for (const id of eduItems) {
+    const degree = val(id+'-degree');
+    const school = val(id+'-school');
+    const year   = val(id+'-year');
+    const grade  = val(id+'-grade');
+    if (!degree) continue;
+    eduLatex += `\\item \\textbf{${degree}}\\hfill \\textbf{${year}}\\\\\n`;
+    if (school) eduLatex += `${school}\\\\\n`;
+    if (grade)  eduLatex += `${grade}\n`;
+  }
+  eduLatex += '\\end{itemize}';
+
+  /* Internship */
+  let internLatex = '';
+  for (const id of internItems) {
+    const company = val(id+'-company');
+    const role    = val(id+'-role');
+    const date    = val(id+'-date');
+    const desc    = val(id+'-desc');
+    const buls    = val(id+'-bullets');
+    if (!company) continue;
+    internLatex += `\\noindent\\textbf{${company} -- ${role}}\\hfill\\textbf{${date}}\\\\\n`;
+    if (desc) internLatex += `\\textit{${desc}}\n`;
+    if (buls) {
+      internLatex += '\\begin{itemize}[leftmargin=0pt, itemsep=2pt, topsep=2pt]\n';
+      buls.split('\n').filter(Boolean).forEach(b => {
+        internLatex += `\\item \\textbf{${b.replace(/^\*+\s*/,'').replace(/^- /,'')}}\n`;
+      });
+      internLatex += '\\end{itemize}\n\\vspace{-4pt}\n';
+    }
+  }
+
+  /* Projects */
+  let projLatex = '';
+  for (const id of projItems) {
+    const name   = val(id+'-name');
+    const gh     = val(id+'-github');
+    const tech   = val(id+'-tech');
+    const desc   = val(id+'-desc');
+    const buls   = val(id+'-bullets');
+    if (!name) continue;
+    projLatex += `\\noindent\\textbf{${name}}\\hfill\\href{${gh}}{\\textbf{GitHub}}\\\\\n`;
+    if (tech) projLatex += `\\textbf{Technologies:} ${tech}\n\n`;
+    if (desc) projLatex += `${desc}\n`;
+    if (buls) {
+      projLatex += '\\vspace{-4pt}\n\\begin{itemize}[leftmargin=0pt, itemsep=2pt, topsep=2pt]\n';
+      buls.split('\n').filter(Boolean).forEach(b => {
+        projLatex += `\\item ${b.replace(/^\*+\s*/,'').replace(/^- /,'')}\n`;
+      });
+      projLatex += '\\end{itemize}\n\\vspace{-4pt}\n';
+    }
+  }
+
+  /* Skills */
+  let skillsLatex = '';
+  if (val('f-skill-langs')) skillsLatex += `\\textbf{Programming Languages:} ${val('f-skill-langs')}\\\\\n`;
+  if (val('f-skill-libs'))  skillsLatex += `\\textbf{Libraries \\& Frameworks:} ${val('f-skill-libs')}\\\\\n`;
+  if (val('f-skill-dbs'))   skillsLatex += `\\textbf{Databases:} ${val('f-skill-dbs')}\\\\\n`;
+  if (val('f-skill-tools')) skillsLatex += `\\textbf{Tools \\& Platforms:} ${val('f-skill-tools')}`;
+
+  /* Honors */
+  let honorsLatex = '\\begin{itemize}[leftmargin=0pt, itemsep=2pt, topsep=2pt]\n';
+  for (const id of honorItems) {
+    const text = val(id+'-text');
+    if (text) honorsLatex += `\\item ${text}\n`;
+  }
+  honorsLatex += '\\end{itemize}';
+
+  /* Certs */
+  let certLatex = '\\begin{itemize}[leftmargin=0pt, itemsep=2pt, topsep=2pt]\n';
+  for (const id of certItems) {
+    const name   = val(id+'-name');
+    const issuer = val(id+'-issuer');
+    const url    = val(id+'-url');
+    if (!name) continue;
+    certLatex += `\\item ${name}`;
+    if (issuer && url) certLatex += ` -- \\href{${url}}{${issuer}}`;
+    else if (issuer)   certLatex += ` -- ${issuer}`;
+    certLatex += '\n';
+  }
+  certLatex += '\\end{itemize}';
+
+  return {
+    name:         val('f-name'),
+    title:        val('f-title'),
+    email:        val('f-email'),
+    phone:        val('f-phone'),
+    location:     val('f-location'),
+    linkedin:     val('f-linkedin')   || 'https://linkedin.com',
+    github:       val('f-github')     || 'https://github.com',
+    portfolio:    val('f-portfolio')  || 'https://example.com',
+    hackerrank:   val('f-hackerrank') || 'https://hackerrank.com',
+    leetcode:     val('f-leetcode')   || 'https://leetcode.com',
+    summary:      val('f-summary'),
+    education:    eduLatex,
+    internship:   internLatex,
+    projects:     projLatex,
+    skills:       skillsLatex,
+    honors:       honorsLatex,
+    certifications: certLatex,
+  };
+}
+
+/* ════════════════════════════════════════
+   GENERATE PDF (POST to Flask)
+════════════════════════════════════════ */
+async function generateResume() {
+  const bar = document.getElementById('progressBar');
+  bar.className = 'rb-progress-bar active';
+  showToast('Generating your resume PDF…', 'info');
+
+  try {
+    const data = collectData();
+
+    if (!data.name || data.name === 'My Resume') {
+      bar.className = 'rb-progress-bar';
+      showToast('Please enter your name first!', 'error');
+      showSection('personal', document.querySelector('[data-sec="personal"]'));
+      return;
+    }
+
+    const res = await fetch('/api/build-resume', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    bar.className = 'rb-progress-bar done';
+
+    if (!res.ok) {
+      let errMsg = `Server error ${res.status}`;
+      try {
+        const errJson = await res.json();
+        errMsg = errJson.error || errMsg;
+      } catch(e) {}
+      throw new Error(errMsg);
+    }
+
+    const blob = await res.blob();
+    const url  = window.URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = (data.name || 'Resume').replace(/\s+/g,'_') + '_Resume.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    showToast('Resume PDF downloaded! ✨', 'success');
+
+  } catch(err) {
+    bar.className = 'rb-progress-bar';
+    showToast('Error: ' + err.message, 'error');
+    console.error('[ResumeBuilder]', err);
+  }
+
+  setTimeout(() => bar.className = 'rb-progress-bar', 1400);
+}
+
+/* ════════════════════════════════════════
+   LOAD SAMPLE DATA (Tushar's resume)
+════════════════════════════════════════ */
+function loadSampleData() {
+  document.getElementById('f-name').value      = 'TUSHAR';
+  document.getElementById('f-title').value     = 'Aspiring Data Scientist | Applied Machine Learning Engineer';
+  document.getElementById('f-email').value     = 'tusharmks9816@gmail.com';
+  document.getElementById('f-phone').value     = '+91-9501802248';
+  document.getElementById('f-location').value  = 'Mohali, Punjab, India';
+  document.getElementById('f-linkedin').value  = 'https://www.linkedin.com/in/tushar-b5b431296/';
+  document.getElementById('f-github').value    = 'https://github.com/tushar-1920';
+  document.getElementById('f-portfolio').value = 'https://portfolio-zndp.onrender.com/';
+  document.getElementById('f-hackerrank').value= 'https://www.hackerrank.com/profile/tusharmks9816';
+  document.getElementById('f-leetcode').value  = 'https://leetcode.com/u/Tushar_1920/';
+  document.getElementById('f-summary').value   = 'Aspiring Data Scientist and Applied Machine Learning Engineer with hands-on experience in building end-to-end data science pipelines and AI-powered web applications. Strong background in Python, machine learning, data analysis, and Flask-based systems, with practical exposure to resume parsing, predictive modeling, and intelligent automation solutions. Passionate about transforming data into actionable insights and developing real-world AI systems.';
+  document.getElementById('f-skill-langs').value = 'Python, SQL, HTML, CSS';
+  document.getElementById('f-skill-libs').value  = 'Pandas, NumPy, Matplotlib, Seaborn, BeautifulSoup, Scikit-learn, TensorFlow, Keras, Flask, Jinja2';
+  document.getElementById('f-skill-dbs').value   = 'MySQL, Oracle, SQLite';
+  document.getElementById('f-skill-tools').value = 'Git, GitHub, VS Code, Anaconda, Jupyter Notebook, JupyterLab, PyCharm, Google Colab';
+
+  /* Clear lists */
+  document.getElementById('edu-list').innerHTML    = '';
+  document.getElementById('intern-list').innerHTML = '';
+  document.getElementById('proj-list').innerHTML   = '';
+  document.getElementById('honor-list').innerHTML  = '';
+  document.getElementById('cert-list').innerHTML   = '';
+  eduItems=[]; internItems=[]; projItems=[]; honorItems=[]; certItems=[];
+
+  addEdu({ degree:'Bachelor of Technology (Computer Science and Engineering)', school:'CGC University, Mohali, Punjab, India', year:'2023–2027', grade:'CGPA: 7.9' });
+  addEdu({ degree:'Senior Secondary Education (Non-Medical)', school:'GSSS Bhullar, Muktsar', year:'2022–2023', grade:'Percentage: 80%' });
+  addEdu({ degree:'Secondary School Education (Class X)', school:'H.S High School, Muktsar', year:'2020–2021', grade:'Percentage: 87.6%' });
+
+  addIntern({ company:'CodexIntern', role:'Python Developer (Remote)', date:'Sep 2025 – Oct 2025', desc:'Contributed to real-world Python-based development tasks and project deliverables.', bullets:'Developed and delivered project-based applications using core Python and supporting libraries.\nApplied clean coding practices and basic optimization techniques to improve performance.\nCollaborated on debugging and testing to deliver reliable and production-ready features.\nStrengthened problem-solving and modular design skills while working under strict deadlines.' });
+  addIntern({ company:'Saiket Systems', role:'Data Science Intern (Remote)', date:'Jan 2026 – Feb 2026', desc:'Worked on applied data science and machine learning workflows for real-world datasets.', bullets:'Performed data cleaning and preprocessing and executed feature engineering on structured datasets.\nBuilt and evaluated machine learning models for analytical and predictive use cases.\nConducted model evaluation and validation to ensure reliability and generalization.\nGenerated data-driven insights to support analytical and business decision-making.' });
+
+  addProject({ name:'AI Skill Gap Analyzer', github:'https://github.com/tushar-1920', tech:'Python, Flask, Scikit-learn, Pandas, NumPy, MySQL', desc:'An AI-powered platform designed to evaluate resumes against job descriptions and provide actionable learning recommendations.', bullets:'Built an end-to-end system to automatically parse resumes and job descriptions.\nDesigned a skill matching and normalization pipeline to identify missing and matched skills.\nImplemented a role-fit scoring mechanism and personalized learning roadmap generation.\nIntegrated ATS-oriented resume improvement suggestions to enhance candidate profiles.' });
+  addProject({ name:'Gurugram Data Insights & Analysis', github:'https://github.com/tushar-1920', tech:'Python, Pandas, NumPy, Matplotlib, Seaborn, Jupyter Notebook', desc:'', bullets:'Performed exploratory data analysis on a real-estate dataset to identify price trends and key factors.\nCleaned and preprocessed data and created meaningful engineered features.\nDeveloped visualizations including heatmaps, scatter plots, and bar charts.\nDerived actionable insights related to location, amenities, and pricing patterns.' });
+  addProject({ name:'Personal Portfolio Website', github:'https://github.com/tushar-1920', tech:'Python, Flask, HTML, CSS, JavaScript, SQLAlchemy, SQLite, REST APIs', desc:'', bullets:'Developed a responsive full-stack portfolio platform to showcase projects and professional profile.\nImplemented backend APIs and database integration for dynamic content.\nDesigned modern UI components and smooth animations for improved user experience.\nMaintained version control and deployment-ready project structure.' });
+  addProject({ name:'Jarvis — AI Virtual Assistant', github:'https://github.com/tushar-1920', tech:'Python, SpeechRecognition, pyttsx3, Requests', desc:'', bullets:'Developed a voice-controlled assistant to open applications, search the web, and retrieve news and weather data.\nAutomated routine tasks using speech-to-text and text-to-speech pipelines.' });
+
+  addHonor({ text:'Solved 300+ coding problems on LeetCode, demonstrating strong problem-solving and algorithmic skills.' });
+  addHonor({ text:'Solved 100+ coding problems on HackerRank, covering Python, SQL, and core programming concepts.' });
+  addHonor({ text:'Smart India Hackathon (SIH) 2025 — College Level Shortlisted Team.' });
+  addHonor({ text:'Smart India Hackathon (SIH) 2024 — College Level Shortlisted Team.' });
+  addHonor({ text:'Secured 3rd Position in 12th Standard (School Rank).' });
+
+  addCert({ name:'The Ultimate Job Ready Data Science Course', issuer:'CodeWithHarry', url:'https://www.codewithharry.com/courses/the-ultimate-job-ready-data-science-course/certificate' });
+  addCert({ name:'Python Course Completion', issuer:'Udemy', url:'https://www.udemy.com/certificate/UC-8116c26f-09c3-4b97-9f47-ce697a81a8c9/' });
+  addCert({ name:'SQL (Advanced)', issuer:'HackerRank', url:'https://www.hackerrank.com/certificates/16eb69f971e0' });
+  addCert({ name:'Python', issuer:'HackerRank', url:'https://www.hackerrank.com/certificates/c09d7c22bff2' });
+  addCert({ name:'Data Analyst', issuer:'OneRoadMap', url:'https://oneroadmap.io/skills/da/certificate/CERT-89750401' });
+  addCert({ name:'Introduction to TensorFlow using Keras', issuer:'Microsoft', url:'https://learn.microsoft.com/en-us/users/Tushar-9765/achievements/NV9A8LEF' });
+  addCert({ name:'Introduction to Machine Learning Concepts', issuer:'Microsoft', url:'https://learn.microsoft.com/api/achievements/share/en-us/Tushar-9765/XQ3Z645Y' });
+
+  liveUpdate();
+  showToast('Sample data loaded! ✨', 'success');
+}
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+liveUpdate();
+</script>
+
+{% endblock %}

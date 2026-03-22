@@ -7,7 +7,7 @@ def login_required(f):
     def decorated_function(*args, **kwargs):
 
         if "user_id" not in session:
-            return redirect(url_for("auth_routes.login_page"))
+            return redirect(url_for("auth_routes.login"))
 
         return f(*args, **kwargs)
 

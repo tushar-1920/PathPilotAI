@@ -1,0 +1,491 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--purple:#a855f7;--amber:#ffb547;--red:#ff5757;--blue:#38bdf8;--font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#000!important;color:#fff!important;font-family:var(--font-b);-webkit-font-smoothing:antialiased;}
+footer,.footer,.site-footer,.main-footer,#footer{display:none!important;}
+.ar-page{min-height:100vh;background:#000;position:relative;overflow-x:hidden;}
+.ar-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 55% 45% at 10% 20%,rgba(168,85,247,.1) 0%,transparent 65%),radial-gradient(ellipse 45% 40% at 90% 80%,rgba(34,197,94,.08) 0%,transparent 60%);}
+.ar-grid{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:60px 60px;}
+.ar-body{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:64px 40px 100px;}
+
+/* HEADER */
+.ar-head{text-align:center;margin-bottom:56px;}
+.ar-logo{display:inline-flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:22px;margin-bottom:24px;background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(34,197,94,.12));border:1px solid rgba(168,85,247,.3);box-shadow:0 0 40px rgba(168,85,247,.25);animation:logoPulse 3s ease-in-out infinite;position:relative;overflow:hidden;}
+.ar-logo::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.07),transparent);}
+@keyframes logoPulse{0%,100%{box-shadow:0 0 35px rgba(168,85,247,.22)}50%{box-shadow:0 0 65px rgba(168,85,247,.5),0 0 100px rgba(34,197,94,.15)}}
+.ar-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 18px;border-radius:100px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.22);font-size:11px;font-weight:600;color:#c084fc;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:22px;}
+.ar-ey-dot{width:6px;height:6px;border-radius:50%;background:#c084fc;box-shadow:0 0 8px #c084fc;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
+.ar-title{font-family:var(--font-d);font-size:clamp(38px,5.5vw,68px);font-weight:200;letter-spacing:-3px;color:rgba(255,255,255,.75);line-height:1.06;margin-bottom:18px;}
+.ar-title strong{font-weight:800;color:#fff;display:block;}
+.ar-title .grad{background:linear-gradient(110deg,var(--purple) 0%,var(--blue) 45%,var(--green) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.ar-sub{font-size:16px;color:rgba(255,255,255,.3);font-weight:300;line-height:1.78;max-width:520px;margin:0 auto;}
+
+/* SETUP CARD */
+.ar-setup{background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:44px;position:relative;overflow:hidden;margin-bottom:40px;}
+.ar-setup::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,.4),rgba(34,197,94,.25),transparent);}
+.ar-section-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2.5px;color:rgba(255,255,255,.28);margin-bottom:22px;display:flex;align-items:center;gap:12px;}
+.ar-section-lbl::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06);}
+.ar-grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;}
+.ar-flabel{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.28);margin-bottom:8px;}
+.ar-select,.ar-input{width:100%;padding:13px 18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:12px;color:#fff;font-family:var(--font-b);font-size:14.5px;outline:none;transition:border-color .25s;}
+.ar-select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba(255,255,255,0.3)' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");background-repeat:no-repeat;background-position:right 14px center;background-size:13px;padding-right:40px;}
+.ar-select:focus,.ar-input:focus{border-color:rgba(168,85,247,.45);box-shadow:0 0 0 3px rgba(168,85,247,.1);}
+.ar-select option{background:#0a0a10;}
+.ar-input::placeholder{color:rgba(255,255,255,.25);}
+
+/* PERSONALITY CARDS */
+.personality-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:28px;}
+.p-card{padding:16px 12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);cursor:pointer;transition:all .2s;text-align:center;}
+.p-card:hover{border-color:rgba(255,255,255,.15);transform:translateY(-2px);}
+.p-card.selected{border-color:rgba(168,85,247,.5);background:rgba(168,85,247,.1);box-shadow:0 0 20px rgba(168,85,247,.15);}
+.p-emoji{font-size:28px;margin-bottom:8px;display:block;}
+.p-name{font-size:11.5px;font-weight:600;color:#fff;margin-bottom:3px;}
+.p-desc{font-size:10px;color:rgba(255,255,255,.3);line-height:1.4;}
+
+/* LEVEL CARDS */
+.level-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
+.l-card{padding:18px 14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);cursor:pointer;transition:all .2s;}
+.l-card:hover{border-color:rgba(255,255,255,.15);transform:translateY(-2px);}
+.l-card.selected{border-color:rgba(91,107,255,.5);background:rgba(91,107,255,.1);}
+.l-num{font-family:var(--font-d);font-size:24px;font-weight:800;color:var(--neon);margin-bottom:8px;}
+.l-name{font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;}
+.l-desc{font-size:11.5px;color:rgba(255,255,255,.3);line-height:1.5;}
+
+/* RESUME AREA */
+.ar-resume-area{border:1.5px dashed rgba(255,255,255,.12);border-radius:14px;padding:28px;text-align:center;cursor:pointer;transition:all .25s;background:rgba(255,255,255,.02);margin-bottom:16px;}
+.ar-resume-area:hover{border-color:rgba(168,85,247,.35);background:rgba(168,85,247,.04);}
+.ar-resume-area.has-text{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.04);}
+.ar-resume-area.drag-over{border-color:rgba(168,85,247,.6);background:rgba(168,85,247,.08);transform:scale(1.01);}
+.ar-resume-icon{font-size:32px;margin-bottom:10px;}
+.ar-resume-text{font-size:13.5px;color:rgba(255,255,255,.4);margin-bottom:6px;}
+.ar-resume-sub{font-size:11.5px;color:rgba(255,255,255,.22);}
+
+/* RESUME TAB BUTTONS */
+.resume-tab-btn{padding:8px 20px;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-b);transition:all .2s;}
+.resume-tab-btn.active{background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.35);color:#c084fc;}
+.resume-tab-btn.inactive{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4);}
+
+/* FILE PREVIEW */
+.file-preview{display:none;margin-top:10px;padding:12px 16px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:10px;align-items:center;gap:10px;}
+.fp-icon{font-size:22px;}
+.fp-name{font-size:13.5px;font-weight:600;color:#fff;}
+.fp-size{font-size:11.5px;color:rgba(255,255,255,.35);}
+.fp-remove{margin-left:auto;font-size:12px;color:rgba(255,87,87,.7);cursor:pointer;padding:3px 10px;border-radius:5px;border:1px solid rgba(255,87,87,.2);transition:all .15s;}
+.fp-remove:hover{background:rgba(255,87,87,.1);color:var(--red);}
+
+/* START BUTTON */
+.ar-start-btn{width:100%;padding:17px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--purple),#6366f1,var(--green));background-size:200%;animation:gradShift 4s ease infinite;color:#fff;font-family:var(--font-b);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 8px 36px rgba(168,85,247,.35);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.ar-start-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);opacity:0;transition:opacity .2s;}
+.ar-start-btn:hover{transform:translateY(-2px);box-shadow:0 12px 48px rgba(168,85,247,.55);}
+.ar-start-btn:hover::before{opacity:1;}
+.ar-start-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+/* FEATURE PILLS */
+.feat-pills{display:flex;gap:20px;flex-wrap:wrap;margin-top:18px;}
+.feat-pill{font-size:12px;color:rgba(255,255,255,.25);display:flex;align-items:center;gap:6px;}
+.feat-pill span{color:var(--green);}
+
+/* HISTORY */
+.ar-history{margin-top:40px;}
+.history-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:18px;}
+.h-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:18px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:13px;}
+.h-card:hover{border-color:rgba(255,255,255,.14);transform:translateX(3px);}
+.h-score-ring{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:14px;font-weight:800;flex-shrink:0;}
+.h-info{flex:1;min-width:0;}
+.h-role{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.h-meta{font-size:11.5px;color:rgba(255,255,255,.28);margin-top:2px;}
+.h-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;display:inline-block;margin-top:4px;}
+.b-hire{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.25);}
+.b-reject{background:rgba(255,87,87,.12);color:#ff5757;border:1px solid rgba(255,87,87,.2);}
+.b-maybe{background:rgba(255,181,71,.12);color:#ffb547;border:1px solid rgba(255,181,71,.2);}
+.b-pending{background:rgba(255,255,255,.06);color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.1);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeUp .6s ease both;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .7s linear infinite;display:inline-block;}
+
+@media(max-width:900px){
+  .ar-body{padding:48px 20px 80px;}
+  .personality-grid{grid-template-columns:repeat(3,1fr);}
+  .level-grid{grid-template-columns:repeat(2,1fr);}
+  .ar-grid2{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .personality-grid{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+
+<div class="ar-page">
+<div class="ar-glow"></div>
+<div class="ar-grid"></div>
+<div class="ar-body">
+
+  <!-- HEADER -->
+  <div class="ar-head fade-in">
+    <div style="display:flex;justify-content:center;margin-bottom:8px">
+      <div class="ar-logo">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" style="position:relative;z-index:1">
+          <circle cx="20" cy="14" r="7" stroke="#a855f7" stroke-width="1.5"/>
+          <circle cx="20" cy="14" r="3" fill="#a855f7" opacity=".85"/>
+          <path d="M8 34c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M29 6l4-4M29 2l4 4" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="34" cy="8" r="2.5" fill="#38bdf8" opacity=".7"/>
+        </svg>
+      </div>
+    </div>
+    <div class="ar-eyebrow"><div class="ar-ey-dot"></div>AI Recruiter Engine</div>
+    <div class="ar-title">
+      Your real interview<br>
+      <strong>starts now</strong><br>
+      <span class="grad">with AI that thinks</span>
+    </div>
+    <div class="ar-sub">A real recruiter powered by AI — asks follow-up questions, reads your face, detects hesitation, and gives you brutal honest feedback.</div>
+  </div>
+
+  <!-- SETUP CARD -->
+  <div class="ar-setup fade-in" style="animation-delay:.1s">
+
+    <!-- PERSONALITY -->
+    <div class="ar-section-lbl">Choose Your Recruiter</div>
+    <div class="personality-grid">
+      <div class="p-card selected" data-personality="friendly" onclick="selectP(this)">
+        <span class="p-emoji">😊</span>
+        <div class="p-name">Sarah</div>
+        <div class="p-desc">Friendly & Supportive</div>
+      </div>
+      <div class="p-card" data-personality="strict" onclick="selectP(this)">
+        <span class="p-emoji">😐</span>
+        <div class="p-name">Mr. Sharma</div>
+        <div class="p-desc">Strict & Demanding</div>
+      </div>
+      <div class="p-card" data-personality="faang" onclick="selectP(this)">
+        <span class="p-emoji">💀</span>
+        <div class="p-name">Alex</div>
+        <div class="p-desc">FAANG Level</div>
+      </div>
+      <div class="p-card" data-personality="startup" onclick="selectP(this)">
+        <span class="p-emoji">🚀</span>
+        <div class="p-name">Rahul</div>
+        <div class="p-desc">Startup Founder</div>
+      </div>
+      <div class="p-card" data-personality="balanced" onclick="selectP(this)">
+        <span class="p-emoji">🎯</span>
+        <div class="p-name">Priya</div>
+        <div class="p-desc">Balanced & Fair</div>
+      </div>
+    </div>
+
+    <!-- LEVEL -->
+    <div class="ar-section-lbl">Interview Difficulty</div>
+    <div class="level-grid">
+      <div class="l-card" data-level="fresher" onclick="selectL(this)">
+        <div class="l-num">L1</div>
+        <div class="l-name">Fresher</div>
+        <div class="l-desc">Entry level, basic CS & projects</div>
+      </div>
+      <div class="l-card selected" data-level="intermediate" onclick="selectL(this)">
+        <div class="l-num">L2</div>
+        <div class="l-name">Intermediate</div>
+        <div class="l-desc">2–5 years, system design basics</div>
+      </div>
+      <div class="l-card" data-level="advanced" onclick="selectL(this)">
+        <div class="l-num">L3</div>
+        <div class="l-name">Senior</div>
+        <div class="l-desc">Architecture & leadership</div>
+      </div>
+      <div class="l-card" data-level="faang" onclick="selectL(this)">
+        <div class="l-num" style="color:var(--red)">L4</div>
+        <div class="l-name" style="color:var(--red)">FAANG 💀</div>
+        <div class="l-desc">Full FAANG interview loop</div>
+      </div>
+    </div>
+
+    <!-- ROLE + LANGUAGE -->
+    <div class="ar-grid2">
+      <div>
+        <label class="ar-flabel">Target Role</label>
+        <select id="roleSelect" class="ar-select">
+          <option>Software Engineer</option>
+          <option>Machine Learning Engineer</option>
+          <option>AI Engineer</option>
+          <option>Data Scientist</option>
+          <option>Backend Developer</option>
+          <option>Frontend Developer</option>
+          <option>Full Stack Developer</option>
+          <option>DevOps Engineer</option>
+          <option>Data Engineer</option>
+          <option>Cloud Engineer</option>
+          <option>Product Manager</option>
+          <option>Engineering Manager</option>
+          <option>Android Developer</option>
+          <option>iOS Developer</option>
+          <option>Cybersecurity Engineer</option>
+          <option>Blockchain Developer</option>
+        </select>
+      </div>
+      <div>
+        <label class="ar-flabel">Interview Language</label>
+        <select id="langSelect" class="ar-select">
+          <option value="en">English</option>
+          <option value="hi">Hindi + English (Hinglish)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- RESUME SECTION -->
+    <div class="ar-section-lbl">Your Resume (Optional but Recommended)</div>
+
+    <!-- Tab switcher -->
+    <div style="display:flex;gap:10px;margin-bottom:16px;">
+      <button class="resume-tab-btn active" id="tab-upload" onclick="switchResumeTab('upload')">
+        📁 Upload File
+      </button>
+      <button class="resume-tab-btn inactive" id="tab-paste" onclick="switchResumeTab('paste')">
+        📋 Paste Text
+      </button>
+    </div>
+
+    <!-- Upload tab -->
+    <div id="resume-upload-tab">
+      <div class="ar-resume-area" id="resumeDropZone"
+        onclick="document.getElementById('resumeFileInput').click()"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="handleResumeDrop(event)">
+        <input type="file" id="resumeFileInput" accept=".pdf,.doc,.docx,.txt"
+          style="display:none" onchange="handleResumeFile(this.files[0])">
+        <div class="ar-resume-icon" id="uploadIcon">📁</div>
+        <div class="ar-resume-text" id="uploadText">Click to upload or drag & drop your resume</div>
+        <div class="ar-resume-sub">Supports PDF, DOC, DOCX, TXT files</div>
+      </div>
+
+      <!-- File preview after upload -->
+      <div class="file-preview" id="filePreview">
+        <span class="fp-icon" id="fileTypeIcon">📄</span>
+        <div>
+          <div class="fp-name" id="fileName">resume.pdf</div>
+          <div class="fp-size" id="fileSize">0 KB</div>
+        </div>
+        <span class="fp-remove" onclick="clearFile()">✕ Remove</span>
+      </div>
+    </div>
+
+    <!-- Paste tab -->
+    <div id="resume-paste-tab" style="display:none;">
+      <div class="ar-resume-area has-text" style="cursor:default;padding:20px;">
+        <div class="ar-resume-icon">📋</div>
+        <div class="ar-resume-text" style="margin-bottom:12px;">Paste your resume text below</div>
+        <textarea id="resumeTextarea"
+          style="width:100%;min-height:120px;padding:12px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:10px;color:#fff;font-family:var(--font-b);font-size:13px;resize:vertical;outline:none;line-height:1.6;"
+          placeholder="Paste your full resume here — name, skills, projects, work experience, education..."></textarea>
+      </div>
+    </div>
+
+    <!-- START BUTTON -->
+    <div style="margin-top:28px;">
+      <button class="ar-start-btn" onclick="startInterview()" id="startBtn">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>
+        </svg>
+        Start AI Interview
+      </button>
+    </div>
+
+    <!-- FEATURE PILLS -->
+    <div class="feat-pills">
+      <div class="feat-pill"><span>✓</span> Real-time face detection</div>
+      <div class="feat-pill"><span>✓</span> AI speaks like a real recruiter</div>
+      <div class="feat-pill"><span>✓</span> Follow-up questions based on your answers</div>
+      <div class="feat-pill"><span>✓</span> Full recruiter report after</div>
+      <div class="feat-pill"><span>✓</span> HIRE / REJECT decision</div>
+    </div>
+
+  </div>
+
+  <!-- PAST INTERVIEWS -->
+  {% if history %}
+  <div class="ar-history fade-in" style="animation-delay:.2s">
+    <div class="ar-section-lbl">Past Interviews</div>
+    <div class="history-grid">
+      {% for h in history %}
+      <div class="h-card" onclick="window.location.href='/ai-recruiter/result/{{ h.id }}'">
+        <div class="h-score-ring" style="background:rgba({% if h.score>=70 %}34,197,94{% elif h.score>=50 %}255,181,71{% else %}255,87,87{% endif %},.15);border:1.5px solid rgba({% if h.score>=70 %}34,197,94{% elif h.score>=50 %}255,181,71{% else %}255,87,87{% endif %},.35)">
+          {{ h.score }}
+        </div>
+        <div class="h-info">
+          <div class="h-role">{{ h.role }}</div>
+          <div class="h-meta">{{ h.level }} · {{ h.date }}</div>
+          <span class="h-badge b-{{ h.decision }}">{{ h.decision.upper() }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+</div>
+
+<script>
+// ── SELECTION STATE ──────────────────────────────────
+let selectedPersonality = "friendly";
+let selectedLevel       = "intermediate";
+window._resumeText      = "";
+
+// ── PERSONALITY & LEVEL SELECTION ───────────────────
+function selectP(el) {
+  document.querySelectorAll(".p-card").forEach(c => c.classList.remove("selected"));
+  el.classList.add("selected");
+  selectedPersonality = el.dataset.personality;
+}
+
+function selectL(el) {
+  document.querySelectorAll(".l-card").forEach(c => c.classList.remove("selected"));
+  el.classList.add("selected");
+  selectedLevel = el.dataset.level;
+}
+
+// ── RESUME TAB SWITCHING ─────────────────────────────
+function switchResumeTab(tab) {
+  const uploadTab  = document.getElementById("resume-upload-tab");
+  const pasteTab   = document.getElementById("resume-paste-tab");
+  const btnUpload  = document.getElementById("tab-upload");
+  const btnPaste   = document.getElementById("tab-paste");
+
+  if (tab === "upload") {
+    uploadTab.style.display = "block";
+    pasteTab.style.display  = "none";
+    btnUpload.className = "resume-tab-btn active";
+    btnPaste.className  = "resume-tab-btn inactive";
+  } else {
+    uploadTab.style.display = "none";
+    pasteTab.style.display  = "block";
+    btnPaste.className  = "resume-tab-btn active";
+    btnUpload.className = "resume-tab-btn inactive";
+  }
+}
+
+// ── FILE UPLOAD ──────────────────────────────────────
+function handleResumeFile(file) {
+  if (!file) return;
+
+  const preview     = document.getElementById("filePreview");
+  const icon        = document.getElementById("uploadIcon");
+  const text        = document.getElementById("uploadText");
+  const nameEl      = document.getElementById("fileName");
+  const sizeEl      = document.getElementById("fileSize");
+  const typeIcon    = document.getElementById("fileTypeIcon");
+  const zone        = document.getElementById("resumeDropZone");
+
+  // Update UI
+  nameEl.textContent = file.name;
+  sizeEl.textContent = file.size > 1024 * 1024
+    ? (file.size / (1024 * 1024)).toFixed(1) + " MB"
+    : (file.size / 1024).toFixed(1) + " KB";
+
+  // File type icon
+  const ext = file.name.split(".").pop().toLowerCase();
+  typeIcon.textContent = ext === "pdf" ? "📕" : ext === "txt" ? "📄" : "📝";
+
+  preview.style.display  = "flex";
+  icon.textContent       = "✅";
+  text.textContent       = "Resume loaded — AI will read your file";
+  zone.style.borderColor = "rgba(34,197,94,.4)";
+  zone.style.background  = "rgba(34,197,94,.04)";
+  zone.classList.remove("drag-over");
+
+  // Read file content
+  const reader = new FileReader();
+  reader.onload = e => {
+    if (file.type === "text/plain" || ext === "txt") {
+      window._resumeText = e.target.result;
+    } else {
+      // For PDF/DOC — send filename + whatever text we can extract
+      // Browser can't parse PDF natively, so we send the filename as context
+      // The AI will still give personalized questions based on role
+      window._resumeText = `[Resume uploaded: ${file.name}]\n` +
+        `File type: ${file.type || ext}\n` +
+        `Size: ${sizeEl.textContent}\n` +
+        `Note: Full text parsing requires server-side processing. ` +
+        `AI will ask questions based on your selected role and level.`;
+      // Try to get any readable text
+      if (e.target.result && typeof e.target.result === "string") {
+        const clean = e.target.result.replace(/[^\x20-\x7E\n]/g, " ").substring(0, 3000);
+        if (clean.trim().length > 50) window._resumeText += "\n\nExtracted text:\n" + clean;
+      }
+    }
+  };
+
+  if (ext === "txt") {
+    reader.readAsText(file);
+  } else {
+    // Read as binary and try to extract text
+    reader.readAsBinaryString(file);
+  }
+}
+
+function handleResumeDrop(event) {
+  event.preventDefault();
+  document.getElementById("resumeDropZone").classList.remove("drag-over");
+  const file = event.dataTransfer.files[0];
+  if (file) handleResumeFile(file);
+}
+
+function clearFile() {
+  document.getElementById("filePreview").style.display   = "none";
+  document.getElementById("resumeFileInput").value       = "";
+  document.getElementById("uploadIcon").textContent      = "📁";
+  document.getElementById("uploadText").textContent      = "Click to upload or drag & drop your resume";
+  document.getElementById("resumeDropZone").style.borderColor = "";
+  document.getElementById("resumeDropZone").style.background  = "";
+  window._resumeText = "";
+}
+
+// ── START INTERVIEW ──────────────────────────────────
+async function startInterview() {
+  const btn = document.getElementById("startBtn");
+
+  // Get resume text from whichever tab is active
+  const pasteText = document.getElementById("resumeTextarea")?.value?.trim() || "";
+  const resumeText = window._resumeText || pasteText || "";
+
+  btn.innerHTML = '<span class="spin">⟳</span> &nbsp;Starting your interview…';
+  btn.disabled  = true;
+
+  try {
+    const res = await fetch("/api/ai-recruiter/start", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        role:        document.getElementById("roleSelect").value,
+        level:       selectedLevel,
+        personality: selectedPersonality,
+        resume_text: resumeText,
+      }),
+    });
+
+    const d = await res.json();
+
+    if (d.success) {
+      window.location.href = d.room_url;
+    } else {
+      alert("Error: " + (d.error || "Failed to start interview"));
+      btn.innerHTML = "⚡ Start AI Interview";
+      btn.disabled  = false;
+    }
+  } catch(e) {
+    alert("Network error: " + e.message);
+    btn.innerHTML = "⚡ Start AI Interview";
+    btn.disabled  = false;
+  }
+}
+</script>
+
+{% endblock %}

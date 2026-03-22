@@ -1,0 +1,535 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --neon:   #5b6bff;
+  --cyan:   #00e5c8;
+  --green:  #22c55e;
+  --purple: #a855f7;
+  --amber:  #ffb547;
+  --blue:   #38bdf8;
+  --rim:    rgba(255,255,255,0.06);
+  --glass:  rgba(255,255,255,0.028);
+  --font-d: 'Syne', sans-serif;
+  --font-b: 'DM Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #000 !important; color: #fff !important; font-family: var(--font-b); -webkit-font-smoothing: antialiased; }
+footer, .footer, .site-footer, .main-footer, #footer { display: none !important; }
+
+/* ── PAGE ── */
+.ca-page { min-height: 100vh; background: #000; position: relative; overflow-x: hidden; }
+
+.ca-glow {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 50% 45% at 90% 10%,  rgba(34,197,94,.1)   0%, transparent 65%),
+    radial-gradient(ellipse 50% 40% at 5%  85%,   rgba(91,107,255,.08) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 30% at 50% 50%,   rgba(0,229,200,.04)  0%, transparent 65%);
+}
+.ca-grid {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.ca-body { position: relative; z-index: 1; max-width: 1160px; margin: 0 auto; padding: 72px 40px 140px; }
+
+/* ── HEADER ── */
+.ca-head { text-align: center; margin-bottom: 80px; animation: fadeUp .7s ease both; }
+
+.ca-logo-wrap {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 76px; height: 76px; border-radius: 22px; margin-bottom: 28px;
+  background: linear-gradient(135deg, rgba(34,197,94,.2), rgba(0,229,200,.12));
+  border: 1px solid rgba(34,197,94,.3);
+  box-shadow: 0 0 40px rgba(34,197,94,.2), 0 0 80px rgba(0,229,200,.08);
+  animation: greenPulse 3s ease-in-out infinite;
+  position: relative; overflow: hidden;
+}
+.ca-logo-wrap::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,.07),transparent); }
+@keyframes greenPulse {
+  0%,100% { box-shadow: 0 0 40px rgba(34,197,94,.2); }
+  50%      { box-shadow: 0 0 70px rgba(34,197,94,.45), 0 0 130px rgba(0,229,200,.2); }
+}
+
+.ca-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 20px; border-radius: 100px;
+  background: rgba(34,197,94,.08); border: 1px solid rgba(34,197,94,.22);
+  font-size: 11px; font-weight: 600; color: #4ade80;
+  letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 24px;
+}
+.ca-eyebrow-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #4ade80; box-shadow: 0 0 10px #4ade80;
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.12} }
+
+.ca-title {
+  font-family: var(--font-d);
+  font-size: clamp(40px, 5.5vw, 72px);
+  font-weight: 200; letter-spacing: -3.5px;
+  color: rgba(255,255,255,.7); line-height: 1.04; margin-bottom: 22px;
+}
+.ca-title strong { font-weight: 800; color: #fff; display: block; }
+.ca-title .grad {
+  background: linear-gradient(110deg, var(--green) 0%, var(--cyan) 70%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.ca-sub {
+  font-size: 16px; color: rgba(255,255,255,.3); font-weight: 300;
+  line-height: 1.78; max-width: 540px; margin: 0 auto;
+}
+
+/* ── STATS ROW ── */
+.ca-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 0; margin-bottom: 80px;
+  background: rgba(255,255,255,.022);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 20px; overflow: hidden;
+  animation: fadeUp .7s .1s ease both;
+}
+.ca-stat {
+  padding: 32px 24px; text-align: center;
+  border-right: 1px solid rgba(255,255,255,.06);
+}
+.ca-stat:last-child { border-right: none; }
+.ca-stat-num {
+  font-family: var(--font-d); font-size: 40px; font-weight: 200;
+  color: #fff; line-height: 1; letter-spacing: -2px; margin-bottom: 6px;
+}
+.ca-stat-num strong { font-weight: 800; }
+.ca-stat-label { font-size: 12px; color: rgba(255,255,255,.28); letter-spacing: .4px; }
+
+/* ── PERKS ── */
+.ca-perks-title {
+  font-family: var(--font-d); font-size: 11px; font-weight: 600;
+  letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,.28);
+  display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+}
+.ca-perks-title::after { content:''; flex:1; height:1px; background:var(--rim); }
+.ca-perks-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+  margin-bottom: 80px; animation: fadeUp .7s .15s ease both;
+}
+.ca-perk {
+  background: rgba(255,255,255,.022); border: 1px solid rgba(255,255,255,.07);
+  border-radius: 18px; padding: 28px 24px;
+  transition: border-color .3s, transform .3s;
+}
+.ca-perk:hover { border-color: rgba(34,197,94,.25); transform: translateY(-3px); }
+.ca-perk-icon { font-size: 32px; margin-bottom: 14px; display: block; }
+.ca-perk-name { font-family: var(--font-d); font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.ca-perk-desc { font-size: 13px; color: rgba(255,255,255,.35); line-height: 1.65; font-weight: 300; }
+
+/* ── JOB SECTION ── */
+.ca-jobs-head {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px;
+}
+.ca-jobs-label {
+  font-family: var(--font-d); font-size: 11px; font-weight: 600;
+  letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,.28);
+  display: flex; align-items: center; gap: 12px;
+}
+.ca-jobs-label::after { content:''; width:50px; height:1px; background:var(--rim); }
+.ca-jobs-count {
+  font-size: 12.5px; color: rgba(255,255,255,.25);
+  display: flex; align-items: center; gap: 8px;
+}
+.ca-open-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 8px var(--green);
+  animation: blink 1.8s infinite;
+}
+
+/* ── DEPT FILTER ── */
+.ca-dept-filters {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px;
+  animation: fadeUp .7s .18s ease both;
+}
+.ca-dept {
+  padding: 8px 18px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+  font-size: 13px; color: rgba(255,255,255,.35); font-weight: 500;
+  cursor: pointer; transition: all .25s;
+}
+.ca-dept:hover, .ca-dept.active {
+  background: rgba(34,197,94,.1);
+  border-color: rgba(34,197,94,.3);
+  color: #4ade80;
+}
+
+/* ── JOB CARDS ── */
+.ca-jobs { display: flex; flex-direction: column; gap: 14px; margin-bottom: 60px; }
+
+.ca-job {
+  background: rgba(255,255,255,.022);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 18px; padding: 28px 32px;
+  display: grid; grid-template-columns: 1fr auto;
+  align-items: center; gap: 24px;
+  transition: border-color .3s, transform .3s, background .3s;
+  cursor: pointer; animation: fadeUp .6s ease both; position: relative;
+}
+.ca-job::before {
+  content:''; position:absolute; left:0; top:15%; bottom:15%;
+  width:3px; border-radius:0 3px 3px 0;
+  background: linear-gradient(to bottom, var(--green), var(--cyan));
+  opacity:0; transition: opacity .3s;
+}
+.ca-job:hover { border-color: rgba(34,197,94,.25); background: rgba(34,197,94,.03); transform: translateX(4px); }
+.ca-job:hover::before { opacity: 1; }
+
+.ca-job-left {}
+.ca-job-top { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+.ca-job-title { font-family: var(--font-d); font-size: 19px; font-weight: 700; color: #fff; letter-spacing: -.3px; }
+.ca-job-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 100px;
+}
+.badge-new { background: rgba(34,197,94,.12); color: var(--green); border: 1px solid rgba(34,197,94,.25); }
+.badge-hot { background: rgba(255,87,87,.12); color: #ff7b7b; border: 1px solid rgba(255,87,87,.25); }
+.badge-remote { background: rgba(56,189,248,.12); color: var(--blue); border: 1px solid rgba(56,189,248,.25); }
+.badge-hybrid { background: rgba(168,85,247,.12); color: #c084fc; border: 1px solid rgba(168,85,247,.25); }
+
+.ca-job-meta { display: flex; gap: 20px; flex-wrap: wrap; }
+.ca-job-meta-item { font-size: 13px; color: rgba(255,255,255,.35); display: flex; align-items: center; gap: 6px; }
+.ca-job-meta-icon { font-size: 14px; opacity: .7; }
+
+.ca-job-right { text-align: right; flex-shrink: 0; }
+.ca-job-salary { font-family: var(--font-d); font-size: 18px; font-weight: 700; color: var(--green); letter-spacing: -.5px; }
+.ca-job-salary-label { font-size: 11px; color: rgba(255,255,255,.22); margin-top: 2px; }
+.ca-apply-btn {
+  margin-top: 12px; padding: 9px 20px; border-radius: 8px;
+  background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.25);
+  color: #4ade80; font-family: var(--font-b); font-size: 13px; font-weight: 600;
+  cursor: pointer; display: block; text-align: center; text-decoration: none;
+  transition: all .25s;
+}
+.ca-apply-btn:hover { background: rgba(34,197,94,.2); border-color: rgba(34,197,94,.45); }
+
+/* ── CTA BANNER ── */
+.ca-cta {
+  background: rgba(255,255,255,.022);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 24px; padding: 64px 48px;
+  text-align: center; position: relative; overflow: hidden;
+}
+.ca-cta::before {
+  content:''; position:absolute; top:0; left:12%; right:12%; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(34,197,94,.5), rgba(0,229,200,.3), transparent);
+}
+.ca-cta::after {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(ellipse 60% 60% at 50% 100%, rgba(34,197,94,.06), transparent);
+}
+.ca-cta-title {
+  font-family: var(--font-d); font-size: clamp(26px, 3vw, 40px);
+  font-weight: 300; letter-spacing: -1.5px; color: rgba(255,255,255,.75);
+  margin-bottom: 12px; position: relative; z-index: 1;
+}
+.ca-cta-title strong { font-weight: 800; color: #fff; }
+.ca-cta-sub { font-size: 15px; color: rgba(255,255,255,.3); font-weight: 300; margin-bottom: 32px; position: relative; z-index: 1; }
+.ca-cta-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 36px; border-radius: 11px;
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  color: #000; font-family: var(--font-b); font-size: 15px; font-weight: 700;
+  text-decoration: none; border: none; cursor: pointer;
+  box-shadow: 0 8px 32px rgba(34,197,94,.3);
+  transition: transform .2s, box-shadow .2s;
+  position: relative; z-index: 1;
+}
+.ca-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 48px rgba(34,197,94,.5); }
+
+/* ── ANIM ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .ca-body { padding: 48px 20px 100px; }
+  .ca-stats { grid-template-columns: repeat(2, 1fr); }
+  .ca-stat { border-bottom: 1px solid rgba(255,255,255,.06); }
+  .ca-perks-grid { grid-template-columns: repeat(2, 1fr); }
+  .ca-job { grid-template-columns: 1fr; }
+  .ca-job-right { text-align: left; }
+  .ca-cta { padding: 44px 24px; }
+}
+@media(max-width:600px){
+  .ca-perks-grid { grid-template-columns: 1fr 1fr; }
+  .ca-stats { grid-template-columns: 1fr 1fr; }
+}
+</style>
+
+<div class="ca-page">
+<div class="ca-glow"></div>
+<div class="ca-grid"></div>
+
+<div class="ca-body">
+
+  <!-- ── HEADER ── -->
+  <div class="ca-head">
+    <div style="display:flex;justify-content:center;margin-bottom:8px">
+      <div class="ca-logo-wrap">
+        <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:relative;z-index:1">
+          <circle cx="19" cy="14" r="7" stroke="#22c55e" stroke-width="1.5"/>
+          <path d="M8 32c0-6.075 4.925-11 11-11s11 4.925 11 11" stroke="#00e5c8" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="19" cy="14" r="3" fill="#22c55e" opacity=".8"/>
+          <path d="M28 8l4-4M28 4l4 4" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="ca-eyebrow"><div class="ca-eyebrow-dot"></div>We're Hiring</div>
+    <div class="ca-title">
+      Build the future<br>
+      <strong>of career intelligence</strong><br>
+      <span class="grad">with us</span>
+    </div>
+    <div class="ca-sub">
+      Join a team obsessed with helping millions of professionals navigate their careers smarter. We move fast, ship daily, and believe the best work happens when you love what you're building.
+    </div>
+  </div>
+
+  <!-- ── STATS ── -->
+  <div class="ca-stats">
+    <div class="ca-stat">
+      <div class="ca-stat-num"><strong>48</strong></div>
+      <div class="ca-stat-label">Team Members</div>
+    </div>
+    <div class="ca-stat">
+      <div class="ca-stat-num"><strong>12</strong></div>
+      <div class="ca-stat-label">Open Roles</div>
+    </div>
+    <div class="ca-stat">
+      <div class="ca-stat-num"><strong>7</strong></div>
+      <div class="ca-stat-label">Countries</div>
+    </div>
+    <div class="ca-stat">
+      <div class="ca-stat-num"><strong>100<span style="font-size:24px;font-weight:300">%</span></strong></div>
+      <div class="ca-stat-label">Remote Friendly</div>
+    </div>
+  </div>
+
+  <!-- ── PERKS ── -->
+  <div class="ca-perks-title">Why PathPilot</div>
+  <div class="ca-perks-grid">
+    <div class="ca-perk" style="animation:fadeUp .6s .05s ease both">
+      <span class="ca-perk-icon">🌍</span>
+      <div class="ca-perk-name">Remote First</div>
+      <div class="ca-perk-desc">Work from anywhere in the world. We believe output matters more than location.</div>
+    </div>
+    <div class="ca-perk" style="animation:fadeUp .6s .1s ease both">
+      <span class="ca-perk-icon">📚</span>
+      <div class="ca-perk-name">Learning Budget</div>
+      <div class="ca-perk-desc">₹1.2L per year for courses, conferences, books, and anything that makes you better.</div>
+    </div>
+    <div class="ca-perk" style="animation:fadeUp .6s .15s ease both">
+      <span class="ca-perk-icon">⚡</span>
+      <div class="ca-perk-name">Ship Real Fast</div>
+      <div class="ca-perk-desc">No bureaucracy. Your code goes to production the same day you write it.</div>
+    </div>
+    <div class="ca-perk" style="animation:fadeUp .6s .2s ease both">
+      <span class="ca-perk-icon">💰</span>
+      <div class="ca-perk-name">Top-Tier Pay</div>
+      <div class="ca-perk-desc">We benchmark salaries at the 90th percentile of the market plus meaningful equity.</div>
+    </div>
+    <div class="ca-perk" style="animation:fadeUp .6s .25s ease both">
+      <span class="ca-perk-icon">🏥</span>
+      <div class="ca-perk-name">Full Health Cover</div>
+      <div class="ca-perk-desc">Complete health insurance for you and your family, including dental and vision.</div>
+    </div>
+    <div class="ca-perk" style="animation:fadeUp .6s .3s ease both">
+      <span class="ca-perk-icon">🎯</span>
+      <div class="ca-perk-name">Real Impact</div>
+      <div class="ca-perk-desc">Work on a product that directly helps millions of people advance their careers.</div>
+    </div>
+    <div class="ca-perk" style="animation:fadeUp .6s .35s ease both">
+      <span class="ca-perk-icon">🧘</span>
+      <div class="ca-perk-name">Flexible Hours</div>
+      <div class="ca-perk-desc">Async-first culture. We trust you to manage your own time and deliver.</div>
+    </div>
+    <div class="ca-perk" style="animation:fadeUp .6s .4s ease both">
+      <span class="ca-perk-icon">🚀</span>
+      <div class="ca-perk-name">Grow Fast</div>
+      <div class="ca-perk-desc">Small team means you can grow from engineer to lead in 12–18 months.</div>
+    </div>
+  </div>
+
+  <!-- ── JOB LISTINGS ── -->
+  <div class="ca-jobs-head">
+    <div class="ca-jobs-label">Open Positions</div>
+    <div class="ca-jobs-count"><div class="ca-open-dot"></div>12 roles open now</div>
+  </div>
+
+  <div class="ca-dept-filters">
+    <div class="ca-dept active">All Departments</div>
+    <div class="ca-dept">Engineering</div>
+    <div class="ca-dept">AI / ML</div>
+    <div class="ca-dept">Product</div>
+    <div class="ca-dept">Design</div>
+    <div class="ca-dept">Growth</div>
+  </div>
+
+  <div class="ca-jobs">
+
+    <div class="ca-job" style="animation-delay:.05s">
+      <div class="ca-job-left">
+        <div class="ca-job-top">
+          <div class="ca-job-title">Senior ML Engineer</div>
+          <span class="ca-job-badge badge-hot">🔥 Hot</span>
+          <span class="ca-job-badge badge-remote">Remote</span>
+        </div>
+        <div class="ca-job-meta">
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">🏢</span>AI / ML Team</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">📍</span>Remote · India / USA</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">⏱</span>Full-time</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">🎓</span>5+ years</div>
+        </div>
+      </div>
+      <div class="ca-job-right">
+        <div class="ca-job-salary">₹60–90 LPA</div>
+        <div class="ca-job-salary-label">+ equity</div>
+        <a href="#" class="ca-apply-btn">Apply Now →</a>
+      </div>
+    </div>
+
+    <div class="ca-job" style="animation-delay:.1s">
+      <div class="ca-job-left">
+        <div class="ca-job-top">
+          <div class="ca-job-title">Full Stack Engineer (React + Python)</div>
+          <span class="ca-job-badge badge-new">New</span>
+          <span class="ca-job-badge badge-remote">Remote</span>
+        </div>
+        <div class="ca-job-meta">
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">🏢</span>Engineering</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">📍</span>Remote · Worldwide</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">⏱</span>Full-time</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">🎓</span>3–6 years</div>
+        </div>
+      </div>
+      <div class="ca-job-right">
+        <div class="ca-job-salary">₹35–55 LPA</div>
+        <div class="ca-job-salary-label">+ equity</div>
+        <a href="#" class="ca-apply-btn">Apply Now →</a>
+      </div>
+    </div>
+
+    <div class="ca-job" style="animation-delay:.15s">
+      <div class="ca-job-left">
+        <div class="ca-job-top">
+          <div class="ca-job-title">Product Manager — AI Features</div>
+          <span class="ca-job-badge badge-new">New</span>
+          <span class="ca-job-badge badge-hybrid">Hybrid</span>
+        </div>
+        <div class="ca-job-meta">
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">🏢</span>Product</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">📍</span>Bangalore / Remote</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">⏱</span>Full-time</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">🎓</span>4+ years</div>
+        </div>
+      </div>
+      <div class="ca-job-right">
+        <div class="ca-job-salary">₹40–65 LPA</div>
+        <div class="ca-job-salary-label">+ equity</div>
+        <a href="#" class="ca-apply-btn">Apply Now →</a>
+      </div>
+    </div>
+
+    <div class="ca-job" style="animation-delay:.2s">
+      <div class="ca-job-left">
+        <div class="ca-job-top">
+          <div class="ca-job-title">Senior Product Designer (0→1)</div>
+          <span class="ca-job-badge badge-remote">Remote</span>
+        </div>
+        <div class="ca-job-meta">
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">🏢</span>Design</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">📍</span>Remote · India</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">⏱</span>Full-time</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">🎓</span>4+ years</div>
+        </div>
+      </div>
+      <div class="ca-job-right">
+        <div class="ca-job-salary">₹30–48 LPA</div>
+        <div class="ca-job-salary-label">+ equity</div>
+        <a href="#" class="ca-apply-btn">Apply Now →</a>
+      </div>
+    </div>
+
+    <div class="ca-job" style="animation-delay:.25s">
+      <div class="ca-job-left">
+        <div class="ca-job-top">
+          <div class="ca-job-title">Growth & SEO Lead</div>
+          <span class="ca-job-badge badge-hot">🔥 Hot</span>
+          <span class="ca-job-badge badge-hybrid">Hybrid</span>
+        </div>
+        <div class="ca-job-meta">
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">🏢</span>Growth</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">📍</span>Bangalore / Delhi</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">⏱</span>Full-time</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">🎓</span>3+ years</div>
+        </div>
+      </div>
+      <div class="ca-job-right">
+        <div class="ca-job-salary">₹22–35 LPA</div>
+        <div class="ca-job-salary-label">+ equity</div>
+        <a href="#" class="ca-apply-btn">Apply Now →</a>
+      </div>
+    </div>
+
+    <div class="ca-job" style="animation-delay:.3s">
+      <div class="ca-job-left">
+        <div class="ca-job-top">
+          <div class="ca-job-title">DevOps / SRE Engineer</div>
+          <span class="ca-job-badge badge-new">New</span>
+          <span class="ca-job-badge badge-remote">Remote</span>
+        </div>
+        <div class="ca-job-meta">
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">🏢</span>Engineering</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">📍</span>Remote · India</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">⏱</span>Full-time</div>
+          <div class="ca-job-meta-item"><span class="ca-job-meta-icon">🎓</span>4+ years</div>
+        </div>
+      </div>
+      <div class="ca-job-right">
+        <div class="ca-job-salary">₹32–52 LPA</div>
+        <div class="ca-job-salary-label">+ equity</div>
+        <a href="#" class="ca-apply-btn">Apply Now →</a>
+      </div>
+    </div>
+
+  </div><!-- /ca-jobs -->
+
+  <!-- ── CTA ── -->
+  <div class="ca-cta">
+    <div class="ca-cta-title">Don't see your role?<br><strong>Send us an open application</strong></div>
+    <div class="ca-cta-sub">We're always looking for exceptional people. Tell us what you do and how you'd make PathPilot better.</div>
+    <a href="mailto:careers@pathpilot.ai" class="ca-cta-btn">
+      ✉️ &nbsp;Send Open Application
+    </a>
+    <div style="margin-top:18px;font-size:12.5px;color:rgba(255,255,255,.18);position:relative;z-index:1">
+      careers@pathpilot.ai · We reply within 48 hours
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+document.querySelectorAll('.ca-dept').forEach(d => {
+  d.addEventListener('click', () => {
+    document.querySelectorAll('.ca-dept').forEach(x => x.classList.remove('active'))
+    d.classList.add('active')
+  })
+})
+</script>
+
+{% endblock %}

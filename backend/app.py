@@ -2,8 +2,11 @@ from flask import Flask
 from backend.config import Config
 from backend.extensions import db
 from apscheduler.schedulers.background import BackgroundScheduler
+from flask_socketio import SocketIO
 import atexit
 
+# ── Create SocketIO instance at module level so run.py can import it ──
+socketio = SocketIO()
 
 def create_app():
 
@@ -17,8 +20,14 @@ def create_app():
 
     db.init_app(app)
 
+    # ── Init SocketIO with app ──
+    socketio.init_app(app, cors_allowed_origins="*", async_mode="threading")
+
+    import json
+    app.jinja_env.filters["fromjson"] = json.loads
+
     # ==========================================
-    # 🔥 CREATE TABLES + SEED DEFAULT DATA
+    # CREATE TABLES + SEED DEFAULT DATA
     # ==========================================
     with app.app_context():
 
@@ -27,102 +36,53 @@ def create_app():
 
         from backend.models import User, Skill
 
-        # ------------------------------
-        # Seed Default Test User
-        # ------------------------------
-        
-
-        # ------------------------------
-        # Seed Global Skills
-        # ------------------------------
         if Skill.query.count() == 0:
-
-            
             global_skills = [
-
-    # =========================================
-    # 🌍 Programming Languages
-    # =========================================
     "Python", "Java", "C", "C++", "C#", "JavaScript",
     "TypeScript", "Go", "Rust", "Swift", "Kotlin",
     "PHP", "Ruby", "Scala", "R", "MATLAB",
     "Dart", "Groovy", "Objective-C",
     "Assembly", "Bash", "PowerShell", "VBA",
-
-    # =========================================
-    # 🌍 Frontend Development
-    # =========================================
     "HTML", "CSS", "SASS", "LESS",
     "Bootstrap", "Tailwind CSS", "Material UI",
     "React", "Next.js", "Redux",
     "Angular", "Vue.js", "Nuxt.js",
     "Svelte", "jQuery",
-
-    # =========================================
-    # 🌍 Backend Development
-    # =========================================
     "Node.js", "Express.js",
     "Django", "Flask", "FastAPI",
     "Spring Boot", "ASP.NET",
     "Laravel", "Ruby on Rails",
     "GraphQL", "REST API",
-
-    # =========================================
-    # 🌍 Mobile Development
-    # =========================================
     "Android", "iOS",
     "React Native", "Flutter",
     "SwiftUI", "Kotlin Multiplatform",
     "Xamarin",
-
-    # =========================================
-    # 🌍 Databases
-    # =========================================
     "MySQL", "PostgreSQL", "MongoDB",
     "Redis", "SQLite", "Oracle",
     "Microsoft SQL Server",
     "Firebase", "Supabase",
     "Cassandra", "DynamoDB",
     "Elasticsearch",
-
-    # =========================================
-    # 🌍 Cloud Platforms
-    # =========================================
     "AWS", "Azure", "Google Cloud",
     "DigitalOcean", "Heroku",
     "Vercel", "Netlify",
-
-    # =========================================
-    # 🌍 DevOps & Infrastructure
-    # =========================================
     "Docker", "Kubernetes",
     "CI/CD", "Jenkins",
     "GitHub Actions", "GitLab CI",
     "Terraform", "Ansible",
     "Nginx", "Apache",
     "Linux", "Unix",
-
-    # =========================================
-    # 🌍 AI / ML / Data Science
-    # =========================================
     "Machine Learning", "Deep Learning",
     "Artificial Intelligence", "Data Science",
     "NLP", "Computer Vision",
     "Reinforcement Learning",
-
     "TensorFlow", "PyTorch", "Keras",
     "Scikit-learn", "XGBoost", "LightGBM",
-
     "Pandas", "NumPy", "SciPy",
     "Matplotlib", "Seaborn", "Plotly",
     "OpenCV",
-
     "Hugging Face", "Transformers",
     "LangChain", "LLMs",
-
-    # =========================================
-    # 🌍 Data Engineering
-    # =========================================
     "Big Data", "Data Mining",
     "Data Visualization", "Data Analysis",
     "Hadoop", "Spark", "Kafka",
@@ -130,72 +90,33 @@ def create_app():
     "Data Warehousing",
     "Snowflake", "BigQuery",
     "Databricks",
-
-    # =========================================
-    # 🌍 Web Scraping
-    # =========================================
     "BeautifulSoup", "Scrapy",
     "Selenium", "Web Scraping",
-
-    # =========================================
-    # 🌍 Cybersecurity
-    # =========================================
     "Cybersecurity", "Ethical Hacking",
     "Penetration Testing", "Network Security",
     "Cryptography", "SOC", "SIEM",
-
-    # =========================================
-    # 🌍 Blockchain / Web3
-    # =========================================
     "Blockchain", "Solidity",
     "Web3", "Smart Contracts",
     "Ethereum", "Hyperledger",
-
-    # =========================================
-    # 🌍 Testing / QA
-    # =========================================
     "Unit Testing", "Automation Testing",
     "Cypress", "Jest", "PyTest",
     "Postman",
-
-    # =========================================
-    # 🌍 BI / Analytics
-    # =========================================
     "Power BI", "Tableau",
     "Excel", "Looker",
     "Google Analytics",
-
-    # =========================================
-    # 🌍 Design
-    # =========================================
     "Figma", "Adobe XD",
     "Photoshop", "UI/UX Design",
     "Wireframing",
-
-    # =========================================
-    # 🌍 Agile / Product
-    # =========================================
     "Agile", "Scrum", "Kanban",
     "Product Management",
     "Project Management",
     "Jira", "Notion",
-
-    # =========================================
-    # 🌍 Soft Skills
-    # =========================================
     "Communication", "Leadership",
     "Problem Solving", "Critical Thinking",
     "Teamwork", "Time Management"
 ]
-
-    
-
-
-            
-
             for skill_name in global_skills:
                 db.session.add(Skill(name=skill_name))
-
             db.session.commit()
 
     # ==============================
@@ -213,6 +134,14 @@ def create_app():
     from backend.routes.forecast_routes import forecast_routes
     from backend.routes.admin_routes import admin_routes
     from backend.routes.application_routes import application_routes
+    from backend.routes.resume_compare_routes import resume_compare_routes
+    from backend.routes.resume_ai_routes import resume_ai_routes
+    from backend.routes.resume_builder_routes import resume_builder
+    from backend.routes.coding_routes import coding_bp
+    from backend.routes.profile_routes import profile_routes
+    from backend.routes.interview_routes import interview_routes
+    from backend.routes.ai_recruiter_routes import ai_recruiter_routes
+    from backend.routes.vidcode_routes import vidcode_routes, register_socketio_events
 
     app.register_blueprint(main_routes)
     app.register_blueprint(resume_routes)
@@ -226,6 +155,16 @@ def create_app():
     app.register_blueprint(forecast_routes)
     app.register_blueprint(admin_routes)
     app.register_blueprint(application_routes)
+    app.register_blueprint(resume_compare_routes)
+    app.register_blueprint(resume_ai_routes)
+    app.register_blueprint(resume_builder)
+    app.register_blueprint(coding_bp)
+    app.register_blueprint(profile_routes)
+    app.register_blueprint(interview_routes)
+    app.register_blueprint(ai_recruiter_routes)
+    app.register_blueprint(vidcode_routes)
+    register_socketio_events(socketio)
+
     # ==============================
     # Start Background Scheduler
     # ==============================
@@ -234,13 +173,8 @@ def create_app():
     return app
 
 
-# ==========================================
-# Background Job Scheduler
-# ==========================================
 def start_scheduler(app):
-
     from backend.services.job_ingest_service import JobIngestService
-
     scheduler = BackgroundScheduler()
     ingest_service = JobIngestService()
 
@@ -256,7 +190,5 @@ def start_scheduler(app):
         id="job_ingestion_task",
         replace_existing=True
     )
-
     scheduler.start()
-
     atexit.register(lambda: scheduler.shutdown())

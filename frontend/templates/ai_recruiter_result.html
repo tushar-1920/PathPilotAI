@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--purple:#a855f7;--amber:#ffb547;--red:#ff5757;--font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#000!important;color:#fff!important;font-family:var(--font-b);-webkit-font-smoothing:antialiased;}
+footer,.footer,.site-footer,.main-footer,#footer{display:none!important;}
+.rp-page{min-height:100vh;background:#000;position:relative;}
+.rp-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 55% 45% at 10% 20%,rgba(168,85,247,.08) 0%,transparent 65%),radial-gradient(ellipse 45% 40% at 90% 80%,rgba(34,197,94,.06) 0%,transparent 60%);}
+.rp-body{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:60px 40px 100px;}
+
+/* DECISION HEADER */
+.decision-hero{text-align:center;margin-bottom:56px;animation:fadeUp .7s ease both;}
+.decision-badge{display:inline-flex;align-items:center;gap:12px;padding:18px 40px;border-radius:20px;margin-bottom:28px;font-family:var(--font-d);font-size:28px;font-weight:800;letter-spacing:-.5px;}
+.db-hire{background:rgba(34,197,94,.12);border:2px solid rgba(34,197,94,.35);color:#22c55e;box-shadow:0 0 40px rgba(34,197,94,.2);}
+.db-reject{background:rgba(255,87,87,.12);border:2px solid rgba(255,87,87,.35);color:#ff5757;box-shadow:0 0 40px rgba(255,87,87,.2);}
+.db-maybe{background:rgba(255,181,71,.12);border:2px solid rgba(255,181,71,.35);color:#ffb547;box-shadow:0 0 40px rgba(255,181,71,.2);}
+.rp-role{font-family:var(--font-d);font-size:clamp(28px,4vw,48px);font-weight:300;letter-spacing:-2px;color:rgba(255,255,255,.75);margin-bottom:10px;}
+.rp-role strong{font-weight:800;color:#fff;}
+.rp-meta{font-size:14px;color:rgba(255,255,255,.3);font-weight:300;}
+
+/* SCORE RING */
+.score-ring-wrap{display:flex;justify-content:center;margin-bottom:48px;animation:fadeUp .7s .1s ease both;}
+.score-ring{width:180px;height:180px;position:relative;display:flex;align-items:center;justify-content:center;}
+.score-ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);}
+.sr-bg{fill:none;stroke:rgba(255,255,255,.06);stroke-width:8;}
+.sr-fill{fill:none;stroke-width:8;stroke-linecap:round;stroke-dasharray:502;transition:stroke-dashoffset 2s cubic-bezier(.16,1,.3,1);}
+.sr-inner{text-align:center;position:relative;z-index:1;}
+.sr-num{font-family:var(--font-d);font-size:52px;font-weight:800;line-height:1;display:block;letter-spacing:-2px;}
+.sr-label{font-size:12px;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
+
+/* GRID */
+.rp-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px;}
+.rp-full{grid-column:1/-1;}
+.rp-card{background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:28px;animation:fadeUp .6s ease both;position:relative;overflow:hidden;}
+.rp-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,.25),transparent);}
+.rp-card-title{font-family:var(--font-d);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.35);margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+
+/* Skill meters */
+.skill-meter{margin-bottom:16px;}
+.sm-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.sm-name{font-size:14px;color:rgba(255,255,255,.7);font-weight:500;}
+.sm-score{font-family:var(--font-d);font-size:18px;font-weight:800;color:#fff;}
+.sm-track{height:7px;border-radius:100px;background:rgba(255,255,255,.06);overflow:hidden;}
+.sm-fill{height:100%;border-radius:100px;transition:width 1.5s cubic-bezier(.16,1,.3,1);}
+
+/* Lists */
+.rp-list{display:flex;flex-direction:column;gap:10px;}
+.rp-li{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:10px;font-size:14px;line-height:1.55;}
+.li-strength{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);color:rgba(255,255,255,.75);}
+.li-weakness{background:rgba(255,87,87,.06);border:1px solid rgba(255,87,87,.15);color:rgba(255,255,255,.75);}
+.li-plan{background:rgba(91,107,255,.06);border:1px solid rgba(91,107,255,.15);color:rgba(255,255,255,.75);}
+.li-icon{flex-shrink:0;font-size:14px;}
+
+/* Brutal feedback */
+.brutal-box{background:rgba(255,87,87,.06);border:1px solid rgba(255,87,87,.2);border-radius:14px;padding:20px;margin-bottom:16px;}
+.brutal-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,87,87,.6);margin-bottom:10px;}
+.brutal-text{font-size:15px;color:rgba(255,255,255,.75);line-height:1.75;font-style:italic;}
+
+/* Salary */
+.salary-box{background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:14px;padding:20px;text-align:center;margin-top:12px;}
+.salary-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(168,85,247,.6);margin-bottom:6px;}
+.salary-val{font-family:var(--font-d);font-size:26px;font-weight:700;color:#c084fc;letter-spacing:-.5px;}
+
+/* Summary */
+.summary-text{font-size:15.5px;color:rgba(255,255,255,.6);line-height:1.82;font-weight:300;}
+
+/* CTA */
+.rp-cta{display:flex;gap:14px;justify-content:center;margin-top:48px;flex-wrap:wrap;}
+.cta-btn{padding:13px 30px;border-radius:11px;font-family:var(--font-b);font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .2s;}
+.cta-primary{background:linear-gradient(135deg,var(--purple),#6366f1);color:#fff;border:none;box-shadow:0 6px 24px rgba(168,85,247,.3);}
+.cta-primary:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(168,85,247,.5);}
+.cta-secondary{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7);}
+.cta-secondary:hover{background:rgba(255,255,255,.09);color:#fff;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:768px){.rp-body{padding:40px 20px 80px;}.rp-grid{grid-template-columns:1fr;}.rp-full{grid-column:1;}}
+</style>
+
+{% set report = result.session.report | fromjson if result.session.report else {} %}
+{% set decision = report.get('hire_decision', 'MAYBE') %}
+{% set score = report.get('overall_score', 0) %}
+
+<div class="rp-page">
+<div class="rp-glow"></div>
+<div class="rp-body">
+
+  <!-- DECISION -->
+  <div class="decision-hero">
+    {% if decision == 'HIRE' %}
+    <div class="decision-badge db-hire">✅ &nbsp;HIRE DECISION</div>
+    {% elif decision == 'REJECT' %}
+    <div class="decision-badge db-reject">❌ &nbsp;NOT SELECTED</div>
+    {% else %}
+    <div class="decision-badge db-maybe">🤔 &nbsp;UNDER CONSIDERATION</div>
+    {% endif %}
+    <div class="rp-role">Interview Report for<br><strong>{{ iv_session.role }}</strong></div>
+    <div class="rp-meta">{{ iv_session.level.title() }} Level · {{ {"friendly":"Sarah","strict":"Mr. Sharma","faang":"Alex","startup":"Rahul","balanced":"Priya"}.get(iv_session.personality,"Priya") }} · {{ iv_session.created_at.strftime("%d %b %Y") if iv_session.created_at else "" }}</div>
+  </div>
+
+  <!-- SCORE RING -->
+  <div class="score-ring-wrap">
+    <div class="score-ring">
+      <svg viewBox="0 0 180 180">
+        <circle class="sr-bg" cx="90" cy="90" r="80"/>
+        <circle class="sr-fill" cx="90" cy="90" r="80"
+          id="scoreRingFill"
+          style="stroke:{% if score>=70 %}var(--green){% elif score>=50 %}var(--amber){% else %}var(--red){% endif %};stroke-dashoffset:502;"
+          data-score="{{ score }}"/>
+      </svg>
+      <div class="sr-inner">
+        <span class="sr-num" style="color:{% if score>=70 %}var(--green){% elif score>=50 %}var(--amber){% else %}var(--red){% endif %}">{{ score|round|int }}</span>
+        <span class="sr-label">/ 100</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  {% if report.get('summary') %}
+  <div class="rp-card rp-full" style="animation-delay:.05s;margin-bottom:18px">
+    <div class="rp-card-title">📋 Executive Summary</div>
+    <div class="summary-text">{{ report.get('summary') }}</div>
+    {% if report.get('salary_offer') %}
+    <div class="salary-box">
+      <div class="salary-label">Salary Offer (Based on Performance)</div>
+      <div class="salary-val">{{ report.get('salary_offer') }}</div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- SKILL BREAKDOWN + STRENGTHS/WEAKNESSES -->
+  <div class="rp-grid">
+
+    <!-- Skill scores -->
+    <div class="rp-card" style="animation-delay:.1s">
+      <div class="rp-card-title">📊 Skill Breakdown</div>
+      {% set scores = report.get('scores', {}) %}
+      {% for skill_name, score_val in [('Communication', scores.get('communication',5)), ('Technical Depth', scores.get('technical_depth',5)), ('Problem Solving', scores.get('problem_solving',5)), ('Confidence', scores.get('confidence',5)), ('Cultural Fit', scores.get('cultural_fit',5)), ('Project Depth', scores.get('project_depth',5))] %}
+      <div class="skill-meter">
+        <div class="sm-top">
+          <span class="sm-name">{{ skill_name }}</span>
+          <span class="sm-score">{{ score_val }}/10</span>
+        </div>
+        <div class="sm-track">
+          <div class="sm-fill" style="width:{{ score_val * 10 }}%;background:{% if score_val >= 8 %}var(--green){% elif score_val >= 6 %}var(--cyan){% elif score_val >= 4 %}var(--amber){% else %}var(--red){% endif %}"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Strengths -->
+    <div class="rp-card" style="animation-delay:.15s">
+      <div class="rp-card-title">💪 Strengths</div>
+      <div class="rp-list">
+        {% for s in report.get('strengths', []) %}
+        <div class="rp-li li-strength"><span class="li-icon">✅</span>{{ s }}</div>
+        {% else %}
+        <div class="rp-li li-strength"><span class="li-icon">✅</span>Completed the interview</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Weaknesses -->
+    <div class="rp-card" style="animation-delay:.2s">
+      <div class="rp-card-title">⚠️ Areas to Improve</div>
+      <div class="rp-list">
+        {% for w in report.get('weaknesses', []) %}
+        <div class="rp-li li-weakness"><span class="li-icon">❌</span>{{ w }}</div>
+        {% else %}
+        <div class="rp-li li-weakness"><span class="li-icon">❌</span>Needs more preparation</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Brutal feedback -->
+    <div class="rp-card" style="animation-delay:.25s">
+      <div class="rp-card-title">💥 Honest Recruiter Feedback</div>
+      {% if report.get('brutal_feedback') %}
+      <div class="brutal-box">
+        <div class="brutal-label">Direct Feedback</div>
+        <div class="brutal-text">"{{ report.get('brutal_feedback') }}"</div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Improvement plan -->
+    <div class="rp-card" style="animation-delay:.3s">
+      <div class="rp-card-title">🚀 Your Improvement Plan</div>
+      <div class="rp-list">
+        {% for p in report.get('improvement_plan', []) %}
+        <div class="rp-li li-plan"><span class="li-icon">→</span>{{ p }}</div>
+        {% else %}
+        <div class="rp-li li-plan"><span class="li-icon">→</span>Practice more interview questions</div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CTA -->
+  <div class="rp-cta">
+    <a href="/ai-recruiter" class="cta-btn cta-primary">🎤 Try Again</a>
+    <a href="/dashboard" class="cta-btn cta-secondary">📊 Dashboard</a>
+    <a href="/roadmap" class="cta-btn cta-secondary">🗺️ My Roadmap</a>
+  </div>
+
+</div>
+</div>
+
+<script>
+// Animate score ring on load
+window.addEventListener("DOMContentLoaded", () => {
+  const ring  = document.getElementById("scoreRingFill");
+  if (!ring) return;
+  const score = parseFloat(ring.dataset.score) || 0;
+  const circumference = 502;
+  const offset = circumference - (score / 100) * circumference;
+  setTimeout(() => { ring.style.strokeDashoffset = offset; }, 400);
+});
+</script>
+{% endblock %}

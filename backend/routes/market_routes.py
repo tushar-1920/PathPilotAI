@@ -3,41 +3,48 @@ from backend.services.market_intelligence_service import MarketIntelligenceServi
 from backend.utils.auth_decorator import login_required
 
 market_routes = Blueprint("market_routes", __name__)
-
 service = MarketIntelligenceService()
 
-
-# ==========================================
-# Market Intelligence Page
-# ==========================================
 @market_routes.route("/market")
 @login_required
 def market_page():
     return render_template("market.html")
 
-
-# ==========================================
-# Top Skills Demand
-# ==========================================
-@market_routes.route("/api/market/top-skills")
+@market_routes.route("/api/market-ai")
 @login_required
-def top_skills():
-    return jsonify(service.get_top_skills())
+def market_ai():
+    data = service.generate_market_intelligence()
+    return jsonify(data)
 
-
-# ==========================================
-# Role Demand Distribution
-# ==========================================
-@market_routes.route("/api/market/role-demand")
+@market_routes.route("/api/market-role-analysis")
 @login_required
-def role_demand():
-    return jsonify(service.get_role_demand())
+def market_role_analysis():
+    return jsonify(service.role_analysis())
 
-
-# ==========================================
-# Hiring Trend Over Time
-# ==========================================
-@market_routes.route("/api/market/hiring-trend")
+@market_routes.route("/api/market-sectors")
 @login_required
-def hiring_trend():
-    return jsonify(service.get_hiring_trend())
+def market_sectors():
+    from backend.models import JobPosting
+    from collections import Counter
+    jobs = JobPosting.query.all()
+    skill_counts = Counter()
+    for job in jobs:
+        if job.normalized_skills:
+            for s in job.normalized_skills.split(","):
+                sk = s.strip().lower()
+                if sk: skill_counts[sk] += 1
+    return jsonify(service._sector_breakdown(dict(skill_counts)))
+
+@market_routes.route("/api/market-roles")
+@login_required
+def market_roles():
+    from backend.models import JobPosting
+    from collections import Counter
+    jobs = JobPosting.query.all()
+    role_counts = Counter()
+    for job in jobs:
+        if job.role:
+            r = job.role.strip()
+            if r.lower() not in ["other","unknown","misc",""]:
+                role_counts[r] += 1
+    return jsonify(service._role_demand(dict(role_counts)))

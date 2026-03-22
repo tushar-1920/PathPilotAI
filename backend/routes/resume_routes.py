@@ -27,6 +27,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # Upload Resume Route
 # ============================
 @resume_routes.route("/api/upload-resume", methods=["POST"])
+@login_required
 def upload_resume():
 
     file = request.files.get("resume")
@@ -34,103 +35,68 @@ def upload_resume():
     if not file:
         return jsonify({"error": "No file uploaded"}), 400
 
-    # 🔐 Must be logged in
-    if not session.get("user_id"):
-        return jsonify({"error": "Unauthorized"}), 401
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
 
-    user = User.query.get(session["user_id"])
-
-    if not user:
-        return jsonify({"error": "User not found"}), 400
-
-    # Save file
     filepath = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(filepath)
 
-    # Parse resume
-    extracted_skills = parser.parse_resume(filepath)
+    extracted_skills = parser.parse_resume(filepath) or []
 
     print("Extracted skills:", extracted_skills)
 
-    # ==============================
-    # 1️⃣ Save Resume Record
-    # ==============================
-    new_resume = Resume(
-        user_id=user.id,
-        filename=file.filename,
-        uploaded_at=datetime.utcnow()
-    )
-
-    db.session.add(new_resume)
-
-    # ==============================
-    # 2️⃣ Update normalized_skills
-    # ==============================
+    # Update user normalized skills ONLY
     user.normalized_skills = ",".join(extracted_skills)
-    from backend.services.skill_score_engine import SkillScoreEngine
 
-    score_engine = SkillScoreEngine()
-    skill_score = score_engine.calculate_skill_score(user.id)
-
-    new_resume = Resume(
-        user_id=user.id,
-        filename=file.filename,
-        skill_score=skill_score
-    )
-
-    db.session.add(new_resume)
-    db.session.commit()
-
-    # ==============================
-    # 3️⃣ Clear old UserSkill entries
-    # ==============================
+    # Clear old skills
     UserSkill.query.filter_by(user_id=user.id).delete()
 
-    # ==============================
-    # 4️⃣ Insert fresh UserSkill records
-    # ==============================
+    # Insert fresh skills
     for skill_name in extracted_skills:
 
         skill = Skill.query.filter_by(name=skill_name).first()
 
         if skill:
-            user_skill = UserSkill(
+            db.session.add(UserSkill(
                 user_id=user.id,
                 skill_id=skill.id
-            )
-            db.session.add(user_skill)
+            ))
 
-    identity_service = CareerIdentityService()
-    identity = identity_service.detect_identity(user.id)
+    # Calculate skill score
+    from backend.services.skill_score_engine import SkillScoreEngine
+    score_engine = SkillScoreEngine()
+    skill_score = score_engine.calculate_skill_score(user.id)
 
+    resume = Resume(
+        user_id=user.id,
+        filename=file.filename,
+        uploaded_at=datetime.utcnow(),
+        skill_score=skill_score,
+        normalized_skills=",".join(extracted_skills)
+    )
+
+    db.session.add(resume)
     db.session.commit()
 
     return jsonify({
-
         "message": "Resume processed successfully",
-        "skills": extracted_skills,
-        "identity": identity
+        "skills": extracted_skills
     })
-
-@resume_routes.route("/api/resume-compare")
-@login_required
-def compare_resumes():
-
-    from flask import session
-    service = ResumeComparisonService()
-
-    result = service.compare_versions(session["user_id"])
-
-    return jsonify(result)
 
 @resume_routes.route("/api/resume-history")
 @login_required
 def resume_history():
 
-    from flask import session
+    from flask import session, jsonify
+    from backend.models import Resume
+
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify([])
 
     resumes = Resume.query\
-        .filter_by(user_id=session["user_id"])\
+        .filter_by(user_id=user_id)\
         .order_by(Resume.uploaded_at.desc())\
         .all()
 
@@ -140,7 +106,7 @@ def resume_history():
         result.append({
             "id": r.id,
             "filename": r.filename,
-            "uploaded_at": r.uploaded_at.strftime("%Y-%m-%d %H:%M"),
+            "uploaded_at": r.uploaded_at.strftime("%Y-%m-%d %H:%M") if r.uploaded_at else "",
             "skill_score": r.skill_score or 0
         })
 

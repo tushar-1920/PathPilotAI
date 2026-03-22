@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--purple:#a855f7;--amber:#ffb547;--blue:#38bdf8;
+  --rim:rgba(255,255,255,0.06);--font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;--font-r:'Lora',serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#000!important;color:#fff!important;font-family:var(--font-b);-webkit-font-smoothing:antialiased;}
+footer,.footer,.site-footer,.main-footer,#footer{display:none!important;}
+
+.bl-page{min-height:100vh;background:#000;position:relative;}
+.bl-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 55% 40% at 8% 15%,rgba(91,107,255,.07) 0%,transparent 65%),radial-gradient(ellipse 45% 35% at 92% 80%,rgba(0,229,200,.05) 0%,transparent 60%);}
+.bl-grid{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:60px 60px;}
+
+/* LIST */
+#blogList{position:relative;z-index:1;}
+.bl-body{max-width:1160px;margin:0 auto;padding:72px 40px 120px;}
+.bl-head{text-align:center;margin-bottom:72px;animation:fadeUp .7s ease both;}
+.bl-logo-wrap{display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:20px;margin-bottom:24px;background:linear-gradient(135deg,rgba(91,107,255,.18),rgba(0,229,200,.1));border:1px solid rgba(91,107,255,.25);box-shadow:0 0 40px rgba(91,107,255,.18);animation:logoPulse 3s ease-in-out infinite;position:relative;overflow:hidden;}
+.bl-logo-wrap::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.06),transparent);}
+@keyframes logoPulse{0%,100%{box-shadow:0 0 35px rgba(91,107,255,.18)}50%{box-shadow:0 0 60px rgba(91,107,255,.38),0 0 100px rgba(0,229,200,.12)}}
+.bl-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 18px;border-radius:100px;background:rgba(91,107,255,.07);border:1px solid rgba(91,107,255,.2);font-size:11px;font-weight:600;color:#818cf8;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:22px;}
+.bl-eyebrow-dot{width:5px;height:5px;border-radius:50%;background:#818cf8;box-shadow:0 0 8px #818cf8;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
+.bl-title{font-family:var(--font-d);font-size:clamp(38px,5vw,68px);font-weight:200;letter-spacing:-3px;color:rgba(255,255,255,.7);line-height:1.05;margin-bottom:20px;}
+.bl-title strong{font-weight:800;color:#fff;display:block;}
+.bl-title .grad{background:linear-gradient(110deg,var(--neon),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.bl-sub{font-size:15.5px;color:rgba(255,255,255,.28);font-weight:300;line-height:1.78;max-width:500px;margin:0 auto;}
+.bl-filters{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-bottom:60px;}
+.bl-filter{padding:8px 20px;border-radius:100px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);font-size:13px;color:rgba(255,255,255,.35);font-weight:500;cursor:pointer;transition:all .22s;}
+.bl-filter:hover,.bl-filter.active{background:rgba(91,107,255,.1);border-color:rgba(91,107,255,.3);color:#818cf8;}
+
+.bl-featured-card{background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.08);border-radius:22px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;transition:border-color .3s,transform .3s;position:relative;margin-bottom:52px;cursor:pointer;}
+.bl-featured-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(91,107,255,.4),rgba(0,229,200,.2),transparent);}
+.bl-featured-card:hover{border-color:rgba(91,107,255,.28);transform:translateY(-3px);}
+.bl-feat-visual{min-height:320px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-right:1px solid rgba(255,255,255,.05);}
+.bl-feat-visual::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 40% 50%,rgba(91,107,255,.18),transparent 70%);animation:pulseGlow 4s ease-in-out infinite;}
+@keyframes pulseGlow{0%,100%{opacity:.5}50%{opacity:1}}
+.bl-feat-icon{font-size:76px;position:relative;z-index:1;filter:drop-shadow(0 0 22px rgba(91,107,255,.45));}
+.bl-feat-tag{position:absolute;top:18px;left:18px;background:rgba(91,107,255,.18);border:1px solid rgba(91,107,255,.35);color:#818cf8;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 11px;border-radius:100px;z-index:2;}
+.bl-feat-content{padding:44px 40px;display:flex;flex-direction:column;justify-content:center;}
+.bl-feat-meta{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap;}
+.bl-feat-badge{padding:3px 11px;border-radius:100px;background:rgba(255,181,71,.1);border:1px solid rgba(255,181,71,.22);font-size:10px;font-weight:700;color:var(--amber);letter-spacing:1px;text-transform:uppercase;}
+.bl-feat-date,.bl-feat-read{font-size:12px;color:rgba(255,255,255,.22);}
+.bl-feat-title{font-family:var(--font-d);font-size:clamp(20px,2.2vw,28px);font-weight:700;letter-spacing:-.5px;color:#fff;line-height:1.22;margin-bottom:14px;}
+.bl-feat-excerpt{font-size:14.5px;color:rgba(255,255,255,.38);line-height:1.78;font-weight:300;margin-bottom:28px;}
+.bl-feat-author{display:flex;align-items:center;gap:12px;}
+.bl-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--neon),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.bl-author-name{font-size:13px;font-weight:600;color:#fff;}
+.bl-author-role{font-size:11px;color:rgba(255,255,255,.25);margin-top:1px;}
+.bl-read-btn{margin-top:22px;align-self:flex-start;padding:10px 22px;border-radius:8px;background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.28);color:#818cf8;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:all .22s;}
+.bl-read-btn:hover{background:rgba(91,107,255,.2);color:#a5b4fc;}
+
+.bl-grid-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.bl-grid-label{font-size:10.5px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.25);display:flex;align-items:center;gap:10px;}
+.bl-grid-label::after{content:'';width:50px;height:1px;background:var(--rim);}
+.bl-posts{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:60px;}
+.bl-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.065);border-radius:18px;overflow:hidden;transition:transform .28s,border-color .28s;display:flex;flex-direction:column;cursor:pointer;position:relative;}
+.bl-card::before{content:'';position:absolute;top:0;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,rgba(91,107,255,.22),transparent);opacity:0;transition:opacity .28s;}
+.bl-card:hover{transform:translateY(-4px);border-color:rgba(91,107,255,.22);}
+.bl-card:hover::before{opacity:1;}
+.bl-card-visual{height:150px;display:flex;align-items:center;justify-content:center;}
+.bl-card-icon{font-size:42px;}
+.bl-card-body{padding:22px 22px 26px;display:flex;flex-direction:column;flex:1;}
+.bl-card-tags{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;}
+.bl-tag{font-size:9.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:3px 9px;border-radius:100px;}
+.bl-card-title{font-family:var(--font-d);font-size:16px;font-weight:700;color:#fff;letter-spacing:-.2px;line-height:1.38;margin-bottom:9px;}
+.bl-card-excerpt{font-size:13px;color:rgba(255,255,255,.32);line-height:1.72;font-weight:300;margin-bottom:16px;flex:1;}
+.bl-card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,.055);margin-top:auto;}
+.bl-card-meta{font-size:11px;color:rgba(255,255,255,.2);}
+.bl-card-link{font-size:12px;font-weight:600;color:rgba(91,107,255,.65);}
+
+.bl-newsletter{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:56px 44px;text-align:center;position:relative;overflow:hidden;}
+.bl-newsletter::before{content:'';position:absolute;top:0;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,rgba(91,107,255,.35),rgba(0,229,200,.18),transparent);}
+.bl-newsletter::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 55% at 50% 100%,rgba(91,107,255,.06),transparent);}
+.bl-nl-title{font-family:var(--font-d);font-size:clamp(22px,2.8vw,34px);font-weight:300;letter-spacing:-1.5px;color:rgba(255,255,255,.8);margin-bottom:9px;position:relative;z-index:1;}
+.bl-nl-title strong{font-weight:800;color:#fff;}
+.bl-nl-sub{font-size:14.5px;color:rgba(255,255,255,.28);font-weight:300;margin-bottom:28px;position:relative;z-index:1;}
+.bl-nl-form{display:flex;gap:11px;max-width:460px;margin:0 auto;position:relative;z-index:1;}
+.bl-nl-input{flex:1;padding:13px 18px;border-radius:10px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);color:#fff;font-family:var(--font-b);font-size:14px;outline:none;transition:border-color .22s,box-shadow .22s;}
+.bl-nl-input::placeholder{color:rgba(255,255,255,.22);}
+.bl-nl-input:focus{border-color:rgba(91,107,255,.4);box-shadow:0 0 0 3px rgba(91,107,255,.09);}
+.bl-nl-btn{padding:13px 26px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--neon),#4a5bff);color:#fff;font-family:var(--font-b);font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 0 24px rgba(91,107,255,.35);transition:transform .2s,box-shadow .2s;}
+.bl-nl-btn:hover{transform:translateY(-1px);box-shadow:0 0 40px rgba(91,107,255,.55);}
+
+/* ARTICLE VIEW */
+#articleView{display:none;position:relative;z-index:1;}
+.art-wrap{max-width:760px;margin:0 auto;padding:60px 40px 120px;}
+.art-back{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.38);font-weight:500;cursor:pointer;margin-bottom:48px;transition:color .2s;padding:8px 0;}
+.art-back:hover{color:#fff;}
+.art-back:hover svg{transform:translateX(-3px);}
+.art-back svg{transition:transform .2s;}
+.art-head{margin-bottom:44px;}
+.art-tags{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.art-tag{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:100px;}
+.art-title{font-family:var(--font-d);font-size:clamp(28px,4vw,48px);font-weight:800;letter-spacing:-2px;color:#fff;line-height:1.1;margin-bottom:18px;}
+.art-excerpt{font-size:18px;color:rgba(255,255,255,.42);line-height:1.75;font-weight:400;margin-bottom:30px;font-style:italic;font-family:var(--font-r);}
+.art-meta-row{display:flex;align-items:center;gap:18px;padding-bottom:28px;border-bottom:1px solid rgba(255,255,255,.07);flex-wrap:wrap;}
+.art-author{display:flex;align-items:center;gap:11px;}
+.art-author-ava{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.art-author-name{font-size:14px;font-weight:600;color:#fff;}
+.art-author-role{font-size:11.5px;color:rgba(255,255,255,.28);}
+.art-meta-divider{width:1px;height:26px;background:rgba(255,255,255,.08);}
+.art-meta-item{font-size:12.5px;color:rgba(255,255,255,.28);}
+
+/* THE READING BODY — clean, editorial */
+.art-body{font-family:var(--font-r);font-size:18px;line-height:1.9;color:rgba(255,255,255,.7);font-weight:400;margin-top:40px;}
+.art-body p{margin-bottom:1.5em;}
+.art-body h2{font-family:var(--font-d);font-size:clamp(20px,2.5vw,26px);font-weight:800;color:#fff;letter-spacing:-.7px;margin:2.2em 0 .8em;line-height:1.2;}
+.art-body h3{font-family:var(--font-d);font-size:clamp(17px,2vw,21px);font-weight:700;color:rgba(255,255,255,.88);letter-spacing:-.4px;margin:1.8em 0 .65em;}
+.art-body strong{color:#fff;font-weight:600;font-family:var(--font-b);}
+.art-body em{color:rgba(255,255,255,.55);font-style:italic;}
+.art-body ul,.art-body ol{padding-left:1.5em;margin-bottom:1.4em;}
+.art-body li{margin-bottom:.65em;color:rgba(255,255,255,.62);}
+.art-body blockquote{border-left:3px solid var(--neon);padding:4px 0 4px 24px;margin:2em 0;font-style:italic;font-size:19px;color:rgba(255,255,255,.5);line-height:1.72;}
+.art-body .highlight{background:rgba(91,107,255,.07);border:1px solid rgba(91,107,255,.17);border-radius:12px;padding:20px 24px;margin:1.8em 0;font-family:var(--font-b);font-size:15.5px;color:rgba(255,255,255,.65);line-height:1.72;}
+.art-body .highlight strong{color:#818cf8;}
+.art-body .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:2em 0;}
+.art-body .stat-box{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px;text-align:center;}
+.art-body .stat-num{font-family:var(--font-d);font-size:32px;font-weight:800;color:#fff;letter-spacing:-1px;display:block;line-height:1;}
+.art-body .stat-label{font-family:var(--font-b);font-size:11.5px;color:rgba(255,255,255,.28);margin-top:7px;display:block;line-height:1.4;}
+.art-body hr{border:none;border-top:1px solid rgba(255,255,255,.07);margin:2.5em 0;}
+
+.art-footer{margin-top:56px;padding-top:30px;border-top:1px solid rgba(255,255,255,.07);}
+.art-footer-title{font-family:var(--font-d);font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:18px;}
+.art-more-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;}
+.art-more-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.065);border-radius:13px;padding:20px;cursor:pointer;transition:all .25s;}
+.art-more-card:hover{border-color:rgba(91,107,255,.22);transform:translateY(-2px);}
+.art-more-tag{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#818cf8;margin-bottom:8px;}
+.art-more-title{font-family:var(--font-d);font-size:14px;font-weight:700;color:#fff;line-height:1.35;}
+.art-more-meta{font-size:11px;color:rgba(255,255,255,.2);margin-top:7px;}
+
+.read-progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--neon),var(--cyan));z-index:9999;width:0;transition:width .1s;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:900px){
+  .bl-body{padding:48px 20px 100px;}
+  .bl-featured-card{grid-template-columns:1fr;}
+  .bl-feat-visual{min-height:180px;border-right:none;border-bottom:1px solid rgba(255,255,255,.05);}
+  .bl-feat-content{padding:28px 24px;}
+  .bl-posts{grid-template-columns:1fr 1fr;}
+  .bl-newsletter{padding:36px 22px;}
+  .bl-nl-form{flex-direction:column;}
+  .art-wrap{padding:48px 20px 80px;}
+  .art-body{font-size:17px;}
+  .art-body .stat-row{grid-template-columns:1fr;gap:10px;}
+  .art-more-grid{grid-template-columns:1fr;}
+}
+@media(max-width:600px){.bl-posts{grid-template-columns:1fr;}}
+</style>
+
+<div class="read-progress" id="readProgress"></div>
+<div class="bl-page">
+<div class="bl-glow"></div>
+<div class="bl-grid"></div>
+
+<div id="blogList">
+<div class="bl-body">
+  <div class="bl-head">
+    <div style="display:flex;justify-content:center;margin-bottom:8px">
+      <div class="bl-logo-wrap">
+        <svg width="36" height="36" viewBox="0 0 38 38" fill="none" style="position:relative;z-index:1">
+          <rect x="4" y="8" width="20" height="3" rx="1.5" fill="#5b6bff" opacity=".9"/>
+          <rect x="4" y="15" width="14" height="3" rx="1.5" fill="#5b6bff" opacity=".6"/>
+          <rect x="4" y="22" width="18" height="3" rx="1.5" fill="#5b6bff" opacity=".75"/>
+          <rect x="4" y="29" width="10" height="3" rx="1.5" fill="#00e5c8" opacity=".7"/>
+          <circle cx="30" cy="12" r="5" stroke="#00e5c8" stroke-width="1.5"/>
+          <path d="M27.5 12h5M30 9.5v5" stroke="#00e5c8" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="bl-eyebrow"><div class="bl-eyebrow-dot"></div>PathPilot Blog</div>
+    <div class="bl-title">Insights to<br><strong>accelerate your career</strong><br><span class="grad">with AI intelligence</span></div>
+    <div class="bl-sub" style="margin-top:16px">Expert articles on AI careers, salary trends, skill development, and the future of work — written by practitioners, not bots.</div>
+  </div>
+
+  <div class="bl-filters">
+    <div class="bl-filter active" data-cat="all">All Posts</div>
+    <div class="bl-filter" data-cat="ai">AI & Machine Learning</div>
+    <div class="bl-filter" data-cat="career">Career Advice</div>
+    <div class="bl-filter" data-cat="salary">Salary Insights</div>
+    <div class="bl-filter" data-cat="skills">Skill Building</div>
+  </div>
+
+  <div style="margin-bottom:18px"><div class="bl-grid-label">Featured Post</div></div>
+  <div class="bl-featured-card" onclick="openArticle('ai-job-market-2026')">
+    <div class="bl-feat-visual" style="background:linear-gradient(135deg,rgba(91,107,255,.14),rgba(168,85,247,.1))">
+      <div class="bl-feat-tag">Featured</div>
+      <div class="bl-feat-icon">🤖</div>
+    </div>
+    <div class="bl-feat-content">
+      <div class="bl-feat-meta">
+        <div class="bl-feat-badge">AI & ML</div>
+        <div class="bl-feat-date">March 12, 2026</div>
+        <div class="bl-feat-read">⏱ 8 min read</div>
+      </div>
+      <div class="bl-feat-title">How AI Is Reshaping the Tech Job Market in 2026 — And What You Need to Do About It</div>
+      <div class="bl-feat-excerpt">The AI job market has fundamentally shifted. Companies want engineers who can deploy, fine-tune, and integrate LLMs into production. Here's how to position yourself ahead of the curve.</div>
+      <div class="bl-feat-author">
+        <div class="bl-avatar">👨‍💻</div>
+        <div><div class="bl-author-name">Rahul Mehta</div><div class="bl-author-role">Head of AI Research, PathPilot</div></div>
+      </div>
+      <div class="bl-read-btn">Read Article →</div>
+    </div>
+  </div>
+
+  <div class="bl-grid-head">
+    <div class="bl-grid-label">Latest Articles</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.22)">6 articles this month</div>
+  </div>
+  <div class="bl-posts" id="postsGrid">
+    <div class="bl-card" data-cat="salary" onclick="openArticle('top-paying-roles-india-2026')" style="animation:fadeUp .6s .05s ease both">
+      <div class="bl-card-visual" style="background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(0,229,200,.06))"><div class="bl-card-icon">📈</div></div>
+      <div class="bl-card-body">
+        <div class="bl-card-tags"><span class="bl-tag" style="background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.2)">Salary</span><span class="bl-tag" style="background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.2)">Trends</span></div>
+        <div class="bl-card-title">Top 10 Highest-Paying Tech Roles in India for 2026</div>
+        <div class="bl-card-excerpt">AI engineers are commanding packages that rival Silicon Valley — here's the full breakdown with real numbers from 50,000+ job postings.</div>
+        <div class="bl-card-footer"><div class="bl-card-meta">Mar 10 · 6 min</div><div class="bl-card-link">Read →</div></div>
+      </div>
+    </div>
+    <div class="bl-card" data-cat="skills" onclick="openArticle('5-skills-irreplaceable-ai')" style="animation:fadeUp .6s .1s ease both">
+      <div class="bl-card-visual" style="background:linear-gradient(135deg,rgba(168,85,247,.1),rgba(91,107,255,.07))"><div class="bl-card-icon">🧠</div></div>
+      <div class="bl-card-body">
+        <div class="bl-card-tags"><span class="bl-tag" style="background:rgba(168,85,247,.1);color:#c084fc;border:1px solid rgba(168,85,247,.2)">Skills</span></div>
+        <div class="bl-card-title">5 Skills That Will Make You Irreplaceable in the Age of AI</div>
+        <div class="bl-card-excerpt">As AI automates more tasks, the skills that remain uniquely human are becoming incredibly valuable. Here's what to invest in right now.</div>
+        <div class="bl-card-footer"><div class="bl-card-meta">Mar 8 · 5 min</div><div class="bl-card-link">Read →</div></div>
+      </div>
+    </div>
+    <div class="bl-card" data-cat="career" onclick="openArticle('negotiate-40-percent-hike')" style="animation:fadeUp .6s .15s ease both">
+      <div class="bl-card-visual" style="background:linear-gradient(135deg,rgba(255,181,71,.09),rgba(255,87,87,.06))"><div class="bl-card-icon">🎯</div></div>
+      <div class="bl-card-body">
+        <div class="bl-card-tags"><span class="bl-tag" style="background:rgba(255,181,71,.1);color:#ffb547;border:1px solid rgba(255,181,71,.2)">Career</span></div>
+        <div class="bl-card-title">How to Negotiate a 40% Salary Hike Using Market Data</div>
+        <div class="bl-card-excerpt">Data-driven salary negotiations consistently outperform gut-feel. We analyzed 2,000 real negotiations to find what actually works.</div>
+        <div class="bl-card-footer"><div class="bl-card-meta">Mar 6 · 7 min</div><div class="bl-card-link">Read →</div></div>
+      </div>
+    </div>
+    <div class="bl-card" data-cat="skills" onclick="openArticle('aws-vs-azure-vs-gcp')" style="animation:fadeUp .6s .2s ease both">
+      <div class="bl-card-visual" style="background:linear-gradient(135deg,rgba(56,189,248,.09),rgba(91,107,255,.06))"><div class="bl-card-icon">☁️</div></div>
+      <div class="bl-card-body">
+        <div class="bl-card-tags"><span class="bl-tag" style="background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.2)">Cloud</span><span class="bl-tag" style="background:rgba(91,107,255,.1);color:#818cf8;border:1px solid rgba(91,107,255,.2)">DevOps</span></div>
+        <div class="bl-card-title">AWS vs Azure vs GCP: Which Cloud Certification Pays the Most in 2026?</div>
+        <div class="bl-card-excerpt">We crunched 50,000 job postings to find which cloud certifications command the highest salary premiums — the results surprised us.</div>
+        <div class="bl-card-footer"><div class="bl-card-meta">Mar 4 · 9 min</div><div class="bl-card-link">Read →</div></div>
+      </div>
+    </div>
+    <div class="bl-card" data-cat="career" onclick="openArticle('sw-to-ml-12-week-roadmap')" style="animation:fadeUp .6s .25s ease both">
+      <div class="bl-card-visual" style="background:linear-gradient(135deg,rgba(0,229,200,.09),rgba(34,197,94,.06))"><div class="bl-card-icon">🚀</div></div>
+      <div class="bl-card-body">
+        <div class="bl-card-tags"><span class="bl-tag" style="background:rgba(0,229,200,.1);color:#00e5c8;border:1px solid rgba(0,229,200,.2)">Career Switch</span></div>
+        <div class="bl-card-title">From Software Engineer to ML Engineer: A 12-Week Roadmap That Actually Works</div>
+        <div class="bl-card-excerpt">We've helped 300+ engineers make this transition. Here's the exact week-by-week plan that produced the best results.</div>
+        <div class="bl-card-footer"><div class="bl-card-meta">Mar 2 · 11 min</div><div class="bl-card-link">Read →</div></div>
+      </div>
+    </div>
+    <div class="bl-card" data-cat="career" onclick="openArticle('ats-resume-fix')" style="animation:fadeUp .6s .3s ease both">
+      <div class="bl-card-visual" style="background:linear-gradient(135deg,rgba(91,107,255,.1),rgba(168,85,247,.07))"><div class="bl-card-icon">📊</div></div>
+      <div class="bl-card-body">
+        <div class="bl-card-tags"><span class="bl-tag" style="background:rgba(91,107,255,.1);color:#818cf8;border:1px solid rgba(91,107,255,.2)">ATS</span><span class="bl-tag" style="background:rgba(255,181,71,.1);color:#ffb547;border:1px solid rgba(255,181,71,.2)">Resume</span></div>
+        <div class="bl-card-title">Why 75% of Resumes Never Get Seen — And How to Fix Yours Today</div>
+        <div class="bl-card-excerpt">ATS systems reject most applications before a human reads them. Here's exactly how to optimize your resume to pass every filter.</div>
+        <div class="bl-card-footer"><div class="bl-card-meta">Feb 28 · 6 min</div><div class="bl-card-link">Read →</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bl-newsletter">
+    <div class="bl-nl-title">Stay ahead of<br><strong>the curve</strong></div>
+    <div class="bl-nl-sub">Weekly career insights, salary data, and skill trends. No spam, ever.</div>
+    <div class="bl-nl-form">
+      <input type="email" class="bl-nl-input" placeholder="Enter your email address">
+      <button class="bl-nl-btn">Subscribe →</button>
+    </div>
+    <div style="margin-top:14px;font-size:11.5px;color:rgba(255,255,255,.16);position:relative;z-index:1">Joined by 8,400+ professionals · Unsubscribe anytime</div>
+  </div>
+</div>
+</div>
+
+<div id="articleView">
+<div class="art-wrap">
+  <div class="art-back" onclick="closeArticle()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+    Back to Blog
+  </div>
+  <div id="articleContent"></div>
+</div>
+</div>
+</div>
+
+<script>
+const ARTICLES = {
+  'ai-job-market-2026':{tags:[{t:'AI & ML',c:'rgba(91,107,255,.1)',tc:'#818cf8',bc:'rgba(91,107,255,.25)'},{t:'Featured',c:'rgba(255,181,71,.1)',tc:'#ffb547',bc:'rgba(255,181,71,.22)'}],title:'How AI Is Reshaping the Tech Job Market in 2026 — And What You Need to Do About It',excerpt:"The AI job market has fundamentally shifted. Companies want engineers who can deploy, fine-tune, and integrate large language models into production systems. Here's how to position yourself ahead of the curve.",author:'Rahul Mehta',role:'Head of AI Research, PathPilot',ava:'👨‍💻',date:'March 12, 2026',read:'8 min read',related:['top-paying-roles-india-2026','5-skills-irreplaceable-ai'],body:`<p>Something fundamental changed in the tech hiring market in 2025. The job titles have changed. The interview questions have changed. And the skills companies are willing to pay a premium for have shifted dramatically.</p><p>We analyzed over 120,000 job postings across India, the US, UK, Germany, and Singapore. The data tells a clear story: <strong>the AI era is no longer coming — it's here, and it's hiring differently than anything before it.</strong></p><h2>The Old Playbook Is Broken</h2><p>For the last decade, the path to a high-paying tech job was fairly predictable. Learn a backend language, get comfortable with cloud infrastructure, pass a LeetCode-heavy interview, and you'd land a solid role. That playbook still works — but it no longer takes you to the top of the market.</p><blockquote>"We no longer hire AI researchers in the traditional sense. We hire engineers who understand AI deeply enough to build real products with it — not just run notebooks." — Engineering Manager, Series C startup, Bangalore</blockquote><h2>What the Data Actually Shows</h2><div class="stat-row"><div class="stat-box"><span class="stat-num">340%</span><span class="stat-label">Growth in LLM-related job postings (2024→2026)</span></div><div class="stat-box"><span class="stat-num">₹52L</span><span class="stat-label">Average CTC for AI Engineers with deployment skills</span></div><div class="stat-box"><span class="stat-num">73%</span><span class="stat-label">Of new senior roles require at least basic ML understanding</span></div></div><p>The most striking shift: companies are no longer separating "software engineers" from "ML engineers" in the way they used to. They want people who can do both — write clean, production-ready code <em>and</em> work meaningfully with AI models.</p><h2>Three Categories of AI Jobs in 2026</h2><h3>1. AI Infrastructure Engineers</h3><p>These engineers build the plumbing that AI runs on — MLOps pipelines, model serving infrastructure, vector databases, RAG architectures. <strong>Demand is up 280% year-over-year.</strong> Typical stack: Kubernetes, Ray, LangChain, FAISS, Redis, AWS Sagemaker.</p><h3>2. AI Product Engineers</h3><p>Full-stack or backend engineers who integrate AI APIs into user-facing products. <strong>This is currently the most in-demand category</strong> because every product company wants to ship AI features, and very few engineers can do it well.</p><h3>3. AI Research Engineers</h3><p>Fine-tuning LLMs, training custom models, running evaluation pipelines. Requires deeper ML knowledge. <strong>Fewer openings, but significantly higher salaries.</strong></p><div class="highlight"><strong>Key insight:</strong> If you're an experienced software engineer, the fastest path to an AI salary premium is AI Product Engineering. You can leverage your existing skills while learning to work with AI APIs, embeddings, and prompting patterns. Most engineers can get there in 8–12 weeks of focused learning.</div><h2>Skills That Are Now Non-Negotiable</h2><ul><li><strong>Python</strong> — with emphasis on async patterns, data pipelines, and model APIs</li><li><strong>LLM API integration</strong> — OpenAI, Anthropic, Gemini; understanding token limits, context windows, cost optimization</li><li><strong>Vector databases</strong> — Pinecone, Weaviate, pgvector; used in almost every RAG application</li><li><strong>Prompt engineering & evaluation</strong> — systematic evaluation of model outputs</li><li><strong>Cloud deployment</strong> — ability to deploy a model endpoint on AWS/GCP/Azure</li></ul><h2>What You Should Do Right Now</h2><ol><li><strong>Build one real AI product.</strong> Not a tutorial — a deployed application someone can actually use.</li><li><strong>Get comfortable with at least one LLM API.</strong> OpenAI is most common; understand streaming, function calling, embeddings.</li><li><strong>Learn RAG architecture.</strong> It's in 60%+ of AI product engineer job descriptions. Learnable in a weekend.</li><li><strong>Update your resume with AI keywords.</strong> Resumes mentioning LLMs, embeddings, and vector search get 3.4× more recruiter responses.</li></ol><hr><p>The window to get ahead of this shift is still open — but it won't be forever. The engineers who move now will define the senior engineering cohort of 2027 and beyond.</p>`},
+  'top-paying-roles-india-2026':{tags:[{t:'Salary',c:'rgba(34,197,94,.1)',tc:'#22c55e',bc:'rgba(34,197,94,.22)'},{t:'Trends',c:'rgba(56,189,248,.1)',tc:'#38bdf8',bc:'rgba(56,189,248,.22)'}],title:"Top 10 Highest-Paying Tech Roles in India for 2026",excerpt:"AI engineers are now commanding packages that rival Silicon Valley — here's the full breakdown with real numbers from 50,000+ job postings.",author:'Priya Sharma',role:'Data Lead, PathPilot',ava:'👩‍💻',date:'March 10, 2026',read:'6 min read',related:['ai-job-market-2026','negotiate-40-percent-hike'],body:`<p>India's tech salary landscape has undergone a seismic shift. We analyzed data from 50,000+ job postings and 8,000+ salary disclosures. Here are the findings.</p><h2>The Top 10 Roles by Total Compensation</h2><h3>1. AI / ML Engineer — ₹38L – ₹95L</h3><p>The undisputed king of Indian tech salaries in 2026. Senior AI engineers at product companies are pulling packages between ₹60–95L. Skills driving the premium: LLM fine-tuning, MLOps, production AI systems. <strong>Demand up 340% YoY.</strong></p><h3>2. Engineering Manager — ₹45L – ₹90L</h3><p>The best-paid non-IC role. Engineering managers at funded startups and tech giants command significant packages, particularly when they have an AI background. Equity is a major component at Series B+ companies.</p><h3>3. Staff / Principal Engineer — ₹50L – ₹85L</h3><p>The senior IC track. Staff engineers who can lead architectural decisions across AI and distributed systems are in extremely short supply. Companies are willing to pay accordingly.</p><h3>4. DevOps / Platform / SRE Engineer — ₹28L – ₹70L</h3><p>Infrastructure talent remains scarce. Platform engineers who understand Kubernetes, Terraform, and cloud cost optimization at scale are increasingly hard to find.</p><h3>5. Backend Engineer (Python / Go / Rust) — ₹22L – ₹65L</h3><p>High-performance backend engineers with distributed systems experience continue to command strong packages. Go and Rust specialists are seeing the fastest salary growth in this category.</p><div class="highlight"><strong>Key data point:</strong> The gap between service company salaries and product company salaries has widened to an average of <strong>2.3×</strong> for equivalent roles. Switching to a product company is the single highest-ROI career move available to most engineers.</div><h3>6. Full Stack Engineer — ₹18L – ₹55L</h3><p>Full-stack engineers who can integrate AI features into web applications are seeing a new salary premium. Adding AI skills (LLM APIs, embeddings, RAG) adds an estimated ₹8–15L to base packages.</p><h3>7. Data Engineer — ₹20L – ₹55L</h3><p>Modern data engineering — dbt, Spark, Kafka, Airflow, Delta Lake — commands strong salaries. The intersection of data engineering and ML pipelines is particularly valued.</p><h3>8. Security Engineer — ₹22L – ₹52L</h3><p>Cybersecurity talent is chronically undervalued and undersupplied in India. Application security and cloud security specialists are particularly in demand.</p><h3>9. Product Manager (Technical) — ₹25L – ₹60L</h3><p>Technical PMs who understand AI product development and can bridge engineering and business are in high demand at AI-first companies.</p><h3>10. Android / iOS Engineer — ₹16L – ₹48L</h3><p>Mobile engineers haven't seen explosive AI-driven growth, but senior mobile engineers at product companies with 5+ years still command very competitive packages.</p><h2>What's Driving the Growth?</h2><ul><li><strong>Global product companies hiring Indian engineers remotely</strong> — and paying closer to global market rates</li><li><strong>AI-first startups in Bangalore and Hyderabad</strong> — funded by US/European VCs who set compensation at global benchmarks</li><li><strong>Retention pressure</strong> — top engineers have never had more leverage; companies are forced to pay to keep talent</li><li><strong>Skill scarcity</strong> — the supply of genuinely senior AI engineers in India is still far below demand</li></ul><hr><p>The single most important insight from this data: <strong>the salary premium for AI skills is real, measurable, and growing.</strong> Engineers who invest 3–6 months in building AI capabilities will see a direct return in their next negotiation.</p>`},
+  '5-skills-irreplaceable-ai':{tags:[{t:'Skills',c:'rgba(168,85,247,.1)',tc:'#c084fc',bc:'rgba(168,85,247,.22)'}],title:'5 Skills That Will Make You Irreplaceable in the Age of AI',excerpt:"As AI automates more tasks, the skills that remain uniquely human are becoming incredibly valuable. Here's exactly what to invest in right now.",author:'Arjun Nair',role:'Senior Career Coach, PathPilot',ava:'🧑‍🏫',date:'March 8, 2026',read:'5 min read',related:['ai-job-market-2026','sw-to-ml-12-week-roadmap'],body:`<p>Every week, a new headline declares that AI will replace some category of workers. Code generation tools are writing 40% of code at some companies. AI can now pass bar exams, write marketing copy, analyze financial statements, and debug software.</p><p>So the natural question: <em>what's left for humans to do?</em></p><p>The answer is nuanced. AI is a force multiplier for certain skills — and those skills are becoming dramatically more valuable, not less.</p><h2>1. System Design & Architecture Thinking</h2><p>AI can write a function. AI can suggest a data model. AI cannot design an entire distributed system with appropriate trade-offs for your specific business constraints, team size, traffic patterns, and budget.</p><p>System design is fundamentally about <strong>navigating constraints and making principled trade-offs</strong> — which requires understanding not just the technical options, but the organizational, operational, and business context. This is deeply human work.</p><div class="highlight"><strong>How to build it:</strong> Study the Engineering at Scale blog posts (Uber, Netflix, Airbnb engineering blogs). Do one system design deep-dive per week. Practice articulating trade-offs out loud.</div><h2>2. Judgment Under Uncertainty</h2><p>AI systems are trained on historical data. They're excellent at pattern matching within their training distribution. They're poor at reasoning about genuinely novel situations where the right answer isn't clear from precedent.</p><p>In practice, the most valuable thing a senior engineer brings to work every day is <strong>judgment</strong> — the ability to make good decisions with incomplete information, with real consequences.</p><h2>3. Communication That Changes Minds</h2><p>AI can produce clear, grammatically correct text. It cannot do the deeply human work of understanding what someone actually cares about, what their hidden objections are, and crafting a communication that moves them.</p><p>As AI handles more content production, the premium on <strong>truly effective communication</strong> — communication that creates action — will grow significantly.</p><blockquote>"The future belongs to people who can connect deep technical skills with genuine understanding of the domain they're building for." — Ananya Krishnan, CTO, Healthtech startup</blockquote><h2>4. Cross-Domain Integration</h2><p>Some of the most valuable technical people aren't the deepest experts in any single domain — they're people who can connect ideas across domains in ways that specialists miss. A backend engineer who understands behavioral economics can design better onboarding flows. An ML engineer who understands supply chain logistics can build better demand forecasting systems.</p><h2>5. The Ability to Learn Faster Than AI Evolves</h2><p>The engineers who will thrive in the AI era are those who have built strong <strong>learning systems</strong> for themselves — not just people who are curious, but people who have deliberately developed the ability to acquire new skills quickly and deeply.</p><hr><p>The common thread across all five skills: they require human experience, judgment, context, and adaptability in ways that AI currently cannot replicate. They also happen to be the skills that the highest-paid technical people have always had — AI is just making the gap between those who have them and those who don't wider and more visible.</p>`},
+  'negotiate-40-percent-hike':{tags:[{t:'Career',c:'rgba(255,181,71,.1)',tc:'#ffb547',bc:'rgba(255,181,71,.22)'}],title:'How to Negotiate a 40% Salary Hike Using Market Data',excerpt:"Data-driven salary negotiations consistently outperform gut-feel. We analyzed 2,000 real negotiations to find what actually works.",author:'Sneha Rao',role:'Career Strategy Lead, PathPilot',ava:'👩‍💼',date:'March 6, 2026',read:'7 min read',related:['top-paying-roles-india-2026','ats-resume-fix'],body:`<p>Most engineers negotiate salary the wrong way. They either don't negotiate at all, or they negotiate based on what they <em>want</em> — which is the wrong foundation. We tracked 2,000 salary negotiations. The engineers who achieved the largest increases — averaging 38% above their initial offer — all followed a similar approach.</p><h2>The Foundation: Market Data Is Your Leverage</h2><p>Salary negotiation is not a feelings conversation. It's a market conversation. Your goal is to demonstrate that the market rate for your skills and experience is higher than what you've been offered — and to do that, you need data.</p><p>Before any negotiation, answer these questions with specific numbers:</p><ul><li>What is the market range for my exact role, experience level, and location?</li><li>What are specific companies paying for this role?</li><li>What premium does my specific skill set command?</li><li>What is this company known for paying — above market, at market, or below?</li></ul><div class="highlight"><strong>The magic sentence:</strong> "Based on my research into market rates for [role] with [X years] of experience and specific expertise in [key skills], the range I'm seeing is [₹X–Y]. I was hoping we could get closer to the top of that range."</div><h2>Timing: When to Negotiate</h2><p>The single most important timing rule: <strong>never negotiate before you have a written offer.</strong> When asked for expectations before an offer, respond: <em>"I'd love to understand the full scope of the role before discussing compensation. What's the budgeted range for this position?"</em></p><h2>The Counter-Offer Framework</h2><h3>Step 1: Express genuine enthusiasm</h3><p>"I'm really excited about this opportunity — the team and the problem you're solving are exactly what I'm looking for."</p><h3>Step 2: Present the gap with data</h3><p>"I've done research into the market rate for this role, and for a senior engineer with [X years] experience and expertise in [skills], the range I'm seeing is [₹X–Y]. The offer is below what I was expecting."</p><h3>Step 3: Make a specific ask</h3><p>Don't say "I want more." Say a specific number — slightly above your true target. "I was hoping we could get to ₹[X]. Is there flexibility there?"</p><h3>Step 4: Silence</h3><p>After you make the ask, stop talking. Many candidates undermine themselves by immediately softening their position before the other side has responded.</p><h2>When They Say No</h2><p>A "no" on base salary is not the end. Other levers include:</p><ul><li><strong>Signing bonus</strong> — often easier to approve than base salary increases</li><li><strong>Equity</strong> — particularly valuable at growth-stage companies</li><li><strong>Performance review timing</strong> — negotiate a 6-month review for an earlier chance at a raise</li><li><strong>Learning budget</strong> — up to ₹1.5L/year in education benefits is common at well-funded companies</li></ul><hr><p>The engineers who achieved the highest increases shared one characteristic: they came into the negotiation with specific, credible market data and a clear, confident ask. Preparation is almost entirely what separates a successful negotiation from a failed one.</p>`},
+  'aws-vs-azure-vs-gcp':{tags:[{t:'Cloud',c:'rgba(56,189,248,.1)',tc:'#38bdf8',bc:'rgba(56,189,248,.22)'},{t:'DevOps',c:'rgba(91,107,255,.1)',tc:'#818cf8',bc:'rgba(91,107,255,.22)'}],title:'AWS vs Azure vs GCP: Which Cloud Certification Pays the Most in 2026?',excerpt:"We crunched 50,000 job postings to find which cloud certifications command the highest salary premiums — the results surprised even us.",author:'Karthik Vijay',role:'Cloud Intelligence Analyst, PathPilot',ava:'👨‍🔧',date:'March 4, 2026',read:'9 min read',related:['top-paying-roles-india-2026','ai-job-market-2026'],body:`<p>Cloud certifications are a billion-dollar industry. AWS alone has certified over 1.2 million engineers globally. The question every engineer asks: <strong>which certification is actually worth the time investment?</strong></p><p>We analyzed 50,000+ job postings across India, the UK, Germany, Singapore, and the US, cross-referenced with salary data from 6,000 PathPilot users who hold cloud certifications.</p><h2>Overall Market Presence</h2><div class="stat-row"><div class="stat-box"><span class="stat-num">58%</span><span class="stat-label">Job postings mention AWS</span></div><div class="stat-box"><span class="stat-num">29%</span><span class="stat-label">Job postings mention Azure</span></div><div class="stat-box"><span class="stat-num">21%</span><span class="stat-label">Job postings mention GCP</span></div></div><p>AWS appears in 58% of cloud-related job postings globally. Azure is mentioned in 29%. GCP appears in 21%. In India specifically: AWS 62%, Azure 31%, GCP 19%. This matters because market presence determines how many doors a certification opens.</p><h2>Salary Premium by Certification</h2><h3>AWS Certified Solutions Architect (Professional) — +22% premium</h3><p>The gold standard. This is the certification that carries the most weight in job descriptions and salary negotiations. The professional level (not just associate) is what moves the needle. Time to prepare: 3–4 months for someone with 2+ years of AWS experience.</p><h3>GCP Professional Cloud Architect — +24% premium</h3><p>Despite lower market prevalence, GCP certifications carry a higher salary premium per job — because GCP specialists are rarer and in demand at AI-forward companies. If you're going into ML infrastructure, GCP is worth serious consideration.</p><h3>Azure Solutions Architect Expert — +19% premium</h3><p>Azure is dominant in enterprise environments (banking, insurance, government). The salary premium is solid but slightly lower than AWS/GCP. However, Azure specialists often face less competition for specific roles.</p><h3>AWS Certified Machine Learning — +31% premium</h3><p>The biggest salary mover we found. The intersection of cloud and ML expertise commands a very significant premium. If you have ML background and want to get into cloud, this is the certification to target.</p><div class="highlight"><strong>Recommended path for maximum salary impact:</strong> Start with AWS Solutions Architect Associate (6–8 weeks), then pursue AWS SA Professional or AWS Machine Learning Specialty. Consider a GCP certification in year 2 for the multi-cloud premium (+18%).</div><h2>Is the Certification Worth It Without Experience?</h2><p>A certification <em>without</em> practical experience produces, on average, a 6% salary bump — versus a 22%+ bump for those who both have the certification and can demonstrate real-world experience.</p><p>The implication: <strong>get the certification, but build real things on the cloud simultaneously.</strong> The certification opens doors; the experience gets you through them.</p><hr><p>Bottom line: if you're going to invest time in one cloud certification in 2026, make it AWS Solutions Architect Professional — or AWS Machine Learning Specialty if you have ML background. The market breadth of AWS combined with the specialization premium makes it the highest-expected-value certification for most engineers today.</p>`},
+  'sw-to-ml-12-week-roadmap':{tags:[{t:'Career Switch',c:'rgba(0,229,200,.1)',tc:'#00e5c8',bc:'rgba(0,229,200,.22)'}],title:'From Software Engineer to ML Engineer: A 12-Week Roadmap That Actually Works',excerpt:"We've helped 300+ engineers make this transition. Here's the exact week-by-week plan, resources, and timeline that produced the best results.",author:'Deepak Iyer',role:'ML Learning Lead, PathPilot',ava:'🧑‍💻',date:'March 2, 2026',read:'11 min read',related:['ai-job-market-2026','5-skills-irreplaceable-ai'],body:`<p>Three hundred and twelve engineers have used PathPilot's structured roadmap to transition from software engineering into machine learning roles over the past two years. We tracked their progress, collected their feedback, and analyzed which paths led to successful job transitions most reliably.</p><p>What follows is the distilled version of what actually works — built from data, not theoretical curriculum design.</p><h2>Who This Is For</h2><p>This roadmap is designed for engineers who already have 2+ years of software engineering experience — specifically Python experience. If you're comfortable writing clean Python and understand data structures and algorithms, you have the prerequisites. A math PhD is not required.</p><h2>The 12-Week Plan</h2><h3>Weeks 1–2: Foundations</h3><p><strong>Goal:</strong> Build a solid intuition for how ML models work without getting lost in mathematical details.</p><ul><li>Fast.ai "Practical Deep Learning for Coders" Part 1 (free, highly practical)</li><li>Scikit-learn fundamentals: train/test splits, cross-validation, basic models</li><li>Build a project: train a classifier on a real dataset</li><li>Key concepts: overfitting, bias-variance trade-off, feature engineering</li></ul><h3>Weeks 3–4: Deep Learning & Neural Networks</h3><p><strong>Goal:</strong> Understand how neural networks work at a level sufficient to build and debug them.</p><ul><li>PyTorch basics: tensors, autograd, building a simple neural network from scratch</li><li>CNNs for image classification — builds crucial intuition</li><li>Transformers: understand "Attention Is All You Need" at a conceptual level</li><li>Project: fine-tune a pre-trained image classifier on a custom dataset</li></ul><div class="highlight"><strong>Common mistake at this stage:</strong> Spending too much time on theory and not enough building. The engineers who transitioned fastest wrote code every single day. Theory follows practice, not the other way around.</div><h3>Weeks 5–6: LLMs & Modern NLP</h3><ul><li>OpenAI API: completions, embeddings, function calling, streaming</li><li>LangChain or LlamaIndex basics: chains, agents, retrieval</li><li>Vector databases: set up Chroma or Pinecone locally, understand semantic search</li><li>Project: build a document Q&A system using RAG (Retrieval-Augmented Generation)</li></ul><h3>Weeks 7–8: MLOps & Productionization</h3><ul><li>Model serving: FastAPI + Uvicorn for serving a model as an API endpoint</li><li>Containerization: Docker for ML applications</li><li>Experiment tracking: MLflow or Weights & Biases</li><li>Project: deploy your RAG application to a cloud provider</li></ul><h3>Weeks 9–10: Specialization</h3><p>Choose based on your target role: AI Product Engineering, ML Infrastructure, or Data Engineering for ML.</p><h3>Weeks 11–12: Portfolio & Job Prep</h3><ul><li>Polish your 2–3 projects: proper README, deployed demos, clean code</li><li>Update your resume with AI/ML keywords</li><li>Prepare for ML interviews: system design for ML systems, ML concept questions</li><li>Targeted outreach to 20 companies hiring for your target role</li></ul><div class="stat-row"><div class="stat-box"><span class="stat-num">312</span><span class="stat-label">Engineers tracked through this program</span></div><div class="stat-box"><span class="stat-num">68%</span><span class="stat-label">Got an ML role within 6 months</span></div><div class="stat-box"><span class="stat-num">41%</span><span class="stat-label">Average salary increase on transition</span></div></div><h2>What Separates the 68% Who Succeeded</h2><p>The single biggest predictor of success was not technical ability — it was <strong>consistency</strong>. The engineers who got jobs built something every single week for 12 weeks.</p><p>The second predictor: having one strong portfolio project. Not five mediocre projects — one genuinely impressive, well-documented project you can speak about deeply in interviews.</p><hr><p><em>PathPilot's AI Roadmap Generator creates a personalized version of this plan based on your current skills, target role, and timeline.</em></p>`},
+  'ats-resume-fix':{tags:[{t:'ATS',c:'rgba(91,107,255,.1)',tc:'#818cf8',bc:'rgba(91,107,255,.22)'},{t:'Resume',c:'rgba(255,181,71,.1)',tc:'#ffb547',bc:'rgba(255,181,71,.22)'}],title:"Why 75% of Resumes Never Get Seen — And How to Fix Yours Today",excerpt:"ATS systems reject the majority of applications before a human reads them. Here's exactly how to optimize your resume to pass every filter.",author:'Meera Pillai',role:'Resume Intelligence Lead, PathPilot',ava:'👩‍💼',date:'February 28, 2026',read:'6 min read',related:['negotiate-40-percent-hike','top-paying-roles-india-2026'],body:`<p>You spent hours on your resume. You applied to 40 jobs. You heard back from 3.</p><p>This isn't unusual — it's the norm. In most cases, the problem isn't your experience or skills. The problem is that your resume never reached a human being.</p><p>Applicant Tracking Systems (ATS) — software used by virtually every company with more than 50 employees — filter out an estimated 75% of applications before a recruiter sees them. Understanding how these systems work is the single highest-leverage thing you can do for your job search.</p><h2>How ATS Systems Actually Work</h2><ol><li><strong>Parse your resume</strong> — extract text, identify sections, and structure the data</li><li><strong>Keyword match</strong> — compare your resume against the job description for matching keywords</li><li><strong>Score and rank</strong> — assign a match score and rank you against other applicants</li><li><strong>Filter</strong> — apply hard filters (minimum experience, required degrees) to eliminate candidates automatically</li></ol><p>Most companies only review applications above a certain score threshold. If you're below it, no human sees your resume.</p><h2>The 7 Most Common ATS Failure Points</h2><h3>1. Using tables, columns, or graphics</h3><p>ATS parsers struggle with complex formatting. Two-column resumes and tables frequently mis-parse. <strong>Fix: use a single-column, plain-text-friendly layout.</strong></p><h3>2. Missing exact keyword matches</h3><p>If a job description says "Kubernetes" and your resume says "K8s" — you might get zero match. <strong>Fix: use the exact terminology from the job description.</strong></p><h3>3. Non-standard section headers</h3><p>"My Journey" instead of "Work Experience." Creative headers cause mis-categorization. <strong>Fix: use standard headers: Work Experience, Education, Skills, Projects.</strong></p><h3>4. Skills buried in descriptions instead of a skills section</h3><p>Many ATS systems specifically parse a "Skills" section. <strong>Fix: include a dedicated, clearly labeled Skills section.</strong></p><h3>5. Dates in non-standard formats</h3><p><strong>Fix: use "Month Year – Month Year" format consistently (e.g., "Mar 2023 – Present").</strong></p><h3>6. PDFs with unembedded fonts</h3><p>Some PDFs contain text that is effectively an image — completely unparseable. <strong>Fix: export from Google Docs or Microsoft Word as PDF.</strong></p><h3>7. Not tailoring to each application</h3><p><strong>Fix: spend 10–15 minutes customizing the skills section and summary for each application.</strong> Each job description is a specification for what the ATS is filtering for.</p><div class="highlight"><strong>Quick win you can do today:</strong> Use PathPilot's Resume Intelligence tool to score your ATS match percentage, identify missing keywords, and get specific suggestions. Average improvement after implementing suggestions: 34 percentage points.</div><h2>ATS Score Benchmarks</h2><ul><li><strong>Below 50%:</strong> Very low callback rate — usually filtered automatically</li><li><strong>50–65%:</strong> Some callbacks, but below the median</li><li><strong>65–80%:</strong> Good callback rate — competitive for most roles</li><li><strong>Above 80%:</strong> Strong callback rate — resume is reaching humans consistently</li></ul><hr><p>The resume that gets you interviews isn't the most beautifully designed — it's the one that passes the ATS filter for the specific job you're applying for, and then makes a strong impression on the human who reads it.</p>`}
+};
+
+function openArticle(id) {
+  const a = ARTICLES[id];
+  if (!a) return;
+  const tagHTML = a.tags.map(t => `<span class="art-tag" style="background:${t.c};color:${t.tc};border:1px solid ${t.bc}">${t.t}</span>`).join('');
+  const relHTML = a.related.map(rid => {
+    const r = ARTICLES[rid]; if (!r) return '';
+    return `<div class="art-more-card" onclick="openArticle('${rid}')"><div class="art-more-tag">${r.tags[0].t}</div><div class="art-more-title">${r.title}</div><div class="art-more-meta">${r.date} · ${r.read}</div></div>`;
+  }).join('');
+  document.getElementById('articleContent').innerHTML = `
+    <div class="art-head">
+      <div class="art-tags">${tagHTML}</div>
+      <div class="art-title">${a.title}</div>
+      <div class="art-excerpt">${a.excerpt}</div>
+      <div class="art-meta-row">
+        <div class="art-author">
+          <div class="art-author-ava" style="background:linear-gradient(135deg,#5b6bff,#00e5c8)">${a.ava}</div>
+          <div><div class="art-author-name">${a.author}</div><div class="art-author-role">${a.role}</div></div>
+        </div>
+        <div class="art-meta-divider"></div>
+        <div class="art-meta-item">📅 ${a.date}</div>
+        <div class="art-meta-divider"></div>
+        <div class="art-meta-item">⏱ ${a.read}</div>
+      </div>
+    </div>
+    <div class="art-body">${a.body}</div>
+    <div class="art-footer">
+      <div class="art-footer-title">Continue Reading</div>
+      <div class="art-more-grid">${relHTML}</div>
+    </div>`;
+  document.getElementById('blogList').style.display = 'none';
+  document.getElementById('articleView').style.display = 'block';
+  window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('readProgress').style.width = '0%';
+}
+
+function closeArticle() {
+  document.getElementById('articleView').style.display = 'none';
+  document.getElementById('blogList').style.display = 'block';
+  document.getElementById('readProgress').style.width = '0%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+window.addEventListener('scroll', () => {
+  if (document.getElementById('articleView').style.display === 'none') return;
+  const d = document.documentElement;
+  document.getElementById('readProgress').style.width = Math.min((d.scrollTop / (d.scrollHeight - d.clientHeight)) * 100, 100) + '%';
+});
+
+document.querySelectorAll('.bl-filter').forEach(f => {
+  f.addEventListener('click', () => {
+    document.querySelectorAll('.bl-filter').forEach(x => x.classList.remove('active'));
+    f.classList.add('active');
+    const cat = f.dataset.cat;
+    document.querySelectorAll('.bl-card').forEach(c => {
+      c.style.display = (cat === 'all' || c.dataset.cat === cat) ? '' : 'none';
+    });
+  });
+});
+</script>
+
+{% endblock %}
