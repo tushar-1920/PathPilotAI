@@ -415,6 +415,14 @@ function initSocket() {
     if (state.output) updateOutput(state.output, state.output_status);
     isLocked = state.locked;
     updateEditorReadOnly();
+    // FIX: new joiner calls offer to ALL existing participants
+    setTimeout(() => {
+      state.participants.forEach(p => {
+        if (p.sid && p.sid !== socket.id && p.user_id !== MY_ID) {
+          initPeerConnection(p.sid, true);
+        }
+      });
+    }, 1200);
   });
 
   // Real-time code sync
@@ -444,7 +452,8 @@ function initSocket() {
     participants = data.participants;
     renderParticipants(participants);
     vcToast(`${data.user_name} joined`, "info");
-    initPeerConnection(data.sid, false);
+    // FIX: existing users send offer to new joiner
+    initPeerConnection(data.sid, true);
   });
 
   socket.on("vc_user_left", data => {
@@ -562,7 +571,13 @@ function createPeer(remoteSid) {
     iceServers: [
       {urls: "stun:stun.l.google.com:19302"},
       {urls: "stun:stun1.l.google.com:19302"},
-    ]
+      {urls: "stun:stun2.l.google.com:19302"},
+      {urls: "stun:stun3.l.google.com:19302"},
+      {urls:"turn:openrelay.metered.ca:80",username:"openrelayproject",credential:"openrelayproject"},
+      {urls:"turn:openrelay.metered.ca:443",username:"openrelayproject",credential:"openrelayproject"},
+      {urls:"turn:openrelay.metered.ca:443?transport=tcp",username:"openrelayproject",credential:"openrelayproject"}
+    ],
+    iceCandidatePoolSize: 10
   });
   peers[remoteSid] = pc;
 
