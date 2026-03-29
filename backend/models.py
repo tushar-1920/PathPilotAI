@@ -433,3 +433,280 @@ class AIInterviewMessage(db.Model):
     message    = db.Column(db.Text,        nullable=False)
     face_data  = db.Column(db.Text,        default="{}")      # JSON face snapshot at time of message
     created_at = db.Column(db.DateTime,    default=datetime.utcnow)
+
+"""
+ADD THESE TO YOUR backend/models.py
+Two new model classes for Career Time Machine + Blind Spot Detector
+"""
+from backend.extensions import db
+from datetime import datetime
+import json
+
+# ══════════════════════════════════════════════════════════════
+#  CAREER TIME MACHINE MODELS
+# ══════════════════════════════════════════════════════════════
+
+class CareerTimeMachine(db.Model):
+    """Stores each user's career journey plan + progress tracking."""
+    __tablename__ = "career_time_machines"
+
+    id              = db.Column(db.Integer, primary_key=True)
+    user_id         = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    target_role     = db.Column(db.String(200), nullable=False)
+    target_company  = db.Column(db.String(200))          # dream company (optional)
+    current_level   = db.Column(db.String(100))          # junior/mid/senior
+    timeline_months = db.Column(db.Integer, default=24)  # 12, 24, or 36 months
+    plan_json       = db.Column(db.Text)                 # full AI-generated plan
+    milestones_json = db.Column(db.Text)                 # list of monthly milestones
+    salary_json     = db.Column(db.Text)                 # salary projections per milestone
+    skills_json     = db.Column(db.Text)                 # skills at each stage
+    created_at      = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at      = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    is_active       = db.Column(db.Boolean, default=True)
+
+    # Relationships
+    progress        = db.relationship("CareerMilestoneProgress", backref="machine",
+                                       lazy=True, cascade="all,delete-orphan")
+
+    def get_plan(self):
+        try: return json.loads(self.plan_json) if self.plan_json else {}
+        except: return {}
+
+    def get_milestones(self):
+        try: return json.loads(self.milestones_json) if self.milestones_json else []
+        except: return []
+
+    def get_salary(self):
+        try: return json.loads(self.salary_json) if self.salary_json else []
+        except: return []
+
+
+class CareerMilestoneProgress(db.Model):
+    """Tracks which milestones a user has completed."""
+    __tablename__ = "career_milestone_progress"
+
+    id          = db.Column(db.Integer, primary_key=True)
+    machine_id  = db.Column(db.Integer, db.ForeignKey("career_time_machines.id"), nullable=False)
+    user_id     = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    month_num   = db.Column(db.Integer, nullable=False)   # which month (1-36)
+    milestone   = db.Column(db.String(500))               # milestone text
+    completed   = db.Column(db.Boolean, default=False)
+    completed_at= db.Column(db.DateTime)
+    note        = db.Column(db.Text)                      # user's own note
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+# ══════════════════════════════════════════════════════════════
+#  BLIND SPOT DETECTOR MODELS
+# ══════════════════════════════════════════════════════════════
+
+class BlindSpotReport(db.Model):
+    """Stores each AI blind spot analysis for a user."""
+    __tablename__ = "blind_spot_reports"
+
+    id              = db.Column(db.Integer, primary_key=True)
+    user_id         = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    overall_score   = db.Column(db.Integer, default=0)      # 0-100 self-awareness score
+    blind_spots_json= db.Column(db.Text)                    # list of detected blind spots
+    strengths_json  = db.Column(db.Text)                    # hidden strengths found
+    patterns_json   = db.Column(db.Text)                    # behavioral patterns detected
+    language_json   = db.Column(db.Text)                    # language analysis
+    gaps_json       = db.Column(db.Text)                    # credibility gaps
+    fixes_json      = db.Column(db.Text)                    # exact fix for each blind spot
+    coach_message   = db.Column(db.Text)                    # personal message from AI coach
+    shock_factor    = db.Column(db.Integer, default=5)      # 1-10 how surprising the findings are
+    created_at      = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def get_blind_spots(self):
+        try: return json.loads(self.blind_spots_json) if self.blind_spots_json else []
+        except: return []
+
+    def get_strengths(self):
+        try: return json.loads(self.strengths_json) if self.strengths_json else []
+        except: return []
+
+    def get_patterns(self):
+        try: return json.loads(self.patterns_json) if self.patterns_json else []
+        except: return []
+
+    def get_fixes(self):
+        try: return json.loads(self.fixes_json) if self.fixes_json else []
+        except: return []
+
+"""
+ADD/REPLACE in backend/models.py
+New additions: PostCommentReply, ProfileStats
+"""
+from backend.extensions import db
+from datetime import datetime
+
+
+# ── ADD THIS NEW MODEL ──────────────────────────────────────
+class PostCommentReply(db.Model):
+    """Replies to comments (nested comments)."""
+    __tablename__ = "post_comment_replies"
+    id         = db.Column(db.Integer, primary_key=True)
+    comment_id = db.Column(db.Integer, db.ForeignKey("post_comments.id"), nullable=False)
+    user_id    = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    content    = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    user       = db.relationship("User", backref="comment_replies")
+    comment    = db.relationship("PostComment",
+                    backref=db.backref("replies", cascade="all,delete-orphan", lazy=True))
+
+
+# ── ADD THIS NEW MODEL ──────────────────────────────────────
+class ProfileStats(db.Model):
+    """Cached stats for profile — ATS score, coding score, etc."""
+    __tablename__ = "profile_stats"
+    id              = db.Column(db.Integer, primary_key=True)
+    user_id         = db.Column(db.Integer, db.ForeignKey("users.id"), unique=True, nullable=False)
+    ats_score       = db.Column(db.Integer, default=0)
+    coding_score    = db.Column(db.Integer, default=0)
+    problems_solved = db.Column(db.Integer, default=0)
+    skills_count    = db.Column(db.Integer, default=0)
+    resume_updated  = db.Column(db.DateTime)
+    updated_at      = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    user            = db.relationship("User", backref=db.backref("profile_stats", uselist=False))
+
+
+# ── UPGRADE PostComment (add parent_id for nested) ──────────
+# Add this column to post_comments table via migration:
+# parent_id = db.Column(db.Integer, db.ForeignKey("post_comments.id"), nullable=True)
+
+# ═══════════════════════════════════════════════════════════════════════
+#  RECRUITER SYSTEM MODELS
+#  APPEND these 3 classes to the BOTTOM of backend/models.py
+#  Do NOT touch any existing model above.
+# ═══════════════════════════════════════════════════════════════════════
+import json
+
+
+class RecruiterJob(db.Model):
+    """
+    Jobs posted by recruiters through the recruiter panel.
+    Separate from JobPosting (which is for scraped/external jobs).
+    """
+    __tablename__ = "recruiter_jobs"
+
+    id              = db.Column(db.Integer, primary_key=True)
+    recruiter_email = db.Column(db.String(200), nullable=False, index=True)
+    company_name    = db.Column(db.String(200), nullable=False)
+    title           = db.Column(db.String(300), nullable=False)
+    description     = db.Column(db.Text,        nullable=False)
+    location        = db.Column(db.String(200))
+    job_type        = db.Column(db.String(100))        # Full-Time / Intern / Contract
+    ctc             = db.Column(db.String(100))        # e.g. "8.44 LPA" or "₹20,000/month"
+    deadline        = db.Column(db.DateTime)
+    stream_required = db.Column(db.String(300))        # CSE, AIML, etc.
+    min_cgpa        = db.Column(db.Float, default=0.0)
+    batch           = db.Column(db.String(50))         # 2025, 2026, 2027
+    rounds          = db.Column(db.Text)               # JSON list of rounds
+    skills_required = db.Column(db.Text)               # comma-separated
+    is_active       = db.Column(db.Boolean, default=True)
+    allow_messaging = db.Column(db.Boolean, default=False)  # can students reply?
+    created_at      = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # relationships
+    applications = db.relationship(
+        "JobApplication", backref="job",
+        lazy=True, cascade="all, delete-orphan"
+    )
+
+    def get_rounds(self):
+        try:    return json.loads(self.rounds) if self.rounds else []
+        except: return []
+
+    def get_skills(self):
+        if not self.skills_required:
+            return []
+        return [s.strip() for s in self.skills_required.split(",") if s.strip()]
+
+    @property
+    def is_expired(self):
+        if not self.deadline:
+            return False
+        return datetime.utcnow() > self.deadline
+
+    @property
+    def applicant_count(self):
+        return len(self.applications)
+
+
+class JobApplication(db.Model):
+    """
+    Student application to a RecruiterJob.
+    Captures all form fields the recruiter asked for.
+    """
+    __tablename__ = "job_applications"
+
+    id              = db.Column(db.Integer, primary_key=True)
+    job_id          = db.Column(db.Integer, db.ForeignKey("recruiter_jobs.id"), nullable=False)
+    user_id         = db.Column(db.Integer, db.ForeignKey("users.id"),          nullable=False)
+
+    # Academic details
+    tenth_percent   = db.Column(db.Float)
+    twelfth_percent = db.Column(db.Float)
+    cgpa            = db.Column(db.Float)
+    degree          = db.Column(db.String(200))
+    college         = db.Column(db.String(300))
+    school_name     = db.Column(db.String(300))
+    batch           = db.Column(db.String(50))
+    stream          = db.Column(db.String(200))
+
+    # Extra info
+    strengths       = db.Column(db.Text)
+    why_hire        = db.Column(db.Text)
+    contact_email   = db.Column(db.String(200))
+    phone           = db.Column(db.String(20))
+
+    # Resume
+    resume_filename = db.Column(db.String(400))   # stored filename
+    resume_url      = db.Column(db.String(500))   # path or cloud URL
+
+    # Status & tracking
+    status          = db.Column(db.String(50), default="applied")
+    # applied | under_review | shortlisted | selected | rejected
+    applied_at      = db.Column(db.DateTime, default=datetime.utcnow)
+    is_before_deadline = db.Column(db.Boolean, default=True)
+
+    # Relationships
+    user = db.relationship("User", backref="job_applications")
+
+    __table_args__ = (
+        db.UniqueConstraint("job_id", "user_id", name="unique_job_user_application"),
+    )
+
+    @property
+    def status_color(self):
+        return {
+            "applied":       "blue",
+            "under_review":  "yellow",
+            "shortlisted":   "purple",
+            "selected":      "green",
+            "rejected":      "red",
+        }.get(self.status, "gray")
+
+
+class RecruiterMessage(db.Model):
+    """
+    Messages sent FROM recruiter TO a student (or reply if allowed).
+    Recruiter is identified by email string, not a User row.
+    """
+    __tablename__ = "recruiter_messages"
+
+    id               = db.Column(db.Integer, primary_key=True)
+    recruiter_email  = db.Column(db.String(200), nullable=False, index=True)
+    company_name     = db.Column(db.String(200))
+    receiver_id      = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    job_id           = db.Column(db.Integer, db.ForeignKey("recruiter_jobs.id"), nullable=True)
+    subject          = db.Column(db.String(300))
+    content          = db.Column(db.Text, nullable=False)
+    message_type     = db.Column(db.String(50), default="general")
+    # general | selected | rejected | interview | offer
+    is_read          = db.Column(db.Boolean, default=False)
+    allow_reply      = db.Column(db.Boolean, default=False)
+    created_at       = db.Column(db.DateTime, default=datetime.utcnow)
+
+    receiver = db.relationship("User", backref="recruiter_messages")
+    job      = db.relationship("RecruiterJob", backref="messages")

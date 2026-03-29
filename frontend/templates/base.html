@@ -19,11 +19,27 @@
   --font-b: 'DM Sans', sans-serif;
 }
 *, *::before, *::after { box-sizing: border-box; }
+html {
+  background: #000 !important;
+}
 body {
   font-family: var(--font-b) !important;
+  background: #000 !important;
   color: #fff !important;
   margin: 0;
   -webkit-font-smoothing: antialiased;
+}
+/* Kill Bootstrap's white body/bg overrides */
+.bg-white, .bg-light { background: rgba(255,255,255,.03) !important; }
+/* Dark selects globally */
+select, select option {
+  background: #0d0d18 !important;
+  color: #fff !important;
+  border-color: rgba(255,255,255,.1) !important;
+}
+select option:checked,
+select option:hover {
+  background: rgba(91,107,255,.3) !important;
 }
 
 /* NAVBAR */
@@ -161,10 +177,33 @@ body {
 .page-wrapper {
   margin-top: 64px;
   position: relative; z-index: 1;
+  background: #000 !important;
+  min-height: 100vh;
+  padding-bottom: 0;
+}
+.page-wrapper > .container,
+.page-wrapper > .container-fluid,
+.page-wrapper > .container > *,
+.container, .container-fluid {
+  background: transparent !important;
+}
+.page-wrapper > .container {
+  max-width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+/* Footer always dark */
+body::after {
+  content: '';
+  display: block;
+  background: #000;
 }
 
 /* FOOTER */
 .footer {
+  background: #000 !important;
   margin-top: 60px; padding: 28px 0;
   text-align: center; font-size: 13px;
   color: rgba(255,255,255,.2);
@@ -293,9 +332,31 @@ a.navbar-brand.pp-logo:hover .pp-w-pilot{color:rgba(255,255,255,.82);}
 <a class="nav-link" href="/about">About</a>
 </li>
 
-{% if session.get('user_id') %}
+{% if session.get('role') == 'recruiter' %}
 
-<!-- AUTH USER NAV -->
+<!-- ══ RECRUITER NAV ══ -->
+<li class="nav-item">
+  <a class="nav-link" href="/recruiter/dashboard">📊 Dashboard</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="/recruiter/post-job">📝 Post Job</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="/recruiter/search-students">🔍 Students</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="/recruiter/messages">💬 Messages</a>
+</li>
+<li class="nav-item" style="font-size:12px;color:rgba(0,229,200,.6);padding:6px 10px;align-self:center;white-space:nowrap">
+  🏢 {{ session.get('recruiter_company','Recruiter') }}
+</li>
+<li class="nav-item ms-2">
+  <a class="btn btn-outline-light btn-sm" href="/logout">Logout</a>
+</li>
+
+{% elif session.get('user_id') %}
+
+<!-- ══ AUTH USER NAV ══ -->
 
 <li class="nav-item">
 <a class="nav-link" href="/dashboard">Dashboard</a>
@@ -314,17 +375,13 @@ a.navbar-brand.pp-logo:hover .pp-w-pilot{color:rgba(255,255,255,.82);}
 <a class="nav-link" href="/upload">Upload</a>
 </li>
 <li class="nav-item">
-<a class="nav-link" href="/resume-ai">AI Resume Analyzer</a>
+<a class="nav-link" href="/resume-ai">AI Resume</a>
 </li>
 <li class="nav-item">
-<a class="nav-link" href="/resume-builder">
-Resume Builder
-</a>
+<a class="nav-link" href="/resume-builder">Resume Builder</a>
 </li>
-<!-- <li class="nav-item">
-    <a class="nav-link" href="/billing">Billing</a>
-</li> -->
-{% if session.get('user_id') %}
+
+<!-- My Profile dropdown -->
 <li class="nav-item dropdown">
   <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
     👤 My Profile
@@ -333,48 +390,31 @@ Resume Builder
     <li><a class="dropdown-item" href="/profile">My Profile</a></li>
     <li><a class="dropdown-item" href="/edit-profile">Edit Profile</a></li>
     <li><a class="dropdown-item" href="/feed">Feed</a></li>
-    <li><a class="dropdown-item" href="/certificates">Certificates</a></li>
-    <li><hr class="dropdown-divider"></li>
-    
+    <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,.08)"></li>
+    <li><a class="dropdown-item" href="/live-jobs" style="color:rgba(34,197,94,.85)">🔴 Live Jobs</a></li>
+    <li><a class="dropdown-item" href="/my-applications">📋 My Applications</a></li>
+    <li><a class="dropdown-item" href="/my-messages">💬 Recruiter Messages</a></li>
   </ul>
 </li>
-{% endif %}
 
-
-
+<!-- Career Tools dropdown -->
 <li class="nav-item dropdown">
-<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-Career Tools
-
-</a>
+<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Career Tools</a>
 <ul class="dropdown-menu dropdown-menu-end shadow">
 <li><a class="dropdown-item" href="/roadmap">Career Roadmap</a></li>
 <li><a class="dropdown-item" href="/salary">Salary Insights</a></li>
 <li><a class="dropdown-item" href="/market">Market Intelligence</a></li>
 <li><a class="dropdown-item" href="/resume-history">Resume History</a></li>
-<li class="nav-item">
-<a class="nav-link" href="/jobs">Jobs</a>
-</li>
-<li class="nav-item">
-<a class="nav-link" href="/job-analyzer">
-Job Analyzer
-</a>
-</li>
-<li class="nav-item">
-<a class="nav-link" href="/saved-jobs">Saved Jobs</a>
-</li>
+<li><a class="dropdown-item" href="/jobs">Jobs</a></li>
+<li><a class="dropdown-item" href="/job-analyzer">Job Analyzer</a></li>
+<li><a class="dropdown-item" href="/saved-jobs">Saved Jobs</a></li>
 <li><a class="dropdown-item" href="/practice">⚡ Code Practice</a></li>
 <li><a class="dropdown-item" href="/interview">🎯 Interview Simulator</a></li>
 <li><a class="dropdown-item" href="/ai-recruiter">🎙️ AI Recruiter</a></li>
-<li class="nav-item">
-<a class="nav-link" href="/vidcode">
-⚡VidCode</a>
-</li>
-
-<!-- <li><a class="dropdown-item" href="/applications">Applications</a></li> -->
-<!-- <li><a class="dropdown-item" href="/pricing">Pricing</a></li> -->
-
-</li>
+<li><a class="dropdown-item" href="/vidcode">⚡ VidCode</a></li>
+<li><a class="dropdown-item" href="/cover-letter">✉️ Cover Letter</a></li>
+<li><a class="dropdown-item" href="/career-time-machine">⏳ Time Machine</a></li>
+<li><a class="dropdown-item" href="/blind-spot-detector">🔍 Blind Spots</a></li>
 </ul>
 </li>
 

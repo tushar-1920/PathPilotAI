@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;--red:#ff5757;--purple:#a855f7;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#000!important;color:#fff!important;}
+.vs-page{min-height:100vh;background:#000;position:relative;}
+.vs-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 55% 45% at 5% 10%,rgba(91,107,255,.09) 0%,transparent 65%),radial-gradient(ellipse 45% 40% at 95% 85%,rgba(0,229,200,.07) 0%,transparent 60%);}
+.vs-body{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:28px 20px 100px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* Back + recruiter bar */
+.vs-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px;}
+.vs-back{display:inline-flex;align-items:center;gap:7px;color:rgba(255,255,255,.4);text-decoration:none;font-size:13px;transition:color .2s;}
+.vs-back:hover{color:#fff;}
+.vs-recruiter-tag{padding:6px 14px;border-radius:100px;background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.2);font-size:12px;color:#818cf8;font-weight:600;}
+
+/* Header Card */
+.vs-hcard{border-radius:22px;overflow:hidden;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);margin-bottom:16px;animation:fadeUp .4s ease both;}
+.vs-cover{height:160px;background:linear-gradient(135deg,rgba(91,107,255,.5),rgba(0,229,200,.3),rgba(168,85,247,.25));position:relative;overflow:hidden;}
+.vs-cover::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px);background-size:24px 24px;}
+.vs-cover::after{content:"";position:absolute;bottom:0;left:0;right:0;height:70px;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 100%);z-index:2;}
+.vs-cover img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.vs-hbody{padding:0 28px 22px;}
+.vs-av-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:-52px;margin-bottom:12px;flex-wrap:wrap;gap:10px;position:relative;z-index:10;}
+.vs-av{width:96px;height:96px;border-radius:22px;border:4px solid #0a0a0a;background:linear-gradient(135deg,rgba(91,107,255,.4),rgba(0,229,200,.2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:34px;font-weight:800;color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.12),0 8px 32px rgba(0,0,0,.9);overflow:hidden;position:relative;z-index:10;}
+.vs-av img{width:100%;height:100%;object-fit:cover;}
+.vs-actions{display:flex;gap:8px;flex-wrap:wrap;padding-top:52px;}
+.vs-btn{padding:9px 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:7px;transition:all .18s;border:1px solid transparent;}
+.vs-btn-msg{background:rgba(0,229,200,.08);border-color:rgba(0,229,200,.22);color:rgba(0,229,200,.9);}
+.vs-btn-msg:hover{background:rgba(0,229,200,.16);color:rgba(0,229,200,1);}
+.vs-name{font-family:'Syne',sans-serif;font-size:clamp(18px,3vw,25px);font-weight:800;letter-spacing:-.8px;color:#fff;margin-bottom:2px;}
+.vs-hl{font-size:14px;color:rgba(255,255,255,.4);font-weight:300;margin-bottom:8px;}
+.vs-loc{font-size:12.5px;color:rgba(255,255,255,.28);display:flex;align-items:center;gap:4px;margin-bottom:12px;}
+.vs-score-badges{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px;}
+.vs-badge{display:flex;align-items:center;gap:8px;padding:7px 13px;border-radius:12px;border:1px solid;}
+.vs-stats{display:flex;gap:0;border-top:1px solid rgba(255,255,255,.06);padding-top:12px;flex-wrap:wrap;}
+.vs-stat{padding:5px 20px 5px 0;cursor:default;}
+.vs-stat+.vs-stat{padding-left:20px;border-left:1px solid rgba(255,255,255,.07);}
+.vs-stat-num{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;line-height:1;}
+.vs-stat-lbl{font-size:10px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+
+/* Layout */
+.vs-layout{display:grid;grid-template-columns:1fr 300px;gap:16px;}
+
+/* Card */
+.vs-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:22px;margin-bottom:14px;}
+.vs-card::before{content:"";display:block;height:1px;margin:-22px -22px 18px;background:linear-gradient(90deg,transparent,rgba(91,107,255,.15),rgba(0,229,200,.08),transparent);}
+.vs-card-title{font-family:'Syne',sans-serif;font-size:14.5px;font-weight:700;color:#fff;letter-spacing:-.3px;margin-bottom:14px;}
+
+/* Applications from this student */
+.vs-app-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:14px;margin-bottom:10px;}
+.vs-app-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:4px;}
+.vs-app-meta{font-size:12px;color:rgba(255,255,255,.35);}
+.vs-app-status{display:inline-flex;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;margin-top:6px;}
+.s-applied{background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.2);color:#818cf8;}
+.s-selected{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
+.s-rejected{background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.2);color:var(--red);}
+.s-shortlisted{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);color:var(--purple);}
+.s-under_review{background:rgba(255,181,71,.1);border:1px solid rgba(255,181,71,.2);color:var(--amber);}
+
+/* Skills */
+.vs-skill-tag{padding:5px 13px;border-radius:100px;font-size:12px;font-weight:500;display:inline-block;margin:3px 4px 3px 0;}
+.vs-skill-r{background:rgba(91,107,255,.08);border:1px solid rgba(91,107,255,.18);color:#818cf8;}
+.vs-skill-e{background:rgba(0,229,200,.07);border:1px solid rgba(0,229,200,.18);color:rgba(0,229,200,.8);}
+
+/* Posts */
+.vs-post{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.vs-post:last-child{border-bottom:none;padding-bottom:0;}
+.vs-post-type{display:inline-flex;padding:2px 9px;border-radius:100px;font-size:9.5px;font-weight:700;margin-bottom:6px;letter-spacing:.5px;}
+.badge-achievement{background:rgba(255,181,71,.12);border:1px solid rgba(255,181,71,.2);color:var(--amber);}
+.badge-milestone{background:rgba(0,229,200,.1);border:1px solid rgba(0,229,200,.2);color:var(--cyan);}
+.badge-image{background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.2);color:#818cf8;}
+.vs-post-content{font-size:14px;color:rgba(255,255,255,.6);line-height:1.75;}
+.vs-post-time{font-size:11.5px;color:rgba(255,255,255,.25);margin-top:6px;}
+
+/* Certs */
+.vs-cert{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.vs-cert:last-child{border-bottom:none;padding-bottom:0;}
+.vs-cert-icon{width:38px;height:38px;border-radius:10px;background:rgba(255,181,71,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.vs-cert-title{font-size:13.5px;font-weight:600;color:#fff;}
+.vs-cert-issuer{font-size:12px;color:rgba(255,255,255,.35);}
+
+/* Social */
+.vs-social{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:11px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);text-decoration:none;margin-bottom:8px;transition:all .2s;}
+.vs-social:hover{background:rgba(255,255,255,.06);transform:translateX(3px);}
+.vs-social-icon{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.vs-social-name{font-size:13px;font-weight:600;color:rgba(255,255,255,.6);}
+.vs-social-url{font-size:11px;color:rgba(255,255,255,.28);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;}
+
+.vs-empty{font-size:13px;color:rgba(255,255,255,.22);font-style:italic;padding:4px 0;}
+
+@media(max-width:900px){.vs-layout{grid-template-columns:1fr;}.vs-hbody{padding:0 16px 18px;}}
+</style>
+
+<div class="vs-page">
+<div class="vs-glow"></div>
+<div class="vs-body">
+
+<div class="vs-topbar">
+  <a href="javascript:history.back()" class="vs-back">← Back</a>
+  <div class="vs-recruiter-tag">🏢 {{ recruiter_company }} — Recruiter View</div>
+</div>
+
+<!-- Header Card -->
+<div class="vs-hcard">
+  <div class="vs-cover">
+    {% if student_profile and student_profile.cover_image %}
+      <img src="/static/{{ student_profile.cover_image }}" alt="cover">
+    {% endif %}
+  </div>
+  <div class="vs-hbody">
+    <div class="vs-av-row">
+      <div class="vs-av">
+        {% if profile_image_url %}<img src="{{ profile_image_url }}" alt="{{ student_user.name }}">
+        {% else %}{{ student_user.name[0].upper() if student_user.name else '?' }}{% endif %}
+      </div>
+      <div class="vs-actions">
+        <a href="/recruiter/send-message?receiver_id={{ student_user.id }}" class="vs-btn vs-btn-msg">💬 Send Message</a>
+      </div>
+    </div>
+
+    <div class="vs-name">{{ student_user.name }}</div>
+    {% if student_profile and student_profile.username %}<div style="font-size:13.5px;color:rgba(0,229,200,.7);margin-bottom:4px">@{{ student_profile.username }}</div>{% endif %}
+    {% if student_profile and student_profile.headline %}<div class="vs-hl">{{ student_profile.headline }}</div>{% endif %}
+    {% if student_profile and student_profile.location %}<div class="vs-loc">📍 {{ student_profile.location }}</div>{% endif %}
+
+    <!-- Scores -->
+    <div class="vs-score-badges">
+      {% if ats_score %}<div class="vs-badge" style="background:rgba(91,107,255,.07);border-color:rgba(91,107,255,.2)"><span>📊</span><div><div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#818cf8">{{ ats_score }}%</div><div style="font-size:10px;color:rgba(255,255,255,.3)">ATS Score</div></div></div>{% endif %}
+      {% if competitive_score %}<div class="vs-badge" style="background:rgba(255,181,71,.07);border-color:rgba(255,181,71,.2)"><span>🏆</span><div><div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--amber)">{{ competitive_score }}%</div><div style="font-size:10px;color:rgba(255,255,255,.3)">Competitive</div></div></div>{% endif %}
+      {% if readiness_score %}<div class="vs-badge" style="background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.18)"><span>✅</span><div><div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--green)">{{ readiness_score }}%</div><div style="font-size:10px;color:rgba(255,255,255,.3)">Job Ready</div></div></div>{% endif %}
+      {% if coding_solved %}<div class="vs-badge" style="background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.18)"><span>🧩</span><div><div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--green)">{{ coding_solved }}</div><div style="font-size:10px;color:rgba(255,255,255,.3)">Solved</div></div></div>{% endif %}
+      {% if resume_skills %}<div class="vs-badge" style="background:rgba(0,229,200,.06);border-color:rgba(0,229,200,.18)"><span>⚡</span><div><div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--cyan)">{{ resume_skills|length }}</div><div style="font-size:10px;color:rgba(255,255,255,.3)">Skills</div></div></div>{% endif %}
+    </div>
+
+    {% if dominant_role %}<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 13px;border-radius:100px;background:rgba(91,107,255,.07);border:1px solid rgba(91,107,255,.16);font-size:12px;color:rgba(255,255,255,.45);margin-bottom:10px;">🎯 Detected Role: <strong style="color:#818cf8">{{ dominant_role }}</strong></div>{% endif %}
+
+    <div class="vs-stats">
+      <div class="vs-stat"><div class="vs-stat-num">{{ followers_count }}</div><div class="vs-stat-lbl">Followers</div></div>
+      <div class="vs-stat"><div class="vs-stat-num">{{ following_count }}</div><div class="vs-stat-lbl">Following</div></div>
+      <div class="vs-stat"><div class="vs-stat-num">{{ posts|length }}</div><div class="vs-stat-lbl">Posts</div></div>
+      {% if certs %}<div class="vs-stat"><div class="vs-stat-num">{{ certs|length }}</div><div class="vs-stat-lbl">Certs</div></div>{% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Layout -->
+<div class="vs-layout">
+
+  <!-- Left -->
+  <div>
+
+    <!-- Applications to MY jobs -->
+    {% if student_apps %}
+    <div class="vs-card" style="animation:fadeUp .35s .04s ease both">
+      <div class="vs-card-title">📨 Applied to Your Jobs</div>
+      {% for app in student_apps %}
+      <div class="vs-app-card">
+        <div class="vs-app-title">{{ app.job.title }}</div>
+        <div class="vs-app-meta">Applied {{ app.applied_at.strftime('%b %d, %Y') if app.applied_at else '—' }} · CGPA: {{ app.cgpa or '—' }} · {{ app.college or '—' }}</div>
+        <div class="vs-app-status s-{{ app.status }}">{{ app.status.replace('_',' ').title() }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Posts -->
+    {% if posts %}
+    <div class="vs-card" style="animation:fadeUp .4s .06s ease both">
+      <div class="vs-card-title">📝 Recent Posts</div>
+      {% for post in posts %}
+      <div class="vs-post">
+        {% if post.post_type != 'text' %}
+        <div class="vs-post-type badge-{{ post.post_type }}">
+          {{ '🏆 Achievement' if post.post_type=='achievement' else '🎯 Milestone' if post.post_type=='milestone' else '🖼️ Photo' }}
+        </div>
+        {% endif %}
+        <div class="vs-post-content">{{ post.content }}</div>
+        {% if post.image_url %}
+        <img src="{{ post.image_url }}" alt="post image"
+             style="width:100%;border-radius:12px;max-height:340px;object-fit:cover;margin-top:10px;border:1px solid rgba(255,255,255,.08);">
+        {% endif %}
+        <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+          <span class="vs-post-time">{{ post.created_at.strftime('%b %d, %Y') if post.created_at else '' }}</span>
+          <span style="font-size:11.5px;color:rgba(255,255,255,.25)">❤️ {{ post.likes|length if post.likes else 0 }}  💬 {{ post.comments|length if post.comments else 0 }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- Right -->
+  <div>
+
+    <!-- Bio -->
+    {% if student_profile and student_profile.bio %}
+    <div class="vs-card" style="animation:fadeUp .35s .02s ease both">
+      <div class="vs-card-title">About</div>
+      <div style="font-size:13.5px;color:rgba(255,255,255,.5);line-height:1.8;font-weight:300">{{ student_profile.bio }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Skills -->
+    {% if resume_skills %}
+    <div class="vs-card" style="animation:fadeUp .38s .05s ease both">
+      <div class="vs-card-title">⚡ Skills</div>
+      <div style="display:flex;flex-wrap:wrap">
+        {% for s in resume_skills[:20] %}<span class="vs-skill-tag vs-skill-r">{{ s }}</span>{% endfor %}
+      </div>
+      {% if student_profile and student_profile.skills_summary %}
+      <div style="margin-top:10px;display:flex;flex-wrap:wrap">
+        {% for s in student_profile.skills_summary.split(',') %}{% if s.strip() %}<span class="vs-skill-tag vs-skill-e">{{ s.strip() }}</span>{% endif %}{% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Certs -->
+    {% if certs %}
+    <div class="vs-card" style="animation:fadeUp .4s .08s ease both">
+      <div class="vs-card-title">🏆 Certifications</div>
+      {% for cert in certs %}
+      <div class="vs-cert">
+        <div class="vs-cert-icon">🏅</div>
+        <div>
+          <div class="vs-cert-title">{{ cert.title }}</div>
+          <div class="vs-cert-issuer">{{ cert.issuer or '' }}{% if cert.issued_date %} · {{ cert.issued_date }}{% endif %}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Social -->
+    {% if student_profile and (student_profile.github or student_profile.linkedin or student_profile.portfolio) %}
+    <div class="vs-card" style="animation:fadeUp .42s .1s ease both">
+      <div class="vs-card-title">🔗 Links</div>
+      {% if student_profile.github %}
+      <a href="{{ student_profile.github }}" target="_blank" class="vs-social"><div class="vs-social-icon" style="background:rgba(255,255,255,.06)">💻</div><div><div class="vs-social-name">GitHub</div><div class="vs-social-url">{{ student_profile.github }}</div></div></a>
+      {% endif %}
+      {% if student_profile.linkedin %}
+      <a href="{{ student_profile.linkedin }}" target="_blank" class="vs-social"><div class="vs-social-icon" style="background:rgba(0,119,181,.15)">in</div><div><div class="vs-social-name">LinkedIn</div><div class="vs-social-url">{{ student_profile.linkedin }}</div></div></a>
+      {% endif %}
+      {% if student_profile.portfolio %}
+      <a href="{{ student_profile.portfolio }}" target="_blank" class="vs-social"><div class="vs-social-icon" style="background:rgba(0,229,200,.08)">🌐</div><div><div class="vs-social-name">Portfolio</div><div class="vs-social-url">{{ student_profile.portfolio }}</div></div></a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+</div>
+</div>
+{% endblock %}

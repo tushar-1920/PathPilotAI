@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+body,html{background:#000!important;}
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;}
+.pj-page{min-height:100vh;background:#000;padding:36px 0 80px;}
+.pj-body{max-width:800px;margin:0 auto;padding:0 20px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.pj-back{display:inline-flex;align-items:center;gap:7px;color:rgba(255,255,255,.35);text-decoration:none;font-size:13px;margin-bottom:22px;transition:color .2s;}
+.pj-back:hover{color:#fff;}
+.pj-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#fff;letter-spacing:-.8px;margin-bottom:4px;}
+.pj-sub{font-size:14px;color:rgba(255,255,255,.35);margin-bottom:28px;}
+.pj-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:28px;margin-bottom:20px;animation:fadeUp .4s ease both;}
+.pj-section{font-family:'Syne',sans-serif;font-size:13.5px;font-weight:700;color:rgba(0,229,200,.8);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;margin-top:4px;}
+.pj-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.pj-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+.pj-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.pj-label{font-size:12.5px;font-weight:600;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.6px;}
+.pj-inp{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:11px;padding:11px 15px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;width:100%;}
+.pj-inp:focus{border-color:rgba(91,107,255,.4);}
+.pj-inp::placeholder{color:rgba(255,255,255,.2);}
+.pj-inp option{background:#0d0d18;color:#fff;}
+.pj-ta{height:120px;resize:vertical;}
+.pj-checkbox-row{display:flex;align-items:center;gap:10px;padding:12px 15px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:11px;}
+.pj-checkbox{width:18px;height:18px;accent-color:var(--neon);cursor:pointer;}
+.pj-checkbox-lbl{font-size:13.5px;color:rgba(255,255,255,.6);cursor:pointer;}
+/* Rounds */
+.pj-rounds{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+.pj-round-tag{display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:100px;background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.2);color:#818cf8;font-size:12.5px;font-weight:600;}
+.pj-round-rm{background:none;border:none;color:rgba(255,87,87,.6);cursor:pointer;font-size:14px;line-height:1;padding:0;}
+.pj-round-add{display:flex;gap:8px;}
+.pj-submit{width:100%;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,var(--neon),#3a4aff);color:#fff;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 6px 24px rgba(91,107,255,.4);transition:all .2s;margin-top:4px;}
+.pj-submit:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(91,107,255,.55);}
+/* Flash */
+.pj-flash{padding:12px 18px;border-radius:12px;margin-bottom:20px;font-size:14px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
+@media(max-width:600px){.pj-row,.pj-row-3{grid-template-columns:1fr;}}
+</style>
+
+<div class="pj-page">
+<div class="pj-body">
+
+{% with msgs = get_flashed_messages() %}{% if msgs %}{% for m in msgs %}<div class="pj-flash">{{ m }}</div>{% endfor %}{% endif %}{% endwith %}
+
+<a href="/recruiter/dashboard" class="pj-back">← Back to Dashboard</a>
+<div class="pj-title">📝 Post a New Job</div>
+<div class="pj-sub">{{ recruiter_company }} · {{ recruiter_email }}</div>
+
+<form method="POST" action="/recruiter/post-job">
+
+  <!-- Basic Info -->
+  <div class="pj-card">
+    <div class="pj-section">📋 Basic Information</div>
+    <div class="pj-field">
+      <label class="pj-label">Job Title *</label>
+      <input class="pj-inp" name="title" placeholder="e.g. Software Engineer Intern, Full Stack Developer" required>
+    </div>
+    <div class="pj-row">
+      <div class="pj-field" style="margin-bottom:0">
+        <label class="pj-label">Job Type</label>
+        <select class="pj-inp" name="job_type">
+          <option value="Full-Time">Full-Time</option>
+          <option value="Internship">Internship</option>
+          <option value="Contract">Contract</option>
+          <option value="Part-Time">Part-Time</option>
+        </select>
+      </div>
+      <div class="pj-field" style="margin-bottom:0">
+        <label class="pj-label">Location</label>
+        <input class="pj-inp" name="location" placeholder="e.g. Bangalore, Remote">
+      </div>
+    </div>
+    <div class="pj-row" style="margin-top:14px">
+      <div class="pj-field" style="margin-bottom:0">
+        <label class="pj-label">CTC / Stipend</label>
+        <input class="pj-inp" name="ctc" placeholder="e.g. 8.44 LPA or ₹20,000/month">
+      </div>
+      <div class="pj-field" style="margin-bottom:0">
+        <label class="pj-label">Application Deadline</label>
+        <input class="pj-inp" type="date" name="deadline">
+      </div>
+    </div>
+  </div>
+
+  <!-- Job Description -->
+  <div class="pj-card" style="animation-delay:.05s">
+    <div class="pj-section">📄 Job Description</div>
+    <div class="pj-field">
+      <label class="pj-label">Full Job Description *</label>
+      <textarea class="pj-inp pj-ta" name="description" placeholder="Describe the role, responsibilities, and what you're looking for..." required style="height:160px"></textarea>
+    </div>
+    <div class="pj-field">
+      <label class="pj-label">Skills Required (comma separated)</label>
+      <input class="pj-inp" name="skills_required" placeholder="e.g. Python, React, SQL, Machine Learning">
+    </div>
+  </div>
+
+  <!-- Eligibility -->
+  <div class="pj-card" style="animation-delay:.08s">
+    <div class="pj-section">🎓 Eligibility Criteria</div>
+    <div class="pj-row-3">
+      <div class="pj-field" style="margin-bottom:0">
+        <label class="pj-label">Min CGPA</label>
+        <input class="pj-inp" type="number" name="min_cgpa" step="0.1" min="0" max="10" placeholder="e.g. 7.0">
+      </div>
+      <div class="pj-field" style="margin-bottom:0">
+        <label class="pj-label">Batch / Year</label>
+        <input class="pj-inp" name="batch" placeholder="e.g. 2025, 2026">
+      </div>
+      <div class="pj-field" style="margin-bottom:0">
+        <label class="pj-label">Stream Required</label>
+        <input class="pj-inp" name="stream_required" placeholder="e.g. CSE, AIML, Any">
+      </div>
+    </div>
+  </div>
+
+  <!-- Rounds -->
+  <div class="pj-card" style="animation-delay:.11s">
+    <div class="pj-section">⚡ Selection Rounds</div>
+    <div class="pj-rounds" id="roundsTags"></div>
+    <div class="pj-round-add">
+      <input class="pj-inp" id="roundInp" placeholder="e.g. Online Test, Technical Interview, HR Round" style="flex:1">
+      <button type="button" onclick="addRound()" style="padding:11px 20px;border-radius:11px;border:1px solid rgba(91,107,255,.3);background:rgba(91,107,255,.1);color:#818cf8;font-size:13.5px;font-weight:600;cursor:pointer">+ Add</button>
+    </div>
+    <div id="roundsHidden"></div>
+    <div style="font-size:12px;color:rgba(255,255,255,.25);margin-top:8px">Press Enter or click Add. Rounds will be shown to students on the job listing.</div>
+  </div>
+
+  <!-- Settings -->
+  <div class="pj-card" style="animation-delay:.14s">
+    <div class="pj-section">⚙️ Settings</div>
+    <div class="pj-checkbox-row">
+      <input class="pj-checkbox" type="checkbox" name="allow_messaging" id="allowMsg">
+      <label class="pj-checkbox-lbl" for="allowMsg">Allow students to reply to recruiter messages for this job</label>
+    </div>
+  </div>
+
+  <button type="submit" class="pj-submit">🚀 Post Job Now</button>
+
+</form>
+</div>
+</div>
+
+<script>
+let rounds = [];
+function addRound(){
+  const inp = document.getElementById("roundInp");
+  const val = inp.value.trim();
+  if(!val) return;
+  rounds.push(val);
+  inp.value = "";
+  renderRounds();
+}
+function removeRound(i){
+  rounds.splice(i,1);
+  renderRounds();
+}
+function renderRounds(){
+  document.getElementById("roundsTags").innerHTML = rounds.map((r,i)=>
+    `<div class="pj-round-tag">${r}<button class="pj-round-rm" type="button" onclick="removeRound(${i})">×</button></div>`
+  ).join('');
+  document.getElementById("roundsHidden").innerHTML = rounds.map(r=>
+    `<input type="hidden" name="rounds" value="${r}">`
+  ).join('');
+}
+document.getElementById("roundInp").addEventListener("keydown", e=>{
+  if(e.key==="Enter"){e.preventDefault();addRound();}
+});
+</script>
+{% endblock %}

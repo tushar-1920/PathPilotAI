@@ -1,0 +1,804 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --acid:#ff3cac;--volt:#00ff88;--plasma:#7b2fff;--solar:#ff9f43;--ice:#00d4ff;--crimson:#ff4757;--obsidian:#0a0a0f;
+  --glass:rgba(255,255,255,.04);--border:rgba(255,255,255,.08);
+  --font-d:"Clash Display",sans-serif;--font-b:"Cabinet Grotesk",sans-serif;--font-c:"Fira Code",monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--obsidian)!important;color:#fff!important;font-family:var(--font-b);-webkit-font-smoothing:antialiased;}
+
+.pg{min-height:100vh;position:relative;overflow-x:hidden;}
+.pg-aurora{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 55% at -5% 5%,rgba(255,60,172,.12) 0%,transparent 55%),
+    radial-gradient(ellipse 60% 45% at 105% 90%,rgba(123,47,255,.1) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 110%,rgba(0,255,136,.07) 0%,transparent 50%),
+    radial-gradient(ellipse 35% 30% at 80% 20%,rgba(0,212,255,.06) 0%,transparent 55%);}
+.pg-grid{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:72px 72px;}
+.scanline{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,60,172,.15),transparent);animation:scanline 8s linear infinite;z-index:0;pointer-events:none;}
+.pg-body{position:relative;z-index:1;max-width:1260px;margin:0 auto;padding:48px 24px 140px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 8px var(--acid)}50%{opacity:.2;box-shadow:none}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 20px rgba(255,60,172,.3)}50%{box-shadow:0 0 40px rgba(255,60,172,.6)}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
+@keyframes reveal{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes barFill{from{width:0}to{width:var(--w)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+
+/* ─── HEADER ─── */
+.hdr{margin-bottom:44px;animation:fadeUp .6s var(--ease) both;}
+.hdr-badge{display:inline-flex;align-items:center;gap:10px;padding:6px 18px;border-radius:100px;background:rgba(255,60,172,.08);border:1px solid rgba(255,60,172,.22);font-size:10px;font-weight:700;color:rgba(255,60,172,.9);letter-spacing:3px;text-transform:uppercase;margin-bottom:18px;}
+.hdr-dot{width:6px;height:6px;border-radius:50%;background:var(--acid);animation:blink 2s ease-in-out infinite;}
+.hdr-title{font-family:var(--font-d);font-size:clamp(32px,6vw,68px);font-weight:700;letter-spacing:-3px;color:#fff;margin-bottom:10px;line-height:1;}
+.hdr-title em{font-style:normal;background:linear-gradient(110deg,var(--acid),var(--plasma),var(--ice));background-size:200%;animation:gradShift 4s ease infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hdr-sub{font-size:16px;color:rgba(255,255,255,.36);font-weight:400;line-height:1.8;max-width:620px;}
+.hdr-stats{display:flex;gap:28px;margin-top:22px;flex-wrap:wrap;}
+.hdr-stat{font-size:12px;color:rgba(255,255,255,.3);}
+.hdr-stat strong{color:rgba(255,255,255,.7);font-weight:700;margin-right:4px;}
+
+/* ─── WARNING BANNER ─── */
+.warn{background:linear-gradient(135deg,rgba(255,60,172,.07),rgba(123,47,255,.06));border:1px solid rgba(255,60,172,.18);border-radius:18px;padding:22px 26px;margin-bottom:28px;display:flex;align-items:flex-start;gap:18px;animation:fadeUp .6s .05s var(--ease) both;position:relative;overflow:hidden;}
+.warn::after{content:"⚠";position:absolute;right:-10px;top:-20px;font-size:120px;opacity:.03;pointer-events:none;}
+.warn-icon{font-size:28px;flex-shrink:0;animation:pulseGlow 2.5s ease-in-out infinite;}
+.warn-title{font-family:var(--font-d);font-size:16px;font-weight:700;color:#fff;margin-bottom:5px;}
+.warn-body{font-size:13.5px;color:rgba(255,255,255,.4);line-height:1.7;}
+
+/* ─── ANALYZE CARD ─── */
+.analyze-card{background:var(--glass);border:1px solid var(--border);border-radius:22px;padding:32px;margin-bottom:26px;position:relative;overflow:hidden;animation:fadeUp .6s .1s var(--ease) both;}
+.analyze-card::before{content:"";position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,60,172,.3),rgba(123,47,255,.2),transparent);}
+.ac-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:rgba(255,255,255,.25);display:block;margin-bottom:8px;}
+.ta{width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:14px 16px;color:#fff;font-family:var(--font-b);font-size:14px;outline:none;resize:vertical;min-height:100px;line-height:1.75;margin-bottom:16px;transition:border-color .2s,box-shadow .2s;}
+.ta:focus{border-color:rgba(123,47,255,.4);box-shadow:0 0 0 4px rgba(123,47,255,.06);}
+.ta::placeholder{color:rgba(255,255,255,.18);}
+.btn-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+.meta-hint{font-size:12.5px;color:rgba(255,255,255,.22);}
+.analyze-btn{padding:15px 36px;border-radius:13px;border:none;background:linear-gradient(135deg,var(--acid),var(--plasma));background-size:200%;animation:gradShift 4s ease infinite;color:#fff;font-family:var(--font-b);font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 32px rgba(255,60,172,.4);transition:transform .2s,box-shadow .2s;display:inline-flex;align-items:center;gap:10px;letter-spacing:.3px;}
+.analyze-btn:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(255,60,172,.6);}
+.analyze-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;animation:none;background:rgba(255,60,172,.25);box-shadow:none;}
+.btn-sm{padding:10px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px;}
+.btn-sm:hover{border-color:rgba(255,60,172,.3);color:#fff;background:rgba(255,60,172,.07);}
+
+/* ─── LOADER ─── */
+.loader{display:none;text-align:center;padding:70px 20px;border:1px solid rgba(255,60,172,.12);border-radius:22px;background:rgba(255,255,255,.015);margin-bottom:20px;}
+.loader.on{display:block;animation:fadeUp .35s var(--ease) both;}
+.spin-ring{width:56px;height:56px;border:3px solid rgba(255,255,255,.05);border-top-color:var(--acid);border-right-color:var(--plasma);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 22px;}
+.loader-title{font-family:var(--font-d);font-size:20px;font-weight:700;color:#fff;margin-bottom:6px;}
+.loader-sub{font-size:13px;color:rgba(255,255,255,.3);margin-bottom:8px;}
+.loader-warn{font-size:12.5px;color:rgba(255,60,172,.65);}
+.stages{display:flex;flex-direction:column;gap:7px;max-width:340px;margin:20px auto 0;}
+.stage{display:flex;align-items:center;gap:10px;padding:9px 15px;border-radius:10px;font-size:12.5px;color:rgba(255,255,255,.25);transition:all .4s;}
+.stage.on{color:rgba(255,60,172,.9);background:rgba(255,60,172,.07);border:1px solid rgba(255,60,172,.15);}
+.stage.done{color:rgba(0,255,136,.75);}
+
+/* ─── RESULTS ─── */
+.results{display:none;}
+.results.on{display:block;animation:fadeUp .5s var(--ease) both;}
+
+/* ─── SCORE HERO ─── */
+.score-hero{background:linear-gradient(135deg,rgba(255,60,172,.09),rgba(123,47,255,.08),rgba(0,212,255,.06));border:1px solid rgba(255,60,172,.2);border-radius:22px;padding:32px 36px;margin-bottom:22px;display:flex;align-items:center;gap:32px;flex-wrap:wrap;position:relative;overflow:hidden;}
+.score-hero::before{content:"";position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,60,172,.08) 0%,transparent 70%);}
+.score-ring-wrap{position:relative;width:110px;height:110px;flex-shrink:0;}
+.score-ring-wrap svg{transform:rotate(-90deg);}
+.score-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.score-big{font-family:var(--font-d);font-size:30px;font-weight:700;line-height:1;}
+.score-tiny{font-size:8.5px;color:rgba(255,255,255,.3);letter-spacing:1px;margin-top:2px;}
+.score-info{flex:1;}
+.score-label{font-family:var(--font-d);font-size:26px;font-weight:700;color:#fff;margin-bottom:8px;letter-spacing:-1px;}
+.score-sub{font-size:14px;color:rgba(255,255,255,.4);line-height:1.7;max-width:460px;}
+.shock-row{display:flex;align-items:center;gap:12px;margin-top:16px;}
+.shock-lbl{font-size:11px;color:rgba(255,255,255,.3);letter-spacing:.5px;}
+.shock-bar{width:130px;height:6px;border-radius:100px;background:rgba(255,255,255,.07);overflow:hidden;}
+.shock-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--volt),var(--solar),var(--crimson));transition:width 1.4s var(--ease);}
+.shock-val{font-family:var(--font-c);font-size:12px;color:rgba(255,255,255,.5);}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+
+/* ─── COACH ─── */
+.coach{background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);border-radius:18px;padding:22px 26px;margin-bottom:22px;display:flex;gap:16px;align-items:flex-start;}
+.coach-av{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,rgba(0,212,255,.25),rgba(123,47,255,.2));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:1px solid rgba(0,212,255,.2);}
+.coach-name{font-size:10px;font-weight:700;color:rgba(0,212,255,.7);margin-bottom:7px;text-transform:uppercase;letter-spacing:2px;}
+.coach-text{font-size:14.5px;color:rgba(255,255,255,.65);line-height:1.8;font-style:italic;}
+
+/* ─── SECTION TITLE ─── */
+.sec-title{font-family:var(--font-d);font-size:18px;font-weight:700;color:#fff;margin-bottom:18px;display:flex;align-items:center;gap:10px;letter-spacing:-.5px;}
+.sec-title .badge{font-family:var(--font-b);font-size:11px;font-weight:600;color:rgba(255,255,255,.3);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:3px 10px;border-radius:100px;}
+
+/* ─── GRID ─── */
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:22px;}
+.full-col{grid-column:span 2;}
+
+/* ─── SEVERITY DISTRIBUTION ─── */
+.sev-dist{display:flex;gap:14px;margin-bottom:18px;flex-wrap:wrap;}
+.sd-pill{flex:1;min-width:80px;padding:14px 16px;border-radius:13px;text-align:center;border:1px solid transparent;}
+.sd-critical{background:rgba(255,71,87,.08);border-color:rgba(255,71,87,.2);}
+.sd-high{background:rgba(255,159,67,.07);border-color:rgba(255,159,67,.18);}
+.sd-medium{background:rgba(123,47,255,.08);border-color:rgba(123,47,255,.18);}
+.sd-num{font-family:var(--font-d);font-size:28px;font-weight:700;line-height:1;margin-bottom:4px;}
+.sd-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;opacity:.6;}
+
+/* ─── BLIND SPOTS ─── */
+.bs-card{background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden;transition:all .25s;cursor:default;}
+.bs-card:hover{border-color:rgba(255,255,255,.16);transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.4);}
+.bs-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0 3px 3px 0;}
+.critical::before{background:linear-gradient(180deg,var(--crimson),var(--acid));}
+.high::before{background:linear-gradient(180deg,var(--solar),#ffd93d);}
+.medium::before{background:linear-gradient(180deg,var(--plasma),var(--ice));}
+.bs-top{display:flex;align-items:flex-start;gap:13px;margin-bottom:12px;}
+.bs-icon{font-size:24px;flex-shrink:0;line-height:1;}
+.bs-meta{flex:1;}
+.bs-title{font-family:var(--font-d);font-size:15.5px;font-weight:600;color:#fff;margin-bottom:3px;letter-spacing:-.3px;}
+.bs-cat{font-size:10px;text-transform:uppercase;letter-spacing:2px;font-weight:700;}
+.bs-sev{padding:4px 11px;border-radius:100px;font-size:10px;font-weight:700;margin-left:auto;flex-shrink:0;}
+.sev-critical{background:rgba(255,71,87,.12);border:1px solid rgba(255,71,87,.28);color:#ff6b7a;}
+.sev-high{background:rgba(255,159,67,.1);border:1px solid rgba(255,159,67,.25);color:#ffb347;}
+.sev-medium{background:rgba(123,47,255,.12);border:1px solid rgba(123,47,255,.25);color:#a78bfa;}
+.bs-finding{font-size:13.5px;color:rgba(255,255,255,.52);line-height:1.7;margin-bottom:10px;}
+.bs-evidence{font-family:var(--font-c);font-size:11px;color:rgba(255,159,67,.75);background:rgba(255,159,67,.05);border:1px solid rgba(255,159,67,.12);border-radius:9px;padding:8px 12px;margin-bottom:10px;line-height:1.6;}
+.bs-impact{font-size:13px;color:rgba(255,71,87,.75);display:flex;align-items:flex-start;gap:7px;margin-bottom:6px;}
+.bs-fix{font-size:13px;color:rgba(0,255,136,.7);display:flex;align-items:flex-start;gap:7px;}
+.bs-actions{display:flex;gap:8px;margin-top:13px;flex-wrap:wrap;}
+.dive-btn{padding:8px 18px;border-radius:9px;border:1px solid rgba(123,47,255,.3);background:rgba(123,47,255,.1);color:rgba(168,139,250,.9);font-family:var(--font-b);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+.dive-btn:hover{background:rgba(123,47,255,.22);border-color:rgba(123,47,255,.5);transform:translateY(-1px);}
+.copy-btn{padding:8px 18px;border-radius:9px;border:1px solid rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:rgba(0,212,255,.85);font-family:var(--font-b);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+.copy-btn:hover{background:rgba(0,212,255,.15);border-color:rgba(0,212,255,.4);}
+.expand-btn{padding:8px 18px;border-radius:9px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.03);color:rgba(255,255,255,.4);font-family:var(--font-b);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+.expand-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.8);}
+
+/* ─── STRENGTHS ─── */
+.str-card{background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.14);border-radius:18px;padding:22px;}
+.str-item{display:flex;gap:13px;align-items:flex-start;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.str-item:last-child{border-bottom:none;padding-bottom:0;}
+.str-icon{font-size:22px;flex-shrink:0;}
+.str-title{font-family:var(--font-d);font-size:14px;font-weight:600;color:#fff;margin-bottom:4px;}
+.str-desc{font-size:13px;color:rgba(255,255,255,.43);line-height:1.65;}
+.str-how{font-size:12.5px;color:rgba(0,255,136,.75);margin-top:5px;display:flex;align-items:flex-start;gap:5px;}
+
+/* ─── LANGUAGE ANALYSIS ─── */
+.lang-card{background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.13);border-radius:18px;padding:22px;}
+.lang-tone-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.lang-tone-badge{font-family:var(--font-d);font-size:18px;font-weight:700;}
+.tone-meter{flex:1;height:7px;border-radius:100px;background:rgba(255,255,255,.07);overflow:hidden;}
+.tone-fill{height:100%;border-radius:100px;transition:width 1.2s var(--ease);}
+.word-section-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;}
+.word-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.word-chip{padding:5px 11px;border-radius:100px;font-size:11.5px;font-weight:600;cursor:pointer;transition:transform .15s;}
+.word-chip:hover{transform:scale(1.08);}
+.word-remove{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.2);color:rgba(255,107,122,.9);}
+.word-add{background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.18);color:rgba(0,255,136,.85);}
+.readability-row{display:flex;align-items:center;gap:12px;}
+.readability-lbl{font-size:12px;color:rgba(255,255,255,.3);}
+.readability-bar{flex:1;height:5px;border-radius:100px;background:rgba(255,255,255,.07);overflow:hidden;}
+.readability-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--ice),var(--volt));}
+
+/* ─── PATTERNS ─── */
+.pattern-item{display:flex;gap:13px;align-items:flex-start;padding:15px 17px;border-radius:13px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);margin-bottom:10px;transition:all .2s;}
+.pattern-item:hover{border-color:rgba(255,255,255,.12);}
+.pat-icon{font-size:22px;flex-shrink:0;}
+.pat-name{font-family:var(--font-d);font-size:14.5px;font-weight:600;color:#fff;margin-bottom:4px;letter-spacing:-.3px;}
+.pat-desc{font-size:13px;color:rgba(255,255,255,.43);line-height:1.65;margin-bottom:5px;}
+.pat-fix{font-size:12.5px;color:rgba(0,212,255,.75);display:flex;align-items:flex-start;gap:5px;}
+
+/* ─── CREDIBILITY GAP ─── */
+.gap-card{padding:16px 18px;border-radius:13px;background:rgba(255,159,67,.04);border:1px solid rgba(255,159,67,.14);margin-bottom:10px;}
+.gap-title{font-size:13.5px;font-weight:700;color:rgba(255,159,67,.9);margin-bottom:5px;}
+.gap-impact{font-size:13px;color:rgba(255,255,255,.4);margin-bottom:5px;line-height:1.6;}
+.gap-fix{font-size:12.5px;color:rgba(0,255,136,.75);}
+
+/* ─── ACTION PLAN ─── */
+.action-plan{background:linear-gradient(135deg,rgba(123,47,255,.08),rgba(0,212,255,.06));border:1px solid rgba(123,47,255,.2);border-radius:18px;padding:24px;margin-bottom:22px;}
+.action-steps{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+.action-step{display:flex;gap:13px;align-items:flex-start;padding:14px 16px;border-radius:11px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);transition:all .2s;}
+.action-step:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);}
+.as-num{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--plasma),var(--ice));display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:13px;font-weight:700;flex-shrink:0;}
+.as-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:3px;}
+.as-effort{font-size:11.5px;color:rgba(255,255,255,.3);}
+.as-done-btn{width:32px;height:32px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:auto;transition:all .2s;}
+.as-done-btn:hover{background:rgba(0,255,136,.1);border-color:rgba(0,255,136,.3);}
+.as-done-btn.done{background:rgba(0,255,136,.12);border-color:rgba(0,255,136,.3);}
+
+/* ─── EMPTY ─── */
+.empty{text-align:center;padding:90px 20px;border:1px solid rgba(255,255,255,.05);border-radius:22px;background:rgba(255,255,255,.012);}
+.empty-icon{font-size:64px;margin-bottom:22px;display:block;animation:float 3s ease-in-out infinite;}
+.empty-title{font-family:var(--font-d);font-size:24px;font-weight:700;color:rgba(255,255,255,.25);margin-bottom:10px;}
+.empty-sub{font-size:14.5px;color:rgba(255,255,255,.18);line-height:1.8;max-width:460px;margin:0 auto;}
+
+/* ─── MODAL ─── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);}
+.modal-overlay.on{display:flex;animation:fadeUp .3s var(--ease) both;}
+.modal{background:#0c0c16;border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:36px;max-width:640px;width:100%;max-height:85vh;overflow-y:auto;position:relative;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;}
+.modal::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(123,47,255,.4),rgba(0,212,255,.3),transparent);}
+.modal-close{position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;color:rgba(255,255,255,.5);transition:all .2s;z-index:2;}
+.modal-close:hover{background:rgba(255,60,172,.1);border-color:rgba(255,60,172,.3);color:var(--acid);}
+.modal-title{font-family:var(--font-d);font-size:21px;font-weight:700;color:#fff;margin-bottom:24px;letter-spacing:-.5px;padding-right:46px;}
+.modal-sec{margin-bottom:20px;}
+.modal-sec-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:rgba(255,255,255,.25);margin-bottom:10px;}
+.modal-text{font-size:14px;color:rgba(255,255,255,.58);line-height:1.8;}
+.modal-steps{display:flex;flex-direction:column;gap:9px;}
+.modal-step{display:flex;gap:11px;font-size:13.5px;color:rgba(255,255,255,.6);padding:11px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);}
+.ba-row{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.ba-box{padding:14px 16px;border-radius:12px;}
+.ba-before{background:rgba(255,71,87,.06);border:1px solid rgba(255,71,87,.15);}
+.ba-after{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.15);}
+.ba-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+.ba-text{font-family:var(--font-c);font-size:12px;color:rgba(255,255,255,.7);line-height:1.65;}
+.modal-truth{padding:16px 20px;border-radius:13px;background:rgba(123,47,255,.08);border:1px solid rgba(123,47,255,.2);margin-top:6px;}
+.modal-truth-text{font-size:16px;color:rgba(168,139,250,.9);font-style:italic;line-height:1.7;font-weight:500;}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:28px;right:28px;z-index:9999;padding:12px 22px;border-radius:13px;font-size:14px;font-weight:700;color:#fff;transform:translateY(16px);opacity:0;transition:all .3s var(--ease);pointer-events:none;}
+.toast.on{transform:translateY(0);opacity:1;}
+.toast-ok{background:rgba(0,255,136,.9);box-shadow:0 8px 28px rgba(0,255,136,.35);}
+.toast-err{background:rgba(255,71,87,.9);box-shadow:0 8px 28px rgba(255,71,87,.35);}
+.toast-info{background:rgba(0,212,255,.9);box-shadow:0 8px 28px rgba(0,212,255,.35);}
+
+/* ─── RESUME STATUS ─── */
+.resume-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:100px;font-size:12.5px;font-weight:700;}
+.rp-ok{background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);color:rgba(0,255,136,.85);}
+.rp-warn{background:rgba(255,159,67,.08);border:1px solid rgba(255,159,67,.2);color:rgba(255,159,67,.85);}
+
+/* ─── EXPORT BANNER ─── */
+.export-bar{display:flex;gap:10px;flex-wrap:wrap;padding:18px 22px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:15px;margin-bottom:22px;align-items:center;}
+.export-lbl{font-size:12px;color:rgba(255,255,255,.3);margin-right:6px;}
+.export-btn{padding:8px 18px;border-radius:9px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.03);color:rgba(255,255,255,.55);font-family:var(--font-b);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+.export-btn:hover{border-color:rgba(0,212,255,.3);color:rgba(0,212,255,.9);background:rgba(0,212,255,.06);}
+
+@media(max-width:800px){
+  .results-grid{grid-template-columns:1fr;}
+  .full-col{grid-column:span 1;}
+  .ba-row{grid-template-columns:1fr;}
+  .score-hero{flex-direction:column;}
+  .sev-dist{flex-direction:column;}
+}
+</style>
+
+<div class="pg">
+<div class="pg-aurora"></div>
+<div class="pg-grid"></div>
+<div class="scanline"></div>
+<div class="pg-body">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-badge"><div class="hdr-dot"></div>AI Career Intelligence · Brutal Honesty Mode</div>
+    <h1 class="hdr-title">Blind Spot<br><em>Detector</em></h1>
+    <p class="hdr-sub">What your resume, your interviews, and even your mentors aren't telling you. AI reads your complete career profile and surfaces the hidden patterns costing you interviews, money, and promotions.</p>
+    <div class="hdr-stats">
+      <div class="hdr-stat"><strong>₹50,000</strong> coaching session value</div>
+      <div class="hdr-stat"><strong>20–30 sec</strong> deep analysis</div>
+      <div class="hdr-stat"><strong>7 dimensions</strong> analyzed</div>
+    </div>
+  </div>
+
+  <!-- WARNING -->
+  <div class="warn">
+    <div class="warn-icon">⚠️</div>
+    <div>
+      <div class="warn-title">This will be brutally, uncomfortably honest.</div>
+      <div class="warn-body">Most professionals never receive feedback this direct. The AI identifies your language patterns, credibility gaps, underselling behaviors, positioning failures, and blind spots about your own strengths — the exact things separating candidates who get hired at top salaries from those who don't.</div>
+    </div>
+  </div>
+
+  <!-- ANALYZE CARD -->
+  <div class="analyze-card">
+    {% if resume %}
+    <div class="resume-pill rp-ok" style="margin-bottom:18px">✅ Resume loaded: <strong>{{ resume.filename or "Your Resume" }}</strong></div>
+    {% else %}
+    <div class="resume-pill rp-warn" style="margin-bottom:18px">⚠️ No resume — <a href="/upload" style="color:rgba(0,212,255,.8);text-decoration:none">upload one</a> for deeper analysis</div>
+    {% endif %}
+    <label class="ac-label">Extra Context <span style="text-transform:none;font-size:9px;color:rgba(255,255,255,.18)">(optional — makes analysis 3× more specific)</span></label>
+    <textarea class="ta" id="extraCtx" placeholder="Give the AI more to work with:&#10;• Been applying to ML roles for 6 months — zero callbacks&#10;• Keep reaching final rounds but never get the offer&#10;• Struggle to talk about leadership, feel like an imposter&#10;• Don't know how to price myself for senior roles&#10;• Any specific pain points you want diagnosed..."></textarea>
+    <div class="btn-row">
+      <div class="meta-hint">Analysis takes 20–30 seconds · Reports auto-saved · GPT-4o powered</div>
+      <button class="analyze-btn" id="analyzeBtn" onclick="runAnalysis()">
+        🔍 Reveal My Blind Spots
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADER -->
+  <div class="loader" id="loader">
+    <div class="spin-ring"></div>
+    <div class="loader-title">Reading between the lines...</div>
+    <div class="loader-sub">AI is finding patterns most people never see about themselves</div>
+    <div class="loader-warn">Prepare for some uncomfortable truths.</div>
+    <div class="stages">
+      <div class="stage" id="s1">📄 Deep-reading your resume</div>
+      <div class="stage" id="s2">🧠 Mapping behavioral patterns</div>
+      <div class="stage" id="s3">🔍 Detecting credibility gaps</div>
+      <div class="stage" id="s4">💡 Surfacing hidden strengths</div>
+      <div class="stage" id="s5">⚡ Writing your personal diagnosis</div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="results">
+
+    <!-- Export Bar -->
+    <div class="export-bar" id="exportBar">
+      <span class="export-lbl">EXPORT REPORT →</span>
+      <button class="export-btn" onclick="exportText()">📄 Copy Full Report</button>
+      <button class="export-btn" onclick="exportJSON()">🗃️ Download JSON</button>
+      <button class="export-btn" onclick="shareReport()">🔗 Share Link</button>
+      <div style="margin-left:auto">
+        <button class="btn-sm" onclick="runAnalysis()">🔄 Re-analyze</button>
+      </div>
+    </div>
+
+    <!-- Score Hero -->
+    <div class="score-hero">
+      <div class="score-ring-wrap">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="8"/>
+          <circle cx="55" cy="55" r="46" fill="none" stroke-width="8" stroke-linecap="round"
+                  stroke-dasharray="289" stroke-dashoffset="289"
+                  id="scoreCircle" style="transition:stroke-dashoffset 1.6s var(--ease),stroke .3s"/>
+        </svg>
+        <div class="score-inner">
+          <div class="score-big" id="scoreNum">—</div>
+          <div class="score-tiny">SELF-AWARE</div>
+        </div>
+      </div>
+      <div class="score-info">
+        <div class="score-label" id="scoreLabel">—</div>
+        <div class="score-sub" id="scoreSub">—</div>
+        <div class="shock-row">
+          <div class="shock-lbl">SHOCK FACTOR</div>
+          <div class="shock-bar"><div class="shock-fill" id="shockFill" style="width:0%"></div></div>
+          <div class="shock-val" id="shockVal">—/10</div>
+        </div>
+        <div class="hero-actions" style="margin-top:14px">
+          <button class="btn-sm" onclick="runAnalysis()">🔄 Re-analyze</button>
+          <button class="btn-sm" onclick="scrollToSection('actionPlan')">🚀 Jump to Action Plan</button>
+          <button class="btn-sm" onclick="scrollToSection('blindSpotsBox')">🔴 View Blind Spots</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coach -->
+    <div class="coach" id="coachMsg">
+      <div class="coach-av">🧑‍💼</div>
+      <div>
+        <div class="coach-name">AI Career Coach · Personal Message</div>
+        <div class="coach-text" id="coachText">—</div>
+      </div>
+    </div>
+
+    <!-- Severity Distribution -->
+    <div class="full-col" style="margin-bottom:18px">
+      <div class="sev-dist" id="sevDist"></div>
+    </div>
+
+    <!-- Grid -->
+    <div class="results-grid">
+
+      <!-- BLIND SPOTS -->
+      <div class="full-col">
+        <div class="sec-title">🔴 Your Blind Spots <span class="badge" id="bsCount">0 found</span></div>
+        <div id="blindSpotsBox"></div>
+      </div>
+
+      <!-- HIDDEN STRENGTHS -->
+      <div>
+        <div class="sec-title">💚 Hidden Strengths You're Not Leveraging</div>
+        <div class="str-card" id="strengthsBox"></div>
+      </div>
+
+      <!-- LANGUAGE ANALYSIS -->
+      <div>
+        <div class="sec-title">🗣️ Language Analysis</div>
+        <div class="lang-card" id="langBox"></div>
+      </div>
+
+    </div>
+
+    <!-- PATTERNS -->
+    <div style="margin-bottom:22px">
+      <div class="sec-title">🔁 Behavioral Patterns Detected</div>
+      <div id="patternsBox"></div>
+    </div>
+
+    <!-- CREDIBILITY GAPS -->
+    <div style="margin-bottom:22px" id="gapsSection">
+      <div class="sec-title">⚡ Credibility Gaps</div>
+      <div id="gapsBox"></div>
+    </div>
+
+    <!-- ACTION PLAN -->
+    <div class="action-plan" id="actionPlan" style="display:none">
+      <div class="sec-title" style="margin-bottom:4px">🚀 Your 30-Day Action Plan</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.3);margin-bottom:0">Prioritized fixes — easiest wins first. Check off each as you complete it.</div>
+      <div class="action-steps" id="actionSteps"></div>
+    </div>
+
+  </div>
+
+  <!-- EMPTY STATE -->
+  {% if not report %}
+  <div class="empty" id="emptyState">
+    <span class="empty-icon">🔍</span>
+    <div class="empty-title">Your Blind Spot Report Awaits</div>
+    <div class="empty-sub">Click "Reveal My Blind Spots" above. The AI will analyze your profile and surface the honest, uncomfortable truths that every top coach charges ₹50,000+ to tell you.</div>
+  </div>
+  {% endif %}
+
+</div>
+</div>
+
+<!-- DEEP DIVE MODAL -->
+<div class="modal-overlay" id="modal" onclick="handleModalClick(event)">
+  <div class="modal" id="modalInner">
+    <div class="modal-close" onclick="closeModal()">×</div>
+    <div class="modal-title" id="modalTitle">Deep Dive</div>
+    <div id="modalBody">
+      <div style="text-align:center;padding:40px">
+        <div class="spin-ring" style="border-top-color:var(--plasma);border-right-color:var(--ice)"></div>
+        <div style="font-size:13px;color:rgba(255,255,255,.3);margin-top:14px">Loading deep insights...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ── State ─────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const show = id => { const e=$(id); if(e) e.style.display="block"; };
+const hide = id => { const e=$(id); if(e) e.style.display="none"; };
+
+let completedActions = new Set();
+let currentReport    = null;   // store full report for export
+
+// ── Load existing report on page load ─────────────────
+{% if report %}
+window.addEventListener('DOMContentLoaded', () => renderResults({{ report | tojson }}));
+{% endif %}
+
+// ── Run Analysis ──────────────────────────────────────
+async function runAnalysis() {
+  hide("emptyState");
+  $("results").classList.remove("on");
+  show("loader");
+  $("analyzeBtn").disabled = true;
+  $("analyzeBtn").innerHTML = "⏳ Analyzing...";
+  animStages();
+
+  try {
+    const r = await fetch("/api/blind-spot/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ extra_context: ($("extraCtx").value || "").trim() })
+    }).then(r => r.json());
+
+    hide("loader");
+
+    // ── FIX: check r.success properly ────────────────
+    if (!r.success) {
+      toast(r.error || "Analysis failed — please try again", "err");
+      show("emptyState");
+      return;
+    }
+    renderResults(r);
+    toast("🔍 Analysis complete — brace yourself", "ok");
+  } catch (e) {
+    hide("loader");
+    toast("Network error — please try again", "err");
+    show("emptyState");
+  }
+  $("analyzeBtn").disabled = false;
+  $("analyzeBtn").innerHTML = "🔍 Reveal My Blind Spots";
+}
+
+// ── Render Results ────────────────────────────────────
+function renderResults(d) {
+  currentReport = d;   // save for export
+
+  // Score ring
+  const score = d.self_awareness_score || 60;
+  const color = score >= 75 ? "#00ff88" : score >= 55 ? "#00d4ff" : score >= 40 ? "#ff9f43" : "#ff4757";
+  const circ = $("scoreCircle");
+  const dashLen = 289;
+  circ.style.stroke = color;
+  setTimeout(() => { circ.style.strokeDashoffset = (dashLen - score / 100 * dashLen).toFixed(1); }, 120);
+  $("scoreNum").textContent = score;
+  $("scoreNum").style.color = color;
+  $("scoreLabel").textContent = d.score_label || scoreLabel(score);
+  $("scoreSub").textContent = d.created_at
+    ? `Last analyzed: ${d.created_at} · ${(d.blind_spots || []).length} blind spots found`
+    : `${(d.blind_spots || []).length} blind spots detected across 7 dimensions`;
+
+  // Shock factor
+  const sf = d.shock_factor || 5;
+  setTimeout(() => { $("shockFill").style.width = (sf * 10) + "%"; }, 200);
+  $("shockVal").textContent = sf + "/10";
+
+  // Coach message
+  $("coachText").textContent = d.coach_message || "Your analysis is ready.";
+
+  // Severity distribution
+  const bs = d.blind_spots || [];
+  const crit = bs.filter(b => (b.severity || "").toLowerCase() === "critical").length;
+  const high = bs.filter(b => (b.severity || "").toLowerCase() === "high").length;
+  const med  = bs.filter(b => !["critical","high"].includes((b.severity || "").toLowerCase())).length;
+  $("sevDist").innerHTML = `
+    <div class="sd-pill sd-critical"><div class="sd-num" style="color:#ff4757">${crit}</div><div class="sd-lbl" style="color:#ff4757">Critical</div></div>
+    <div class="sd-pill sd-high"><div class="sd-num" style="color:#ff9f43">${high}</div><div class="sd-lbl" style="color:#ff9f43">High</div></div>
+    <div class="sd-pill sd-medium"><div class="sd-num" style="color:#a78bfa">${med}</div><div class="sd-lbl" style="color:#a78bfa">Medium</div></div>
+    <div class="sd-pill" style="background:rgba(0,212,255,.06);border-color:rgba(0,212,255,.18);flex:2">
+      <div style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:4px">Overall Assessment</div>
+      <div style="font-family:var(--font-d);font-size:14px;color:#fff">${d.score_label || scoreLabel(score)} Self-Awareness</div>
+    </div>`;
+
+  // Blind spots
+  const bsBox = $("blindSpotsBox");
+  bsBox.innerHTML = "";
+  $("bsCount").textContent = bs.length + " found";
+  bs.forEach((b, idx) => {
+    const sevClass = (b.severity || "").toLowerCase() === "critical" ? "critical" : (b.severity || "").toLowerCase() === "high" ? "high" : "medium";
+    const sevBadge = (b.severity || "").toLowerCase() === "critical" ? "sev-critical" : (b.severity || "").toLowerCase() === "high" ? "sev-high" : "sev-medium";
+    const catColor = (b.category || "").toLowerCase().includes("language") ? "#00d4ff"
+      : (b.category || "").toLowerCase().includes("position") ? "#ff9f43"
+      : (b.category || "").toLowerCase().includes("skill") ? "#a78bfa" : "rgba(255,255,255,.35)";
+    bsBox.innerHTML += `
+      <div class="bs-card ${sevClass}" id="bsc-${idx}" style="animation:reveal .4s ${Math.min(idx * .08, .5)}s ease both">
+        <div class="bs-top">
+          <div class="bs-icon">${b.icon || '🔴'}</div>
+          <div class="bs-meta">
+            <div class="bs-title">${esc(b.title || 'Blind Spot')}</div>
+            <div class="bs-cat" style="color:${catColor}">${esc(b.category || '')}</div>
+          </div>
+          <div class="bs-sev ${sevBadge}">${esc(b.severity || 'Medium')}</div>
+        </div>
+        ${b.finding  ? `<div class="bs-finding">${esc(b.finding)}</div>` : ''}
+        ${b.evidence ? `<div class="bs-evidence">📎 Evidence: "${esc(b.evidence)}"</div>` : ''}
+        ${b.impact   ? `<div class="bs-impact"><span>💸</span><span>${esc(b.impact)}</span></div>` : ''}
+        ${b.fix      ? `<div class="bs-fix"><span>✅</span><span>${esc(b.fix)}</span></div>` : ''}
+        <div class="bs-actions">
+          <button class="dive-btn" onclick="deepDive(${idx})">🔬 Deep Dive →</button>
+          <button class="copy-btn" onclick="copyBlindSpot(${idx})">📋 Copy</button>
+        </div>
+      </div>`;
+  });
+
+  // Hidden strengths
+  const strBox = $("strengthsBox");
+  const strengths = d.hidden_strengths || [];
+  strBox.innerHTML = strengths.length
+    ? strengths.map(s => `
+      <div class="str-item">
+        <div class="str-icon">${s.icon || '💚'}</div>
+        <div>
+          <div class="str-title">${esc(s.title || '')}</div>
+          <div class="str-desc">${esc(s.description || '')}</div>
+          ${s.how_to_use ? `<div class="str-how"><span>→</span><span>${esc(s.how_to_use)}</span></div>` : ''}
+        </div>
+      </div>`).join('')
+    : '<div style="padding:20px;color:rgba(255,255,255,.25);text-align:center">No hidden strengths data</div>';
+
+  // Language analysis
+  const lang = d.language_analysis || {};
+  const toneScore = lang.tone === "Assertive" ? 95 : lang.tone === "Confident" ? 80 : lang.tone === "Neutral" ? 55 : 30;
+  const toneColor = toneScore >= 75 ? "#00ff88" : toneScore >= 50 ? "#ff9f43" : "#ff4757";
+  $("langBox").innerHTML = `
+    <div class="lang-tone-row">
+      <div class="lang-tone-badge" style="color:${toneColor}">${esc(lang.tone || 'Neutral')}</div>
+      <div class="tone-meter"><div class="tone-fill" style="width:${toneScore}%;background:${toneColor}"></div></div>
+      <div style="font-size:11px;color:rgba(255,255,255,.3)">${toneScore}%</div>
+    </div>
+    ${lang.summary ? `<div style="font-size:13.5px;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:16px">${esc(lang.summary)}</div>` : ''}
+    ${(lang.words_to_remove || []).length ? `
+      <div class="word-section-lbl" style="color:rgba(255,71,87,.5)">Remove These Words</div>
+      <div class="word-row">${(lang.words_to_remove || []).map(w => `<div class="word-chip word-remove" title="Click to copy" onclick="quickCopy('${esc(w)}')">✗ ${esc(w)}</div>`).join('')}</div>` : ''}
+    ${(lang.words_to_add || []).length ? `
+      <div class="word-section-lbl" style="color:rgba(0,255,136,.5)">Add These Words</div>
+      <div class="word-row">${(lang.words_to_add || []).map(w => `<div class="word-chip word-add" title="Click to copy" onclick="quickCopy('${esc(w)}')">✓ ${esc(w)}</div>`).join('')}</div>` : ''}
+    ${lang.passive_count !== undefined ? `
+      <div class="readability-row" style="margin-top:10px">
+        <div class="readability-lbl">Passive voice: ${lang.passive_count} instances</div>
+        <div class="readability-bar"><div class="readability-fill" style="width:${Math.min(100, lang.passive_count * 10)}%"></div></div>
+      </div>` : ''}`;
+
+  // Patterns
+  $("patternsBox").innerHTML = (d.patterns || []).map(p => `
+    <div class="pattern-item">
+      <div class="pat-icon">${p.icon || '🔁'}</div>
+      <div>
+        <div class="pat-name">${esc(p.pattern || '')}</div>
+        <div class="pat-desc">${esc(p.description || '')}</div>
+        ${p.fix ? `<div class="pat-fix"><span>→</span><span>${esc(p.fix)}</span></div>` : ''}
+      </div>
+    </div>`).join('') || '<div style="color:rgba(255,255,255,.25);padding:14px">No patterns detected</div>';
+
+  // Credibility gaps
+  const gaps = d.credibility_gaps || [];
+  $("gapsSection").style.display = gaps.length ? "block" : "none";
+  $("gapsBox").innerHTML = gaps.map(g => `
+    <div class="gap-card">
+      <div class="gap-title">⚡ ${esc(g.gap || '')}</div>
+      <div class="gap-impact">💸 ${esc(g.impact || '')}</div>
+      <div class="gap-fix">✅ Fix: ${esc(g.fix || '')}</div>
+    </div>`).join('');
+
+  // Action plan from fixes
+  const fixes = d.fixes || [];
+  $("actionPlan").style.display = fixes.length ? "block" : "none";
+  $("actionSteps").innerHTML = fixes.map((f, i) => `
+    <div class="action-step" id="as-${i}">
+      <div class="as-num">${i + 1}</div>
+      <div style="flex:1">
+        <div class="as-title">${f.before ? `Replace: "${esc(f.before.substring(0, 55))}${f.before.length > 55 ? '...' : ''}"` : `Fix ${i + 1}`}</div>
+        ${f.after ? `<div style="font-size:12.5px;color:rgba(0,255,136,.75);margin-top:3px">→ ${esc(f.after.substring(0, 90))}${f.after.length > 90 ? '...' : ''}</div>` : ''}
+        <div class="as-effort">⏱️ ${esc(f.effort || '30 minutes')}</div>
+      </div>
+      <button class="as-done-btn ${completedActions.has(i) ? 'done' : ''}" id="adb-${i}" onclick="toggleAction(${i})" title="Mark done">
+        ${completedActions.has(i) ? '✅' : '○'}
+      </button>
+    </div>`).join('');
+
+  $("results").classList.add("on");
+  hide("emptyState");
+}
+
+// ── Deep Dive — navigate to full dedicated page ───────────────
+function deepDive(idx) {
+  if (!currentReport) return;
+  const bs = (currentReport.blind_spots || [])[idx];
+  if (!bs) return;
+
+  // Build URL with all context as params
+  const params = new URLSearchParams({
+    title:    bs.title    || "",
+    context:  ((bs.finding || "") + " " + (bs.evidence || "")).trim().substring(0, 500),
+    severity: bs.severity || "",
+    category: bs.category || "",
+  });
+  // Navigate to the new full-screen deep dive page
+  window.location.href = `/blind-spot/deep-dive?${params.toString()}`;
+}
+
+// ── Modal ─────────────────────────────────────────────
+function handleModalClick(e) {
+  if (e.target === $("modal")) closeModal();
+}
+function closeModal() {
+  $("modal").classList.remove("on");
+}
+
+// ── Copy Blind Spot ───────────────────────────────────
+function copyBlindSpot(idx) {
+  if (!currentReport) return;
+  const b = (currentReport.blind_spots || [])[idx];
+  if (!b) return;
+  const text = [
+    `BLIND SPOT: ${b.title}`,
+    `Severity: ${b.severity}`,
+    `Category: ${b.category}`,
+    `Finding: ${b.finding}`,
+    b.evidence ? `Evidence: ${b.evidence}` : "",
+    b.impact   ? `Impact: ${b.impact}` : "",
+    b.fix      ? `Fix: ${b.fix}` : "",
+  ].filter(Boolean).join("\n");
+  navigator.clipboard.writeText(text)
+    .then(() => toast("📋 Copied to clipboard!", "info"))
+    .catch(() => toast("Copy failed", "err"));
+}
+
+// ── Word copy ─────────────────────────────────────────
+function quickCopy(word) {
+  navigator.clipboard.writeText(word)
+    .then(() => toast(`📋 Copied "${word}"`, "info"))
+    .catch(() => {});
+}
+
+// ── Toggle Action ─────────────────────────────────────
+function toggleAction(idx) {
+  if (completedActions.has(idx)) completedActions.delete(idx);
+  else completedActions.add(idx);
+  const btn = $(`adb-${idx}`);
+  if (btn) {
+    btn.classList.toggle("done", completedActions.has(idx));
+    btn.textContent = completedActions.has(idx) ? "✅" : "○";
+  }
+  toast(completedActions.has(idx) ? "✅ Action marked done!" : "Action unchecked", "ok");
+}
+
+// ── Scroll helpers ────────────────────────────────────
+function scrollToSection(id) {
+  const el = $(id);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// ── Export helpers ────────────────────────────────────
+function exportText() {
+  if (!currentReport) return;
+  const bs = currentReport.blind_spots || [];
+  const lines = [
+    "═══════════════════════════════════════",
+    "BLIND SPOT DETECTOR — FULL REPORT",
+    "═══════════════════════════════════════",
+    `Self-Awareness Score: ${currentReport.self_awareness_score}/100 (${currentReport.score_label})`,
+    `Shock Factor: ${currentReport.shock_factor}/10`,
+    `Coach Message: ${currentReport.coach_message}`,
+    "",
+    "── BLIND SPOTS ──",
+    ...bs.map((b, i) => [
+      `\n${i+1}. [${b.severity}] ${b.title}`,
+      `   Category: ${b.category}`,
+      `   Finding: ${b.finding}`,
+      b.evidence ? `   Evidence: ${b.evidence}` : "",
+      b.impact   ? `   Impact: ${b.impact}` : "",
+      b.fix      ? `   Fix: ${b.fix}` : "",
+    ].filter(Boolean).join("\n")),
+    "",
+    "── ACTION PLAN ──",
+    ...(currentReport.fixes || []).map((f, i) =>
+      `${i+1}. Before: ${f.before}\n   After: ${f.after}\n   Effort: ${f.effort}`
+    ),
+  ].join("\n");
+  navigator.clipboard.writeText(lines)
+    .then(() => toast("📄 Full report copied!", "ok"))
+    .catch(() => toast("Copy failed", "err"));
+}
+
+function exportJSON() {
+  if (!currentReport) return;
+  const blob = new Blob([JSON.stringify(currentReport, null, 2)], { type: "application/json" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href = url; a.download = "blind_spot_report.json"; a.click();
+  URL.revokeObjectURL(url);
+  toast("🗃️ JSON downloaded!", "ok");
+}
+
+function shareReport() {
+  const url = window.location.href;
+  navigator.clipboard.writeText(url)
+    .then(() => toast("🔗 Page link copied!", "info"))
+    .catch(() => toast("Copy failed", "err"));
+}
+
+// ── Stage animation ───────────────────────────────────
+function animStages() {
+  ["s1","s2","s3","s4","s5"].forEach(s => $(s).className = "stage");
+  let i = 0;
+  const t = setInterval(() => {
+    if (i > 0) { $(`s${i}`).classList.remove("on"); $(`s${i}`).classList.add("done"); }
+    if (i < 5) { i++; $(`s${i}`).classList.add("on"); } else clearInterval(t);
+  }, 1200);
+}
+
+// ── Helpers ───────────────────────────────────────────
+function scoreLabel(s) {
+  if (s >= 80) return "Highly Self-Aware";
+  if (s >= 65) return "Aware";
+  if (s >= 45) return "Developing";
+  return "Unaware";
+}
+
+function esc(s) {
+  return String(s || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function toast(msg, type) {
+  const el = $("toast");
+  el.textContent = msg;
+  el.className = `toast on toast-${type}`;
+  clearTimeout(window._toast);
+  window._toast = setTimeout(() => el.classList.remove("on"), 3500);
+}
+</script>
+{% endblock %}

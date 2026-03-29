@@ -1,0 +1,681 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --neon:#5b6bff;--cyan:#00e5c8;--volt:#00ff88;--solar:#ffb547;--crimson:#ff5757;--plasma:#a855f7;--ice:#38bdf8;
+  --obsidian:#07070f;--glass:rgba(255,255,255,.035);--border:rgba(255,255,255,.07);
+  --font-d:"Clash Display",sans-serif;--font-b:"Cabinet Grotesk",sans-serif;--font-c:"Fira Code",monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--obsidian)!important;color:#fff!important;font-family:var(--font-b);-webkit-font-smoothing:antialiased;}
+
+/* ─── AMBIENT LAYERS ─── */
+.pg{min-height:100vh;position:relative;overflow-x:hidden;}
+.pg-ambient{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 50% at -8% 5%,rgba(91,107,255,.13) 0%,transparent 55%),
+    radial-gradient(ellipse 55% 45% at 108% 85%,rgba(0,229,200,.1) 0%,transparent 55%),
+    radial-gradient(ellipse 45% 40% at 50% 110%,rgba(168,85,247,.08) 0%,transparent 50%),
+    radial-gradient(ellipse 30% 28% at 75% 18%,rgba(0,255,136,.07) 0%,transparent 55%);}
+.pg-grid{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.016) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.016) 1px,transparent 1px);
+  background-size:68px 68px;}
+.pg-body{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:48px 24px 140px;}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes barIn{from{width:0}to{width:var(--w)}}
+@keyframes reveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,229,200,.4)}50%{box-shadow:0 0 0 8px rgba(0,229,200,0)}}
+@keyframes countUp{from{opacity:0;transform:translateY(8px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* ─── HEADER ─── */
+.hdr{margin-bottom:44px;animation:fadeUp .6s var(--ease) both;}
+.hdr-badge{display:inline-flex;align-items:center;gap:10px;padding:6px 18px;border-radius:100px;background:rgba(91,107,255,.08);border:1px solid rgba(91,107,255,.22);font-size:10px;font-weight:700;color:#818cf8;letter-spacing:3px;text-transform:uppercase;margin-bottom:18px;}
+.hdr-dot{width:6px;height:6px;border-radius:50%;background:var(--neon);box-shadow:0 0 10px var(--neon);animation:blink 2s ease-in-out infinite;}
+.hdr-title{font-family:var(--font-d);font-size:clamp(32px,6vw,68px);font-weight:700;letter-spacing:-3px;line-height:1;margin-bottom:10px;}
+.hdr-title em{font-style:normal;background:linear-gradient(110deg,var(--neon),var(--cyan),var(--volt));background-size:200%;animation:gradShift 5s ease infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hdr-sub{font-size:16px;color:rgba(255,255,255,.36);line-height:1.8;max-width:640px;}
+
+/* ─── SETUP CARD ─── */
+.setup-card{background:var(--glass);border:1px solid var(--border);border-radius:22px;padding:36px;margin-bottom:28px;position:relative;overflow:hidden;animation:fadeUp .6s .06s var(--ease) both;}
+.setup-card::before{content:"";position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(91,107,255,.3),rgba(0,229,200,.25),transparent);}
+.setup-title{font-family:var(--font-d);font-size:19px;font-weight:700;color:#fff;margin-bottom:26px;display:flex;align-items:center;gap:10px;letter-spacing:-.5px;}
+.setup-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;align-items:end;}
+.fld{display:flex;flex-direction:column;gap:8px;}
+.lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:rgba(255,255,255,.25);}
+.inp,.sel{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 15px;color:#fff;font-family:var(--font-b);font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%;}
+.inp:focus,.sel:focus{border-color:rgba(91,107,255,.45);box-shadow:0 0 0 4px rgba(91,107,255,.06);}
+.inp::placeholder{color:rgba(255,255,255,.2);}
+.sel{-webkit-appearance:none;appearance:none;cursor:pointer;min-height:48px;height:48px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='rgba(255,255,255,0.3)'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;}
+.sel option{background:#0d0d1a;color:#fff;}
+
+/* ─── PRIMARY BUTTON ─── */
+.gen-btn{padding:14px 32px;border-radius:13px;border:none;background:linear-gradient(135deg,var(--neon),#3a4aff,var(--cyan));background-size:200%;animation:gradShift 4s ease infinite;color:#fff;font-family:var(--font-b);font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 32px rgba(91,107,255,.45);transition:transform .2s,box-shadow .2s;white-space:nowrap;display:flex;align-items:center;gap:9px;letter-spacing:.3px;}
+.gen-btn:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(91,107,255,.65);}
+.gen-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;animation:none;background:rgba(91,107,255,.25);box-shadow:none;}
+.btn-sm{padding:9px 18px;border-radius:10px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);font-family:var(--font-b);font-size:12.5px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px;}
+.btn-sm:hover{border-color:rgba(0,229,200,.3);color:rgba(0,229,200,.85);background:rgba(0,229,200,.06);}
+
+/* ─── LOADER ─── */
+.loader{display:none;text-align:center;padding:70px 20px;border:1px solid rgba(91,107,255,.12);border-radius:22px;background:rgba(255,255,255,.015);margin-bottom:20px;}
+.loader.on{display:block;animation:fadeUp .35s var(--ease) both;}
+.spin-ring{width:56px;height:56px;border:3px solid rgba(255,255,255,.05);border-top-color:var(--cyan);border-right-color:var(--neon);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 22px;}
+.stages{display:flex;flex-direction:column;gap:7px;max-width:320px;margin:20px auto 0;}
+.stage{display:flex;align-items:center;gap:10px;padding:9px 15px;border-radius:10px;font-size:12.5px;color:rgba(255,255,255,.25);transition:all .4s;}
+.stage.on{color:rgba(0,229,200,.9);background:rgba(0,229,200,.07);border:1px solid rgba(0,229,200,.15);}
+.stage.done{color:rgba(0,255,136,.75);}
+
+/* ─── DASHBOARD ─── */
+.dashboard{display:none;}
+.dashboard.on{display:block;animation:fadeUp .5s var(--ease) both;}
+
+/* ─── KEY MESSAGE ─── */
+.key-msg{padding:24px 28px;border-radius:18px;background:linear-gradient(135deg,rgba(91,107,255,.1),rgba(0,229,200,.07));border:1px solid rgba(91,107,255,.22);margin-bottom:24px;display:flex;align-items:center;gap:18px;}
+.km-icon{font-size:36px;flex-shrink:0;animation:float 3s ease-in-out infinite;}
+.km-text{font-family:var(--font-d);font-size:18px;font-weight:600;color:#fff;line-height:1.55;letter-spacing:-.4px;}
+
+/* ─── OVERVIEW STRIP ─── */
+.overview-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.ov-card{padding:22px 20px;border-radius:18px;background:var(--glass);border:1px solid var(--border);position:relative;overflow:hidden;text-align:center;transition:all .25s;}
+.ov-card:hover{border-color:rgba(255,255,255,.14);transform:translateY(-3px);}
+.ov-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;}
+.ov-c1::before{background:linear-gradient(90deg,var(--neon),var(--cyan));}
+.ov-c2::before{background:linear-gradient(90deg,var(--cyan),var(--volt));}
+.ov-c3::before{background:linear-gradient(90deg,var(--volt),var(--solar));}
+.ov-c4::before{background:linear-gradient(90deg,var(--solar),var(--plasma));}
+.ov-icon{font-size:26px;margin-bottom:11px;}
+.ov-num{font-family:var(--font-d);font-size:32px;font-weight:700;letter-spacing:-1.5px;line-height:1;margin-bottom:5px;}
+.ov-lbl{font-size:11px;color:rgba(255,255,255,.3);letter-spacing:.5px;}
+
+/* ─── PROGRESS SECTION ─── */
+.progress-section{background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:24px 26px;margin-bottom:24px;}
+.prog-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.prog-title{font-family:var(--font-d);font-size:17px;font-weight:700;color:#fff;letter-spacing:-.4px;}
+.prog-pct{font-family:var(--font-d);font-size:24px;font-weight:800;color:var(--cyan);}
+.prog-bar-wrap{height:9px;border-radius:100px;background:rgba(255,255,255,.07);overflow:hidden;margin-bottom:12px;}
+.prog-bar{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--neon),var(--cyan),var(--volt));transition:width 1.6s var(--ease);position:relative;}
+.prog-bar::after{content:"";position:absolute;right:0;top:0;bottom:0;width:20px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4));border-radius:100px;}
+.prog-meta{display:flex;gap:16px;font-size:12px;color:rgba(255,255,255,.3);flex-wrap:wrap;}
+.track-badge{padding:5px 13px;border-radius:100px;font-size:11px;font-weight:700;}
+.track-yes{background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.25);color:rgba(0,255,136,.9);}
+.track-no{background:rgba(255,181,71,.1);border:1px solid rgba(255,181,71,.25);color:rgba(255,181,71,.9);}
+
+/* ─── READINESS GAUGE ─── */
+.readiness-row{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:13px;background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.12);margin-bottom:24px;}
+.rg-lbl{font-size:12px;color:rgba(255,255,255,.35);white-space:nowrap;}
+.rg-bar{flex:1;height:8px;border-radius:100px;background:rgba(255,255,255,.07);overflow:hidden;}
+.rg-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--neon),var(--cyan),var(--volt));transition:width 1.4s var(--ease);}
+.rg-val{font-family:var(--font-d);font-size:15px;font-weight:700;color:var(--volt);white-space:nowrap;}
+
+/* ─── SALARY CHART ─── */
+.salary-section{background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:24px 26px;margin-bottom:24px;}
+.salary-title{font-family:var(--font-d);font-size:17px;font-weight:700;color:#fff;margin-bottom:22px;letter-spacing:-.4px;}
+.salary-chart{display:flex;align-items:flex-end;gap:14px;height:130px;}
+.sal-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;}
+.sal-bar{width:100%;border-radius:7px 7px 0 0;transition:height 1.5s var(--ease);min-height:8px;position:relative;cursor:pointer;overflow:hidden;}
+.sal-bar::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.15),transparent);}
+.sal-bar:hover{filter:brightness(1.2);}
+.sal-bar.now{background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.15);}
+.sal-bar.goal{background:linear-gradient(180deg,var(--volt),rgba(0,255,136,.35));}
+.sal-bar.mid{background:linear-gradient(180deg,var(--cyan),rgba(0,229,200,.35));}
+.sal-amt{font-family:var(--font-c);font-size:10.5px;color:var(--cyan);font-weight:700;text-align:center;}
+.sal-lbl{font-size:10px;color:rgba(255,255,255,.3);text-align:center;}
+
+/* ─── SKILL STAGES ─── */
+.skills-section{background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:24px 26px;margin-bottom:24px;}
+.skills-title{font-family:var(--font-d);font-size:17px;font-weight:700;color:#fff;margin-bottom:20px;letter-spacing:-.4px;}
+.skill-stages{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.ss-card{padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02);transition:all .25s;}
+.ss-card:hover{border-color:rgba(255,255,255,.14);transform:translateY(-2px);}
+.ss-top{display:flex;align-items:center;gap:10px;margin-bottom:13px;}
+.ss-dot{width:11px;height:11px;border-radius:50%;}
+.ss-lbl{font-family:var(--font-d);font-size:13.5px;font-weight:700;color:#fff;}
+.ss-months{font-size:10.5px;color:rgba(255,255,255,.28);margin-left:auto;font-family:var(--font-c);}
+.ss-chips{display:flex;flex-wrap:wrap;gap:5px;}
+.ss-chip{padding:4px 10px;border-radius:100px;font-size:11px;font-weight:600;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.55);}
+
+/* ─── TIMELINE ─── */
+.timeline-section{margin-bottom:26px;}
+.tl-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.tl-title{font-family:var(--font-d);font-size:18px;font-weight:700;color:#fff;letter-spacing:-.5px;}
+.filter-row{display:flex;gap:7px;flex-wrap:wrap;}
+.f-btn{padding:7px 15px;border-radius:9px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:rgba(255,255,255,.4);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
+.f-btn.active{border-color:rgba(0,229,200,.3);background:rgba(0,229,200,.07);color:rgba(0,229,200,.9);}
+.tl-search{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 14px;color:#fff;font-family:var(--font-b);font-size:13px;outline:none;width:200px;transition:border-color .2s;}
+.tl-search:focus{border-color:rgba(0,229,200,.3);}
+.tl-search::placeholder{color:rgba(255,255,255,.2);}
+.timeline-list{display:flex;flex-direction:column;gap:10px;max-height:680px;overflow-y:auto;overflow-x:hidden;padding-right:6px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent;width:100%;}
+.timeline-list::-webkit-scrollbar{width:5px;}
+.timeline-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:100px;}
+.month-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:15px;padding:17px 20px;display:flex;gap:16px;align-items:flex-start;transition:all .25s;cursor:default;}
+.month-card:hover{border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.04);}
+.month-card.completed{border-color:rgba(0,255,136,.18);background:rgba(0,255,136,.03);}
+.month-card.current{border-color:rgba(0,229,200,.28);background:rgba(0,229,200,.045);box-shadow:0 0 24px rgba(0,229,200,.07);}
+.mc-circle{width:44px;height:44px;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);}
+.mc-circle.done{background:rgba(0,255,136,.1);border-color:rgba(0,255,136,.25);}
+.mc-circle.curr{background:rgba(0,229,200,.1);border-color:rgba(0,229,200,.3);animation:pulse 2s ease-in-out infinite;}
+.mc-num{font-family:var(--font-d);font-size:14px;font-weight:800;color:#fff;line-height:1;}
+.mc-lbl{font-size:8.5px;color:rgba(255,255,255,.3);letter-spacing:.5px;}
+.mc-content{flex:1;min-width:0;}
+.mc-title{font-family:var(--font-d);font-size:14.5px;font-weight:700;color:#fff;margin-bottom:4px;letter-spacing:-.3px;}
+.mc-action{font-size:13px;color:rgba(255,255,255,.48);line-height:1.65;margin-bottom:8px;}
+.mc-checkpoint{font-size:12px;color:rgba(0,229,200,.65);margin-bottom:8px;display:flex;align-items:flex-start;gap:5px;}
+.mc-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.m-tag{padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;}
+.t-skill{background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.2);color:#818cf8;}
+.t-project{background:rgba(0,229,200,.08);border:1px solid rgba(0,229,200,.18);color:rgba(0,229,200,.85);}
+.t-impact{background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.18);color:rgba(0,255,136,.85);}
+.mc-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.check-btn{padding:7px 14px;border-radius:9px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.03);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:5px;}
+.check-btn:hover{background:rgba(0,255,136,.08);border-color:rgba(0,255,136,.25);color:rgba(0,255,136,.85);}
+.check-btn.done{background:rgba(0,255,136,.1);border-color:rgba(0,255,136,.3);color:rgba(0,255,136,.9);}
+.note-btn{padding:7px 14px;border-radius:9px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:5px;}
+.note-btn:hover{background:rgba(91,107,255,.07);border-color:rgba(91,107,255,.25);color:rgba(129,140,248,.85);}
+.mc-note{font-size:12px;color:rgba(255,181,71,.7);background:rgba(255,181,71,.05);border:1px solid rgba(255,181,71,.12);border-radius:8px;padding:7px 11px;margin-top:8px;display:none;}
+.mc-note.on{display:block;}
+
+/* ─── NOTE MODAL ─── */
+.note-modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}
+.note-modal.on{display:flex;}
+.nm-box{background:#0c0c18;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px;max-width:460px;width:100%;}
+.nm-title{font-family:var(--font-d);font-size:17px;font-weight:700;color:#fff;margin-bottom:16px;}
+.nm-ta{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:12px 14px;color:#fff;font-family:var(--font-b);font-size:13.5px;outline:none;resize:none;min-height:80px;line-height:1.65;}
+.nm-ta:focus{border-color:rgba(0,229,200,.3);}
+.nm-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px;}
+
+/* ─── EMPTY ─── */
+.empty{text-align:center;padding:90px 20px;border:1px solid rgba(255,255,255,.05);border-radius:22px;background:rgba(255,255,255,.012);margin-top:20px;}
+.empty-icon{font-size:64px;margin-bottom:22px;display:block;animation:float 3s ease-in-out infinite;}
+.empty-title{font-family:var(--font-d);font-size:24px;font-weight:700;color:rgba(255,255,255,.25);margin-bottom:10px;}
+.empty-sub{font-size:15px;color:rgba(255,255,255,.18);line-height:1.8;max-width:480px;margin:0 auto;}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:28px;right:28px;z-index:9999;padding:12px 22px;border-radius:13px;font-size:14px;font-weight:700;color:#fff;transform:translateY(16px);opacity:0;transition:all .3s var(--ease);pointer-events:none;}
+.toast.on{transform:translateY(0);opacity:1;}
+.toast-ok{background:rgba(0,255,136,.9);box-shadow:0 8px 28px rgba(0,255,136,.35);}
+.toast-err{background:rgba(255,87,87,.9);box-shadow:0 8px 28px rgba(255,87,87,.35);}
+
+/* ─── RESUME STATUS ─── */
+.resume-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:100px;font-size:12.5px;font-weight:700;}
+.rp-ok{background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.2);color:rgba(0,255,136,.85);}
+.rp-warn{background:rgba(255,181,71,.07);border:1px solid rgba(255,181,71,.2);color:rgba(255,181,71,.85);}
+
+@media(max-width:1024px){.setup-grid{grid-template-columns:1fr 1fr;}.skill-stages{grid-template-columns:1fr 1fr;}.overview-strip{grid-template-columns:1fr 1fr;}}
+@media(max-width:640px){.setup-grid{grid-template-columns:1fr;}.overview-strip{grid-template-columns:1fr 1fr;}.salary-chart{gap:8px;}}
+</style>
+
+<div class="pg">
+<div class="pg-ambient"></div>
+<div class="pg-grid"></div>
+<div class="pg-body">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-badge"><div class="hdr-dot"></div>Personalized · Month-by-Month · Live Progress</div>
+    <h1 class="hdr-title">Career<br><em>Time Machine</em></h1>
+    <p class="hdr-sub">Enter your target role. AI builds your complete month-by-month career roadmap with salary projections, skill milestones, and progress tracking. Your personal GPS to the job you actually want.</p>
+  </div>
+
+  <!-- SETUP CARD -->
+  <div class="setup-card">
+    <div class="setup-title">🚀 Set Your Destination</div>
+    <div class="setup-grid">
+      <div class="fld">
+        <label class="lbl">Target Role *</label>
+        <input class="inp" id="targetRole" placeholder="ML Engineer, Data Scientist...">
+      </div>
+      <div class="fld">
+        <label class="lbl">Dream Company <span style="text-transform:none;font-size:9px;color:rgba(255,255,255,.2)">(optional)</span></label>
+        <input class="inp" id="targetCompany" placeholder="Google, OpenAI, Startup...">
+      </div>
+      <div class="fld">
+        <label class="lbl">Current Level</label>
+        <select class="sel" id="currentLevel">
+          <option value="fresher">Fresher / Student</option>
+          <option value="junior">Junior (0–2 yrs)</option>
+          <option value="mid" selected>Mid-Level (2–4 yrs)</option>
+          <option value="senior">Senior (4+ yrs)</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label class="lbl">Timeline</label>
+        <select class="sel" id="selectTimeline">
+          <option value="12">12 Months</option>
+          <option value="24" selected>24 Months</option>
+          <option value="36">36 Months</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;flex-wrap:wrap;gap:14px">
+      {% if resume %}
+      <div class="resume-pill rp-ok">✅ Resume: <strong>{{ resume.filename or "Uploaded" }}</strong></div>
+      {% else %}
+      <div class="resume-pill rp-warn">⚠️ No resume — <a href="/upload" style="color:rgba(0,229,200,.7);text-decoration:none">upload one</a> for a personalized plan</div>
+      {% endif %}
+      <button class="gen-btn" id="genBtn" onclick="generatePlan()">⚡ Generate My Roadmap</button>
+    </div>
+  </div>
+
+  <!-- LOADER -->
+  <div class="loader" id="loader">
+    <div class="spin-ring"></div>
+    <div style="font-family:var(--font-d);font-size:20px;font-weight:700;color:#fff;margin-bottom:6px">Building your career roadmap...</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.3);margin-bottom:20px">AI is mapping every month of your journey</div>
+    <div class="stages">
+      <div class="stage" id="s1">🧠 Analyzing your current profile</div>
+      <div class="stage" id="s2">🎯 Mapping the gap to your target role</div>
+      <div class="stage" id="s3">🗓️ Planning month-by-month milestones</div>
+      <div class="stage" id="s4">💰 Projecting salary at each stage</div>
+      <div class="stage" id="s5">🔥 Finalizing your personal roadmap</div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="dashboard" id="dashboard">
+
+    <!-- Key message -->
+    <div class="key-msg">
+      <div class="km-icon">🎯</div>
+      <div class="km-text" id="keyMsgText">Your roadmap is loading...</div>
+    </div>
+
+    <!-- Overview strip -->
+    <div class="overview-strip">
+      <div class="ov-card ov-c1">
+        <div class="ov-icon">🎯</div>
+        <div class="ov-num" id="ovTarget" style="font-size:16px;color:var(--neon)">—</div>
+        <div class="ov-lbl">Target Role</div>
+      </div>
+      <div class="ov-card ov-c2">
+        <div class="ov-icon">📅</div>
+        <div class="ov-num" id="ovMonths" style="color:var(--cyan)">—</div>
+        <div class="ov-lbl">Months to Goal</div>
+      </div>
+      <div class="ov-card ov-c3">
+        <div class="ov-icon">⚡</div>
+        <div class="ov-num" id="ovReady" style="color:var(--volt)">—</div>
+        <div class="ov-lbl">Readiness Score</div>
+      </div>
+      <div class="ov-card ov-c4">
+        <div class="ov-icon">💰</div>
+        <div class="ov-num" id="ovSalary" style="font-size:20px;color:var(--solar)">—</div>
+        <div class="ov-lbl">Target Salary</div>
+      </div>
+    </div>
+
+    <!-- Readiness -->
+    <div class="readiness-row" id="readinessRow">
+      <div class="rg-lbl">READINESS</div>
+      <div class="rg-bar"><div class="rg-fill" id="readinessFill" style="width:0%"></div></div>
+      <div class="rg-val" id="readinessVal">0%</div>
+      <div class="btn-sm" onclick="generatePlan()">🔄 Regenerate</div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-section" id="progressSection" style="display:none">
+      <div class="prog-header">
+        <div class="prog-title">📊 Your Progress</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span class="track-badge" id="trackBadge">—</span>
+          <div class="prog-pct" id="progPct">0%</div>
+        </div>
+      </div>
+      <div class="prog-bar-wrap"><div class="prog-bar" id="progBar" style="width:0%"></div></div>
+      <div class="prog-meta">
+        <span id="progDone">0 completed</span>
+        <span>·</span>
+        <span id="progLeft">0 remaining</span>
+        <span>·</span>
+        <span id="progElapsed">Just started</span>
+      </div>
+    </div>
+
+    <!-- Salary chart -->
+    <div class="salary-section">
+      <div class="salary-title">💰 Salary Projection</div>
+      <div class="salary-chart" id="salaryChart"></div>
+    </div>
+
+    <!-- Skill stages -->
+    <div class="skills-section">
+      <div class="skills-title">🧠 Skills at Each Stage</div>
+      <div class="skill-stages" id="skillStages"></div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline-section">
+      <div class="tl-header">
+        <div class="tl-title">🗓️ Month-by-Month Roadmap</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input class="tl-search" id="tlSearch" placeholder="Search milestones..." oninput="filterTimeline('search')">
+          <div class="filter-row">
+            <button class="f-btn active" onclick="filterTimeline('all',this)">All</button>
+            <button class="f-btn" onclick="filterTimeline('pending',this)">Pending</button>
+            <button class="f-btn" onclick="filterTimeline('done',this)">Completed</button>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-list" id="timeline-list"></div>
+    </div>
+
+  </div>
+
+  <!-- EMPTY STATE -->
+  {% if not machine %}
+  <div class="empty" id="emptyState">
+    <span class="empty-icon">⏳</span>
+    <div class="empty-title">Your Career GPS is Ready</div>
+    <div class="empty-sub">Enter your target role above and click Generate. AI builds your complete month-by-month roadmap with salary projections, skill milestones, and projects to build as proof.</div>
+  </div>
+  {% endif %}
+
+</div>
+</div>
+
+<!-- NOTE MODAL -->
+<div class="note-modal" id="noteModal">
+  <div class="nm-box">
+    <div class="nm-title">📝 Add a Note</div>
+    <textarea class="nm-ta" id="noteText" placeholder="What did you accomplish? Any blockers? Your reflection..."></textarea>
+    <div class="nm-actions">
+      <button class="btn-sm" onclick="closeNoteModal()">Cancel</button>
+      <button class="gen-btn" style="padding:9px 22px;font-size:13px" onclick="saveNote()">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ── State ─────────────────────────────────────────────
+let machineId   = null;
+let allMilestones = [];
+let completedMonths = new Set();
+let noteTargetMonth = null;
+let notes = {};
+
+const $ = id => document.getElementById(id);
+const show = id => { const e=$(id); if(e) e.style.display="block"; };
+const hide = id => { const e=$(id); if(e) e.style.display="none"; };
+
+// ── Load existing machine ─────────────────────────────
+{% if machine %}
+window.addEventListener('DOMContentLoaded', () => renderDashboard({{ machine | tojson }}));
+{% endif %}
+
+// ── Generate Plan ─────────────────────────────────────
+async function generatePlan() {
+  const role = ($("targetRole").value || "").trim();
+  if (!role) { toast("Enter your target role first", "err"); $("targetRole").focus(); return; }
+
+  hide("emptyState");
+  $("dashboard").classList.remove("on");
+  show("loader");
+  $("genBtn").disabled = true;
+  $("genBtn").innerHTML = "⏳ Building...";
+  animStages();
+
+  // ── BUG FIX: safely parse timeline ────────────────
+  const rawTimeline = ($("selectTimeline") || {}).value;
+  const timeline = rawTimeline ? parseInt(rawTimeline, 10) : 24;
+
+  try {
+    const r = await fetch("/api/ctm/generate", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        target_role:     role,
+        target_company:  ($("targetCompany").value || "").trim(),
+        timeline_months: isNaN(timeline) ? 24 : timeline,
+        current_level:   ($("currentLevel").value || "mid").trim(),
+      })
+    }).then(r => r.json());
+
+    hide("loader");
+    if (!r.success) { toast(r.error || "Failed to generate plan", "err"); return; }
+    renderDashboard(r);
+    toast("🎯 Your roadmap is ready!", "ok");
+  } catch(e) {
+    hide("loader");
+    toast("Network error — please try again", "err");
+  }
+  $("genBtn").disabled = false;
+  $("genBtn").innerHTML = "⚡ Generate My Roadmap";
+}
+
+// ── Render Dashboard ──────────────────────────────────
+function renderDashboard(d) {
+  machineId     = d.machine_id;
+  allMilestones = d.milestones || [];
+  completedMonths = new Set(d.completed_months || []);
+
+  // Key message
+  $("keyMsgText").textContent = d.key_message || d.overview?.summary || "Your journey starts now.";
+
+  // Overview
+  const role = (d.target_role || d.target || "—");
+  $("ovTarget").textContent = role.length > 18 ? role.substring(0,16)+"..." : role;
+  $("ovMonths").textContent = (d.estimated_months || d.timeline_months || "—") + "";
+  $("ovReady").textContent  = (d.readiness_score || 0) + "%";
+
+  // Salary
+  const salProj = d.salary_projection || [];
+  if (salProj.length) {
+    const last = salProj[salProj.length-1];
+    const amt  = last.salary || 0;
+    $("ovSalary").textContent = formatSalary(amt);
+  }
+
+  // Readiness fill
+  const rs = d.readiness_score || 0;
+  setTimeout(() => { $("readinessFill").style.width = rs + "%"; }, 200);
+  $("readinessVal").textContent = rs + "%";
+
+  // Salary chart
+  renderSalaryChart(salProj);
+
+  // Skill stages
+  renderSkillStages(d.skill_stages || []);
+
+  // Progress (existing machine)
+  if (d.progress_pct !== undefined) {
+    $("progressSection").style.display = "block";
+    const pct = d.progress_pct || 0;
+    $("progPct").textContent  = pct + "%";
+    setTimeout(() => { $("progBar").style.width = pct + "%"; }, 200);
+    $("progDone").textContent = `${d.done || 0} milestones completed`;
+    $("progLeft").textContent = `${(d.total||0)-(d.done||0)} remaining`;
+    $("progElapsed").textContent = d.months_elapsed ? `Month ${d.months_elapsed} of ${d.timeline_months}` : "";
+    const onTrack = d.on_track;
+    $("trackBadge").textContent = onTrack ? "✅ On Track" : "⚠️ Behind Schedule";
+    $("trackBadge").className = "track-badge " + (onTrack ? "track-yes" : "track-no");
+  }
+
+  // Timeline
+  renderTimeline(allMilestones);
+
+  $("dashboard").classList.add("on");
+  $("dashboard").scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+// ── Salary Chart ──────────────────────────────────────
+function renderSalaryChart(proj) {
+  const box = $("salaryChart");
+  box.innerHTML = "";
+  if (!proj.length) return;
+  const maxSal = Math.max(...proj.map(p => p.salary || 0));
+  proj.forEach((p, i) => {
+    const pct   = maxSal > 0 ? Math.max(8, (p.salary/maxSal)*100) : 30;
+    const isNow  = i === 0;
+    const isGoal = i === proj.length-1;
+    box.innerHTML += `
+      <div class="sal-wrap">
+        <div class="sal-amt">${formatSalary(p.salary||0)}</div>
+        <div class="sal-bar ${isNow?'now':isGoal?'goal':'mid'}" style="height:${pct}%" title="${p.role||''}"></div>
+        <div class="sal-lbl">${p.label||'M'+p.month}</div>
+      </div>`;
+  });
+}
+
+// ── Skill Stages ──────────────────────────────────────
+function renderSkillStages(stages) {
+  $("skillStages").innerHTML = stages.map(s => `
+    <div class="ss-card">
+      <div class="ss-top">
+        <div class="ss-dot" style="background:${s.color||'#5b6bff'}"></div>
+        <div class="ss-lbl">${s.label||'Stage '+s.stage}</div>
+        <div class="ss-months">${s.months||''}</div>
+      </div>
+      <div class="ss-chips">${(s.skills||[]).map(sk=>`<div class="ss-chip">${sk}</div>`).join('')}</div>
+    </div>`).join('') || '<div style="color:rgba(255,255,255,.25);padding:20px">No skill data</div>';
+}
+
+// ── Timeline ──────────────────────────────────────────
+function renderTimeline(milestones) {
+  const box = $("timeline-list");
+  box.innerHTML = "";
+  if (!milestones.length) { box.innerHTML = '<div style="color:rgba(255,255,255,.25);padding:20px;text-align:center">No milestones found</div>'; return; }
+
+  const currentMonth = milestones.find(m => !completedMonths.has(m.month || 0))?.month;
+
+  milestones.forEach((m, i) => {
+    const mn    = m.month || (i+1);
+    const isDone = completedMonths.has(mn);
+    const isCurr = mn === currentMonth;
+    const note   = notes[mn] || "";
+
+    box.innerHTML += `
+      <div class="month-card ${isDone?'completed':isCurr?'current':''}" id="mc-${mn}" style="animation:reveal .3s ${Math.min(i*.04,.5)}s ease both">
+        <div class="mc-circle ${isDone?'done':isCurr?'curr':''}">
+          <div class="mc-num">${mn}</div>
+          <div class="mc-lbl">MO</div>
+        </div>
+        <div class="mc-content">
+          <div class="mc-title">${m.title||'Milestone '+mn}</div>
+          <div class="mc-action">${m.action||m.focus||''}</div>
+          ${m.checkpoint ? `<div class="mc-checkpoint">✓ ${m.checkpoint}</div>` : ''}
+          <div class="mc-tags">
+            ${m.skill_to_add ? `<div class="m-tag t-skill">🧠 ${m.skill_to_add}</div>` : ''}
+            ${m.project ? `<div class="m-tag t-project">🔥 ${m.project.substring(0,42)}${m.project.length>42?'...':''}</div>` : ''}
+            ${m.salary_impact && m.salary_impact !== '+0%' ? `<div class="m-tag t-impact">💰 ${m.salary_impact}</div>` : ''}
+          </div>
+          ${note ? `<div class="mc-note on">📝 ${note}</div>` : `<div class="mc-note" id="note-${mn}"></div>`}
+          <div class="mc-actions">
+            <button class="check-btn ${isDone?'done':''}" id="cb-${mn}" onclick="toggleMilestone(${mn},'${esc(m.title||'')}')">
+              ${isDone ? '✅ Completed' : '○ Mark Done'}
+            </button>
+            <button class="note-btn" onclick="openNoteModal(${mn})">📝 Note</button>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+
+// ── Filter Timeline ───────────────────────────────────
+let currentFilter = "all";
+function filterTimeline(type, btn) {
+  if (type !== "search") {
+    currentFilter = type;
+    document.querySelectorAll(".f-btn").forEach(b => b.classList.remove("active"));
+    if (btn) btn.classList.add("active");
+  }
+  const query = ($("tlSearch").value || "").toLowerCase();
+  document.querySelectorAll(".month-card").forEach(card => {
+    const isDone = card.classList.contains("completed");
+    const text   = card.textContent.toLowerCase();
+    const matchFilter = currentFilter === "all" || (currentFilter === "done" && isDone) || (currentFilter === "pending" && !isDone);
+    const matchSearch = !query || text.includes(query);
+    card.style.display = (matchFilter && matchSearch) ? "flex" : "none";
+  });
+}
+
+// ── Toggle Milestone ──────────────────────────────────
+async function toggleMilestone(monthNum, milestone) {
+  if (!machineId) return;
+  try {
+    const r = await fetch("/api/ctm/toggle-milestone", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ machine_id: machineId, month_num: monthNum, milestone, note: notes[monthNum]||"" })
+    }).then(r => r.json());
+
+    if (!r.success) { toast(r.error || "Error", "err"); return; }
+
+    if (r.completed) completedMonths.add(monthNum); else completedMonths.delete(monthNum);
+
+    // Update card
+    const card = $(`mc-${monthNum}`);
+    const btn  = $(`cb-${monthNum}`);
+    card.classList.toggle("completed", r.completed);
+    btn.classList.toggle("done", r.completed);
+    btn.textContent = r.completed ? "✅ Completed" : "○ Mark Done";
+
+    // Update progress
+    $("progressSection").style.display = "block";
+    $("progPct").textContent  = r.progress_pct + "%";
+    $("progBar").style.width  = r.progress_pct + "%";
+    $("progDone").textContent = `${r.done} milestones completed`;
+    $("progLeft").textContent = `${(r.total||0)-(r.done||0)} remaining`;
+
+    toast(r.completed ? "✅ Milestone completed! 🎉" : "Milestone unchecked", "ok");
+  } catch(e) { toast("Error updating milestone", "err"); }
+}
+
+// ── Notes ─────────────────────────────────────────────
+function openNoteModal(monthNum) {
+  noteTargetMonth = monthNum;
+  $("noteText").value = notes[monthNum] || "";
+  $("noteModal").classList.add("on");
+  $("noteText").focus();
+}
+function closeNoteModal() {
+  $("noteModal").classList.remove("on");
+  noteTargetMonth = null;
+}
+function saveNote() {
+  if (!noteTargetMonth) return;
+  const text = ($("noteText").value || "").trim();
+  notes[noteTargetMonth] = text;
+  const noteEl = $(`note-${noteTargetMonth}`);
+  if (noteEl) {
+    noteEl.textContent = text ? "📝 " + text : "";
+    noteEl.classList.toggle("on", !!text);
+  }
+  closeNoteModal();
+  toast("📝 Note saved", "ok");
+}
+$("noteModal").addEventListener("click", e => { if (e.target === $("noteModal")) closeNoteModal(); });
+
+// ── Helpers ───────────────────────────────────────────
+function formatSalary(amt) {
+  if (!amt) return "—";
+  if (amt >= 10000000) return "₹"+(amt/10000000).toFixed(1)+"Cr";
+  if (amt >= 100000)   return "₹"+(amt/100000).toFixed(1)+"L";
+  return "₹"+amt.toLocaleString();
+}
+
+function animStages() {
+  ["s1","s2","s3","s4","s5"].forEach(s => $(s).className = "stage");
+  let i = 0;
+  const t = setInterval(() => {
+    if (i > 0) { $(`s${i}`).classList.remove("on"); $(`s${i}`).classList.add("done"); }
+    if (i < 5) { i++; $(`s${i}`).classList.add("on"); } else clearInterval(t);
+  }, 700);
+}
+
+function esc(s) { return (s||"").replace(/'/g,"&#39;"); }
+
+function toast(msg, type) {
+  const el = $("toast");
+  el.textContent = msg;
+  el.className = `toast on toast-${type}`;
+  clearTimeout(window._t);
+  window._t = setTimeout(() => el.classList.remove("on"), 3500);
+}
+</script>
+{% endblock %}

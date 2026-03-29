@@ -142,6 +142,10 @@ def create_app():
     from backend.routes.interview_routes import interview_routes
     from backend.routes.ai_recruiter_routes import ai_recruiter_routes
     from backend.routes.vidcode_routes import vidcode_routes, register_socketio_events
+    from backend.routes.cover_letter_routes import cover_letter_routes
+    from backend.routes.career_time_machine_routes import ctm_routes
+    from backend.routes.blind_spot_routes import blind_spot_routes
+    from backend.routes.recruiter_routes import recruiter_routes
 
     app.register_blueprint(main_routes)
     app.register_blueprint(resume_routes)
@@ -164,6 +168,11 @@ def create_app():
     app.register_blueprint(ai_recruiter_routes)
     app.register_blueprint(vidcode_routes)
     register_socketio_events(socketio)
+    app.register_blueprint(cover_letter_routes)
+    app.register_blueprint(ctm_routes)
+    app.register_blueprint(blind_spot_routes)
+    app.register_blueprint(recruiter_routes)
+    
 
     # ==============================
     # Start Background Scheduler

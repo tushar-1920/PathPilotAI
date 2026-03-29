@@ -1,0 +1,777 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;
+  --red:#ff5757;--purple:#a855f7;--pink:#f472b6;
+  --font-d:"Syne",sans-serif;--font-b:"DM Sans",sans-serif;--font-c:"JetBrains Mono",monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#000!important;color:#fff!important;font-family:var(--font-b);}
+.pg{min-height:100vh;background:#000;position:relative;}
+.pg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 55% 45% at 5% 10%,rgba(91,107,255,.1) 0%,transparent 65%),
+             radial-gradient(ellipse 45% 40% at 95% 85%,rgba(0,229,200,.08) 0%,transparent 60%),
+             radial-gradient(ellipse 35% 30% at 50% 50%,rgba(168,85,247,.05) 0%,transparent 65%);}
+.pg-grid{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+  background-size:60px 60px;}
+.pg-body{position:relative;z-index:1;max-width:1320px;margin:0 auto;padding:36px 24px 100px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+@keyframes barIn{from{width:0!important}to{width:var(--w)}}
+@keyframes popIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+
+/* ── HEADER ── */
+.hdr{margin-bottom:32px;animation:fadeUp .5s ease both;}
+.hdr-eye{display:inline-flex;align-items:center;gap:8px;padding:5px 16px;border-radius:100px;background:rgba(91,107,255,.08);border:1px solid rgba(91,107,255,.2);font-size:10.5px;font-weight:700;color:#818cf8;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:14px;}
+.hdr-dot{width:5px;height:5px;border-radius:50%;background:#818cf8;box-shadow:0 0 8px #818cf8;animation:blink 2s ease-in-out infinite;}
+.hdr-title{font-family:var(--font-d);font-size:clamp(26px,4.5vw,50px);font-weight:800;letter-spacing:-2px;color:#fff;margin-bottom:7px;line-height:1.05;}
+.hdr-title span{background:linear-gradient(110deg,var(--cyan),var(--neon),var(--purple));background-size:200%;animation:gradShift 4s ease infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hdr-sub{font-size:15px;color:rgba(255,255,255,.36);font-weight:300;line-height:1.75;max-width:650px;}
+
+/* ── TWO-COL LAYOUT ── */
+.two-col{display:grid;grid-template-columns:390px 1fr;gap:20px;align-items:start;}
+
+/* ── CARD ── */
+.card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:20px;position:relative;overflow:hidden;margin-bottom:12px;}
+.card::before{content:"";position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(91,107,255,.2),rgba(0,229,200,.12),transparent);}
+.card-title{font-family:var(--font-d);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.3px;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+
+/* ── FORM ── */
+.lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.28);margin-bottom:6px;display:block;}
+.inp,.sel,.ta{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 14px;color:#fff;font-family:var(--font-b);font-size:13.5px;outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:11px;}
+.inp:focus,.sel:focus,.ta:focus{border-color:rgba(91,107,255,.45);box-shadow:0 0 0 3px rgba(91,107,255,.07);}
+.inp::placeholder,.ta::placeholder{color:rgba(255,255,255,.2);}
+.sel{-webkit-appearance:none;appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='rgba(255,255,255,0.3)'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;}
+.sel option{background:#0d0d18;color:#fff;}
+.ta{resize:vertical;min-height:110px;line-height:1.7;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* ── RESUME PILLS ── */
+.resume-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;-ms-overflow-style:none;}
+.resume-scroll::-webkit-scrollbar{display:none;}
+.res-pill{flex-shrink:0;padding:10px 14px;border-radius:11px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);cursor:pointer;transition:all .22s;min-width:140px;max-width:200px;position:relative;}
+.res-pill:hover{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.06);}
+.res-pill.active{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.07);}
+.res-pill-name{font-size:12.5px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px;}
+.res-pill-meta{font-size:10.5px;color:rgba(255,255,255,.35);}
+.res-pill-check{position:absolute;top:7px;right:8px;font-size:11px;color:rgba(34,197,94,.8);display:none;}
+.res-pill.active .res-pill-check{display:block;}
+
+/* ── TONE GRID ── */
+.tone-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.tone-btn{padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02);cursor:pointer;transition:all .2s;text-align:left;position:relative;overflow:hidden;}
+.tone-btn::after{content:"";position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .2s;border-radius:11px 11px 0 0;}
+.tone-btn:hover{border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.05);}
+.tone-btn.active{border-color:rgba(91,107,255,.35);background:rgba(91,107,255,.08);}
+.tone-btn.active::after{opacity:1;}
+.tone-icon{font-size:18px;margin-bottom:4px;display:block;}
+.tone-name{font-size:13px;font-weight:700;color:#fff;margin-bottom:1px;}
+.tone-desc{font-size:10.5px;color:rgba(255,255,255,.33);}
+
+/* ── LENGTH PILLS ── */
+.len-row{display:flex;gap:8px;margin-bottom:12px;}
+.len-btn{flex:1;padding:9px 6px;border-radius:10px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02);cursor:pointer;transition:all .2s;text-align:center;}
+.len-btn:hover{border-color:rgba(255,255,255,.16);}
+.len-btn.active{border-color:rgba(0,229,200,.35);background:rgba(0,229,200,.07);}
+.len-name{font-size:13px;font-weight:700;color:#fff;margin-bottom:1px;}
+.len-words{font-size:10px;color:rgba(255,255,255,.33);}
+
+/* ── GENERATE BTN ── */
+.gen-btn{width:100%;padding:15px;border-radius:13px;border:none;
+  background:linear-gradient(135deg,var(--neon),#3a4aff,var(--cyan));
+  background-size:200%;animation:gradShift 4s ease infinite;
+  color:#fff;font-family:var(--font-b);font-size:15px;font-weight:800;cursor:pointer;
+  box-shadow:0 8px 30px rgba(91,107,255,.4);transition:transform .2s,box-shadow .2s;
+  display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:-.2px;}
+.gen-btn:hover{transform:translateY(-2px);box-shadow:0 14px 42px rgba(91,107,255,.6);}
+.gen-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;animation:none;background:rgba(91,107,255,.3);}
+
+/* ══════════ OUTPUT ══════════ */
+.out-col{display:flex;flex-direction:column;gap:14px;}
+
+/* Empty */
+.empty-state{text-align:center;padding:80px 20px;border:1px solid rgba(255,255,255,.06);border-radius:20px;background:rgba(255,255,255,.015);}
+.empty-icon{font-size:58px;margin-bottom:16px;display:block;}
+.empty-title{font-family:var(--font-d);font-size:19px;font-weight:700;color:rgba(255,255,255,.3);margin-bottom:8px;}
+.empty-sub{font-size:14px;color:rgba(255,255,255,.2);line-height:1.75;}
+
+/* Loading */
+.loader{display:none;text-align:center;padding:60px 20px;border:1px solid rgba(255,255,255,.06);border-radius:20px;background:rgba(255,255,255,.015);}
+.loader.on{display:block;animation:fadeUp .3s ease both;}
+.spin-ring{width:50px;height:50px;border:3px solid rgba(255,255,255,.06);border-top-color:var(--cyan);border-radius:50%;animation:spin .85s linear infinite;margin:0 auto 18px;}
+.loader-title{font-family:var(--font-d);font-size:17px;font-weight:700;color:#fff;margin-bottom:5px;}
+.loader-sub{font-size:13px;color:rgba(255,255,255,.32);}
+.stages{display:flex;flex-direction:column;gap:6px;max-width:290px;margin:16px auto 0;}
+.stage{display:flex;align-items:center;gap:10px;padding:7px 13px;border-radius:9px;font-size:12.5px;color:rgba(255,255,255,.28);transition:all .4s;}
+.stage.on{color:rgba(0,229,200,.85);background:rgba(0,229,200,.07);}
+.stage.done{color:rgba(34,197,94,.7);}
+
+/* Score card */
+.score-card{display:none;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:22px;background:rgba(255,255,255,.025);animation:popIn .4s ease both;}
+.score-card.on{display:block;}
+.score-top{display:flex;align-items:center;gap:16px;margin-bottom:18px;}
+.score-ring-wrap{position:relative;width:80px;height:80px;flex-shrink:0;}
+.score-ring-wrap svg{transform:rotate(-90deg);}
+.score-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.score-big{font-family:var(--font-d);font-size:22px;font-weight:800;line-height:1;}
+.score-tiny{font-size:9px;color:rgba(255,255,255,.28);letter-spacing:.5px;}
+.score-label{font-family:var(--font-d);font-size:19px;font-weight:800;color:#fff;margin-bottom:3px;}
+.score-detail{font-size:12px;color:rgba(255,255,255,.35);line-height:1.6;}
+/* Breakdown */
+.breakdown{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px;}
+.bk{padding:12px 13px;border-radius:11px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);}
+.bk-lbl{font-size:9.5px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:7px;}
+.bk-bar-wrap{height:5px;border-radius:100px;background:rgba(255,255,255,.07);overflow:hidden;margin-bottom:5px;}
+.bk-bar{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--neon),var(--cyan));width:0;transition:width 1s var(--ease);}
+.bk-val{font-family:var(--font-d);font-size:14px;font-weight:800;color:#fff;}
+/* Keywords */
+.kw-section{margin-bottom:12px;}
+.kw-title{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+.kw-chips{display:flex;flex-wrap:wrap;gap:5px;}
+.kw-chip{padding:3px 10px;border-radius:100px;font-size:11.5px;font-weight:600;}
+.kw-match{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:rgba(34,197,94,.85);}
+.kw-miss{background:rgba(255,181,71,.07);border:1px solid rgba(255,181,71,.18);color:rgba(255,181,71,.8);}
+/* Tips */
+.tips{display:flex;flex-direction:column;gap:6px;}
+.tip{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:rgba(255,255,255,.42);padding:8px 12px;border-radius:9px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);}
+.tip-icon{flex-shrink:0;font-size:13px;}
+
+/* ══ LETTER CARD ══ */
+.letter-card{display:none;border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;background:rgba(255,255,255,.02);animation:popIn .4s ease both;}
+.letter-card.on{display:block;}
+
+/* Toolbar */
+.lt-bar{display:flex;align-items:center;gap:7px;padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.015);flex-wrap:wrap;}
+.lt-bar-title{font-family:var(--font-d);font-size:13.5px;font-weight:700;color:#fff;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:4px;}
+.tb-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:9px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);font-family:var(--font-b);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.tb-btn:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2);}
+.tb-btn.edit-active{background:rgba(91,107,255,.12);border-color:rgba(91,107,255,.28);color:#818cf8;}
+.tb-btn.copied{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.25);color:rgba(34,197,94,.9);}
+.tb-btn.cyan{background:rgba(0,229,200,.07);border-color:rgba(0,229,200,.2);color:rgba(0,229,200,.8);}
+.tb-btn.cyan:hover{background:rgba(0,229,200,.14);}
+.tb-btn.purple{background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.2);color:rgba(168,85,247,.85);}
+.tb-btn.purple:hover{background:rgba(168,85,247,.16);}
+
+/* Letter document */
+.lt-doc{padding:36px 42px;background:#030309;}
+.lt-text{font-family:Georgia,"Times New Roman",serif;font-size:15px;line-height:2;color:rgba(255,255,255,.72);white-space:pre-wrap;min-height:180px;border-radius:8px;outline:none;}
+.lt-text.edit-mode{background:rgba(91,107,255,.04);border:1px dashed rgba(91,107,255,.25);padding:16px;color:#fff;}
+
+/* Footer */
+.lt-foot{display:flex;align-items:center;gap:10px;padding:10px 16px;border-top:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.3);}
+.lt-words{font-family:var(--font-c);font-size:11px;color:rgba(255,255,255,.22);}
+.lt-tone-tag{font-size:11px;padding:3px 10px;border-radius:100px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.3);}
+.lt-resume-tag{font-size:11px;padding:3px 10px;border-radius:100px;background:rgba(0,229,200,.05);border:1px solid rgba(0,229,200,.14);color:rgba(0,229,200,.55);}
+
+/* Improve panel */
+.improve-panel{padding:16px 18px;border-top:1px solid rgba(255,255,255,.07);background:rgba(91,107,255,.03);display:none;}
+.improve-panel.open{display:block;animation:fadeUp .3s ease both;}
+.improve-title{font-size:12.5px;font-weight:600;color:rgba(255,255,255,.45);margin-bottom:10px;}
+.improve-inp{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(91,107,255,.2);border-radius:9px;padding:9px 13px;color:#fff;font-family:var(--font-b);font-size:13px;outline:none;margin-bottom:9px;}
+.improve-inp::placeholder{color:rgba(255,255,255,.2);}
+.quick-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.q-btn{padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:rgba(255,255,255,.45);font-size:11.5px;cursor:pointer;transition:all .2s;}
+.q-btn:hover{background:rgba(255,255,255,.08);color:#fff;}
+.regen-btn{padding:8px 18px;border-radius:9px;border:none;background:rgba(91,107,255,.14);border:1px solid rgba(91,107,255,.24);color:#818cf8;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.regen-btn:hover{background:rgba(91,107,255,.26);}
+.improve-hint{font-size:11px;color:rgba(255,255,255,.2);margin-top:8px;}
+
+/* Action row */
+.action-row{display:none;gap:10px;flex-wrap:wrap;}
+.action-row.on{display:flex;}
+.act-btn{flex:1;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);font-family:var(--font-b);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;}
+.act-btn:hover{background:rgba(255,255,255,.09);color:#fff;}
+.act-btn.neon{background:rgba(91,107,255,.08);border-color:rgba(91,107,255,.22);color:#818cf8;}
+.act-btn.neon:hover{background:rgba(91,107,255,.18);}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;z-index:9999;padding:11px 20px;border-radius:12px;font-size:13.5px;font-weight:600;color:#fff;transform:translateY(14px);opacity:0;transition:all .28s;pointer-events:none;}
+.toast.on{transform:translateY(0);opacity:1;}
+.toast-ok{background:rgba(34,197,94,.92);box-shadow:0 6px 22px rgba(34,197,94,.3);}
+.toast-err{background:rgba(255,87,87,.92);box-shadow:0 6px 22px rgba(255,87,87,.3);}
+
+@media(max-width:960px){.two-col{grid-template-columns:1fr;}.row2{grid-template-columns:1fr;}}
+@media(max-width:560px){.tone-grid{grid-template-columns:1fr;}.lt-doc{padding:20px 16px;}.pg-body{padding:22px 14px 80px;}.lt-bar{gap:5px;}}
+</style>
+
+<div class="pg">
+<div class="pg-glow"></div>
+<div class="pg-grid"></div>
+<div class="pg-body">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-eye"><div class="hdr-dot"></div>AI-Powered · Resume-Aware · ATS Optimized</div>
+    <div class="hdr-title">AI Cover Letter <span>Generator</span></div>
+    <div class="hdr-sub">Select your resume, paste a JD, pick a tone — AI connects your exact experience to the job requirements and writes a personalized letter in seconds.</div>
+  </div>
+
+  <div class="two-col">
+
+    <!-- ══ LEFT INPUT ══ -->
+    <div>
+
+      <!-- Resume Selector -->
+      <div class="card" style="animation:fadeUp .4s .04s ease both">
+        <div class="card-title">📄 Select Resume</div>
+        {% if resumes %}
+        <div class="resume-scroll" id="resumeScroll">
+          {% for r in resumes %}
+          <div class="res-pill {% if loop.first %}active{% endif %}"
+               data-id="{{ r.id }}"
+               onclick="pickResume({{ r.id }}, this)">
+            <div class="res-pill-check">✓</div>
+            <div class="res-pill-name">{{ r.filename or ("Resume #" ~ r.id) }}</div>
+            <div class="res-pill-meta">
+              {% if r.normalized_skills %}{{ r.normalized_skills.split(",")|length }} skills{% endif %}
+              {% if loop.first %} · Latest{% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <a href="/upload" style="font-size:11.5px;color:rgba(91,107,255,.6);text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-top:10px;">＋ Upload new resume</a>
+        {% else %}
+        <div style="padding:14px;border-radius:12px;background:rgba(255,87,87,.06);border:1px solid rgba(255,87,87,.15);display:flex;align-items:center;gap:10px;">
+          <span style="font-size:20px">⚠️</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:rgba(255,87,87,.85)">No resume uploaded yet</div>
+            <a href="/upload" style="font-size:11.5px;color:rgba(255,87,87,.6);text-decoration:underline">Upload your resume for best results →</a>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Job Details -->
+      <div class="card" style="animation:fadeUp .4s .08s ease both">
+        <div class="card-title">💼 Job Details</div>
+        <div class="row2" style="margin-bottom:10px">
+          <div>
+            <label class="lbl">Company Name *</label>
+            <input class="inp" id="company" placeholder="Google, Amazon, startup..." style="margin-bottom:0">
+          </div>
+          <div>
+            <label class="lbl">Role / Position *</label>
+            <input class="inp" id="role" placeholder="ML Engineer, SWE..." style="margin-bottom:0">
+          </div>
+        </div>
+        <label class="lbl">Hiring Manager <span style="text-transform:none;font-size:9.5px;color:rgba(255,255,255,.2)">(optional)</span></label>
+        <input class="inp" id="manager" placeholder="Sarah Johnson, Mr. Kumar..." style="margin-bottom:0">
+      </div>
+
+      <!-- Job Description -->
+      <div class="card" style="animation:fadeUp .4s .12s ease both">
+        <div class="card-title">📋 Job Description *</div>
+        <textarea class="ta" id="jd"
+          placeholder="Paste the full job description here...
+
+We are looking for a Machine Learning Engineer with:
+• 2+ years Python experience
+• TensorFlow / PyTorch knowledge
+• Experience building data pipelines..." style="min-height:150px;margin-bottom:5px"></textarea>
+        <div style="font-size:11px;color:rgba(255,255,255,.2)">Paste the complete JD — AI uses it to match your skills and inject keywords</div>
+      </div>
+
+      <!-- Tone & Style -->
+      <div class="card" style="animation:fadeUp .4s .16s ease both">
+        <div class="card-title">🎭 Tone & Style</div>
+        <div class="tone-grid">
+          {% for key, t in tones.items() %}
+          <div class="tone-btn {% if key=='professional' %}active{% endif %}"
+               data-tone="{{ key }}" onclick="pickTone('{{ key }}', this)"
+               style="--tone-c:{{ t.color }}">
+            <span class="tone-icon">{{ t.icon }}</span>
+            <div class="tone-name">{{ t.label }}</div>
+            <div class="tone-desc">{{ t.desc }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        <label class="lbl" style="margin-top:2px">Length</label>
+        <div class="len-row">
+          {% for key, l in lengths.items() %}
+          <div class="len-btn {% if key=='medium' %}active{% endif %}"
+               data-len="{{ key }}" onclick="pickLen('{{ key }}', this)">
+            <div class="len-name">{{ l.label }}</div>
+            <div class="len-words">{{ l.words }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Extra context -->
+      <div class="card" style="animation:fadeUp .4s .2s ease both">
+        <div class="card-title">✨ Extra Context <span style="font-size:11px;font-weight:400;color:rgba(255,255,255,.25)">(optional)</span></div>
+        <textarea class="ta" id="extra"
+          placeholder="Anything specific to include:
+• I interned at this company before
+• Highlight my open-source project
+• Mention my leadership experience
+• I recently relocated to this city..." style="min-height:85px;margin-bottom:0"></textarea>
+      </div>
+
+      <!-- Generate -->
+      <button class="gen-btn" id="genBtn" onclick="generate()">
+        ✨ Generate My Cover Letter
+      </button>
+
+    </div>
+
+    <!-- ══ RIGHT OUTPUT ══ -->
+    <div class="out-col">
+
+      <!-- Empty -->
+      <div class="empty-state" id="emptyState">
+        <span class="empty-icon">✉️</span>
+        <div class="empty-title">Your cover letter appears here</div>
+        <div class="empty-sub">Fill in the details on the left and click<br><strong style="color:rgba(255,255,255,.4)">Generate</strong> to create your personalized letter</div>
+      </div>
+
+      <!-- Loader -->
+      <div class="loader" id="loader">
+        <div class="spin-ring"></div>
+        <div class="loader-title">Crafting your letter...</div>
+        <div class="loader-sub">AI is reading your resume + analyzing the JD</div>
+        <div class="stages">
+          <div class="stage" id="s1">📄 Reading your resume</div>
+          <div class="stage" id="s2">🔍 Analyzing job description</div>
+          <div class="stage" id="s3">🧠 Mapping your experience to requirements</div>
+          <div class="stage" id="s4">✍️ Writing your personalized letter</div>
+          <div class="stage" id="s5">📊 Scoring and optimizing</div>
+        </div>
+      </div>
+
+      <!-- Score -->
+      <div class="score-card" id="scoreCard">
+        <div style="font-family:var(--font-d);font-size:14px;font-weight:700;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:7px;">📊 Cover Letter Score</div>
+
+        <div class="score-top">
+          <div class="score-ring-wrap">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="6"/>
+              <circle cx="40" cy="40" r="32" fill="none" stroke-width="6" stroke-linecap="round"
+                      stroke-dasharray="201" stroke-dashoffset="201"
+                      id="scoreCircle" style="transition:stroke-dashoffset 1.2s var(--ease),stroke .3s"/>
+            </svg>
+            <div class="score-inner">
+              <div class="score-big" id="scoreNum">—</div>
+              <div class="score-tiny">SCORE</div>
+            </div>
+          </div>
+          <div>
+            <div class="score-label" id="scoreLabel">—</div>
+            <div class="score-detail" id="scoreDetail">—</div>
+          </div>
+        </div>
+
+        <div class="breakdown" id="breakdown"></div>
+
+        <!-- Matched keywords -->
+        <div class="kw-section">
+          <div class="kw-title" style="color:rgba(34,197,94,.6)">✅ Keywords Matched</div>
+          <div class="kw-chips" id="kwMatch"></div>
+        </div>
+
+        <!-- Missing keywords -->
+        <div class="kw-section" id="missSect" style="display:none">
+          <div class="kw-title" style="color:rgba(255,181,71,.7)">⚠️ Missing Keywords (add to boost score)</div>
+          <div class="kw-chips" id="kwMiss"></div>
+        </div>
+
+        <!-- Improvement tips -->
+        <div id="tipsSect" style="display:none">
+          <div class="kw-title" style="color:rgba(168,85,247,.7);margin-bottom:8px">💡 Improvement Tips</div>
+          <div class="tips" id="tipsBox"></div>
+        </div>
+      </div>
+
+      <!-- Letter -->
+      <div class="letter-card" id="letterCard">
+
+        <!-- Toolbar -->
+        <div class="lt-bar">
+          <div class="lt-bar-title" id="ltTitle">Cover Letter</div>
+          <button class="tb-btn" id="editBtn"    onclick="toggleEdit()">✏️ Edit</button>
+          <button class="tb-btn" id="copyBtn"    onclick="copyLetter()">📋 Copy</button>
+          <button class="tb-btn cyan"            onclick="dlTxt()">⬇️ .txt</button>
+          <button class="tb-btn purple"          onclick="dlPdf()">📄 PDF</button>
+          <button class="tb-btn" id="improveBtn" onclick="toggleImprove()">🔄 Improve</button>
+        </div>
+
+        <!-- Content -->
+        <div class="lt-doc">
+          <div class="lt-text" id="ltText" contenteditable="false" spellcheck="true"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="lt-foot">
+          <span class="lt-words" id="ltWords">0 words</span>
+          <span style="flex:1"></span>
+          <span class="lt-tone-tag" id="ltTone">—</span>
+          <span class="lt-resume-tag" id="ltResume">—</span>
+        </div>
+
+        <!-- Improve panel -->
+        <div class="improve-panel" id="improvePanel">
+          <div class="improve-title">🔄 Select any paragraph above → describe what to change → click Rewrite</div>
+          <input class="improve-inp" id="improveInp" placeholder="e.g. Make it more confident · Add metrics · Shorter · Better opening">
+          <div class="quick-btns">
+            <button class="q-btn" onclick="qi('Make it more confident and assertive')">💪 More confident</button>
+            <button class="q-btn" onclick="qi('Add specific numbers, percentages, and metrics')">📊 Add metrics</button>
+            <button class="q-btn" onclick="qi('Make it shorter and more punchy')">✂️ Shorter</button>
+            <button class="q-btn" onclick="qi('Rewrite with a more engaging and memorable opening')">🎯 Better hook</button>
+            <button class="q-btn" onclick="qi('Add more enthusiasm and energy to this paragraph')">⚡ More energy</button>
+          </div>
+          <button class="regen-btn" id="regenBtn" onclick="regenPara()">✨ Rewrite Selected Paragraph</button>
+          <div class="improve-hint">💡 Select paragraph text in the letter, fill in the instruction above, then click Rewrite</div>
+        </div>
+      </div>
+
+      <!-- Action row -->
+      <div class="action-row" id="actionRow">
+        <button class="act-btn neon" onclick="generate()">🔄 Regenerate</button>
+        <button class="act-btn"      onclick="changeTone()">🎭 Try Different Tone</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ─── State ──────────────────────────────────────
+let resumeId     = {{ resumes[0].id if resumes else 'null' }};
+let tone         = "professional";
+let length       = "medium";
+let letter       = "";
+let editing      = false;
+
+// ─── Resume ─────────────────────────────────────
+function pickResume(id, el) {
+  resumeId = id;
+  document.querySelectorAll(".res-pill").forEach(p => p.classList.remove("active"));
+  el.classList.add("active");
+}
+
+// ─── Tone ────────────────────────────────────────
+function pickTone(t, el) {
+  tone = t;
+  document.querySelectorAll(".tone-btn").forEach(b => b.classList.remove("active"));
+  el.classList.add("active");
+}
+
+// ─── Length ──────────────────────────────────────
+function pickLen(l, el) {
+  length = l;
+  document.querySelectorAll(".len-btn").forEach(b => b.classList.remove("active"));
+  el.classList.add("active");
+}
+
+// ─── GENERATE ────────────────────────────────────
+async function generate() {
+  const company = v("company"), role = v("role"), jd = v("jd");
+  if (!company) { toast("Enter company name","err"); focus("company"); return; }
+  if (!role)    { toast("Enter the role / position","err"); focus("role"); return; }
+  if (!jd)      { toast("Paste the job description","err"); focus("jd"); return; }
+
+  // Reset output
+  hide("emptyState");
+  id("scoreCard").classList.remove("on");
+  id("letterCard").classList.remove("on");
+  id("actionRow").classList.remove("on");
+  show("loader");
+  disableBtn(true);
+  animStages();
+
+  try {
+    const res = await fetch("/api/cover-letter/generate", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        company_name: company, role_name: role,
+        job_description: jd,
+        hiring_manager: v("manager"),
+        tone, length,
+        extra_notes: v("extra"),
+        resume_id: resumeId,
+      })
+    });
+    const d = await res.json();
+    hide("loader");
+
+    if (!d.success) {
+      toast(d.error || "Generation failed — try again","err");
+      show("emptyState"); return;
+    }
+
+    letter = d.letter;
+    renderScore(d);
+    renderLetter(d);
+    id("actionRow").classList.add("on");
+    toast("✅ Cover letter generated!","ok");
+
+  } catch(e) {
+    hide("loader"); show("emptyState");
+    toast("Network error — try again","err");
+    console.error(e);
+  }
+  disableBtn(false);
+}
+
+// ─── Animate stages ───────────────────────────────
+function animStages() {
+  ["s1","s2","s3","s4","s5"].forEach(s => id(s).className = "stage");
+  let i = 0;
+  const t = setInterval(() => {
+    if (i > 0) { id(`s${i}`).classList.remove("on"); id(`s${i}`).classList.add("done"); }
+    if (i < 5) { i++; id(`s${i}`).classList.add("on"); }
+    else clearInterval(t);
+  }, 750);
+}
+
+// ─── Render score ─────────────────────────────────
+function renderScore(d) {
+  const card = id("scoreCard");
+  card.classList.add("on");
+
+  const score  = d.score || 75;
+  const color  = d.score_color || "#00e5c8";
+  const circ   = id("scoreCircle");
+  const dashLen = 201;
+
+  circ.style.stroke = color;
+  setTimeout(() => {
+    circ.style.strokeDashoffset = (dashLen - score/100*dashLen).toFixed(1);
+  }, 100);
+
+  id("scoreNum").textContent   = score;
+  id("scoreNum").style.color   = color;
+  id("scoreLabel").textContent = d.score_label || "Good";
+  id("scoreLabel").style.color = color;
+  id("scoreDetail").textContent =
+    `${d.word_count||0} words · ${d.tone||"Professional"} · ${d.company} — ${d.role}`;
+
+  // Breakdown
+  const box = id("breakdown");
+  box.innerHTML = "";
+  Object.entries(d.breakdown || {}).forEach(([k,v]) => {
+    const pct = (v/10*100).toFixed(0);
+    const el = document.createElement("div");
+    el.className = "bk";
+    el.innerHTML = `
+      <div class="bk-lbl">${k}</div>
+      <div class="bk-bar-wrap"><div class="bk-bar" data-w="${pct}"></div></div>
+      <div class="bk-val">${v}/10</div>`;
+    box.appendChild(el);
+  });
+  setTimeout(() => {
+    document.querySelectorAll(".bk-bar").forEach(b => b.style.width = b.dataset.w + "%");
+  }, 200);
+
+  // Matched keywords
+  const matchBox = id("kwMatch");
+  matchBox.innerHTML = "";
+  if (d.key_matches?.length) {
+    d.key_matches.forEach(m =>
+      matchBox.insertAdjacentHTML("beforeend", `<div class="kw-chip kw-match">✓ ${m}</div>`)
+    );
+  } else {
+    matchBox.innerHTML = `<span style="font-size:12px;color:rgba(255,255,255,.22);font-style:italic">Paste a detailed JD for keyword matching</span>`;
+  }
+
+  // Missing keywords
+  const missBox  = id("kwMiss");
+  const missSect = id("missSect");
+  missBox.innerHTML = "";
+  if (d.missing_kw?.length) {
+    missSect.style.display = "block";
+    d.missing_kw.forEach(m =>
+      missBox.insertAdjacentHTML("beforeend", `<div class="kw-chip kw-miss">+ ${m}</div>`)
+    );
+  } else missSect.style.display = "none";
+
+  // Tips
+  const tipsBox  = id("tipsBox");
+  const tipsSect = id("tipsSect");
+  tipsBox.innerHTML = "";
+  if (d.suggestions?.length) {
+    tipsSect.style.display = "block";
+    d.suggestions.forEach(tip =>
+      tipsBox.insertAdjacentHTML("beforeend",
+        `<div class="tip"><span class="tip-icon">💡</span><span>${tip}</span></div>`)
+    );
+  } else tipsSect.style.display = "none";
+}
+
+// ─── Render letter ────────────────────────────────
+function renderLetter(d) {
+  const card = id("letterCard");
+  card.classList.add("on");
+
+  const el = id("ltText");
+  el.textContent        = d.letter;
+  el.contentEditable    = "false";
+  el.classList.remove("edit-mode");
+  editing               = false;
+  id("editBtn").innerHTML  = "✏️ Edit";
+  id("editBtn").classList.remove("edit-active");
+
+  id("ltTitle").textContent  = `Cover Letter — ${d.company} · ${d.role}`;
+  id("ltTone").textContent   = d.tone   || "Professional";
+  id("ltResume").textContent = "📄 " + (d.resume_used || "Resume");
+  id("ltWords").textContent  = (d.word_count || wc(d.letter)) + " words";
+}
+
+// ─── Edit ─────────────────────────────────────────
+function toggleEdit() {
+  const el  = id("ltText");
+  const btn = id("editBtn");
+  editing   = !editing;
+  el.contentEditable = editing ? "true" : "false";
+  el.classList.toggle("edit-mode", editing);
+  if (editing) {
+    btn.innerHTML = "💾 Save";
+    btn.classList.add("edit-active");
+    el.focus();
+    // move cursor to end
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+  } else {
+    btn.innerHTML = "✏️ Edit";
+    btn.classList.remove("edit-active");
+    letter = el.textContent;
+    id("ltWords").textContent = wc(letter) + " words";
+    toast("Changes saved","ok");
+  }
+}
+
+// ─── Copy ─────────────────────────────────────────
+async function copyLetter() {
+  const text = id("ltText").textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch(e) {
+    // Fallback
+    const ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand("copy"); ta.remove();
+  }
+  const btn = id("copyBtn");
+  btn.innerHTML = "✅ Copied!";
+  btn.classList.add("copied");
+  setTimeout(() => { btn.innerHTML = "📋 Copy"; btn.classList.remove("copied"); }, 2500);
+  toast("Copied to clipboard!","ok");
+}
+
+// ─── Download .txt ────────────────────────────────
+function dlTxt() {
+  const text = id("ltText").textContent;
+  const name = `Cover_Letter_${v("company")}_${v("role")}`.replace(/\s+/g,"_") + ".txt";
+  const a    = Object.assign(document.createElement("a"),
+    {href: URL.createObjectURL(new Blob([text],{type:"text/plain;charset=utf-8"})), download: name});
+  a.click();
+  toast("Downloaded as .txt!","ok");
+}
+
+// ─── Download PDF ─────────────────────────────────
+function dlPdf() {
+  const text    = id("ltText").textContent.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const company = v("company") || "Company";
+  const role_   = v("role") || "Role";
+  const win     = window.open("","_blank");
+  win.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title>Cover Letter — ${company} ${role_}</title>
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0;}
+      body{font-family:Georgia,"Times New Roman",serif;font-size:12.5pt;line-height:1.9;
+           color:#111;max-width:680px;margin:0 auto;padding:60px 48px;}
+      pre{white-space:pre-wrap;font-family:inherit;font-size:inherit;line-height:inherit;}
+      @page{margin:2.2cm}
+      @media print{body{padding:0;max-width:100%;}}
+    </style>
+  </head><body>
+    <pre>${text}</pre>
+    <script>window.onload=function(){setTimeout(()=>{window.print();},300);}<\/script>
+  </body></html>`);
+  win.document.close();
+  toast("Print dialog opened — save as PDF!","ok");
+}
+
+// ─── Improve panel ────────────────────────────────
+function toggleImprove() {
+  const p = id("improvePanel");
+  p.classList.toggle("open");
+  id("improveBtn").classList.toggle("edit-active", p.classList.contains("open"));
+}
+function qi(text) { id("improveInp").value = text; }
+
+// ─── Regen paragraph ─────────────────────────────
+async function regenPara() {
+  const sel  = window.getSelection()?.toString()?.trim();
+  const inst = id("improveInp").value.trim();
+  if (!sel)  { toast("Select a paragraph in the letter first","err"); return; }
+  if (!inst) { toast("Describe what to change","err"); return; }
+
+  const btn = id("regenBtn");
+  btn.textContent = "⏳ Rewriting..."; btn.disabled = true;
+
+  try {
+    const d = await fetch("/api/cover-letter/regenerate-paragraph",{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({paragraph:sel, instruction:inst, tone, context:letter})
+    }).then(r=>r.json());
+
+    if (d.success) {
+      const el = id("ltText");
+      el.textContent = el.textContent.replace(sel, d.paragraph);
+      letter = el.textContent;
+      id("ltWords").textContent = wc(letter) + " words";
+      id("improveInp").value = "";
+      toast("Paragraph rewritten!","ok");
+    } else toast(d.error || "Failed","err");
+  } catch(e) { toast("Network error","err"); }
+
+  btn.textContent = "✨ Rewrite Selected Paragraph"; btn.disabled = false;
+}
+
+// ─── Change tone ──────────────────────────────────
+function changeTone() {
+  document.querySelector(".tone-grid").scrollIntoView({behavior:"smooth",block:"center"});
+  toast("Pick a new tone above, then generate again","ok");
+}
+
+// ─── Helpers ──────────────────────────────────────
+const id   = s => document.getElementById(s);
+const v    = s => (id(s)?.value || "").trim();
+const wc   = t => (t||"").split(/\s+/).filter(Boolean).length;
+const show = s => id(s).style.display = "block";
+const hide = s => id(s).style.display = "none";
+const focus= s => id(s).focus();
+
+function disableBtn(d) {
+  id("genBtn").disabled = d;
+  id("genBtn").innerHTML = d ? "⏳ Generating..." : "✨ Generate My Cover Letter";
+}
+
+function toast(msg, type) {
+  const el = id("toast");
+  el.textContent = msg;
+  el.className = `toast on toast-${type}`;
+  clearTimeout(window._toast);
+  window._toast = setTimeout(() => el.classList.remove("on"), 3200);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;--red:#ff5757;--purple:#a855f7;}
+*,*::before,*::after{box-sizing:border-box;}
+body,html{background:#000!important;}
+.jm-wrap{background:#000;min-height:calc(100vh - 64px);padding:34px 0 80px;width:100%;}
+.jm-body{max-width:860px;margin:0 auto;padding:0 20px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.jm-back{display:inline-flex;align-items:center;gap:7px;color:rgba(255,255,255,.4);text-decoration:none;font-size:13px;margin-bottom:20px;padding:7px 16px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);transition:all .2s;}
+.jm-back:hover{background:rgba(255,255,255,.09);color:#fff;}
+.jm-header{margin-bottom:22px;animation:fadeUp .35s ease both;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.jm-title-row{display:flex;align-items:center;gap:10px;}
+.jm-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;letter-spacing:-.7px;}
+.jm-unread-dot{width:10px;height:10px;border-radius:50%;background:var(--red);animation:blink 1.5s infinite;box-shadow:0 0 6px rgba(255,87,87,.6);}
+.jm-unread-badge{padding:3px 11px;border-radius:100px;background:rgba(255,87,87,.12);border:1px solid rgba(255,87,87,.22);color:var(--red);font-size:12px;font-weight:700;}
+.jm-sub{font-size:13px;color:rgba(255,255,255,.35);margin-top:5px;}
+.jm-subnav{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+.jm-subnav a{padding:9px 18px;border-radius:10px;font-size:13.5px;font-weight:600;text-decoration:none;transition:all .2s;border:1px solid rgba(255,255,255,.08);}
+.jm-subnav a.active{background:rgba(91,107,255,.12);border-color:rgba(91,107,255,.25);color:#818cf8;}
+.jm-subnav a:not(.active){color:rgba(255,255,255,.4);background:rgba(255,255,255,.02);}
+.jm-subnav a:not(.active):hover{background:rgba(255,255,255,.07);color:#fff;}
+/* Card */
+.jm-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;margin-bottom:14px;animation:fadeUp .4s ease both;transition:border-color .2s;}
+.jm-card.unread{border-color:rgba(91,107,255,.25);box-shadow:0 0 0 1px rgba(91,107,255,.08);}
+.jm-new-bar{height:2px;background:linear-gradient(90deg,var(--neon),var(--cyan));opacity:0;}
+.jm-card.unread .jm-new-bar{opacity:1;}
+.jm-card-body{padding:20px 22px;}
+.jm-card-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:11px;}
+.jm-company{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:rgba(0,229,200,.9);}
+.jm-email-small{font-size:11.5px;color:rgba(255,255,255,.3);margin-top:1px;}
+.jm-badge{display:inline-flex;padding:4px 12px;border-radius:100px;font-size:11.5px;font-weight:700;}
+.type-selected{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.22);color:var(--green);}
+.type-rejected{background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.22);color:var(--red);}
+.type-interview{background:rgba(255,181,71,.1);border:1px solid rgba(255,181,71,.22);color:var(--amber);}
+.type-offer{background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.22);color:#818cf8;}
+.type-general{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);}
+.type-reply{background:rgba(0,229,200,.07);border:1px solid rgba(0,229,200,.18);color:rgba(0,229,200,.8);}
+.jm-subject{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:-.3px;margin-bottom:10px;}
+.jm-content{font-size:13.5px;color:rgba(255,255,255,.55);line-height:1.85;white-space:pre-wrap;background:rgba(255,255,255,.022);border-radius:12px;padding:14px 16px;border:1px solid rgba(255,255,255,.06);margin-bottom:12px;}
+.jm-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.jm-time{font-size:11.5px;color:rgba(255,255,255,.25);}
+.jm-job-pill{font-size:12px;color:rgba(255,255,255,.35);background:rgba(255,255,255,.04);padding:3px 10px;border-radius:100px;border:1px solid rgba(255,255,255,.07);}
+.jm-reply-pill{font-size:12px;color:rgba(0,229,200,.7);padding:3px 10px;border-radius:100px;border:1px solid rgba(0,229,200,.18);background:rgba(0,229,200,.05);}
+.jm-new-pill{font-size:11px;color:#818cf8;font-weight:700;background:rgba(91,107,255,.1);padding:2px 9px;border-radius:100px;border:1px solid rgba(91,107,255,.2);}
+/* Selected special */
+.jm-selected-alert{display:flex;align-items:center;gap:10px;padding:11px 15px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.18);border-radius:11px;font-size:13.5px;font-weight:600;color:var(--green);margin-bottom:12px;}
+.jm-interview-alert{display:flex;align-items:center;gap:10px;padding:11px 15px;background:rgba(255,181,71,.07);border:1px solid rgba(255,181,71,.18);border-radius:11px;font-size:13.5px;font-weight:600;color:var(--amber);margin-bottom:12px;}
+/* Reply */
+.jm-reply-section{border-top:1px solid rgba(255,255,255,.06);padding:16px 22px;background:rgba(0,229,200,.015);}
+.jm-reply-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:10px;border:1px solid rgba(0,229,200,.22);background:rgba(0,229,200,.07);color:rgba(0,229,200,.9);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.jm-reply-btn:hover{background:rgba(0,229,200,.16);}
+.jm-reply-form{margin-top:12px;display:none;}
+.jm-reply-form.open{display:block;animation:fadeUp .2s ease both;}
+.jm-reply-ta{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 15px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13.5px;resize:none;outline:none;height:90px;transition:border-color .2s;}
+.jm-reply-ta:focus{border-color:rgba(0,229,200,.35);}
+.jm-reply-ta::placeholder{color:rgba(255,255,255,.22);}
+.jm-reply-submit{padding:9px 22px;border-radius:10px;border:none;background:linear-gradient(135deg,rgba(0,229,200,.85),rgba(91,107,255,.9));color:#fff;font-family:'Syne',sans-serif;font-size:13.5px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(0,229,200,.18);}
+.jm-reply-submit:hover{transform:translateY(-1px);}
+.jm-reply-cancel{background:none;border:none;color:rgba(255,255,255,.3);font-size:13px;cursor:pointer;padding:9px 12px;}
+/* Flash */
+.jm-flash{padding:12px 18px;border-radius:12px;margin-bottom:18px;font-size:14px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
+.jm-empty{text-align:center;padding:70px 20px;color:rgba(255,255,255,.2);}
+</style>
+
+<div class="jm-wrap">
+<div class="jm-body">
+
+{% with flashed = get_flashed_messages() %}
+{% if flashed %}{% for m in flashed %}<div class="jm-flash">✅ {{ m }}</div>{% endfor %}{% endif %}
+{% endwith %}
+
+<a href="/profile" class="jm-back">← Back to Profile</a>
+
+<div class="jm-header">
+  <div>
+    <div class="jm-title-row">
+      {% if unread %}<div class="jm-unread-dot"></div>{% endif %}
+      <div class="jm-title">Recruiter Messages</div>
+      {% if unread %}<span class="jm-unread-badge">{{ unread }} new</span>{% endif %}
+    </div>
+    <div class="jm-sub">{{ msgs|length }} message{{ 's' if msgs|length != 1 else '' }} from companies and recruiters</div>
+  </div>
+</div>
+
+<div class="jm-subnav">
+  <a href="/live-jobs">🔴 Live Jobs</a>
+  <a href="/my-applications">📋 My Applications</a>
+  <a href="/my-messages" class="active">💬 Messages{% if unread %}&nbsp;<span style="background:var(--red);color:#fff;border-radius:100px;padding:1px 7px;font-size:10px">{{ unread }}</span>{% endif %}</a>
+</div>
+
+{% if msgs %}
+{% for m in msgs %}
+<div class="jm-card {{ 'unread' if not m.is_read else '' }}" style="animation-delay:{{ loop.index0 * 0.05 }}s">
+  <div class="jm-new-bar"></div>
+  <div class="jm-card-body">
+
+    {% if m.message_type == 'selected' %}
+    <div class="jm-selected-alert">🎉 You have been SELECTED by {{ m.company_name }}!</div>
+    {% elif m.message_type == 'interview' %}
+    <div class="jm-interview-alert">📅 Interview invitation from {{ m.company_name }}</div>
+    {% elif m.message_type == 'offer' %}
+    <div style="display:flex;align-items:center;gap:9px;padding:10px 14px;background:rgba(91,107,255,.08);border:1px solid rgba(91,107,255,.2);border-radius:10px;font-size:13.5px;color:#818cf8;font-weight:600;margin-bottom:12px">🎁 Offer from {{ m.company_name }}</div>
+    {% endif %}
+
+    <div class="jm-card-top">
+      <div>
+        <div class="jm-company">🏢 {{ m.company_name or 'Recruiter' }}</div>
+        <div class="jm-email-small">{{ m.recruiter_email }}</div>
+      </div>
+      <span class="jm-badge type-{{ m.message_type }}">
+        {% if m.message_type == 'selected' %}✅ Selected
+        {% elif m.message_type == 'rejected' %}❌ Rejected
+        {% elif m.message_type == 'interview' %}📅 Interview
+        {% elif m.message_type == 'offer' %}🎁 Offer
+        {% elif m.message_type == 'reply' %}↩ Reply
+        {% else %}💬 Message{% endif %}
+      </span>
+    </div>
+
+    <div class="jm-subject">{{ m.subject or '(No subject)' }}</div>
+    <div class="jm-content">{{ m.content }}</div>
+
+    <div class="jm-meta">
+      <span class="jm-time">{{ m.created_at.strftime('%b %d, %Y · %I:%M %p') if m.created_at else '—' }}</span>
+      {% if m.job %}<span class="jm-job-pill">📋 {{ m.job.title }}</span>{% endif %}
+      {% if m.allow_reply %}<span class="jm-reply-pill">↩ Reply allowed</span>{% endif %}
+      {% if not m.is_read %}<span class="jm-new-pill">● New</span>{% endif %}
+    </div>
+  </div>
+
+  {% if m.allow_reply and m.message_type != 'reply' %}
+  <div class="jm-reply-section">
+    <button class="jm-reply-btn" onclick="toggleReply({{ m.id }}, this)">
+      ↩ Reply to {{ m.company_name }}
+    </button>
+    <div class="jm-reply-form" id="rf-{{ m.id }}">
+      <form method="POST" action="/my-messages/{{ m.id }}/reply">
+        <textarea class="jm-reply-ta" name="reply_content"
+                  placeholder="Write your reply to {{ m.company_name or 'the recruiter' }}..."></textarea>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:9px">
+          <button type="submit" class="jm-reply-submit">Send Reply →</button>
+          <button type="button" class="jm-reply-cancel"
+                  onclick="toggleReply({{ m.id }}, null)">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endfor %}
+{% else %}
+<div class="jm-empty">
+  <div style="font-size:48px;margin-bottom:14px">📭</div>
+  <div style="font-size:16px;font-weight:600;color:rgba(255,255,255,.25);margin-bottom:8px">No messages yet</div>
+  <div style="font-size:13.5px;color:rgba(255,255,255,.18);margin-bottom:20px">Apply to jobs and recruiters will reach out to you here</div>
+  <a href="/live-jobs" style="color:var(--neon);text-decoration:none;font-size:14px;font-weight:600;padding:10px 22px;border-radius:11px;border:1px solid rgba(91,107,255,.25);background:rgba(91,107,255,.08)">
+    Browse Live Jobs →
+  </a>
+</div>
+{% endif %}
+
+</div>
+</div>
+
+<script>
+function toggleReply(id, btn) {
+  const form = document.getElementById('rf-' + id);
+  const isOpen = form.classList.contains('open');
+  form.classList.toggle('open');
+  if (!isOpen) {
+    form.querySelector('textarea').focus();
+    if (btn) btn.textContent = '✕ Cancel Reply';
+  } else {
+    if (btn) btn.innerHTML = '↩ Reply to recruiter';
+  }
+}
+</script>
+{% endblock %}

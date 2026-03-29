@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+body,html{background:#000!important;}
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;}
+.sm-page{min-height:100vh;background:#000;padding:36px 0 80px;}
+.sm-body{max-width:720px;margin:0 auto;padding:0 20px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.sm-back{display:inline-flex;align-items:center;gap:7px;color:rgba(255,255,255,.35);text-decoration:none;font-size:13px;margin-bottom:20px;transition:color .2s;}
+.sm-back:hover{color:#fff;}
+.sm-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;letter-spacing:-.7px;margin-bottom:4px;}
+.sm-sub{font-size:14px;color:rgba(255,255,255,.35);margin-bottom:28px;}
+.sm-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:28px;margin-bottom:20px;animation:fadeUp .4s ease both;}
+.sm-section{font-family:'Syne',sans-serif;font-size:12.5px;font-weight:700;color:rgba(0,229,200,.8);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;}
+.sm-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.sm-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.6px;}
+.sm-inp{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:11px;padding:11px 15px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;width:100%;}
+.sm-inp:focus{border-color:rgba(91,107,255,.4);}
+.sm-inp::placeholder{color:rgba(255,255,255,.2);}
+.sm-inp option{background:#0d0d18;color:#fff;}
+.sm-ta{height:140px;resize:vertical;}
+/* Template buttons */
+.sm-templates{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.sm-tmpl{padding:8px 15px;border-radius:10px;font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid;transition:all .2s;background:none;}
+.tmpl-selected{border-color:rgba(34,197,94,.3);color:var(--green);}
+.tmpl-rejected{border-color:rgba(255,87,87,.3);color:#ff5757;}
+.tmpl-interview{border-color:rgba(255,181,71,.3);color:var(--amber);}
+.tmpl-offer{border-color:rgba(91,107,255,.3);color:#818cf8;}
+.tmpl-general{border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.55);}
+.sm-tmpl:hover{transform:translateY(-1px);}
+.sm-checkbox-row{display:flex;align-items:center;gap:10px;padding:11px 15px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:11px;margin-bottom:14px;}
+.sm-checkbox{width:17px;height:17px;accent-color:var(--neon);cursor:pointer;}
+.sm-checkbox-lbl{font-size:13px;color:rgba(255,255,255,.55);cursor:pointer;}
+.sm-submit{width:100%;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,var(--neon),#3a4aff);color:#fff;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 6px 24px rgba(91,107,255,.4);transition:all .2s;margin-top:4px;}
+.sm-submit:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(91,107,255,.55);}
+/* Student selector */
+.sm-student-search{position:relative;}
+.sm-student-results{position:absolute;top:100%;left:0;right:0;background:#0d0d1a;border:1px solid rgba(255,255,255,.1);border-radius:12px;z-index:100;display:none;max-height:240px;overflow-y:auto;margin-top:4px;}
+.sm-student-results.open{display:block;}
+.sm-student-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .2s;}
+.sm-student-item:hover{background:rgba(255,255,255,.06);}
+.sm-student-av{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,rgba(91,107,255,.35),rgba(0,229,200,.2));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;}
+.sm-student-name{font-size:13.5px;font-weight:600;color:#fff;}
+.sm-student-email{font-size:11.5px;color:rgba(255,255,255,.35);}
+.sm-selected-student{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(91,107,255,.07);border:1px solid rgba(91,107,255,.2);border-radius:11px;margin-top:8px;}
+.sm-flash{padding:12px 18px;border-radius:12px;margin-bottom:20px;font-size:14px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
+</style>
+
+<div class="sm-page">
+<div class="sm-body">
+
+{% with msgs = get_flashed_messages() %}{% if msgs %}{% for m in msgs %}<div class="sm-flash">{{ m }}</div>{% endfor %}{% endif %}{% endwith %}
+
+<a href="/recruiter/messages" class="sm-back">← Back to Messages</a>
+<div class="sm-title">✉️ Send Message</div>
+<div class="sm-sub">{{ recruiter_company }} · {{ recruiter_email }}</div>
+
+<form method="POST" action="/recruiter/send-message">
+
+  <!-- Recipient -->
+  <div class="sm-card">
+    <div class="sm-section">👤 Recipient</div>
+
+    {% if students and pre_receiver %}
+      {% set s = students[0] %}
+      <div class="sm-selected-student">
+        <div class="sm-student-av">{{ s.name[0].upper() }}</div>
+        <div>
+          <div class="sm-student-name">{{ s.name }}</div>
+          <div class="sm-student-email">{{ s.email }}</div>
+        </div>
+      </div>
+      <input type="hidden" name="receiver_id" value="{{ pre_receiver }}">
+    {% else %}
+      <div class="sm-field">
+        <label class="sm-label">Search Student by Name</label>
+        <div class="sm-student-search">
+          <input class="sm-inp" id="studentSearch" placeholder="Type student name..." autocomplete="off"
+                 oninput="searchStudents(this.value)">
+          <div class="sm-student-results" id="studentResults"></div>
+        </div>
+        <input type="hidden" name="receiver_id" id="selectedStudentId">
+        <div id="selectedStudentPreview"></div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Message Type & Subject -->
+  <div class="sm-card" style="animation-delay:.05s">
+    <div class="sm-section">📋 Message Details</div>
+
+    <div class="sm-field">
+      <label class="sm-label">Message Template</label>
+      <div class="sm-templates">
+        <button type="button" class="sm-tmpl tmpl-selected"  onclick="setTemplate('selected')" >✅ Selected</button>
+        <button type="button" class="sm-tmpl tmpl-rejected"  onclick="setTemplate('rejected')" >❌ Rejected</button>
+        <button type="button" class="sm-tmpl tmpl-interview" onclick="setTemplate('interview')">📅 Interview</button>
+        <button type="button" class="sm-tmpl tmpl-offer"     onclick="setTemplate('offer')"    >🎁 Offer</button>
+        <button type="button" class="sm-tmpl tmpl-general"   onclick="setTemplate('general')"  >💬 General</button>
+      </div>
+      <input type="hidden" name="msg_type" id="msgType" value="general">
+    </div>
+
+    {% if jobs %}
+    <div class="sm-field">
+      <label class="sm-label">Related Job (Optional)</label>
+      <select class="sm-inp" name="job_id">
+        <option value="">— Select a job —</option>
+        {% for j in jobs %}
+        <option value="{{ j.id }}" {% if pre_job|string == j.id|string %}selected{% endif %}>{{ j.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+
+    <div class="sm-field">
+      <label class="sm-label">Subject</label>
+      <input class="sm-inp" name="subject" id="subjectInp" placeholder="e.g. Interview Invitation — Software Engineer" required>
+    </div>
+
+    <div class="sm-field">
+      <label class="sm-label">Message</label>
+      <textarea class="sm-inp sm-ta" name="content" id="contentInp" placeholder="Write your message here..." required></textarea>
+    </div>
+  </div>
+
+  <!-- Options -->
+  <div class="sm-card" style="animation-delay:.08s">
+    <div class="sm-section">⚙️ Options</div>
+    <div class="sm-checkbox-row">
+      <input class="sm-checkbox" type="checkbox" name="send_email" id="sendEmail">
+      <label class="sm-checkbox-lbl" for="sendEmail">Also send via email to the student</label>
+    </div>
+    <div class="sm-checkbox-row">
+      <input class="sm-checkbox" type="checkbox" name="allow_reply" id="allowReply">
+      <label class="sm-checkbox-lbl" for="allowReply">Allow student to reply to this message</label>
+    </div>
+  </div>
+
+  <button type="submit" class="sm-submit">🚀 Send Message</button>
+</form>
+</div>
+</div>
+
+<script>
+const COMPANY = "{{ recruiter_company }}";
+const TEMPLATES = {
+  selected:  {subject:`🎉 Congratulations! You're Selected — ${COMPANY}`, body:`Dear Student,\n\nWe are thrilled to inform you that you have been SELECTED!\n\nPlease check your email for next steps.\n\nBest regards,\n${COMPANY} Hiring Team`},
+  rejected:  {subject:`Application Update — ${COMPANY}`, body:`Dear Student,\n\nThank you for applying to ${COMPANY}.\n\nAfter careful consideration, we regret to inform you that we will not be moving forward with your application at this time.\n\nWe wish you all the best in your career journey.\n\nBest regards,\n${COMPANY} Hiring Team`},
+  interview: {subject:`Interview Invitation — ${COMPANY}`, body:`Dear Student,\n\nWe are pleased to invite you for an interview!\n\nPlease reply with your preferred time slot.\n\nBest regards,\n${COMPANY} Hiring Team`},
+  offer:     {subject:`Offer Letter — ${COMPANY}`, body:`Dear Student,\n\nWe are delighted to extend an offer to you!\n\nKindly confirm your acceptance at the earliest.\n\nBest regards,\n${COMPANY} Hiring Team`},
+  general:   {subject:`Message from ${COMPANY} — PathPilot`, body:`Dear Student,\n\n`},
+};
+function setTemplate(type){
+  document.getElementById("msgType").value = type;
+  document.getElementById("subjectInp").value = TEMPLATES[type].subject;
+  document.getElementById("contentInp").value = TEMPLATES[type].body;
+}
+
+let searchTimer;
+async function searchStudents(q){
+  clearTimeout(searchTimer);
+  if(!q || q.length < 2){document.getElementById("studentResults").classList.remove("open");return;}
+  searchTimer = setTimeout(async ()=>{
+    const data = await fetch(`/api/recruiter/search-students?q=${encodeURIComponent(q)}`).then(r=>r.json());
+    const res = document.getElementById("studentResults");
+    if(!data.length){res.classList.remove("open");return;}
+    res.innerHTML = data.map(s=>`
+      <div class="sm-student-item" onclick="selectStudent(${s.id},'${s.name.replace(/'/g,"\\'")}','${s.email}')">
+        <div class="sm-student-av">${s.name[0].toUpperCase()}</div>
+        <div><div class="sm-student-name">${s.name}</div><div class="sm-student-email">${s.email}</div></div>
+      </div>`).join('');
+    res.classList.add("open");
+  }, 350);
+}
+function selectStudent(id, name, email){
+  document.getElementById("selectedStudentId").value = id;
+  document.getElementById("studentSearch").value = name;
+  document.getElementById("studentResults").classList.remove("open");
+  document.getElementById("selectedStudentPreview").innerHTML =
+    `<div class="sm-selected-student" style="margin-top:8px"><div class="sm-student-av">${name[0].toUpperCase()}</div><div><div class="sm-student-name">${name}</div><div class="sm-student-email">${email}</div></div></div>`;
+}
+document.addEventListener("click", e=>{
+  if(!e.target.closest(".sm-student-search")) document.getElementById("studentResults").classList.remove("open");
+});
+</script>
+{% endblock %}

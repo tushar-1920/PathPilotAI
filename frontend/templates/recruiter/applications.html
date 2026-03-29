@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+body,html{background:#000!important;}
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;--red:#ff5757;--purple:#a855f7;}
+*,*::before,*::after{box-sizing:border-box;}
+.ra-page{min-height:100vh;background:#000;padding:32px 0 80px;}
+.ra-body{max-width:1200px;margin:0 auto;padding:0 20px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.ra-back{display:inline-flex;align-items:center;gap:7px;color:rgba(255,255,255,.35);text-decoration:none;font-size:13px;margin-bottom:20px;transition:color .2s;}
+.ra-back:hover{color:#fff;}
+.ra-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:24px;}
+.ra-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#fff;letter-spacing:-.6px;}
+.ra-meta{font-size:13px;color:rgba(255,255,255,.35);margin-top:4px;}
+/* Filters */
+.ra-filters{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px 20px;margin-bottom:20px;animation:fadeUp .35s ease both;}
+.ra-filter-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+.ra-filter-field{display:flex;flex-direction:column;gap:5px;min-width:140px;}
+.ra-filter-lbl{font-size:11px;color:rgba(255,255,255,.35);font-weight:600;text-transform:uppercase;letter-spacing:.6px;}
+.ra-filter-inp{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:8px 13px;color:#fff;font-size:13.5px;outline:none;transition:border-color .2s;}
+.ra-filter-inp:focus{border-color:rgba(91,107,255,.4);}
+.ra-filter-inp option{background:#0d0d18;color:#fff;}
+.ra-filter-btn{padding:9px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--neon),#3a4aff);color:#fff;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.ra-filter-btn:hover{transform:translateY(-1px);}
+.ra-filter-clear{padding:9px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.4);font-size:13px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;}
+.ra-filter-clear:hover{background:rgba(255,255,255,.06);color:#fff;}
+/* Cards */
+.ra-cards{display:flex;flex-direction:column;gap:14px;}
+.ra-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:20px;animation:fadeUp .4s ease both;transition:border-color .2s;}
+.ra-card:hover{border-color:rgba(91,107,255,.2);}
+.ra-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+.ra-student-info{display:flex;align-items:center;gap:13px;}
+.ra-av{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,rgba(91,107,255,.35),rgba(0,229,200,.2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden;}
+.ra-av img{width:100%;height:100%;object-fit:cover;}
+.ra-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff;}
+.ra-email{font-size:12px;color:rgba(255,255,255,.3);margin-top:2px;}
+.ra-applied{font-size:11.5px;margin-top:3px;}
+.ra-applied.on-time{color:var(--green);}
+.ra-applied.late{color:var(--amber);}
+/* Badge */
+.ra-badge{display:inline-flex;padding:4px 11px;border-radius:100px;font-size:11.5px;font-weight:600;letter-spacing:.3px;}
+.s-applied{background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.2);color:#818cf8;}
+.s-under_review{background:rgba(255,181,71,.1);border:1px solid rgba(255,181,71,.2);color:var(--amber);}
+.s-shortlisted{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);color:var(--purple);}
+.s-selected{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
+.s-rejected{background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.2);color:var(--red);}
+/* Academic grid */
+.ra-acad{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px;}
+.ra-acad-item{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:11px;padding:10px 13px;}
+.ra-acad-val{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:#fff;}
+.ra-acad-lbl{font-size:10.5px;color:rgba(255,255,255,.3);margin-top:2px;}
+/* Actions row */
+.ra-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-top:1px solid rgba(255,255,255,.06);padding-top:13px;}
+.ra-link{padding:7px 15px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:1px solid transparent;}
+.ra-link-profile{background:rgba(91,107,255,.08);border-color:rgba(91,107,255,.2);color:#818cf8;}
+.ra-link-profile:hover{background:rgba(91,107,255,.18);color:#fff;}
+.ra-link-msg{background:rgba(0,229,200,.07);border-color:rgba(0,229,200,.18);color:rgba(0,229,200,.85);}
+.ra-link-msg:hover{background:rgba(0,229,200,.15);}
+.ra-link-resume{background:rgba(255,181,71,.07);border-color:rgba(255,181,71,.18);color:var(--amber);}
+.ra-link-resume:hover{background:rgba(255,181,71,.15);}
+.ra-status-form{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.ra-status-sel{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:7px 12px;color:#fff;font-size:13px;outline:none;cursor:pointer;}
+.ra-status-sel option{background:#0d0d18;color:#fff;}
+.ra-status-btn{padding:7px 14px;border-radius:9px;border:none;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.22);color:var(--green);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.ra-status-btn:hover{background:rgba(34,197,94,.22);}
+/* Strengths */
+.ra-strengths{font-size:13px;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:12px;background:rgba(255,255,255,.02);border-radius:10px;padding:10px 14px;border:1px solid rgba(255,255,255,.05);}
+.ra-empty{text-align:center;padding:50px 20px;color:rgba(255,255,255,.2);font-size:15px;}
+.ra-count{font-size:13px;color:rgba(255,255,255,.3);margin-bottom:14px;}
+</style>
+
+<div class="ra-page">
+<div class="ra-body">
+
+{% with msgs = get_flashed_messages() %}{% if msgs %}{% for m in msgs %}<div style="padding:12px 18px;border-radius:12px;margin-bottom:16px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);font-size:14px">{{ m }}</div>{% endfor %}{% endif %}{% endwith %}
+
+<a href="/recruiter/dashboard" class="ra-back">← Back to Dashboard</a>
+
+<div class="ra-header">
+  <div>
+    <div class="ra-title">📨 Applications — {{ job.title }}</div>
+    <div class="ra-meta">{{ job.company_name }} · {{ job.job_type }} · {{ apps|length }} total applications</div>
+  </div>
+  <a href="/recruiter/send-message?job_id={{ job.id }}" class="ra-link ra-link-msg" style="padding:10px 20px;font-size:13.5px">✉️ Message All</a>
+</div>
+
+<!-- Filters -->
+<div class="ra-filters">
+  <form method="GET" action="/recruiter/jobs/{{ job.id }}/applications">
+    <div class="ra-filter-row">
+      <div class="ra-filter-field">
+        <label class="ra-filter-lbl">Min CGPA</label>
+        <input class="ra-filter-inp" type="number" name="min_cgpa" step="0.1" min="0" max="10"
+               placeholder="e.g. 7.0" value="{{ filters.min_cgpa }}" style="width:120px">
+      </div>
+      <div class="ra-filter-field">
+        <label class="ra-filter-lbl">College</label>
+        <input class="ra-filter-inp" name="college" placeholder="Search college..." value="{{ filters.college }}">
+      </div>
+      <div class="ra-filter-field">
+        <label class="ra-filter-lbl">Status</label>
+        <select class="ra-filter-inp" name="status">
+          <option value="">All Status</option>
+          <option value="applied"      {% if filters.status=='applied' %}selected{% endif %}>Applied</option>
+          <option value="under_review" {% if filters.status=='under_review' %}selected{% endif %}>Under Review</option>
+          <option value="shortlisted"  {% if filters.status=='shortlisted' %}selected{% endif %}>Shortlisted</option>
+          <option value="selected"     {% if filters.status=='selected' %}selected{% endif %}>Selected</option>
+          <option value="rejected"     {% if filters.status=='rejected' %}selected{% endif %}>Rejected</option>
+        </select>
+      </div>
+      <div class="ra-filter-field">
+        <label class="ra-filter-lbl">Timing</label>
+        <select class="ra-filter-inp" name="timing">
+          <option value="all"            {% if filters.timing=='all' %}selected{% endif %}>All</option>
+          <option value="before_deadline"{% if filters.timing=='before_deadline' %}selected{% endif %}>Before Deadline</option>
+          <option value="after_deadline" {% if filters.timing=='after_deadline' %}selected{% endif %}>After Deadline</option>
+        </select>
+      </div>
+      <button type="submit" class="ra-filter-btn">🔍 Apply Filters</button>
+      <a href="/recruiter/jobs/{{ job.id }}/applications" class="ra-filter-clear">✕ Clear</a>
+    </div>
+  </form>
+</div>
+
+{% if apps %}
+<div class="ra-count">Showing {{ apps|length }} application{{ 's' if apps|length != 1 else '' }}</div>
+<div class="ra-cards">
+{% for app in apps %}
+{% set u = app.user %}
+{% set profile = u.profile if u else None %}
+<div class="ra-card" style="animation-delay:{{ loop.index0 * 0.04 }}s">
+  <div class="ra-card-top">
+    <div class="ra-student-info">
+      <div class="ra-av">
+        {% if profile and profile.profile_image %}
+          <img src="/static/{{ profile.profile_image }}" alt="{{ u.name }}">
+        {% else %}
+          {{ u.name[0].upper() if u else '?' }}
+        {% endif %}
+      </div>
+      <div>
+        <div class="ra-name">{{ u.name if u else 'Unknown' }}</div>
+        <div class="ra-email">{{ u.email if u else '' }}</div>
+        {% if job.deadline %}
+          {% if app.applied_at <= job.deadline %}
+            <div class="ra-applied on-time">✓ Applied on time · {{ app.applied_at.strftime('%b %d, %Y %I:%M %p') }}</div>
+          {% else %}
+            <div class="ra-applied late">⚠ Applied after deadline · {{ app.applied_at.strftime('%b %d, %Y %I:%M %p') }}</div>
+          {% endif %}
+        {% else %}
+          <div class="ra-applied" style="color:rgba(255,255,255,.3)">Applied {{ app.applied_at.strftime('%b %d, %Y') if app.applied_at else '—' }}</div>
+        {% endif %}
+      </div>
+    </div>
+    <span class="ra-badge s-{{ app.status }}">{{ app.status.replace('_',' ').title() }}</span>
+  </div>
+
+  <!-- Academic details -->
+  <div class="ra-acad">
+    {% if app.cgpa %}<div class="ra-acad-item"><div class="ra-acad-val" style="color:var(--cyan)">{{ app.cgpa }}</div><div class="ra-acad-lbl">CGPA</div></div>{% endif %}
+    {% if app.tenth_percent %}<div class="ra-acad-item"><div class="ra-acad-val">{{ app.tenth_percent }}%</div><div class="ra-acad-lbl">10th %</div></div>{% endif %}
+    {% if app.twelfth_percent %}<div class="ra-acad-item"><div class="ra-acad-val">{{ app.twelfth_percent }}%</div><div class="ra-acad-lbl">12th %</div></div>{% endif %}
+    {% if app.college %}<div class="ra-acad-item"><div class="ra-acad-val" style="font-size:13px">{{ app.college }}</div><div class="ra-acad-lbl">College</div></div>{% endif %}
+    {% if app.degree %}<div class="ra-acad-item"><div class="ra-acad-val" style="font-size:13px">{{ app.degree }}</div><div class="ra-acad-lbl">Degree</div></div>{% endif %}
+    {% if app.stream %}<div class="ra-acad-item"><div class="ra-acad-val" style="font-size:13px">{{ app.stream }}</div><div class="ra-acad-lbl">Stream</div></div>{% endif %}
+    {% if app.batch %}<div class="ra-acad-item"><div class="ra-acad-val">{{ app.batch }}</div><div class="ra-acad-lbl">Batch</div></div>{% endif %}
+    {% if app.phone %}<div class="ra-acad-item"><div class="ra-acad-val" style="font-size:13px">{{ app.phone }}</div><div class="ra-acad-lbl">Phone</div></div>{% endif %}
+  </div>
+
+  {% if app.strengths %}
+  <div class="ra-strengths"><strong style="color:rgba(255,255,255,.6)">Strengths / DSA:</strong> {{ app.strengths }}</div>
+  {% endif %}
+  {% if app.why_hire %}
+  <div class="ra-strengths"><strong style="color:rgba(255,255,255,.6)">Why Hire Me:</strong> {{ app.why_hire }}</div>
+  {% endif %}
+
+  <!-- Actions -->
+  <div class="ra-actions">
+    {% if u %}
+    <a href="/recruiter/student/{{ u.id }}" class="ra-link ra-link-profile">👤 Full Profile</a>
+    <a href="/recruiter/send-message?receiver_id={{ u.id }}&job_id={{ job.id }}" class="ra-link ra-link-msg">💬 Send Message</a>
+    {% endif %}
+    {% if app.resume_filename %}
+    <a href="/uploads/application_resumes/{{ app.resume_filename }}" target="_blank" class="ra-link ra-link-resume">📄 Resume</a>
+    {% endif %}
+
+    <!-- Status Update -->
+    <form method="POST" action="/recruiter/applications/{{ app.id }}/status" class="ra-status-form">
+      <select class="ra-status-sel" name="status">
+        <option value="applied"      {% if app.status=='applied' %}selected{% endif %}>Applied</option>
+        <option value="under_review" {% if app.status=='under_review' %}selected{% endif %}>Under Review</option>
+        <option value="shortlisted"  {% if app.status=='shortlisted' %}selected{% endif %}>Shortlisted</option>
+        <option value="selected"     {% if app.status=='selected' %}selected{% endif %}>Selected ✅</option>
+        <option value="rejected"     {% if app.status=='rejected' %}selected{% endif %}>Rejected ❌</option>
+      </select>
+      <button type="submit" class="ra-status-btn">Update</button>
+    </form>
+  </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="ra-empty">
+  <div style="font-size:40px;margin-bottom:12px">📭</div>
+  No applications match your filters yet.
+</div>
+{% endif %}
+
+</div>
+</div>
+{% endblock %}

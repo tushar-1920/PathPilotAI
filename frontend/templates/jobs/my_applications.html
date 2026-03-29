@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+body,html{background:#000!important;}
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;--red:#ff5757;--purple:#a855f7;}
+*,*::before,*::after{box-sizing:border-box;}
+.ma-page{min-height:100vh;background:#000;padding:34px 0 80px;}
+.ma-body{max-width:900px;margin:0 auto;padding:0 20px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.ma-header{margin-bottom:22px;animation:fadeUp .35s ease both;}
+.ma-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;letter-spacing:-.7px;}
+.ma-sub{font-size:13px;color:rgba(255,255,255,.35);margin-top:4px;}
+
+/* Sub navbar */
+.ma-subnav{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+.ma-subnav a{padding:9px 18px;border-radius:10px;font-size:13.5px;font-weight:600;text-decoration:none;transition:all .2s;border:1px solid rgba(255,255,255,.08);}
+.ma-subnav a.active{background:rgba(91,107,255,.12);border-color:rgba(91,107,255,.25);color:#818cf8;}
+.ma-subnav a:not(.active){color:rgba(255,255,255,.4);background:rgba(255,255,255,.02);}
+.ma-subnav a:not(.active):hover{background:rgba(255,255,255,.07);color:#fff;}
+
+/* Cards */
+.ma-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:20px 22px;margin-bottom:12px;animation:fadeUp .4s ease both;transition:border-color .2s;}
+.ma-card:hover{border-color:rgba(91,107,255,.18);}
+.ma-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+.ma-job-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:-.3px;}
+.ma-company{font-size:13px;color:rgba(255,255,255,.4);margin-top:2px;}
+/* Status badge */
+.ma-badge{display:inline-flex;padding:4px 12px;border-radius:100px;font-size:12px;font-weight:600;}
+.s-applied{background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.2);color:#818cf8;}
+.s-under_review{background:rgba(255,181,71,.1);border:1px solid rgba(255,181,71,.2);color:var(--amber);}
+.s-shortlisted{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);color:var(--purple);}
+.s-selected{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
+.s-rejected{background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.2);color:var(--red);}
+/* Details grid */
+.ma-details{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+.ma-detail{font-size:12.5px;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:5px;}
+/* Timeline bar */
+.ma-timeline{display:flex;gap:0;margin-top:12px;overflow-x:auto;padding-bottom:4px;}
+.ma-step{flex:1;min-width:80px;text-align:center;position:relative;}
+.ma-step-dot{width:10px;height:10px;border-radius:50%;margin:0 auto 4px;background:rgba(255,255,255,.12);}
+.ma-step-dot.done{background:var(--neon);box-shadow:0 0 8px rgba(91,107,255,.5);}
+.ma-step-dot.current{background:var(--cyan);box-shadow:0 0 8px rgba(0,229,200,.5);}
+.ma-step-dot.success{background:var(--green);box-shadow:0 0 8px rgba(34,197,94,.5);}
+.ma-step-dot.fail{background:var(--red);box-shadow:0 0 8px rgba(255,87,87,.4);}
+.ma-step-line{position:absolute;top:5px;left:50%;right:-50%;height:1px;background:rgba(255,255,255,.1);z-index:-1;}
+.ma-step:last-child .ma-step-line{display:none;}
+.ma-step-lbl{font-size:10px;color:rgba(255,255,255,.3);white-space:nowrap;}
+
+.ma-deadline-tag{font-size:11.5px;padding:3px 10px;border-radius:100px;}
+.ma-deadline-ok{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.15);color:var(--green);}
+.ma-deadline-late{background:rgba(255,181,71,.07);border:1px solid rgba(255,181,71,.15);color:var(--amber);}
+
+.ma-empty{text-align:center;padding:60px 20px;color:rgba(255,255,255,.2);font-size:16px;}
+</style>
+
+<div class="ma-page">
+<div class="ma-body">
+
+<div class="ma-header">
+  <div class="ma-title">📋 My Applications</div>
+  <div class="ma-sub">Track all your job applications in one place</div>
+</div>
+
+<div class="ma-subnav">
+  <a href="/live-jobs">🔴 Live Jobs</a>
+  <a href="/my-applications" class="active">📋 My Applications</a>
+  <a href="/my-messages">💬 Recruiter Messages</a>
+</div>
+
+{% if apps %}
+{% for app, job in apps %}
+<div class="ma-card" style="animation-delay:{{ loop.index0 * 0.04 }}s">
+  <div class="ma-card-top">
+    <div>
+      <div class="ma-job-title">{{ job.title }}</div>
+      <div class="ma-company">{{ job.company_name }} · {{ job.job_type }}</div>
+    </div>
+    <span class="ma-badge s-{{ app.status }}">
+      {% if app.status == 'applied' %}📨 Applied
+      {% elif app.status == 'under_review' %}🔍 Under Review
+      {% elif app.status == 'shortlisted' %}⭐ Shortlisted
+      {% elif app.status == 'selected' %}🎉 Selected!
+      {% elif app.status == 'rejected' %}❌ Rejected
+      {% else %}{{ app.status.replace('_',' ').title() }}{% endif %}
+    </span>
+  </div>
+
+  <div class="ma-details">
+    {% if app.cgpa %}<span class="ma-detail">📊 CGPA: {{ app.cgpa }}</span>{% endif %}
+    {% if app.college %}<span class="ma-detail">🎓 {{ app.college }}</span>{% endif %}
+    {% if job.location %}<span class="ma-detail">📍 {{ job.location }}</span>{% endif %}
+    {% if job.ctc %}<span class="ma-detail">💰 {{ job.ctc }}</span>{% endif %}
+    <span class="ma-detail">🕐 Applied {{ app.applied_at.strftime('%b %d, %Y') if app.applied_at else '—' }}</span>
+    {% if job.deadline %}
+      {% if app.applied_at and app.applied_at <= job.deadline %}
+        <span class="ma-deadline-tag ma-deadline-ok">✓ On time</span>
+      {% else %}
+        <span class="ma-deadline-tag ma-deadline-late">⚠ After deadline</span>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <!-- Status Progress Bar -->
+  <div class="ma-timeline">
+    {% set steps = ['applied', 'under_review', 'shortlisted', 'selected'] %}
+    {% set step_labels = {'applied':'Applied','under_review':'In Review','shortlisted':'Shortlisted','selected':'Selected'} %}
+    {% if app.status == 'rejected' %}
+      {% set current_idx = -1 %}
+    {% else %}
+      {% set current_idx = steps.index(app.status) if app.status in steps else 0 %}
+    {% endif %}
+    {% for s in steps %}
+    {% set idx = loop.index0 %}
+    <div class="ma-step">
+      <div class="ma-step-dot
+        {% if app.status == 'rejected' %}fail
+        {% elif idx < current_idx %}done
+        {% elif idx == current_idx %}current
+        {% endif %}
+        {% if app.status == 'selected' and s == 'selected' %}success{% endif %}
+      "></div>
+      <div class="ma-step-line"></div>
+      <div class="ma-step-lbl">{{ step_labels[s] }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if app.status == 'selected' %}
+  <div style="margin-top:12px;padding:10px 14px;border-radius:11px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);font-size:13.5px;color:var(--green);font-weight:600">
+    🎉 Congratulations! You have been selected. Check your messages for next steps.
+  </div>
+  {% endif %}
+</div>
+{% endfor %}
+{% else %}
+<div class="ma-empty">
+  <div style="font-size:40px;margin-bottom:12px">📭</div>
+  No applications yet.
+  <br><a href="/live-jobs" style="color:var(--neon);text-decoration:none;font-weight:600;display:inline-block;margin-top:8px">Browse Live Jobs →</a>
+</div>
+{% endif %}
+
+</div>
+</div>
+{% endblock %}

@@ -1,740 +1,1078 @@
 {% extends "base.html" %}
 {% block title %}Admin Control Center — PathPilot AI{% endblock %}
 {% block content %}
-
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
 <style>
 html,body{background:#000!important;color:#f1f5f9!important;}
-.container,.container-fluid,.row,.col,.col-12,.main-content,.content,.wrapper,.page-content,
-.content-wrapper,[class*="content"],[class*="wrapper"],[class*="page"]{background:#000!important;}
-
-#admin-root{
-  --neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;
-  --amber:#ffb547;--red:#ff5757;--purple:#a855f7;
-  --bg:#000;--bg2:#0a0a12;--bg3:#0f0f1a;--card:#0d0d18;
+*{box-sizing:border-box;}
+#ar{
+  --neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;
+  --red:#ff5757;--purple:#a855f7;--blue:#38bdf8;--pink:#f472b6;
+  --bg:#000;--card:#0d0d18;--card2:#0a0a12;
   --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
   --txt:#f1f5f9;--txt2:#94a3b8;--txt3:#64748b;
   --font:"DM Sans",sans-serif;--display:"Syne",sans-serif;--mono:"JetBrains Mono",monospace;
-  background:var(--bg);color:var(--txt);font-family:var(--font);
-  min-height:calc(100vh - 60px);padding-bottom:60px;
+  background:#000;color:var(--txt);font-family:var(--font);min-height:100vh;padding-bottom:80px;
 }
-
-/* ── GLOW BG ── */
-.admin-glow{position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(ellipse 50% 40% at 5% 8%,rgba(91,107,255,.08) 0%,transparent 65%),
-    radial-gradient(ellipse 40% 35% at 95% 90%,rgba(0,229,200,.06) 0%,transparent 60%),
-    radial-gradient(ellipse 30% 25% at 50% 50%,rgba(168,85,247,.04) 0%,transparent 70%);}
-.admin-grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),
-  linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);
-  background-size:56px 56px;}
-.admin-wrap{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:28px 24px;}
+.ag{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 50% 40% at 5% 8%,rgba(91,107,255,.07) 0%,transparent 65%),
+    radial-gradient(ellipse 40% 35% at 95% 90%,rgba(0,229,200,.05) 0%,transparent 60%),
+    radial-gradient(ellipse 30% 25% at 50% 50%,rgba(168,85,247,.03) 0%,transparent 70%);}
+.agb{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px);background-size:56px 56px;}
+.aw{position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:28px 24px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,87,87,.5)}50%{box-shadow:0 0 0 6px rgba(255,87,87,0)}}
+@keyframes pulse-g{0%,100%{box-shadow:0 0 6px var(--green)}50%{box-shadow:0 0 14px var(--green)}}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.fi{animation:fadeUp .4s ease both;}
+.d1{animation-delay:.04s}.d2{animation-delay:.08s}.d3{animation-delay:.12s}
+.d4{animation-delay:.16s}.d5{animation-delay:.20s}.d6{animation-delay:.24s}
+.d7{animation-delay:.28s}.d8{animation-delay:.32s}
 
 /* ── HEADER ── */
-.admin-header{display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:32px;flex-wrap:wrap;gap:14px;}
-.admin-title{font-family:var(--display);font-size:28px;font-weight:800;
-  letter-spacing:-.8px;color:#fff;}
-.admin-title span{background:linear-gradient(135deg,var(--neon),var(--cyan));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.admin-badge{display:flex;align-items:center;gap:8px;padding:7px 16px;border-radius:100px;
-  background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.25);
-  color:#ff5757;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
-.admin-badge-dot{width:7px;height:7px;border-radius:50%;background:#ff5757;
-  animation:pulse 1.5s ease-in-out infinite;}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,87,87,.5)}50%{box-shadow:0 0 0 6px rgba(255,87,87,0)}}
-.health-dot{width:9px;height:9px;border-radius:50%;background:#22c55e;
-  box-shadow:0 0 8px #22c55e;animation:pulse-g 2s ease-in-out infinite;}
-@keyframes pulse-g{0%,100%{box-shadow:0 0 6px #22c55e}50%{box-shadow:0 0 14px #22c55e}}
+.ah{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:14px;}
+.atitle{font-family:var(--display);font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.8px;color:#fff;}
+.atitle span{background:linear-gradient(135deg,var(--neon),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.abadge{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:100px;
+  background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.25);color:#ff5757;
+  font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;}
+.abd{width:7px;height:7px;border-radius:50%;background:#ff5757;animation:pulse 1.5s infinite;}
+.rfbtn{padding:7px 16px;border-radius:9px;border:1px solid var(--border);background:rgba(255,255,255,.03);
+  color:var(--txt2);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--font);
+  display:flex;align-items:center;gap:6px;}
+.rfbtn:hover{border-color:var(--neon);color:#fff;background:rgba(91,107,255,.08);}
+
+/* ── TAB NAV ── */
+.tabnav{display:flex;gap:4px;margin-bottom:24px;background:rgba(255,255,255,.02);
+  border:1px solid var(--border);border-radius:14px;padding:5px;flex-wrap:wrap;}
+.tab{padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;color:var(--txt3);
+  cursor:pointer;transition:all .2s;border:1px solid transparent;display:flex;align-items:center;gap:6px;}
+.tab:hover{color:#fff;background:rgba(255,255,255,.05);}
+.tab.active{background:linear-gradient(135deg,rgba(91,107,255,.18),rgba(0,229,200,.08));
+  border-color:rgba(91,107,255,.22);color:#fff;}
 
 /* ── SECTION LABEL ── */
-.sec-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;
-  color:var(--txt3);display:flex;align-items:center;gap:10px;margin-bottom:16px;}
-.sec-label::after{content:"";flex:1;height:1px;background:var(--border);}
+.slbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:var(--txt3);
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;margin-top:6px;}
+.slbl::after{content:"";flex:1;height:1px;background:var(--border);}
 
-/* ── KPI GRID ── */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
-.kpi-card{padding:22px 20px;border-radius:16px;background:var(--card);
-  border:1px solid var(--border);position:relative;overflow:hidden;
-  transition:transform .2s,border-color .2s;cursor:default;}
-.kpi-card:hover{transform:translateY(-3px);border-color:var(--border2);}
-.kpi-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .3s;}
-.kpi-card:hover::before{opacity:1;}
-.kpi-glow-neon::before{background:linear-gradient(90deg,var(--neon),rgba(91,107,255,0));}
-.kpi-glow-cyan::before{background:linear-gradient(90deg,var(--cyan),rgba(0,229,200,0));}
-.kpi-glow-green::before{background:linear-gradient(90deg,var(--green),rgba(34,197,94,0));}
-.kpi-glow-amber::before{background:linear-gradient(90deg,var(--amber),rgba(255,181,71,0));}
-.kpi-glow-red::before{background:linear-gradient(90deg,var(--red),rgba(255,87,87,0));}
-.kpi-glow-purple::before{background:linear-gradient(90deg,var(--purple),rgba(168,85,247,0));}
-.kpi-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;
-  justify-content:center;font-size:18px;margin-bottom:12px;}
-.kpi-num{font-family:var(--display);font-size:30px;font-weight:800;letter-spacing:-1px;
-  color:#fff;line-height:1;}
-.kpi-label{font-size:12px;color:var(--txt3);font-weight:500;margin-top:5px;text-transform:uppercase;letter-spacing:.8px;}
-.kpi-delta{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;
-  margin-top:8px;padding:2px 8px;border-radius:100px;}
-.kpi-up{background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.2);}
-.kpi-down{background:rgba(255,87,87,.1);color:#ff5757;border:1px solid rgba(255,87,87,.2);}
-.kpi-neutral{background:rgba(255,181,71,.1);color:#ffb547;border:1px solid rgba(255,181,71,.2);}
+/* ── HEALTH ── */
+.hgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px;}
+.hitem{padding:12px 14px;border-radius:12px;background:var(--card);border:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;transition:border-color .2s;}
+.hitem:hover{border-color:var(--border2);}
+.hdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.hok{background:#22c55e;animation:pulse-g 2s infinite;}
+.hwarn{background:#ffb547;box-shadow:0 0 8px #ffb547;}
+.herr{background:#ff5757;box-shadow:0 0 8px #ff5757;}
+.hname{font-size:12.5px;font-weight:600;color:#fff;}
+.hdetail{font-size:10.5px;color:var(--txt3);margin-top:1px;}
 
-/* ── CHART CARDS ── */
-.chart-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
-.chart-grid-3{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px;}
-.chart-grid-full{margin-bottom:24px;}
-.chart-card{background:var(--card);border:1px solid var(--border);border-radius:16px;
-  padding:22px;overflow:hidden;}
-.chart-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
-.chart-card-title{font-family:var(--display);font-size:15px;font-weight:700;color:#fff;letter-spacing:-.3px;}
-.chart-card-sub{font-size:12px;color:var(--txt3);margin-top:2px;}
-.chart-wrap{height:220px;position:relative;}
-.chart-wrap-sm{height:180px;position:relative;}
-.chart-wrap-lg{height:260px;position:relative;}
+/* ── KPI ── */
+.kgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px;}
+.kgrid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;}
+.kcard{padding:18px 16px;border-radius:16px;background:var(--card);border:1px solid var(--border);
+  position:relative;overflow:hidden;transition:transform .2s,border-color .2s;cursor:default;}
+.kcard:hover{transform:translateY(-3px);border-color:var(--border2);}
+.kcard::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .3s;}
+.kcard:hover::before{opacity:1;}
+.gn::before{background:linear-gradient(90deg,var(--neon),transparent);}
+.gc::before{background:linear-gradient(90deg,var(--cyan),transparent);}
+.gg::before{background:linear-gradient(90deg,var(--green),transparent);}
+.ga::before{background:linear-gradient(90deg,var(--amber),transparent);}
+.gr::before{background:linear-gradient(90deg,var(--red),transparent);}
+.gp::before{background:linear-gradient(90deg,var(--purple),transparent);}
+.gb::before{background:linear-gradient(90deg,var(--blue),transparent);}
+.gpk::before{background:linear-gradient(90deg,var(--pink),transparent);}
+.kicon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:10px;}
+.knum{font-family:var(--display);font-size:clamp(22px,2.5vw,28px);font-weight:800;letter-spacing:-1px;color:#fff;line-height:1;}
+.klbl{font-size:10.5px;color:var(--txt3);font-weight:500;margin-top:4px;text-transform:uppercase;letter-spacing:.8px;}
+.kdelta{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;
+  margin-top:7px;padding:2px 8px;border-radius:100px;}
+.kup{background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.2);}
+.kdown{background:rgba(255,87,87,.1);color:#ff5757;border:1px solid rgba(255,87,87,.2);}
+.kneutral{background:rgba(255,181,71,.1);color:#ffb547;border:1px solid rgba(255,181,71,.2);}
+
+/* ── CHARTS ── */
+.cgrid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.cgrid3{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px;}
+.cgrid1{margin-bottom:20px;}
+.cgrid34{display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:20px;}
+.cc{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;overflow:hidden;}
+.cch{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.cct{font-family:var(--display);font-size:14.5px;font-weight:700;color:#fff;letter-spacing:-.3px;}
+.ccs{font-size:11.5px;color:var(--txt3);margin-top:2px;}
+.cwrap{height:200px;position:relative;}
+.cwrap-sm{height:160px;position:relative;}
+.cwrap-lg{height:240px;position:relative;}
+.cwrap-xl{height:280px;position:relative;}
+.ministats{display:flex;gap:16px;flex-wrap:wrap;}
+.ms{text-align:center;}
+.msn{font-family:var(--display);font-size:20px;font-weight:800;letter-spacing:-.5px;}
+.msl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+
+/* ── SKILL BARS ── */
+.sbrow{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.sbname{font-size:12.5px;color:var(--txt);width:130px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sbt{flex:1;height:6px;border-radius:100px;background:rgba(255,255,255,.06);}
+.sbf{height:100%;border-radius:100px;transition:width .8s cubic-bezier(.16,1,.3,1);}
+.sbn{font-family:var(--mono);font-size:11.5px;color:var(--txt3);width:26px;text-align:right;}
 
 /* ── DATA TABLE ── */
-.data-table-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px;}
-.dtc-header{padding:18px 22px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;}
-.dtc-title{font-family:var(--display);font-size:15px;font-weight:700;color:#fff;}
-.dtc-body{overflow-x:auto;}
-.data-table{width:100%;border-collapse:collapse;}
-.data-table th{text-align:left;padding:10px 16px;font-size:10.5px;font-weight:700;
-  text-transform:uppercase;letter-spacing:1.5px;color:var(--txt3);
-  border-bottom:1px solid var(--border);white-space:nowrap;}
-.data-table td{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);
-  font-size:13.5px;color:var(--txt);vertical-align:middle;}
-.data-table tr:last-child td{border-bottom:none;}
-.data-table tr:hover td{background:rgba(255,255,255,.02);}
-.plan-badge{display:inline-flex;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;}
-.plan-pro{background:rgba(91,107,255,.12);color:#818cf8;border:1px solid rgba(91,107,255,.2);}
-.plan-free{background:rgba(100,116,139,.1);color:#94a3b8;border:1px solid rgba(100,116,139,.2);}
-.plan-ent{background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.2);}
-.verified-yes{color:#22c55e;font-size:13px;}
-.verified-no{color:#64748b;font-size:13px;}
+.dtcard{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px;}
+.dth{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.dtitle{font-family:var(--display);font-size:14.5px;font-weight:700;color:#fff;}
+.dtbody{overflow-x:auto;}
+.dt{width:100%;border-collapse:collapse;}
+.dt th{text-align:left;padding:9px 14px;font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:1.5px;color:var(--txt3);border-bottom:1px solid var(--border);white-space:nowrap;}
+.dt td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;color:var(--txt);vertical-align:middle;}
+.dt tr:last-child td{border-bottom:none;}
+.dt tr:hover td{background:rgba(255,255,255,.02);}
+.dt tr{cursor:pointer;}
+.pbadge{display:inline-flex;padding:2px 9px;border-radius:100px;font-size:10.5px;font-weight:700;}
+.bpro{background:rgba(91,107,255,.12);color:#818cf8;border:1px solid rgba(91,107,255,.2);}
+.bfree{background:rgba(100,116,139,.1);color:#94a3b8;border:1px solid rgba(100,116,139,.2);}
+.bent{background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.2);}
+.bverify{color:#22c55e;font-size:12px;}
+.bunverify{color:#64748b;font-size:12px;}
+.bstatus{display:inline-flex;padding:2px 9px;border-radius:100px;font-size:10.5px;font-weight:600;}
+.bapplied{background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.2);color:#818cf8;}
+.bselected{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
+.brejected{background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.2);color:var(--red);}
+.bshort{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);color:var(--purple);}
+.bhire{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
+.breject{background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.2);color:var(--red);}
+.bmaybe{background:rgba(255,181,71,.1);border:1px solid rgba(255,181,71,.2);color:var(--amber);}
 
-/* ── HEALTH PANEL ── */
-.health-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
-.health-item{padding:14px 16px;border-radius:12px;background:var(--card);
-  border:1px solid var(--border);display:flex;align-items:center;gap:12px;}
-.health-status{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.hs-ok{background:#22c55e;box-shadow:0 0 8px #22c55e;}
-.hs-warn{background:#ffb547;box-shadow:0 0 8px #ffb547;}
-.hs-err{background:#ff5757;box-shadow:0 0 8px #ff5757;}
-.health-name{font-size:13px;font-weight:600;color:#fff;}
-.health-detail{font-size:11px;color:var(--txt3);}
+/* ── SEARCH ── */
+.sinp{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;
+  padding:8px 14px;color:#fff;font-family:var(--font);font-size:13.5px;outline:none;transition:border-color .2s;width:220px;}
+.sinp:focus{border-color:rgba(91,107,255,.4);}
+.sinp::placeholder{color:var(--txt3);}
+.sselect{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;
+  padding:8px 12px;color:#fff;font-family:var(--font);font-size:13px;outline:none;cursor:pointer;}
+.sselect option{background:#0d0d18;color:#fff;}
 
-/* ── STATS ROW ── */
-.mini-stats{display:flex;gap:20px;flex-wrap:wrap;}
-.mini-stat{text-align:center;}
-.mini-stat-n{font-family:var(--display);font-size:22px;font-weight:800;letter-spacing:-.5px;}
-.mini-stat-l{font-size:10.5px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+/* ── MODAL (user detail) ── */
+.modal-bg{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;animation:fadeUp .25s ease both;}
+.modal-box{background:#0d0d18;border:1px solid rgba(255,255,255,.1);border-radius:22px;
+  width:100%;max-width:720px;max-height:85vh;margin:16px;overflow-y:auto;padding:28px;}
+.modal-close{float:right;background:none;border:none;color:var(--txt3);font-size:22px;cursor:pointer;
+  padding:0 4px;transition:color .2s;}
+.modal-close:hover{color:#fff;}
+.mod-name{font-family:var(--display);font-size:22px;font-weight:800;color:#fff;letter-spacing:-.6px;}
+.mod-email{font-size:13px;color:var(--txt3);margin-top:3px;font-family:var(--mono);}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:18px 0;}
+.mod-stat{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-align:center;}
+.mod-stat-n{font-family:var(--display);font-size:22px;font-weight:800;color:#fff;}
+.mod-stat-l{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
+.mod-section{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
+  color:rgba(0,229,200,.7);margin:18px 0 10px;}
+.mod-skill{display:inline-flex;padding:3px 10px;border-radius:100px;font-size:11.5px;
+  background:rgba(91,107,255,.08);border:1px solid rgba(91,107,255,.18);color:#818cf8;
+  margin:2px 3px 2px 0;}
+.mod-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);font-size:13px;}
+.mod-row:last-child{border-bottom:none;}
+.mod-key{color:var(--txt3);font-size:12px;}
+.mod-val{color:#fff;font-weight:500;text-align:right;max-width:55%;}
+.score-bar{height:5px;border-radius:100px;background:rgba(255,255,255,.08);margin-top:3px;}
+.score-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--neon),var(--cyan));}
 
-/* ── TOP SKILLS BARS ── */
-.skill-bars{padding:0 2px;}
-.skill-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.skill-bar-name{font-size:12.5px;color:var(--txt);width:140px;flex-shrink:0;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.skill-bar-track{flex:1;height:7px;border-radius:100px;background:rgba(255,255,255,.07);}
-.skill-bar-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--neon),var(--cyan));
-  transition:width .8s cubic-bezier(.16,1,.3,1);}
-.skill-bar-num{font-family:var(--mono);font-size:12px;color:var(--txt3);width:24px;text-align:right;}
+/* ── TAB PANELS ── */
+.tpanel{display:none;}
+.tpanel.active{display:block;}
 
-/* ── REFRESH BTN ── */
-.refresh-btn{padding:7px 16px;border-radius:9px;border:1px solid var(--border);
-  background:rgba(255,255,255,.04);color:var(--txt2);font-size:12.5px;font-weight:600;
-  cursor:pointer;transition:all .15s;font-family:var(--font);display:flex;align-items:center;gap:6px;}
-.refresh-btn:hover{border-color:var(--neon);color:#fff;background:rgba(91,107,255,.1);}
+/* ── PAGINATION ── */
+.pgn{display:flex;gap:6px;align-items:center;justify-content:center;margin-top:14px;}
+.pgbtn{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.03);
+  color:var(--txt2);font-size:12.5px;cursor:pointer;transition:all .15s;}
+.pgbtn:hover,.pgbtn.cur{border-color:var(--neon);background:rgba(91,107,255,.1);color:#fff;}
+.pgbtn:disabled{opacity:.35;cursor:not-allowed;}
 
-/* ── LOADING SKELETON ── */
+/* ── MISC ── */
 .skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%);
-  background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;height:20px;}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  background-size:200%;animation:shimmer 1.5s infinite;border-radius:8px;height:18px;}
+.dot-live{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse-g 2s infinite;display:inline-block;margin-right:4px;}
+.empty-msg{text-align:center;padding:28px;color:var(--txt3);font-size:13.5px;}
+.tag{display:inline-flex;padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600;}
+.tag-active{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
+.tag-inactive{background:rgba(255,87,87,.08);border:1px solid rgba(255,87,87,.18);color:var(--red);}
 
-/* ── ANIMATIONS ── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.fade-in{animation:fadeUp .4s ease both;}
-.delay-1{animation-delay:.05s;} .delay-2{animation-delay:.1s;} .delay-3{animation-delay:.15s;}
-.delay-4{animation-delay:.2s;}  .delay-5{animation-delay:.25s;} .delay-6{animation-delay:.3s;}
-.delay-7{animation-delay:.35s;} .delay-8{animation-delay:.4s;}
-
-@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr);}
-  .chart-grid-2,.chart-grid-3{grid-template-columns:1fr;}.health-grid{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:640px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.kpi-num{font-size:24px;}}
+@media(max-width:1200px){.kgrid{grid-template-columns:repeat(3,1fr);}.hgrid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:900px){.kgrid,.kgrid4{grid-template-columns:repeat(2,1fr);}.cgrid2,.cgrid3,.cgrid34{grid-template-columns:1fr;}.hgrid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.kgrid,.kgrid4{grid-template-columns:repeat(2,1fr);}.mod-grid{grid-template-columns:1fr 1fr;}}
 </style>
 
-<div id="admin-root">
-<div class="admin-glow"></div>
-<div class="admin-grid-bg"></div>
-<div class="admin-wrap">
+<div id="ar">
+<div class="ag"></div><div class="agb"></div>
+<div class="aw">
 
-  <!-- ── HEADER ── -->
-  <div class="admin-header fade-in">
-    <div>
-      <div class="admin-title">PathPilot <span>Control Center</span></div>
-      <div style="font-size:13px;color:var(--txt3);margin-top:4px">
-        Real-time platform analytics · <span id="lastUpdated" style="color:var(--cyan)">Loading…</span>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div class="admin-badge"><div class="admin-badge-dot"></div>ADMIN ACCESS</div>
-      <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+<!-- ── HEADER ── -->
+<div class="ah fi">
+  <div>
+    <div class="atitle">PathPilot <span>Control Center</span></div>
+    <div style="font-size:12.5px;color:var(--txt3);margin-top:5px">
+      <span class="dot-live"></span>Live · Updated <span id="lastUp" style="color:var(--cyan)">Loading…</span>
     </div>
   </div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <div class="abadge"><div class="abd"></div>ADMIN ONLY</div>
+    <button class="rfbtn" onclick="loadAll()">↻ Refresh All</button>
+  </div>
+</div>
 
-  <!-- ── SYSTEM HEALTH ── -->
-  <div class="sec-label fade-in delay-1">System Health</div>
-  <div class="health-grid fade-in delay-1" id="healthGrid">
-    <div class="health-item"><div class="health-status hs-ok"></div><div><div class="health-name">Database</div><div class="health-detail">Loading…</div></div></div>
-    <div class="health-item"><div class="health-status hs-ok"></div><div><div class="health-name">Coding Module</div><div class="health-detail">Loading…</div></div></div>
-    <div class="health-item"><div class="health-status hs-ok"></div><div><div class="health-name">Job Engine</div><div class="health-detail">Loading…</div></div></div>
-    <div class="health-item"><div class="health-status hs-ok"></div><div><div class="health-name">AI Services</div><div class="health-detail">Loading…</div></div></div>
+<!-- ── TAB NAV ── -->
+<div class="tabnav fi d1">
+  <div class="tab active" onclick="switchTab('overview',this)">📊 Overview</div>
+  <div class="tab" onclick="switchTab('users',this)">👥 Users</div>
+  <div class="tab" onclick="switchTab('social',this)">📱 Social</div>
+  <div class="tab" onclick="switchTab('interviews',this)">🎯 AI Interviews</div>
+  <div class="tab" onclick="switchTab('recruiter',this)">🏢 Recruiter</div>
+  <div class="tab" onclick="switchTab('coding',this)">⚡ Coding</div>
+  <div class="tab" onclick="switchTab('aitools',this)">🤖 AI Tools</div>
+  <div class="tab" onclick="switchTab('health',this)">🟢 Health</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  TAB: OVERVIEW                                  -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="tab-overview" class="tpanel active">
+
+  <!-- KPI ROW 1 — Users & Revenue -->
+  <div class="slbl fi d2">Platform Overview</div>
+  <div class="kgrid fi d2">
+    <div class="kcard gn"><div class="kicon" style="background:rgba(91,107,255,.12)">👥</div>
+      <div class="knum" id="kTU">—</div><div class="klbl">Total Users</div>
+      <div class="kdelta kup" id="kTUd">+0 this week</div></div>
+    <div class="kcard gc"><div class="kicon" style="background:rgba(0,229,200,.1)">⭐</div>
+      <div class="knum" id="kPro">—</div><div class="klbl">Pro Users</div>
+      <div class="kdelta kneutral" id="kConv">0% conv</div></div>
+    <div class="kcard gg"><div class="kicon" style="background:rgba(34,197,94,.1)">💰</div>
+      <div class="knum" id="kMRR">—</div><div class="klbl">MRR</div>
+      <div class="kdelta kup" id="kARR">$0 ARR</div></div>
+    <div class="kcard ga"><div class="kicon" style="background:rgba(255,181,71,.1)">📈</div>
+      <div class="knum" id="kGr">—</div><div class="klbl">WoW Growth</div>
+      <div class="kdelta" id="kGrd">—</div></div>
+    <div class="kcard gp"><div class="kicon" style="background:rgba(168,85,247,.1)">📄</div>
+      <div class="knum" id="kRes">—</div><div class="klbl">Resumes</div>
+      <div class="kdelta kneutral" id="kAvgSc">Avg: — pts</div></div>
+    <div class="kcard gb"><div class="kicon" style="background:rgba(56,189,248,.1)">✉️</div>
+      <div class="knum" id="kPosts">—</div><div class="klbl">Total Posts</div>
+      <div class="kdelta kneutral" id="kLikes">0 likes</div></div>
   </div>
 
-  <!-- ── KPI ROW 1: USERS ── -->
-  <div class="sec-label fade-in delay-2">Platform Overview</div>
-  <div class="kpi-grid" style="margin-bottom:14px;">
-    <div class="kpi-card kpi-glow-neon fade-in delay-2">
-      <div class="kpi-icon" style="background:rgba(91,107,255,.12)">👥</div>
-      <div class="kpi-num" id="kTotalUsers">—</div>
-      <div class="kpi-label">Total Users</div>
-      <div class="kpi-delta kpi-up" id="kUsersDelta">+0 this week</div>
-    </div>
-    <div class="kpi-card kpi-glow-cyan fade-in delay-3">
-      <div class="kpi-icon" style="background:rgba(0,229,200,.1)">⭐</div>
-      <div class="kpi-num" id="kProUsers">—</div>
-      <div class="kpi-label">Pro Subscribers</div>
-      <div class="kpi-delta kpi-neutral" id="kConvRate">0% conversion</div>
-    </div>
-    <div class="kpi-card kpi-glow-green fade-in delay-4">
-      <div class="kpi-icon" style="background:rgba(34,197,94,.1)">💰</div>
-      <div class="kpi-num" id="kMRR">—</div>
-      <div class="kpi-label">Monthly Revenue</div>
-      <div class="kpi-delta kpi-up" id="kARR">$0 ARR</div>
-    </div>
-    <div class="kpi-card kpi-glow-amber fade-in delay-5">
-      <div class="kpi-icon" style="background:rgba(255,181,71,.1)">📈</div>
-      <div class="kpi-num" id="kGrowth">—</div>
-      <div class="kpi-label">WoW Growth</div>
-      <div class="kpi-delta" id="kGrowthBadge">Calculating…</div>
-    </div>
+  <!-- KPI ROW 2 — Platform Activity -->
+  <div class="kgrid fi d3">
+    <div class="kcard gn"><div class="kicon" style="background:rgba(91,107,255,.12)">⚡</div>
+      <div class="knum" id="kSubs">—</div><div class="klbl">Code Submissions</div>
+      <div class="kdelta kup" id="kAccR">0% accepted</div></div>
+    <div class="kcard gg"><div class="kicon" style="background:rgba(34,197,94,.1)">✅</div>
+      <div class="knum" id="kSolved">—</div><div class="klbl">Problems Solved</div>
+      <div class="kdelta kup">all users</div></div>
+    <div class="kcard gc"><div class="kicon" style="background:rgba(0,229,200,.1)">🎯</div>
+      <div class="knum" id="kIVTotal">—</div><div class="klbl">AI Interviews</div>
+      <div class="kdelta kneutral" id="kHireR">0% hire rate</div></div>
+    <div class="kcard ga"><div class="kicon" style="background:rgba(255,181,71,.1)">🏢</div>
+      <div class="knum" id="kRecJobs">—</div><div class="klbl">Recruiter Jobs</div>
+      <div class="kdelta kup" id="kRecApps">0 applications</div></div>
+    <div class="kcard gp"><div class="kicon" style="background:rgba(168,85,247,.1)">⏳</div>
+      <div class="knum" id="kCTM">—</div><div class="klbl">Career Plans</div>
+      <div class="kdelta kneutral" id="kBS">0 blind spots</div></div>
+    <div class="kcard gr"><div class="kicon" style="background:rgba(255,87,87,.1)">🎉</div>
+      <div class="knum" id="kSelected">—</div><div class="klbl">Students Selected</div>
+      <div class="kdelta kup" id="kSelR">0% rate</div></div>
   </div>
 
-  <!-- ── KPI ROW 2: PLATFORM ── -->
-  <div class="kpi-grid fade-in delay-3" style="margin-bottom:28px;">
-    <div class="kpi-card kpi-glow-purple">
-      <div class="kpi-icon" style="background:rgba(168,85,247,.1)">📄</div>
-      <div class="kpi-num" id="kResumes">—</div>
-      <div class="kpi-label">Resumes Uploaded</div>
-      <div class="kpi-delta kpi-neutral" id="kAvgScore">Avg: 0 pts</div>
-    </div>
-    <div class="kpi-card kpi-glow-cyan">
-      <div class="kpi-icon" style="background:rgba(0,229,200,.1)">💼</div>
-      <div class="kpi-num" id="kJobs">—</div>
-      <div class="kpi-label">Job Listings</div>
-      <div class="kpi-delta kpi-neutral" id="kApps">0 applications</div>
-    </div>
-    <div class="kpi-card kpi-glow-neon">
-      <div class="kpi-icon" style="background:rgba(91,107,255,.12)">⚡</div>
-      <div class="kpi-num" id="kSubmissions">—</div>
-      <div class="kpi-label">Code Submissions</div>
-      <div class="kpi-delta kpi-up" id="kAccRate">0% accepted</div>
-    </div>
-    <div class="kpi-card kpi-glow-green">
-      <div class="kpi-icon" style="background:rgba(34,197,94,.1)">✅</div>
-      <div class="kpi-num" id="kSolved">—</div>
-      <div class="kpi-label">Problems Solved</div>
-      <div class="kpi-delta kpi-up" id="kSolvedSub">across all users</div>
-    </div>
+  <!-- Charts Row 1 -->
+  <div class="slbl fi d4">User & Revenue Analytics</div>
+  <div class="cgrid3 fi d4">
+    <div class="cc">
+      <div class="cch"><div><div class="cct">User Growth — Last 30 Days</div><div class="ccs">Daily new + cumulative total</div></div>
+        <div class="ministats"><div class="ms"><div class="msn" id="mg7d" style="color:var(--cyan)">—</div><div class="msl">7d New</div></div>
+          <div class="ms" style="margin-left:14px"><div class="msn" id="mg30d" style="color:var(--neon)">—</div><div class="msl">30d New</div></div></div></div>
+      <div class="cwrap-lg"><canvas id="userGrowthChart"></canvas></div></div>
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Subscription Split</div><div class="ccs">Free · Pro · Enterprise</div></div></div>
+      <div class="cwrap-lg"><canvas id="subPieChart"></canvas></div></div>
   </div>
 
-  <!-- ── ROW 1: USER GROWTH + SUBSCRIPTION PIE ── -->
-  <div class="sec-label fade-in">User Analytics</div>
-  <div class="chart-grid-3 fade-in delay-1">
-    <div class="chart-card">
-      <div class="chart-card-head">
-        <div>
-          <div class="chart-card-title">User Growth (Last 30 Days)</div>
-          <div class="chart-card-sub">Daily registrations + cumulative total</div>
-        </div>
-        <div class="mini-stats">
-          <div class="mini-stat"><div class="mini-stat-n" id="mg7d" style="color:var(--cyan)">—</div><div class="mini-stat-l">7d New</div></div>
-          <div class="mini-stat" style="margin-left:16px"><div class="mini-stat-n" id="mg30d" style="color:var(--neon)">—</div><div class="mini-stat-l">30d New</div></div>
-        </div>
-      </div>
-      <div class="chart-wrap-lg"><canvas id="userGrowthChart"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-card-head">
-        <div>
-          <div class="chart-card-title">Subscription Split</div>
-          <div class="chart-card-sub">Free vs Pro vs Enterprise</div>
-        </div>
-      </div>
-      <div class="chart-wrap-lg"><canvas id="subPieChart"></canvas></div>
-    </div>
+  <div class="cgrid1 fi d5">
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Revenue Trend — Last 12 Months</div><div class="ccs">Monthly recurring revenue ($)</div></div>
+        <div class="ministats">
+          <div class="ms"><div class="msn" id="revMRR" style="color:var(--green)">—</div><div class="msl">MRR</div></div>
+          <div class="ms" style="margin-left:14px"><div class="msn" id="revARR" style="color:var(--cyan)">—</div><div class="msl">ARR</div></div>
+          <div class="ms" style="margin-left:14px"><div class="msn" id="revConv" style="color:var(--amber)">—</div><div class="msl">Conv Rate</div></div></div></div>
+      <div class="cwrap-xl"><canvas id="revenueChart"></canvas></div></div>
   </div>
 
-  <!-- ── ROW 2: REVENUE ── -->
-  <div class="sec-label fade-in">Revenue Intelligence</div>
-  <div class="chart-grid-full fade-in delay-1">
-    <div class="chart-card">
-      <div class="chart-card-head">
-        <div>
-          <div class="chart-card-title">Revenue Trend (Last 12 Months)</div>
-          <div class="chart-card-sub">Monthly recurring + annual contract revenue</div>
-        </div>
-        <div class="mini-stats">
-          <div class="mini-stat"><div class="mini-stat-n" id="revMRR" style="color:var(--green)">—</div><div class="mini-stat-l">MRR</div></div>
-          <div class="mini-stat" style="margin-left:20px"><div class="mini-stat-n" id="revARR" style="color:var(--cyan)">—</div><div class="mini-stat-l">ARR</div></div>
-          <div class="mini-stat" style="margin-left:20px"><div class="mini-stat-n" id="revConv" style="color:var(--amber)">—</div><div class="mini-stat-l">Conv Rate</div></div>
-        </div>
-      </div>
-      <div class="chart-wrap-lg"><canvas id="revenueChart"></canvas></div>
-    </div>
+  <!-- Charts Row 2 — Platform Activity -->
+  <div class="slbl fi d5">Platform Activity (Last 14 Days)</div>
+  <div class="cgrid2 fi d5">
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Daily Activity</div><div class="ccs">Resumes · Submissions · Posts · Interviews</div></div></div>
+      <div class="cwrap"><canvas id="activityChart"></canvas></div></div>
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Top Skills Across Platform</div><div class="ccs">Most common skills from all resumes</div></div></div>
+      <div id="topSkillsBars" style="padding:4px 0"></div></div>
   </div>
 
-  <!-- ── ROW 3: PLATFORM ACTIVITY + CODING STATUS ── -->
-  <div class="sec-label fade-in">Platform Activity</div>
-  <div class="chart-grid-2 fade-in delay-1">
-    <div class="chart-card">
-      <div class="chart-card-head">
-        <div>
-          <div class="chart-card-title">Activity (Last 14 Days)</div>
-          <div class="chart-card-sub">Resume uploads + Code submissions daily</div>
-        </div>
-      </div>
-      <div class="chart-wrap"><canvas id="activityChart"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-card-head">
-        <div>
-          <div class="chart-card-title">Submission Status Distribution</div>
-          <div class="chart-card-sub">Accepted · Wrong Answer · TLE · Error</div>
-        </div>
-      </div>
-      <div class="chart-wrap"><canvas id="submissionStatusChart"></canvas></div>
-    </div>
+  <!-- Charts Row 3 — Jobs -->
+  <div class="slbl fi d6">Jobs & Market</div>
+  <div class="cgrid2 fi d6">
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Job Sources</div><div class="ccs">Where scraped listings come from</div></div></div>
+      <div class="cwrap-sm"><canvas id="jobSourceChart"></canvas></div></div>
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Top Roles in Demand</div><div class="ccs">Most listed job roles on platform</div></div></div>
+      <div class="cwrap-sm"><canvas id="jobRolesChart"></canvas></div></div>
   </div>
 
-  <!-- ── ROW 4: TOP SKILLS + RESUME SCORES ── -->
-  <div class="sec-label fade-in">Skills & Resume Intelligence</div>
-  <div class="chart-grid-2 fade-in delay-1">
-    <div class="chart-card">
-      <div class="chart-card-head">
-        <div>
-          <div class="chart-card-title">🔥 Top Skills Across Platform</div>
-          <div class="chart-card-sub">Most common skills from all user resumes</div>
-        </div>
-      </div>
-      <div id="topSkillsBars" class="skill-bars" style="margin-top:4px"></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-card-head">
-        <div>
-          <div class="chart-card-title">Resume Score Distribution</div>
-          <div class="chart-card-sub">Breakdown of ATS/skill scores</div>
-        </div>
-      </div>
-      <div class="chart-wrap"><canvas id="resumeScoreChart"></canvas></div>
-    </div>
-  </div>
-
-  <!-- ── ROW 5: JOB STATS ── -->
-  <div class="sec-label fade-in">Jobs & Applications</div>
-  <div class="chart-grid-2 fade-in delay-1">
-    <div class="chart-card">
-      <div class="chart-card-head">
-        <div>
-          <div class="chart-card-title">Top Job Sources</div>
-          <div class="chart-card-sub">Where job listings are coming from</div>
-        </div>
-      </div>
-      <div class="chart-wrap-sm"><canvas id="jobSourceChart"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-card-head">
-        <div>
-          <div class="chart-card-title">Top Roles in Demand</div>
-          <div class="chart-card-sub">Most common job roles on platform</div>
-        </div>
-      </div>
-      <div class="chart-wrap-sm"><canvas id="jobRolesChart"></canvas></div>
-    </div>
-  </div>
-
-  <!-- ── RECENT USERS TABLE ── -->
-  <div class="sec-label fade-in">Recent Registrations</div>
-  <div class="data-table-card fade-in delay-1">
-    <div class="dtc-header">
-      <div class="dtc-title">Latest 10 Users</div>
-      <div style="font-size:12.5px;color:var(--txt3)" id="tableRefreshed">—</div>
-    </div>
-    <div class="dtc-body">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Plan</th>
-            <th>Verified</th>
-            <th>Role</th>
-            <th>Joined</th>
-          </tr>
-        </thead>
-        <tbody id="usersTableBody">
-          <tr><td colspan="6" style="text-align:center;color:var(--txt3);padding:24px">Loading…</td></tr>
-        </tbody>
+  <!-- Recent Users Table -->
+  <div class="slbl fi d7">Recent Registrations</div>
+  <div class="dtcard fi d7">
+    <div class="dth"><div class="dtitle">Latest 15 Users</div>
+      <div style="font-size:12px;color:var(--txt3)" id="tblTime">—</div></div>
+    <div class="dtbody">
+      <table class="dt">
+        <thead><tr><th>Name</th><th>Email</th><th>Plan</th><th>Skills</th><th>Verified</th><th>Resumes</th><th>Role</th><th>Joined</th></tr></thead>
+        <tbody id="recentUsersBody"><tr><td colspan="8" class="empty-msg">Loading…</td></tr></tbody>
       </table>
     </div>
   </div>
+</div>
 
-  <!-- ── CODING TOP SUBMITTERS ── -->
-  <div class="sec-label fade-in">Coding Practice Leaders</div>
-  <div class="chart-card fade-in delay-1" style="margin-bottom:24px">
-    <div class="chart-card-head">
-      <div class="chart-card-title">🏆 Top Submitters</div>
-      <div class="chart-card-sub">Most active code practice users</div>
+<!-- ═══════════════════════════════════════════════ -->
+<!--  TAB: USERS                                     -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="tab-users" class="tpanel">
+  <div class="slbl">All Users</div>
+  <div class="dtcard">
+    <div class="dth">
+      <div class="dtitle">User Directory <span id="userCount" style="color:var(--txt3);font-size:13px;font-weight:400"></span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input class="sinp" id="userSearch" placeholder="Search name or email…" oninput="searchUsers()">
+        <select class="sselect" id="planFilter" onchange="searchUsers()">
+          <option value="">All Plans</option><option value="free">Free</option>
+          <option value="pro">Pro</option><option value="enterprise">Enterprise</option>
+        </select>
+      </div>
     </div>
-    <div id="topSubmitters" style="padding:4px 0"></div>
+    <div class="dtbody">
+      <table class="dt">
+        <thead><tr><th>Name</th><th>Email</th><th>Plan</th><th>Skills</th><th>Posts</th><th>Interviews</th><th>Solved</th><th>Verified</th><th>Joined</th></tr></thead>
+        <tbody id="usersBody"><tr><td colspan="9" class="empty-msg">Loading…</td></tr></tbody>
+      </table>
+    </div>
+    <div class="pgn" id="userPgn"></div>
   </div>
+</div>
 
-</div><!-- end wrap -->
-</div><!-- end admin-root -->
+<!-- ═══════════════════════════════════════════════ -->
+<!--  TAB: SOCIAL                                    -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="tab-social" class="tpanel">
+  <div class="kgrid4 fi">
+    <div class="kcard gn"><div class="kicon" style="background:rgba(91,107,255,.12)">📝</div>
+      <div class="knum" id="sPosts">—</div><div class="klbl">Total Posts</div>
+      <div class="kdelta kneutral" id="sAvgLikes">0 avg likes</div></div>
+    <div class="kcard gc"><div class="kicon" style="background:rgba(0,229,200,.1)">❤️</div>
+      <div class="knum" id="sLikes">—</div><div class="klbl">Total Likes</div></div>
+    <div class="kcard ga"><div class="kicon" style="background:rgba(255,181,71,.1)">💬</div>
+      <div class="knum" id="sCmts">—</div><div class="klbl">Comments</div>
+      <div class="kdelta kneutral" id="sReplies">0 replies</div></div>
+    <div class="kcard gp"><div class="kicon" style="background:rgba(168,85,247,.1)">👥</div>
+      <div class="knum" id="sFollows">—</div><div class="klbl">Follow Connections</div>
+      <div class="kdelta kneutral" id="sMsgs">0 DMs</div></div>
+  </div>
+  <div class="cgrid2">
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Posts Per Day</div><div class="ccs">Last 14 days</div></div></div>
+      <div class="cwrap"><canvas id="postsDailyChart"></canvas></div></div>
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Post Type Breakdown</div><div class="ccs">Text · Achievement · Milestone · Image</div></div></div>
+      <div class="cwrap"><canvas id="postTypeChart"></canvas></div></div>
+  </div>
+  <div class="cgrid2">
+    <div class="cc">
+      <div class="cch"><div><div class="cct">🏆 Top Posters</div><div class="ccs">Most active users on the feed</div></div></div>
+      <div id="topPostersEl" style="padding:4px 0"></div></div>
+    <div class="cc">
+      <div class="cch"><div><div class="cct">🌟 Most Followed</div><div class="ccs">Users with most followers</div></div></div>
+      <div id="topFollowedEl" style="padding:4px 0"></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  TAB: AI INTERVIEWS                             -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="tab-interviews" class="tpanel">
+  <div class="kgrid fi">
+    <div class="kcard gn"><div class="kicon" style="background:rgba(91,107,255,.12)">🎯</div>
+      <div class="knum" id="ivTotal">—</div><div class="klbl">Total Sessions</div></div>
+    <div class="kcard gg"><div class="kicon" style="background:rgba(34,197,94,.1)">✅</div>
+      <div class="knum" id="ivDone">—</div><div class="klbl">Completed</div>
+      <div class="kdelta kup" id="ivComp">0% completion</div></div>
+    <div class="kcard ga"><div class="kicon" style="background:rgba(255,181,71,.1)">⚡</div>
+      <div class="knum" id="ivActive">—</div><div class="klbl">Active Now</div></div>
+    <div class="kcard gc"><div class="kicon" style="background:rgba(0,229,200,.1)">🎉</div>
+      <div class="knum" id="ivHired">—</div><div class="klbl">Hired Decision</div>
+      <div class="kdelta kup" id="ivHR">0% hire rate</div></div>
+    <div class="kcard gr"><div class="kicon" style="background:rgba(255,87,87,.1)">❌</div>
+      <div class="knum" id="ivRej">—</div><div class="klbl">Rejected</div></div>
+    <div class="kcard gp"><div class="kicon" style="background:rgba(168,85,247,.1)">⭐</div>
+      <div class="knum" id="ivAvgSc">—</div><div class="klbl">Avg Score</div></div>
+  </div>
+  <div class="cgrid2">
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Daily Interviews</div><div class="ccs">Last 14 days</div></div></div>
+      <div class="cwrap"><canvas id="ivDailyChart"></canvas></div></div>
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Decision Breakdown</div><div class="ccs">Hire · Reject · Maybe</div></div></div>
+      <div class="cwrap"><canvas id="ivDecisionChart"></canvas></div></div>
+  </div>
+  <div class="cgrid34">
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Top Roles Practiced</div><div class="ccs">Most common interview roles</div></div></div>
+      <div class="cwrap-sm"><canvas id="ivRolesChart"></canvas></div></div>
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Level Distribution</div><div class="ccs">Fresher · Intermediate · Advanced · FAANG</div></div></div>
+      <div class="cwrap-sm"><canvas id="ivLevelChart"></canvas></div></div>
+  </div>
+  <div class="slbl">Recent Interview Sessions</div>
+  <div class="dtcard">
+    <div class="dth"><div class="dtitle">Latest 8 Sessions</div></div>
+    <div class="dtbody">
+      <table class="dt">
+        <thead><tr><th>Student</th><th>Role</th><th>Level</th><th>Status</th><th>Decision</th><th>Score</th><th>Date</th></tr></thead>
+        <tbody id="ivRecentBody"><tr><td colspan="7" class="empty-msg">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  TAB: RECRUITER                                 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="tab-recruiter" class="tpanel">
+  <div class="kgrid fi">
+    <div class="kcard gn"><div class="kicon" style="background:rgba(91,107,255,.12)">💼</div>
+      <div class="knum" id="rJobs">—</div><div class="klbl">Jobs Posted</div>
+      <div class="kdelta kup" id="rActiveJ">0 active</div></div>
+    <div class="kcard gg"><div class="kicon" style="background:rgba(34,197,94,.1)">📨</div>
+      <div class="knum" id="rApps">—</div><div class="klbl">Applications</div></div>
+    <div class="kcard gc"><div class="kicon" style="background:rgba(0,229,200,.1)">🎉</div>
+      <div class="knum" id="rSelected">—</div><div class="klbl">Students Selected</div>
+      <div class="kdelta kup" id="rSelR">0% rate</div></div>
+    <div class="kcard ga"><div class="kicon" style="background:rgba(255,181,71,.1)">📊</div>
+      <div class="knum" id="rAvgCGPA">—</div><div class="klbl">Avg Applicant CGPA</div></div>
+    <div class="kcard gp"><div class="kicon" style="background:rgba(168,85,247,.1)">💬</div>
+      <div class="knum" id="rMsgs">—</div><div class="klbl">Messages Sent</div>
+      <div class="kdelta kneutral" id="rReadR">0% read</div></div>
+    <div class="kcard gb"><div class="kicon" style="background:rgba(56,189,248,.1)">⭐</div>
+      <div class="knum" id="rShort">—</div><div class="klbl">Shortlisted</div></div>
+  </div>
+  <div class="cgrid2">
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Application Status Flow</div><div class="ccs">All application stages</div></div></div>
+      <div class="cwrap"><canvas id="rStatusChart"></canvas></div></div>
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Message Type Breakdown</div><div class="ccs">Selected · Interview · Offer · General</div></div></div>
+      <div class="cwrap"><canvas id="rMsgTypeChart"></canvas></div></div>
+  </div>
+  <div class="cgrid2">
+    <div class="cc">
+      <div class="cch"><div><div class="cct">🏢 Top Companies</div><div class="ccs">Most active hiring companies</div></div></div>
+      <div id="topCompaniesEl" style="padding:4px 0"></div></div>
+    <div class="cc">
+      <div class="cch"><div><div class="cct">🎓 Top Colleges Applying</div><div class="ccs">Most applications by institution</div></div></div>
+      <div id="topCollegesEl" style="padding:4px 0"></div></div>
+  </div>
+  <div class="slbl">Recent Recruiter Jobs</div>
+  <div class="dtcard">
+    <div class="dth"><div class="dtitle">Latest 8 Jobs Posted</div></div>
+    <div class="dtbody">
+      <table class="dt">
+        <thead><tr><th>Job Title</th><th>Company</th><th>Type</th><th>Status</th><th>Applications</th><th>Posted</th></tr></thead>
+        <tbody id="recJobsBody"><tr><td colspan="6" class="empty-msg">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="slbl">Most Applied Jobs</div>
+  <div class="dtcard">
+    <div class="dth"><div class="dtitle">Top 6 Most Applied Jobs</div></div>
+    <div class="dtbody">
+      <table class="dt">
+        <thead><tr><th>Job Title</th><th>Company</th><th>Applications</th></tr></thead>
+        <tbody id="topJobsBody"><tr><td colspan="3" class="empty-msg">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  TAB: CODING                                    -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="tab-coding" class="tpanel">
+  <div class="kgrid4 fi">
+    <div class="kcard gn"><div class="kicon" style="background:rgba(91,107,255,.12)">⚡</div>
+      <div class="knum" id="cTotal">—</div><div class="klbl">Total Submissions</div>
+      <div class="kdelta kup" id="cAcc">0% accepted</div></div>
+    <div class="kcard gg"><div class="kicon" style="background:rgba(34,197,94,.1)">✅</div>
+      <div class="knum" id="cSolved">—</div><div class="klbl">Problems Solved</div></div>
+    <div class="kcard gr"><div class="kicon" style="background:rgba(255,87,87,.1)">❌</div>
+      <div class="knum" id="cWrong">—</div><div class="klbl">Wrong Answer</div></div>
+    <div class="kcard ga"><div class="kicon" style="background:rgba(255,181,71,.1)">⏱</div>
+      <div class="knum" id="cTLE">—</div><div class="klbl">Time Limit Exceeded</div></div>
+  </div>
+  <div class="cgrid2">
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Submission Status</div><div class="ccs">Pass · Fail breakdown</div></div></div>
+      <div class="cwrap"><canvas id="subStatusChart"></canvas></div></div>
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Language Popularity</div><div class="ccs">Most used coding languages</div></div></div>
+      <div class="cwrap"><canvas id="langChart"></canvas></div></div>
+  </div>
+  <div class="slbl">🏆 Top Coders</div>
+  <div class="cc" style="margin-bottom:16px"><div id="topCodersEl" style="padding:4px 0"></div></div>
+  <div class="slbl">🔥 Most Attempted Problems</div>
+  <div class="dtcard">
+    <div class="dth"><div class="dtitle">Top 6 Problems</div></div>
+    <div class="dtbody">
+      <table class="dt">
+        <thead><tr><th>Problem</th><th>Difficulty</th><th>Attempts</th></tr></thead>
+        <tbody id="topProblemsBody"><tr><td colspan="3" class="empty-msg">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  TAB: AI TOOLS (CTM + BLIND SPOT)               -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="tab-aitools" class="tpanel">
+  <div class="kgrid4 fi">
+    <div class="kcard gc"><div class="kicon" style="background:rgba(0,229,200,.1)">⏳</div>
+      <div class="knum" id="ctmTotal">—</div><div class="klbl">Career Time Machines</div>
+      <div class="kdelta kup" id="ctmActive">0 active</div></div>
+    <div class="kcard gn"><div class="kicon" style="background:rgba(91,107,255,.12)">🔍</div>
+      <div class="knum" id="bsTotal">—</div><div class="klbl">Blind Spot Reports</div></div>
+    <div class="kcard ga"><div class="kicon" style="background:rgba(255,181,71,.1)">🎯</div>
+      <div class="knum" id="bsAvgScore">—</div><div class="klbl">Avg Self-Awareness Score</div></div>
+    <div class="kcard gr"><div class="kicon" style="background:rgba(255,87,87,.1)">💥</div>
+      <div class="knum" id="bsShock">—</div><div class="klbl">Avg Shock Factor</div></div>
+  </div>
+  <div class="cgrid2">
+    <div class="cc">
+      <div class="cch"><div><div class="cct">🎯 Top Dream Roles</div><div class="ccs">Most targeted career goals</div></div></div>
+      <div id="ctmRolesEl" style="padding:4px 0"></div></div>
+    <div class="cc">
+      <div class="cch"><div><div class="cct">🏆 Dream Companies</div><div class="ccs">Most wanted companies to work at</div></div></div>
+      <div id="ctmCompEl" style="padding:4px 0"></div></div>
+  </div>
+  <div class="cgrid2">
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Timeline Distribution</div><div class="ccs">12 · 24 · 36 month plans</div></div></div>
+      <div class="cwrap"><canvas id="ctmTimelineChart"></canvas></div></div>
+    <div class="cc">
+      <div class="cch"><div><div class="cct">Resume Score Distribution</div><div class="ccs">ATS/Skill score buckets</div></div></div>
+      <div class="cwrap"><canvas id="resumeScoreChart"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  TAB: HEALTH                                    -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="tab-health" class="tpanel">
+  <div class="slbl">System Health Check</div>
+  <div class="hgrid fi" id="healthGrid">
+    <div class="hitem"><div class="hdot hok"></div><div><div class="hname">Database</div><div class="hdetail">Loading…</div></div></div>
+    <div class="hitem"><div class="hdot hok"></div><div><div class="hname">Coding Module</div><div class="hdetail">Loading…</div></div></div>
+    <div class="hitem"><div class="hdot hok"></div><div><div class="hname">Recruiter System</div><div class="hdetail">Loading…</div></div></div>
+    <div class="hitem"><div class="hdot hok"></div><div><div class="hname">AI Interviews</div><div class="hdetail">Loading…</div></div></div>
+    <div class="hitem"><div class="hdot hok"></div><div><div class="hname">AI Services</div><div class="hdetail">Loading…</div></div></div>
+  </div>
+  <!-- System Info -->
+  <div class="cc fi" style="margin-bottom:16px">
+    <div class="cch"><div class="cct">Platform Stats Snapshot</div></div>
+    <div id="healthSnapshot" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:4px 0"></div>
+  </div>
+</div>
+
+</div><!-- end aw -->
+</div><!-- end ar -->
+
+<!-- ── USER DETAIL MODAL ── -->
+<div class="modal-bg" id="userModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div id="modalContent"><div class="empty-msg">Loading…</div></div>
+  </div>
+</div>
 
 <script>
-// ══════════════════════════════════════════════════
-//  CHART.JS GLOBAL CONFIG
-// ══════════════════════════════════════════════════
-Chart.defaults.color = 'rgba(255,255,255,.38)';
-Chart.defaults.borderColor = 'rgba(255,255,255,.06)';
-Chart.defaults.font.family = '"DM Sans",sans-serif';
+// ═══════════════════════════════════════════════════════
+//  CHART.JS CONFIG
+// ═══════════════════════════════════════════════════════
+Chart.defaults.color='rgba(255,255,255,.38)';
+Chart.defaults.borderColor='rgba(255,255,255,.06)';
+Chart.defaults.font.family='"DM Sans",sans-serif';
+const C={neon:'#5b6bff',cyan:'#00e5c8',green:'#22c55e',amber:'#ffb547',red:'#ff5757',purple:'#a855f7',blue:'#38bdf8',pink:'#f472b6'};
+let charts={};
+function mkChart(id,cfg){if(charts[id])charts[id].destroy();const el=document.getElementById(id);if(!el)return;charts[id]=new Chart(el,cfg);}
 
-const COLORS = {
-  neon:'#5b6bff',cyan:'#00e5c8',green:'#22c55e',
-  amber:'#ffb547',red:'#ff5757',purple:'#a855f7',blue:'#38bdf8'
-};
-
-function chartDefaults(type){
-  return {
-    responsive:true, maintainAspectRatio:false,
-    plugins:{
-      legend:{labels:{color:'rgba(255,255,255,.45)',font:{size:11},padding:12,boxWidth:10}},
-      tooltip:{backgroundColor:'rgba(10,10,20,.95)',borderColor:'rgba(255,255,255,.1)',
-        borderWidth:1,titleColor:'#fff',bodyColor:'rgba(255,255,255,.65)',padding:10,cornerRadius:8}
-    },
-    scales: type==='pie'||type==='doughnut' ? {} : {
-      x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.35)',font:{size:11}}},
-      y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.35)',font:{size:11}}}
-    }
-  };
+function cDef(type='bar'){
+  const base={responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'rgba(255,255,255,.42)',font:{size:11},padding:10,boxWidth:10}},
+      tooltip:{backgroundColor:'rgba(8,8,20,.97)',borderColor:'rgba(255,255,255,.09)',borderWidth:1,
+        titleColor:'#fff',bodyColor:'rgba(255,255,255,.65)',padding:10,cornerRadius:8}}};
+  if(type==='pie'||type==='doughnut')return base;
+  return {...base,scales:{
+    x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.35)',font:{size:11}}},
+    y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.35)',font:{size:11}}}}};
 }
 
-let charts = {};
-function makeChart(id, config){
-  if(charts[id]) charts[id].destroy();
-  const ctx = document.getElementById(id);
-  if(!ctx) return;
-  charts[id] = new Chart(ctx, config);
+// ═══════════════════════════════════════════════════════
+//  TAB SWITCHING
+// ═══════════════════════════════════════════════════════
+function switchTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.tpanel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  // lazy load tab data
+  if(name==='social' && !window._loadedSocial){loadSocial();window._loadedSocial=true;}
+  if(name==='interviews' && !window._loadedIV){loadInterviews();window._loadedIV=true;}
+  if(name==='recruiter' && !window._loadedRec){loadRecruiter();window._loadedRec=true;}
+  if(name==='coding' && !window._loadedCode){loadCoding();window._loadedCode=true;}
+  if(name==='aitools' && !window._loadedAI){loadAITools();window._loadedAI=true;}
+  if(name==='health' && !window._loadedHealth){loadHealth();window._loadedHealth=true;}
+  if(name==='users' && !window._loadedUsers){loadUsers();window._loadedUsers=true;}
 }
 
-// ══════════════════════════════════════════════════
-//  LOAD ALL DATA
-// ══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  LOAD ALL (overview)
+// ═══════════════════════════════════════════════════════
 async function loadAll(){
-  document.getElementById('lastUpdated').textContent = 'Refreshing…';
-  await Promise.all([
-    loadStats(),
-    loadUserGrowth(),
-    loadRevenue(),
-    loadActivity(),
-    loadSubPie(),
-    loadTopSkills(),
-    loadCodingStats(),
-    loadResumeStats(),
-    loadJobStats(),
-    loadRecentUsers(),
-    loadHealth(),
-  ]);
-  document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
-  document.getElementById('tableRefreshed').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  document.getElementById('lastUp').textContent='Refreshing…';
+  window._loadedSocial=window._loadedIV=window._loadedRec=window._loadedCode=window._loadedAI=window._loadedHealth=window._loadedUsers=false;
+  await Promise.all([loadStats(),loadUserGrowth(),loadRevenue(),loadActivity(),loadSubPie(),
+                     loadTopSkills(),loadJobStats(),loadRecentUsers()]);
+  document.getElementById('lastUp').textContent=new Date().toLocaleTimeString();
+  document.getElementById('tblTime').textContent='Updated '+new Date().toLocaleTimeString();
 }
 
-// ── CORE STATS ──
+// ── STATS ──
 async function loadStats(){
-  const d = await api('/api/admin/stats');
-  if(!d) return;
-  const u = d.users, r = d.revenue, p = d.platform;
-
-  setText('kTotalUsers', u.total.toLocaleString());
-  setText('kProUsers', u.pro.toLocaleString());
-  setText('kMRR', '$'+r.mrr.toLocaleString());
-  setText('kGrowth', (u.growth_rate>0?'+':'')+u.growth_rate+'%');
-  setText('kResumes', p.resumes.toLocaleString());
-  setText('kJobs', p.jobs.toLocaleString());
-  setText('kSubmissions', p.submissions.toLocaleString());
-  setText('kSolved', p.solved.toLocaleString());
-
-  setText('kUsersDelta', `+${u.new_7d} this week`);
-  setText('kConvRate', r.conversion_rate+'% conversion');
-  setText('kARR', '$'+r.arr.toLocaleString()+' ARR');
-  setText('kApps', p.applications.toLocaleString()+' applications');
-
-  const gb = document.getElementById('kGrowthBadge');
-  gb.textContent = u.growth_rate >= 0 ? '↑ Growing' : '↓ Declining';
-  gb.className = 'kpi-delta '+(u.growth_rate >= 0 ? 'kpi-up' : 'kpi-down');
-
-  setText('mg7d', u.new_7d.toLocaleString());
-  setText('mg30d', u.new_30d.toLocaleString());
-  setText('revMRR', '$'+r.mrr.toLocaleString());
-  setText('revARR', '$'+r.arr.toLocaleString());
-  setText('revConv', r.conversion_rate+'%');
+  const d=await api('/api/admin/stats');if(!d)return;
+  const u=d.users,r=d.revenue,p=d.platform,ai=d.ai,rec=d.recruiter;
+  set('kTU',u.total.toLocaleString()); set('kPro',u.pro.toLocaleString());
+  set('kMRR','$'+r.mrr.toLocaleString()); set('kGr',(u.growth_rate>0?'+':'')+u.growth_rate+'%');
+  set('kRes',p.resumes.toLocaleString()); set('kPosts',p.posts.toLocaleString());
+  set('kSubs',p.submissions.toLocaleString()); set('kSolved',p.solved.toLocaleString());
+  set('kIVTotal',ai.interviews_total.toLocaleString());
+  set('kRecJobs',rec.jobs_total.toLocaleString()); set('kCTM',ai.career_time_machines.toLocaleString());
+  set('kSelected',rec.students_selected.toLocaleString());
+  set('kTUd','+'+u.new_7d+' this week'); set('kConv',r.conversion_rate+'% conv');
+  set('kARR','$'+r.arr.toLocaleString()+' ARR');
+  set('kAccR','0% accepted'); set('kHireR',ai.hire_rate+'% hire rate');
+  set('kRecApps',rec.applications.toLocaleString()+' applications');
+  set('kBS',ai.blind_spot_reports+' blind spots');
+  set('kSelR',rec.selection_rate+'% rate');
+  set('kLikes',p.likes.toLocaleString()+' likes');
+  const gb=document.getElementById('kGrd');
+  gb.textContent=u.growth_rate>=0?'↑ Growing':'↓ Declining';
+  gb.className='kdelta '+(u.growth_rate>=0?'kup':'kdown');
+  set('mg7d',u.new_7d.toLocaleString()); set('mg30d',u.new_30d.toLocaleString());
+  set('revMRR','$'+r.mrr.toLocaleString()); set('revARR','$'+r.arr.toLocaleString()); set('revConv',r.conversion_rate+'%');
+  // coding accent
+  const cs=await api('/api/admin/coding-stats');
+  if(cs&&cs.acceptance_rate!==undefined) set('kAccR',cs.acceptance_rate+'% accepted');
+  if(cs&&cs.total_submissions) set('kSubs',cs.total_submissions.toLocaleString());
+  if(cs&&cs.total_solved) set('kSolved',cs.total_solved.toLocaleString());
+  set('kAvgSc','Avg: — pts');
+  const rs=await api('/api/admin/resume-stats');
+  if(rs) set('kAvgSc','Avg: '+rs.avg_score+' pts');
 }
 
-// ── USER GROWTH CHART ──
 async function loadUserGrowth(){
-  const d = await api('/api/admin/user-growth');
-  if(!d) return;
-  makeChart('userGrowthChart', {
-    type:'bar',
-    data:{
-      labels:d.labels,
-      datasets:[
-        {type:'bar',label:'Daily New Users',data:d.daily,
-         backgroundColor:'rgba(91,107,255,.35)',borderColor:COLORS.neon,borderWidth:1.5,borderRadius:4},
-        {type:'line',label:'Cumulative Total',data:d.cumulative,
-         borderColor:COLORS.cyan,backgroundColor:'rgba(0,229,200,.08)',
-         borderWidth:2,pointRadius:0,tension:.4,fill:true,yAxisID:'y1'}
-      ]
-    },
-    options:{...chartDefaults('bar'),
-      scales:{
-        x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.3)',font:{size:10},maxRotation:45}},
-        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.35)',font:{size:11}}},
-        y1:{position:'right',grid:{display:false},ticks:{color:'rgba(0,229,200,.5)',font:{size:10}}}
-      }
-    }
-  });
+  const d=await api('/api/admin/user-growth');if(!d)return;
+  mkChart('userGrowthChart',{type:'bar',data:{labels:d.labels,datasets:[
+    {type:'bar',label:'Daily',data:d.daily,backgroundColor:'rgba(91,107,255,.35)',borderColor:C.neon,borderWidth:1.5,borderRadius:4},
+    {type:'line',label:'Cumulative',data:d.cumulative,borderColor:C.cyan,backgroundColor:'rgba(0,229,200,.07)',
+     borderWidth:2,pointRadius:0,tension:.4,fill:true,yAxisID:'y1'}
+  ]},options:{...cDef(),scales:{
+    x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.3)',font:{size:10},maxRotation:45}},
+    y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.35)',font:{size:11}}},
+    y1:{position:'right',grid:{display:false},ticks:{color:'rgba(0,229,200,.5)',font:{size:10}}}}}});
 }
 
-// ── REVENUE CHART ──
 async function loadRevenue(){
-  const d = await api('/api/admin/revenue-chart');
-  if(!d) return;
-  makeChart('revenueChart', {
-    type:'line',
-    data:{
-      labels:d.labels,
-      datasets:[{
-        label:'Monthly Revenue ($)',
-        data:d.revenue,
-        borderColor:COLORS.green,
-        backgroundColor:'rgba(34,197,94,.1)',
-        borderWidth:2.5,pointRadius:4,pointHoverRadius:7,
-        pointBackgroundColor:COLORS.green,fill:true,tension:.4
-      }]
-    },
-    options:{...chartDefaults('line')}
-  });
+  const d=await api('/api/admin/revenue-chart');if(!d)return;
+  mkChart('revenueChart',{type:'line',data:{labels:d.labels,datasets:[{label:'Revenue ($)',data:d.revenue,
+    borderColor:C.green,backgroundColor:'rgba(34,197,94,.09)',borderWidth:2.5,
+    pointRadius:4,pointHoverRadius:7,pointBackgroundColor:C.green,fill:true,tension:.4}]},options:{...cDef()}});
 }
 
-// ── PLATFORM ACTIVITY ──
 async function loadActivity(){
-  const d = await api('/api/admin/platform-activity');
-  if(!d) return;
-  makeChart('activityChart', {
-    type:'bar',
-    data:{
-      labels:d.labels,
-      datasets:[
-        {label:'Resumes',data:d.resumes,backgroundColor:'rgba(168,85,247,.4)',borderColor:COLORS.purple,borderWidth:1.5,borderRadius:4},
-        {label:'Code Submissions',data:d.submissions,backgroundColor:'rgba(0,229,200,.3)',borderColor:COLORS.cyan,borderWidth:1.5,borderRadius:4}
-      ]
-    },
-    options:{...chartDefaults('bar')}
-  });
+  const d=await api('/api/admin/platform-activity');if(!d)return;
+  mkChart('activityChart',{type:'bar',data:{labels:d.labels,datasets:[
+    {label:'Resumes',data:d.resumes,backgroundColor:'rgba(168,85,247,.4)',borderColor:C.purple,borderWidth:1.5,borderRadius:3},
+    {label:'Submissions',data:d.submissions,backgroundColor:'rgba(0,229,200,.3)',borderColor:C.cyan,borderWidth:1.5,borderRadius:3},
+    {label:'Posts',data:d.posts,backgroundColor:'rgba(91,107,255,.4)',borderColor:C.neon,borderWidth:1.5,borderRadius:3},
+    {label:'Interviews',data:d.interviews,backgroundColor:'rgba(255,181,71,.35)',borderColor:C.amber,borderWidth:1.5,borderRadius:3},
+  ]},options:{...cDef()}});
 }
 
-// ── SUBSCRIPTION PIE ──
 async function loadSubPie(){
-  const d = await api('/api/admin/subscription-breakdown');
-  if(!d) return;
-  makeChart('subPieChart', {
-    type:'doughnut',
-    data:{labels:d.labels,datasets:[{data:d.values,backgroundColor:d.colors,
-      borderColor:'rgba(0,0,0,.4)',borderWidth:2,hoverOffset:8}]},
-    options:{...chartDefaults('doughnut'),cutout:'65%',
-      plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,.45)',padding:14,font:{size:11}}}}}
-  });
+  const d=await api('/api/admin/subscription-breakdown');if(!d)return;
+  mkChart('subPieChart',{type:'doughnut',data:{labels:d.labels,datasets:[{data:d.values,
+    backgroundColor:d.colors,borderColor:'rgba(0,0,0,.4)',borderWidth:2,hoverOffset:8}]},
+    options:{...cDef('doughnut'),cutout:'65%',plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,.42)',padding:12,font:{size:11}}}}}});
 }
 
-// ── CODING STATS ──
-async function loadCodingStats(){
-  const d = await api('/api/admin/coding-stats');
-  if(!d) return;
-
-  setText('kAccRate', d.acceptance_rate+'% accepted');
-
-  // Submission status donut
-  if(d.status_values && d.status_values.length){
-    makeChart('submissionStatusChart', {
-      type:'doughnut',
-      data:{labels:d.status_labels,datasets:[{data:d.status_values,
-        backgroundColor:d.status_colors,borderColor:'rgba(0,0,0,.4)',borderWidth:2,hoverOffset:8}]},
-      options:{...chartDefaults('doughnut'),cutout:'60%',
-        plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,.45)',padding:10,font:{size:11}}}}}
-    });
-  }
-
-  // Top submitters
-  const wrap = document.getElementById('topSubmitters');
-  if(d.top_submitters && d.top_submitters.length){
-    const maxSubs = Math.max(...d.top_submitters.map(u=>u.submissions));
-    wrap.innerHTML = d.top_submitters.map((u,i)=>`
-      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);">
-        <div style="width:24px;height:24px;border-radius:50%;background:${['#5b6bff','#00e5c8','#22c55e','#ffb547','#a855f7'][i]};
-          display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">${i+1}</div>
-        <div style="flex:1">
-          <div style="font-size:13.5px;font-weight:600;color:#fff">${u.name}</div>
-          <div style="height:5px;background:rgba(255,255,255,.07);border-radius:100px;margin-top:5px;">
-            <div style="height:100%;border-radius:100px;background:linear-gradient(90deg,#5b6bff,#00e5c8);width:${Math.round(u.submissions/maxSubs*100)}%;transition:width .8s;"></div>
-          </div>
-        </div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#00e5c8;font-weight:600">${u.submissions} subs</div>
-      </div>`).join('');
-  } else {
-    wrap.innerHTML = '<div style="padding:18px;color:rgba(255,255,255,.25);font-size:13px">No submission data yet.</div>';
-  }
-}
-
-// ── RESUME STATS ──
-async function loadResumeStats(){
-  const d = await api('/api/admin/resume-stats');
-  if(!d) return;
-  setText('kAvgScore', 'Avg: '+d.avg_score+' pts');
-  const buckets = d.buckets || {};
-  makeChart('resumeScoreChart', {
-    type:'bar',
-    data:{
-      labels:['0–25','26–50','51–75','76–100'],
-      datasets:[{
-        label:'Resumes',
-        data:[buckets['0-25']||0,buckets['26-50']||0,buckets['51-75']||0,buckets['76-100']||0],
-        backgroundColor:['rgba(255,87,87,.5)','rgba(255,181,71,.5)','rgba(91,107,255,.5)','rgba(34,197,94,.5)'],
-        borderColor:['#ff5757','#ffb547','#5b6bff','#22c55e'],
-        borderWidth:1.5,borderRadius:6
-      }]
-    },
-    options:{...chartDefaults('bar'),plugins:{legend:{display:false}}}
-  });
-}
-
-// ── JOB STATS ──
-async function loadJobStats(){
-  const d = await api('/api/admin/job-stats');
-  if(!d) return;
-  setText('kApps', (d.total_apps||0).toLocaleString()+' applications');
-
-  if(d.top_sources && d.top_sources.length){
-    makeChart('jobSourceChart', {
-      type:'bar',
-      data:{
-        labels:d.top_sources.map(s=>s.source),
-        datasets:[{label:'Jobs',data:d.top_sources.map(s=>s.count),
-          backgroundColor:'rgba(56,189,248,.4)',borderColor:'#38bdf8',borderWidth:1.5,borderRadius:6}]
-      },
-      options:{...chartDefaults('bar'),plugins:{legend:{display:false}}}
-    });
-  }
-
-  if(d.top_roles && d.top_roles.length){
-    makeChart('jobRolesChart', {
-      type:'bar',
-      data:{
-        labels:d.top_roles.map(r=>r.role.length>20?r.role.substring(0,20)+'…':r.role),
-        datasets:[{label:'Listings',data:d.top_roles.map(r=>r.count),
-          backgroundColor:'rgba(168,85,247,.4)',borderColor:'#a855f7',borderWidth:1.5,borderRadius:6}]
-      },
-      options:{...chartDefaults('bar'),indexAxis:'y',plugins:{legend:{display:false}},
-        scales:{
-          x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.35)',font:{size:10}}},
-          y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.35)',font:{size:10}}}
-        }
-      }
-    });
-  }
-}
-
-// ── TOP SKILLS BARS ──
 async function loadTopSkills(){
-  const d = await api('/api/admin/top-skills');
-  if(!d || !d.labels || !d.labels.length) return;
-  const maxVal = Math.max(...d.counts);
-  const container = document.getElementById('topSkillsBars');
-  const colors = ['#5b6bff','#00e5c8','#22c55e','#ffb547','#ff5757',
-                  '#a855f7','#38bdf8','#5b6bff','#00e5c8','#22c55e'];
-  container.innerHTML = d.labels.slice(0,10).map((skill,i)=>`
-    <div class="skill-bar-row">
-      <div class="skill-bar-name">${skill}</div>
-      <div class="skill-bar-track">
-        <div class="skill-bar-fill" style="width:${Math.round(d.counts[i]/maxVal*100)}%;background:${colors[i%colors.length]}"></div>
+  const d=await api('/api/admin/top-skills');if(!d||!d.labels.length)return;
+  const mx=Math.max(...d.counts);
+  const clrs=[C.neon,C.cyan,C.green,C.amber,C.red,C.purple,C.blue,C.pink,C.neon,C.cyan];
+  document.getElementById('topSkillsBars').innerHTML=d.labels.slice(0,12).map((sk,i)=>`
+    <div class="sbrow"><div class="sbname">${sk}</div>
+    <div class="sbt"><div class="sbf" style="width:${Math.round(d.counts[i]/mx*100)}%;background:${clrs[i%clrs.length]}"></div></div>
+    <div class="sbn">${d.counts[i]}</div></div>`).join('');
+}
+
+async function loadJobStats(){
+  const d=await api('/api/admin/job-stats');if(!d)return;
+  if(d.top_sources&&d.top_sources.length)
+    mkChart('jobSourceChart',{type:'bar',data:{labels:d.top_sources.map(s=>s.source),
+      datasets:[{label:'Jobs',data:d.top_sources.map(s=>s.count),backgroundColor:'rgba(56,189,248,.4)',
+        borderColor:C.blue,borderWidth:1.5,borderRadius:5}]},
+      options:{...cDef(),plugins:{legend:{display:false}}}});
+  if(d.top_roles&&d.top_roles.length)
+    mkChart('jobRolesChart',{type:'bar',data:{labels:d.top_roles.map(r=>r.role.length>20?r.role.substring(0,20)+'…':r.role),
+      datasets:[{label:'Listings',data:d.top_roles.map(r=>r.count),backgroundColor:'rgba(168,85,247,.4)',
+        borderColor:C.purple,borderWidth:1.5,borderRadius:5}]},
+      options:{...cDef(),indexAxis:'y',plugins:{legend:{display:false}}}});
+}
+
+async function loadRecentUsers(){
+  const d=await api('/api/admin/recent-users');if(!d)return;
+  document.getElementById('recentUsersBody').innerHTML=d.map(u=>`
+    <tr onclick="openUser(${u.id})">
+      <td style="font-weight:600">${u.name}</td>
+      <td style="color:var(--txt3);font-family:var(--mono);font-size:12px">${u.email}</td>
+      <td><span class="pbadge ${u.plan==='pro'?'bpro':u.plan==='enterprise'?'bent':'bfree'}">${u.plan==='enterprise'?'Enterprise':u.plan==='pro'?'Pro':'Free'}</span></td>
+      <td style="color:var(--cyan);font-weight:600">${u.skills}</td>
+      <td><span class="${u.verified?'bverify':'bunverify'}">${u.verified?'✓ Yes':'○ No'}</span></td>
+      <td style="color:var(--txt2)">${u.resumes}</td>
+      <td style="color:var(--txt3)">${u.role}</td>
+      <td style="color:var(--txt3);font-family:var(--mono);font-size:12px">${u.joined}</td>
+    </tr>`).join('');
+}
+
+// ── USERS TAB ──
+let userPage=1, userQ='', userPlan='';
+async function loadUsers(){
+  document.getElementById('usersBody').innerHTML='<tr><td colspan="9" class="empty-msg">Loading…</td></tr>';
+  const d=await api(`/api/admin/users?page=${userPage}&q=${encodeURIComponent(userQ)}&plan=${userPlan}`);
+  if(!d)return;
+  set('userCount',`(${d.total.toLocaleString()} total)`);
+  document.getElementById('usersBody').innerHTML=d.users.length?d.users.map(u=>`
+    <tr onclick="openUser(${u.id})">
+      <td style="font-weight:600">${u.name}</td>
+      <td style="color:var(--txt3);font-family:var(--mono);font-size:12px">${u.email}</td>
+      <td><span class="pbadge ${u.plan==='pro'?'bpro':u.plan==='enterprise'?'bent':'bfree'}">${u.plan==='enterprise'?'Enterprise':u.plan==='pro'?'Pro':'Free'}</span></td>
+      <td style="color:var(--cyan)">${u.skills}</td><td style="color:var(--txt2)">${u.posts}</td>
+      <td style="color:var(--txt2)">${u.interviews}</td><td style="color:var(--txt2)">${u.solved}</td>
+      <td><span class="${u.verified?'bverify':'bunverify'}">${u.verified?'✓':'○'}</span></td>
+      <td style="color:var(--txt3);font-family:var(--mono);font-size:12px">${u.joined}</td>
+    </tr>`).join(''):'<tr><td colspan="9" class="empty-msg">No users found</td></tr>';
+  // Pagination
+  const pgn=document.getElementById('userPgn');
+  pgn.innerHTML='';
+  if(d.pages>1){
+    const prev=document.createElement('button'); prev.className='pgbtn'; prev.textContent='←';
+    prev.disabled=d.page<=1; prev.onclick=()=>{userPage--;loadUsers();}; pgn.appendChild(prev);
+    for(let i=Math.max(1,d.page-2);i<=Math.min(d.pages,d.page+2);i++){
+      const b=document.createElement('button'); b.className='pgbtn'+(i===d.page?' cur':'');
+      b.textContent=i; const pg=i; b.onclick=()=>{userPage=pg;loadUsers();}; pgn.appendChild(b);
+    }
+    const next=document.createElement('button'); next.className='pgbtn'; next.textContent='→';
+    next.disabled=d.page>=d.pages; next.onclick=()=>{userPage++;loadUsers();}; pgn.appendChild(next);
+  }
+}
+let searchTimer;
+function searchUsers(){
+  clearTimeout(searchTimer);
+  searchTimer=setTimeout(()=>{
+    userQ=document.getElementById('userSearch').value;
+    userPlan=document.getElementById('planFilter').value;
+    userPage=1; loadUsers();
+  },400);
+}
+
+// ── SOCIAL ──
+async function loadSocial(){
+  const d=await api('/api/admin/social-stats');if(!d)return;
+  set('sPosts',d.totals.posts.toLocaleString()); set('sLikes',d.totals.likes.toLocaleString());
+  set('sCmts',d.totals.comments.toLocaleString()); set('sFollows',d.totals.follows.toLocaleString());
+  set('sAvgLikes',d.avg_likes_per_post+' avg likes'); set('sReplies',d.totals.replies+' replies');
+  set('sMsgs',d.totals.messages+' DMs');
+  if(d.posts_daily.length)
+    mkChart('postsDailyChart',{type:'bar',data:{labels:d.labels_14,datasets:[{label:'Posts',data:d.posts_daily,
+      backgroundColor:'rgba(91,107,255,.4)',borderColor:C.neon,borderWidth:1.5,borderRadius:4}]},
+      options:{...cDef(),plugins:{legend:{display:false}}}});
+  const pt=d.post_types;
+  mkChart('postTypeChart',{type:'doughnut',data:{labels:['Text','Achievement','Milestone','Image'],
+    datasets:[{data:[pt.text||0,pt.achievement||0,pt.milestone||0,pt.image||0],
+      backgroundColor:[C.neon,C.amber,C.cyan,C.purple],borderColor:'rgba(0,0,0,.4)',borderWidth:2,hoverOffset:8}]},
+    options:{...cDef('doughnut'),cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,.42)',padding:10,font:{size:11}}}}}});
+  const mx1=d.top_posters.length?Math.max(...d.top_posters.map(u=>u.posts)):1;
+  document.getElementById('topPostersEl').innerHTML=d.top_posters.map((u,i)=>leaderRow(i+1,u.name,u.posts,'posts',mx1,C.neon)).join('');
+  const mx2=d.top_followed.length?Math.max(...d.top_followed.map(u=>u.followers)):1;
+  document.getElementById('topFollowedEl').innerHTML=d.top_followed.map((u,i)=>leaderRow(i+1,u.name,u.followers,'followers',mx2,C.cyan)).join('');
+}
+
+// ── INTERVIEWS ──
+async function loadInterviews(){
+  const d=await api('/api/admin/interview-stats');if(!d)return;
+  set('ivTotal',d.totals.total.toLocaleString()); set('ivDone',d.totals.completed.toLocaleString());
+  set('ivActive',d.totals.active.toLocaleString()); set('ivHired',d.totals.hired.toLocaleString());
+  set('ivRej',d.totals.rejected.toLocaleString()); set('ivAvgSc',d.avg_score);
+  set('ivComp',d.completion_rate+'% completion'); set('ivHR',d.hire_rate+'% hire rate');
+  if(d.labels.length)
+    mkChart('ivDailyChart',{type:'bar',data:{labels:d.labels,datasets:[{label:'Sessions',data:d.daily,
+      backgroundColor:'rgba(91,107,255,.4)',borderColor:C.neon,borderWidth:1.5,borderRadius:4}]},
+      options:{...cDef(),plugins:{legend:{display:false}}}});
+  mkChart('ivDecisionChart',{type:'doughnut',data:{labels:['Hired','Rejected','Maybe'],
+    datasets:[{data:[d.totals.hired,d.totals.rejected,d.totals.maybe],
+      backgroundColor:[C.green,C.red,C.amber],borderColor:'rgba(0,0,0,.4)',borderWidth:2,hoverOffset:8}]},
+    options:{...cDef('doughnut'),cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,.42)',padding:10,font:{size:11}}}}}});
+  const rc=d.role_counts;
+  if(Object.keys(rc).length)
+    mkChart('ivRolesChart',{type:'bar',data:{labels:Object.keys(rc).slice(0,8),
+      datasets:[{label:'Sessions',data:Object.values(rc).slice(0,8),backgroundColor:'rgba(0,229,200,.35)',borderColor:C.cyan,borderWidth:1.5,borderRadius:4}]},
+      options:{...cDef(),plugins:{legend:{display:false}}}});
+  const lc=d.level_counts;
+  if(Object.keys(lc).length)
+    mkChart('ivLevelChart',{type:'doughnut',data:{labels:Object.keys(lc),
+      datasets:[{data:Object.values(lc),backgroundColor:[C.neon,C.cyan,C.amber,C.purple],borderColor:'rgba(0,0,0,.4)',borderWidth:2}]},
+      options:{...cDef('doughnut'),cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,.42)',padding:8,font:{size:11}}}}}});
+  const dstatus={hire:'bhire',reject:'breject',maybe:'bmaybe'};
+  document.getElementById('ivRecentBody').innerHTML=d.recent.length?d.recent.map(s=>`
+    <tr><td style="font-weight:600">${s.name}</td><td style="color:var(--txt2)">${s.role}</td>
+    <td><span class="bstatus bapplied">${s.level}</span></td>
+    <td><span class="bstatus ${s.status==='ended'?'bselected':'bapplied'}">${s.status}</span></td>
+    <td><span class="bstatus ${dstatus[s.decision]||'bapplied'}">${s.decision}</span></td>
+    <td style="color:var(--cyan);font-weight:600">${s.score}</td>
+    <td style="color:var(--txt3);font-family:var(--mono);font-size:12px">${s.date}</td></tr>`).join('')
+    :'<tr><td colspan="7" class="empty-msg">No sessions yet</td></tr>';
+}
+
+// ── RECRUITER ──
+async function loadRecruiter(){
+  const d=await api('/api/admin/recruiter-stats');if(!d)return;
+  set('rJobs',d.totals.jobs.toLocaleString()); set('rApps',d.totals.applications.toLocaleString());
+  set('rSelected',d.totals.selected.toLocaleString()); set('rAvgCGPA',d.avg_cgpa.toLocaleString());
+  set('rMsgs',d.totals.messages.toLocaleString()); set('rShort',d.totals.shortlisted.toLocaleString());
+  set('rActiveJ',d.totals.active_jobs+' active'); set('rSelR',d.selection_rate+'% rate');
+  set('rReadR',d.msg_read_rate+'% read');
+  const sc=d.status_counts;
+  mkChart('rStatusChart',{type:'doughnut',data:{labels:Object.keys(sc),
+    datasets:[{data:Object.values(sc),backgroundColor:[C.neon,C.amber,C.purple,C.green,C.red],
+      borderColor:'rgba(0,0,0,.4)',borderWidth:2,hoverOffset:8}]},
+    options:{...cDef('doughnut'),cutout:'58%',plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,.42)',padding:10,font:{size:11}}}}}});
+  const mt=d.msg_types;
+  mkChart('rMsgTypeChart',{type:'bar',data:{labels:Object.keys(mt),datasets:[{label:'Messages',data:Object.values(mt),
+    backgroundColor:'rgba(168,85,247,.4)',borderColor:C.purple,borderWidth:1.5,borderRadius:4}]},
+    options:{...cDef(),plugins:{legend:{display:false}}}});
+  const mx1=d.top_companies.length?Math.max(...d.top_companies.map(c=>c.jobs)):1;
+  document.getElementById('topCompaniesEl').innerHTML=d.top_companies.map((c,i)=>leaderRow(i+1,c.company,c.jobs,'jobs',mx1,C.amber)).join('');
+  const mx2=d.top_colleges.length?Math.max(...d.top_colleges.map(c=>c.count)):1;
+  document.getElementById('topCollegesEl').innerHTML=d.top_colleges.map((c,i)=>leaderRow(i+1,c.college,c.count,'apps',mx2,C.cyan)).join('');
+  document.getElementById('recJobsBody').innerHTML=d.recent_jobs.length?d.recent_jobs.map(j=>`
+    <tr><td style="font-weight:600">${j.title}</td><td style="color:var(--txt2)">${j.company}</td>
+    <td><span class="bstatus bapplied">${j.type}</span></td>
+    <td><span class="tag ${j.active?'tag-active':'tag-inactive'}">${j.active?'Active':'Paused'}</span></td>
+    <td style="color:var(--cyan);font-weight:600">${j.apps}</td>
+    <td style="color:var(--txt3);font-family:var(--mono);font-size:12px">${j.posted}</td></tr>`).join('')
+    :'<tr><td colspan="6" class="empty-msg">No jobs posted yet</td></tr>';
+  document.getElementById('topJobsBody').innerHTML=d.top_jobs.length?d.top_jobs.map(j=>`
+    <tr><td style="font-weight:600">${j.title}</td><td style="color:var(--txt2)">${j.company}</td>
+    <td><span style="color:var(--cyan);font-weight:700;font-size:15px">${j.apps}</span></td></tr>`).join('')
+    :'<tr><td colspan="3" class="empty-msg">No data yet</td></tr>';
+}
+
+// ── CODING ──
+async function loadCoding(){
+  const d=await api('/api/admin/coding-stats');if(!d)return;
+  set('cTotal',d.total_submissions.toLocaleString()); set('cSolved',d.total_solved.toLocaleString());
+  set('cWrong',d.wrong_answer.toLocaleString()); set('cTLE',d.tle.toLocaleString());
+  set('cAcc',d.acceptance_rate+'% accepted');
+  if(d.status_values.length)
+    mkChart('subStatusChart',{type:'doughnut',data:{labels:d.status_labels,datasets:[{data:d.status_values,
+      backgroundColor:d.status_colors,borderColor:'rgba(0,0,0,.4)',borderWidth:2,hoverOffset:8}]},
+      options:{...cDef('doughnut'),cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,.42)',padding:10,font:{size:11}}}}}});
+  const lc=d.lang_counts;
+  if(Object.keys(lc).length)
+    mkChart('langChart',{type:'bar',data:{labels:Object.keys(lc),datasets:[{label:'Submissions',data:Object.values(lc),
+      backgroundColor:'rgba(56,189,248,.4)',borderColor:C.blue,borderWidth:1.5,borderRadius:4}]},
+      options:{...cDef(),plugins:{legend:{display:false}},indexAxis:'y'}});
+  const mx=d.top_submitters.length?Math.max(...d.top_submitters.map(u=>u.submissions)):1;
+  document.getElementById('topCodersEl').innerHTML=d.top_submitters.map((u,i)=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+      <div style="width:26px;height:26px;border-radius:50%;background:${[C.neon,C.cyan,C.green,C.amber,C.purple][i%5]};
+        display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">${i+1}</div>
+      <div style="flex:1">
+        <div style="font-size:13.5px;font-weight:600;color:#fff">${u.name}</div>
+        <div style="font-size:11px;color:var(--txt3);font-family:var(--mono)">${u.email}</div>
+        <div style="height:4px;background:rgba(255,255,255,.07);border-radius:100px;margin-top:5px">
+          <div style="height:100%;border-radius:100px;background:linear-gradient(90deg,${C.neon},${C.cyan});width:${Math.round(u.submissions/mx*100)}%;transition:width .8s"></div></div>
       </div>
-      <div class="skill-bar-num">${d.counts[i]}</div>
-    </div>`).join('');
+      <div style="text-align:right">
+        <div style="font-family:var(--mono);font-size:13px;color:var(--cyan);font-weight:600">${u.submissions} subs</div>
+        <div style="font-size:11px;color:var(--txt3)">${u.solved} solved</div>
+      </div></div>`).join('');
+  document.getElementById('topProblemsBody').innerHTML=d.top_problems.length?d.top_problems.map(p=>`
+    <tr><td style="font-weight:600">${p.title}</td>
+    <td><span class="bstatus ${p.difficulty==='Easy'?'bselected':p.difficulty==='Medium'?'bapplied':'brejected'}">${p.difficulty}</span></td>
+    <td><span style="color:var(--cyan);font-weight:700">${p.attempts}</span></td></tr>`).join('')
+    :'<tr><td colspan="3" class="empty-msg">No submission data yet</td></tr>';
+}
+
+// ── AI TOOLS ──
+async function loadAITools(){
+  const d=await api('/api/admin/ai-tools-stats');if(!d)return;
+  set('ctmTotal',d.ctm.total.toLocaleString()); set('ctmActive',d.ctm.active+' active');
+  set('bsTotal',d.blind_spot.total.toLocaleString());
+  set('bsAvgScore',d.blind_spot.avg_score||'—'); set('bsShock',d.blind_spot.avg_shock||'—');
+  const mx1=d.ctm.top_roles.length?Math.max(...d.ctm.top_roles.map(r=>r.count)):1;
+  document.getElementById('ctmRolesEl').innerHTML=d.ctm.top_roles.map((r,i)=>leaderRow(i+1,r.role,r.count,'users',mx1,C.cyan)).join('');
+  const mx2=d.ctm.top_companies.length?Math.max(...d.ctm.top_companies.map(c=>c.count)):1;
+  document.getElementById('ctmCompEl').innerHTML=d.ctm.top_companies.map((c,i)=>leaderRow(i+1,c.company,c.count,'users',mx2,C.amber)).join('');
+  const td=d.ctm.timeline_dist;
+  mkChart('ctmTimelineChart',{type:'doughnut',data:{labels:['12 months','24 months','36 months'],
+    datasets:[{data:[td['12']||0,td['24']||0,td['36']||0],backgroundColor:[C.cyan,C.neon,C.purple],
+      borderColor:'rgba(0,0,0,.4)',borderWidth:2,hoverOffset:8}]},
+    options:{...cDef('doughnut'),cutout:'58%',plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,.42)',padding:10,font:{size:11}}}}}});
+  const rs=await api('/api/admin/resume-stats');
+  if(rs){
+    const b=rs.buckets;
+    mkChart('resumeScoreChart',{type:'bar',data:{labels:['0–25','26–50','51–75','76–100'],
+      datasets:[{label:'Resumes',data:[b['0-25']||0,b['26-50']||0,b['51-75']||0,b['76-100']||0],
+        backgroundColor:[C.red,C.amber,C.neon,C.green].map(c=>c+'88'),
+        borderColor:[C.red,C.amber,C.neon,C.green],borderWidth:1.5,borderRadius:6}]},
+      options:{...cDef(),plugins:{legend:{display:false}}}});}
 }
 
 // ── HEALTH ──
 async function loadHealth(){
-  const d = await api('/api/admin/health');
-  if(!d) return;
-  const checks = d.checks;
-  const items  = Object.values(checks);
-  const grid   = document.getElementById('healthGrid');
-  const statusCls = s => s==='ok'?'hs-ok':s==='warning'?'hs-warn':'hs-err';
-  grid.innerHTML = items.map(c=>`
-    <div class="health-item fade-in">
-      <div class="health-status ${statusCls(c.status)}"></div>
-      <div>
-        <div class="health-name">${c.label}</div>
-        <div class="health-detail">${c.detail||c.status}</div>
-      </div>
-    </div>`).join('');
+  const d=await api('/api/admin/health');if(!d)return;
+  const items=Object.values(d.checks);
+  const sc=s=>s==='ok'?'hok':s==='warning'?'hwarn':'herr';
+  document.getElementById('healthGrid').innerHTML=items.map(c=>`
+    <div class="hitem"><div class="hdot ${sc(c.status)}"></div>
+    <div><div class="hname">${c.label}</div><div class="hdetail">${c.detail||c.status}</div></div></div>`).join('');
+  // Stats snapshot
+  const st=await api('/api/admin/stats');
+  if(st){
+    const snap=[
+      {l:'Total Users',v:st.users.total,c:C.neon},{l:'Pro Users',v:st.users.pro,c:C.cyan},
+      {l:'MRR',v:'$'+st.revenue.mrr,c:C.green},{l:'Resumes',v:st.platform.resumes,c:C.purple},
+      {l:'AI Interviews',v:st.ai.interviews_total,c:C.amber},{l:'Recruiter Jobs',v:st.recruiter.jobs_total,c:C.blue},
+    ];
+    document.getElementById('healthSnapshot').innerHTML=snap.map(s=>`
+      <div class="mod-stat"><div class="mod-stat-n" style="color:${s.c}">${typeof s.v==='number'?s.v.toLocaleString():s.v}</div>
+      <div class="mod-stat-l">${s.l}</div></div>`).join('');
+  }
 }
 
-// ── RECENT USERS TABLE ──
-async function loadRecentUsers(){
-  const d = await api('/api/admin/recent-users');
-  if(!d) return;
-  const planBadge = p => p==='pro'?'plan-pro':p==='enterprise'?'plan-ent':'plan-free';
-  const planLabel = p => p==='pro'?'Pro':p==='enterprise'?'Enterprise':'Free';
-  document.getElementById('usersTableBody').innerHTML = d.map(u=>`
-    <tr>
-      <td style="font-weight:600">${u.name}</td>
-      <td style="color:rgba(255,255,255,.5);font-family:'JetBrains Mono',monospace;font-size:12.5px">${u.email}</td>
-      <td><span class="plan-badge ${planBadge(u.plan)}">${planLabel(u.plan)}</span></td>
-      <td><span class="${u.verified?'verified-yes':'verified-no'}">${u.verified?'✓ Verified':'○ Unverified'}</span></td>
-      <td style="color:rgba(255,255,255,.4);font-size:12.5px">${u.role||'user'}</td>
-      <td style="color:rgba(255,255,255,.35);font-size:12.5px;font-family:'JetBrains Mono',monospace">${u.joined}</td>
-    </tr>`).join('');
+// ── USER DETAIL MODAL ──
+async function openUser(uid){
+  document.getElementById('userModal').classList.add('open');
+  document.getElementById('modalContent').innerHTML='<div class="empty-msg" style="padding:40px">Loading…</div>';
+  const d=await api(`/api/admin/user/${uid}`);
+  if(!d){document.getElementById('modalContent').innerHTML='<div class="empty-msg">Failed to load user</div>';return;}
+  const u=d.user,p=d.profile,sc=d.scores,ac=d.activity;
+  document.getElementById('modalContent').innerHTML=`
+    <div><div class="mod-name">${u.name}</div><div class="mod-email">${u.email}</div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <span class="pbadge ${u.plan==='pro'?'bpro':u.plan==='enterprise'?'bent':'bfree'}">${u.plan}</span>
+      <span class="pbadge ${u.verified?'bselected':'brejected'}">${u.verified?'✓ Verified':'Unverified'}</span>
+      <span class="bstatus bapplied">${u.role}</span>
+      <span style="font-size:12px;color:var(--txt3);align-self:center">Joined ${u.joined}</span>
+    </div></div>
+    ${p&&p.headline?`<div style="font-size:13px;color:var(--txt2);margin-top:10px">${p.headline}${p.location?' · 📍'+p.location:''}</div>`:''}
+    ${p&&p.username?`<div style="font-size:12px;color:var(--cyan);margin-top:4px">@${p.username}</div>`:''}
+    <div class="mod-section">Activity & Stats</div>
+    <div class="mod-grid">
+      <div class="mod-stat"><div class="mod-stat-n" style="color:var(--cyan)">${ac.resumes}</div><div class="mod-stat-l">Resumes</div></div>
+      <div class="mod-stat"><div class="mod-stat-n" style="color:var(--neon)">${ac.posts}</div><div class="mod-stat-l">Posts</div></div>
+      <div class="mod-stat"><div class="mod-stat-n" style="color:var(--green)">${ac.solved}</div><div class="mod-stat-l">Solved</div></div>
+      <div class="mod-stat"><div class="mod-stat-n" style="color:var(--amber)">${ac.interviews}</div><div class="mod-stat-l">Interviews</div></div>
+      <div class="mod-stat"><div class="mod-stat-n" style="color:var(--purple)">${ac.followers}</div><div class="mod-stat-l">Followers</div></div>
+      <div class="mod-stat"><div class="mod-stat-n" style="color:var(--red)">${ac.recruiter_apps}</div><div class="mod-stat-l">Job Apps</div></div>
+    </div>
+    <div class="mod-section">AI Scores</div>
+    ${sc.ats||sc.competitive?`
+    <div class="mod-row"><span class="mod-key">ATS Score</span><div>
+      <span class="mod-val">${sc.ats}%</span>
+      <div class="score-bar"><div class="score-fill" style="width:${sc.ats}%"></div></div></div></div>
+    <div class="mod-row"><span class="mod-key">Competitive Score</span><div>
+      <span class="mod-val">${sc.competitive}%</span>
+      <div class="score-bar"><div class="score-fill" style="width:${sc.competitive}%;background:linear-gradient(90deg,var(--amber),var(--green))"></div></div></div></div>
+    <div class="mod-row"><span class="mod-key">Job Readiness</span><div>
+      <span class="mod-val">${sc.readiness}%</span>
+      <div class="score-bar"><div class="score-fill" style="width:${sc.readiness}%;background:linear-gradient(90deg,var(--cyan),var(--green))"></div></div></div></div>
+    ${sc.dominant_role?`<div class="mod-row"><span class="mod-key">Detected Role</span><span class="mod-val" style="color:var(--neon)">${sc.dominant_role}</span></div>`:''}
+    `:'<div style="color:var(--txt3);font-size:13px">No resume uploaded yet</div>'}
+    ${d.skills.length?`<div class="mod-section">Skills (${d.skills.length})</div>
+    <div>${d.skills.map(s=>`<span class="mod-skill">${s}</span>`).join('')}</div>`:''}
+    ${d.ctm?`<div class="mod-section">Career Time Machine</div>
+    <div class="mod-row"><span class="mod-key">Target Role</span><span class="mod-val" style="color:var(--cyan)">${d.ctm.target_role}</span></div>
+    ${d.ctm.target_company?`<div class="mod-row"><span class="mod-key">Dream Company</span><span class="mod-val">${d.ctm.target_company}</span></div>`:''}
+    <div class="mod-row"><span class="mod-key">Timeline</span><span class="mod-val">${d.ctm.timeline} months</span></div>`:''}
+    ${d.interviews.length?`<div class="mod-section">Recent Interviews</div>`+d.interviews.map(iv=>`
+    <div class="mod-row"><span class="mod-key">${iv.role} (${iv.level})</span>
+    <div style="text-align:right"><span class="mod-val">${iv.decision} — ${iv.score}pts</span><div style="font-size:11px;color:var(--txt3)">${iv.date}</div></div></div>`).join(''):''}
+    ${d.recruiter_apps.length?`<div class="mod-section">Recruiter Applications</div>`+d.recruiter_apps.map(a=>`
+    <div class="mod-row"><span class="mod-key">${a.job} ${a.college?'· '+a.college:''}</span>
+    <div style="text-align:right"><span class="bstatus b${a.status==='selected'?'selected':a.status==='rejected'?'rejected':'applied'}">${a.status}</span>
+    <div style="font-size:11px;color:var(--txt3)">${a.applied}</div></div></div>`).join(''):''}
+    <div style="margin-top:18px;padding:12px 16px;background:rgba(91,107,255,.06);border:1px solid rgba(91,107,255,.15);
+      border-radius:11px;font-size:12px;color:var(--txt3);display:flex;gap:16px;flex-wrap:wrap">
+      <span>📝 ${ac.posts} posts</span><span>❤️ ${ac.follows} following</span>
+      <span>🏆 ${ac.certs} certs</span><span>💬 ${ac.recruiter_msgs} msgs</span>
+      ${ac.has_ctm?'<span>⏳ Career plan</span>':''}${ac.blind_spots?'<span>🔍 Blind spot report</span>':''}
+    </div>`;
+}
+function closeModal(){document.getElementById('userModal').classList.remove('open');}
+document.getElementById('userModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+// ── HELPERS ──
+async function api(url){try{const r=await fetch(url);if(!r.ok)return null;return await r.json();}catch(e){return null;}}
+function set(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+function leaderRow(rank,name,val,unit,max,color){
+  return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+    <div style="width:22px;height:22px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;
+      font-size:11px;font-weight:800;color:#000;flex-shrink:0">${rank}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
+      <div style="height:4px;background:rgba(255,255,255,.07);border-radius:100px;margin-top:4px">
+        <div style="height:100%;border-radius:100px;background:${color};opacity:.7;width:${Math.round(val/Math.max(max,1)*100)}%;transition:width .8s"></div></div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:${color};font-weight:600;flex-shrink:0">${val} ${unit}</div>
+  </div>`;
 }
 
-// ── UTILS ──
-async function api(url){
-  try{
-    const r = await fetch(url);
-    if(!r.ok) return null;
-    return await r.json();
-  }catch(e){ console.error(url, e); return null; }
-}
-function setText(id, val){
-  const el = document.getElementById(id);
-  if(el) el.textContent = val;
-}
-
-// ── AUTO-REFRESH every 60 seconds ──
 loadAll();
-setInterval(loadAll, 60000);
+setInterval(loadAll,60000);
 </script>
-
 {% endblock %}

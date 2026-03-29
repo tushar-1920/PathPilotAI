@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body,html{background:#000!important;}
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;--red:#ff5757;--purple:#a855f7;}
+*,*::before,*::after{box-sizing:border-box;}
+.rc-page{min-height:100vh;background:#000;padding:32px 0 80px;}
+.rc-body{max-width:1200px;margin:0 auto;padding:0 20px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* Header */
+.rc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.rc-title{font-family:'Syne',sans-serif;font-size:clamp(22px,3vw,32px);font-weight:800;color:#fff;letter-spacing:-.8px;}
+.rc-company{font-size:14px;color:rgba(0,229,200,.7);font-weight:500;margin-top:3px;}
+.rc-btns{display:flex;gap:10px;flex-wrap:wrap;}
+.rc-btn{padding:10px 22px;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .2s;border:1px solid transparent;}
+.rc-btn-primary{background:linear-gradient(135deg,var(--neon),#3a4aff);color:#fff;box-shadow:0 4px 20px rgba(91,107,255,.4);}
+.rc-btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(91,107,255,.55);color:#fff;}
+.rc-btn-sec{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.6);}
+.rc-btn-sec:hover{background:rgba(255,255,255,.1);color:#fff;}
+
+/* Stats */
+.rc-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px;}
+.rc-stat{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:20px;animation:fadeUp .4s ease both;}
+.rc-stat-icon{font-size:22px;margin-bottom:8px;}
+.rc-stat-val{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:#fff;letter-spacing:-1px;line-height:1;}
+.rc-stat-lbl{font-size:11.5px;color:rgba(255,255,255,.3);margin-top:4px;text-transform:uppercase;letter-spacing:.8px;}
+
+/* Card */
+.rc-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:24px;margin-bottom:20px;animation:fadeUp .4s .06s ease both;}
+.rc-card-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;}
+
+/* Jobs table */
+.rc-table{width:100%;border-collapse:collapse;}
+.rc-table th{font-size:11px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1px;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left;}
+.rc-table td{padding:13px 14px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+.rc-table tr:last-child td{border-bottom:none;}
+.rc-table tr:hover td{background:rgba(255,255,255,.025);}
+.rc-job-title{font-size:14px;font-weight:600;color:#fff;}
+.rc-job-meta{font-size:12px;color:rgba(255,255,255,.35);margin-top:2px;}
+.rc-badge{display:inline-flex;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:.3px;}
+.badge-active{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:var(--green);}
+.badge-inactive{background:rgba(255,87,87,.08);border:1px solid rgba(255,87,87,.18);color:var(--red);}
+.badge-applied{background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.2);color:#818cf8;}
+.rc-action-link{font-size:12.5px;color:rgba(91,107,255,.8);text-decoration:none;padding:5px 10px;border-radius:8px;transition:all .2s;display:inline-flex;align-items:center;gap:5px;}
+.rc-action-link:hover{background:rgba(91,107,255,.12);color:var(--neon);}
+.rc-action-link.danger{color:rgba(255,87,87,.7);}
+.rc-action-link.danger:hover{background:rgba(255,87,87,.08);color:var(--red);}
+.rc-empty{text-align:center;padding:40px;color:rgba(255,255,255,.25);font-size:14px;}
+
+/* Flash */
+.rc-flash{padding:12px 18px;border-radius:12px;margin-bottom:20px;font-size:14px;font-weight:500;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
+
+/* Recruiter nav bar */
+.rc-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:8px;}
+.rc-nav a{padding:9px 18px;border-radius:10px;font-size:13.5px;font-weight:600;color:rgba(255,255,255,.45);text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:7px;}
+.rc-nav a:hover{background:rgba(255,255,255,.07);color:#fff;}
+.rc-nav a.active{background:linear-gradient(135deg,rgba(91,107,255,.2),rgba(0,229,200,.1));color:#fff;border:1px solid rgba(91,107,255,.2);}
+</style>
+
+<div class="rc-page">
+<div class="rc-body">
+
+{% with msgs = get_flashed_messages() %}
+{% if msgs %}{% for m in msgs %}<div class="rc-flash">{{ m }}</div>{% endfor %}{% endif %}
+{% endwith %}
+
+<!-- Header -->
+<div class="rc-header">
+  <div>
+    <div class="rc-title">🏢 Recruiter Dashboard</div>
+    <div class="rc-company">{{ recruiter_company }} · {{ recruiter_email }}</div>
+  </div>
+  <div class="rc-btns">
+    <a href="/recruiter/search-students" class="rc-btn rc-btn-sec">🔍 Search Students</a>
+    <a href="/recruiter/messages" class="rc-btn rc-btn-sec">💬 Messages</a>
+    <a href="/recruiter/post-job" class="rc-btn rc-btn-primary">+ Post New Job</a>
+  </div>
+</div>
+
+<!-- Nav bar -->
+<div class="rc-nav">
+  <a href="/recruiter/dashboard" class="active">📊 Dashboard</a>
+  <a href="/recruiter/post-job">📝 Post Job</a>
+  <a href="/recruiter/search-students">🔍 Search Students</a>
+  <a href="/recruiter/messages">💬 Messages</a>
+  <a href="/recruiter/send-message">✉️ Send Message</a>
+  <a href="/logout">🚪 Logout</a>
+</div>
+
+<!-- Stats -->
+<div class="rc-stats">
+  <div class="rc-stat" style="animation-delay:.02s">
+    <div class="rc-stat-icon">📋</div>
+    <div class="rc-stat-val">{{ stats.total_jobs }}</div>
+    <div class="rc-stat-lbl">Total Jobs</div>
+  </div>
+  <div class="rc-stat" style="animation-delay:.05s">
+    <div class="rc-stat-icon">🟢</div>
+    <div class="rc-stat-val">{{ stats.active_jobs }}</div>
+    <div class="rc-stat-lbl">Active Jobs</div>
+  </div>
+  <div class="rc-stat" style="animation-delay:.08s">
+    <div class="rc-stat-icon">📨</div>
+    <div class="rc-stat-val">{{ stats.total_apps }}</div>
+    <div class="rc-stat-lbl">Applications</div>
+  </div>
+  <div class="rc-stat" style="animation-delay:.11s">
+    <div class="rc-stat-icon">✅</div>
+    <div class="rc-stat-val" style="color:var(--green)">{{ stats.selected }}</div>
+    <div class="rc-stat-lbl">Selected</div>
+  </div>
+  <div class="rc-stat" style="animation-delay:.14s">
+    <div class="rc-stat-icon">💬</div>
+    <div class="rc-stat-val" style="color:var(--cyan)">{{ stats.msgs_sent }}</div>
+    <div class="rc-stat-lbl">Msgs Sent</div>
+  </div>
+</div>
+
+<!-- Jobs List -->
+<div class="rc-card">
+  <div class="rc-card-title">
+    Posted Jobs
+    <a href="/recruiter/post-job" class="rc-btn rc-btn-primary" style="padding:7px 16px;font-size:12.5px">+ Post Job</a>
+  </div>
+
+  {% if jobs %}
+  <div style="overflow-x:auto">
+  <table class="rc-table">
+    <thead>
+      <tr>
+        <th>Job Title</th>
+        <th>Type</th>
+        <th>Deadline</th>
+        <th>Status</th>
+        <th>Apps</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for job in jobs %}
+    <tr>
+      <td>
+        <div class="rc-job-title">{{ job.title }}</div>
+        <div class="rc-job-meta">📍 {{ job.location or "Remote" }} · CGPA ≥ {{ job.min_cgpa or "Any" }} · Batch {{ job.batch or "Any" }}</div>
+      </td>
+      <td><span class="rc-badge badge-applied">{{ job.job_type }}</span></td>
+      <td style="font-size:13px;color:rgba(255,255,255,.5)">
+        {% if job.deadline %}{{ job.deadline.strftime('%b %d, %Y') }}{% else %}—{% endif %}
+      </td>
+      <td>
+        <span class="rc-badge {{ 'badge-active' if job.is_active else 'badge-inactive' }}">
+          {{ 'Active' if job.is_active else 'Paused' }}
+        </span>
+      </td>
+      <td>
+        <a href="/recruiter/jobs/{{ job.id }}/applications" class="rc-action-link" style="font-size:13px;font-weight:700;color:var(--cyan)">
+          {{ job.applications|length }} →
+        </a>
+      </td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap">
+        <a href="/recruiter/jobs/{{ job.id }}/applications" class="rc-action-link">👁 View Apps</a>
+        <form method="POST" action="/recruiter/jobs/{{ job.id }}/toggle" style="display:inline">
+          <button type="submit" class="rc-action-link" style="background:none;border:none;cursor:pointer">
+            {{ '⏸ Pause' if job.is_active else '▶ Resume' }}
+          </button>
+        </form>
+        <form method="POST" action="/recruiter/jobs/{{ job.id }}/delete"
+              onsubmit="return confirm('Delete this job and all its applications?')" style="display:inline">
+          <button type="submit" class="rc-action-link danger" style="background:none;border:none;cursor:pointer">🗑 Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% else %}
+  <div class="rc-empty">No jobs posted yet. <a href="/recruiter/post-job" style="color:var(--neon)">Post your first job →</a></div>
+  {% endif %}
+</div>
+
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+body,html{background:#000!important;}
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;--red:#ff5757;--purple:#a855f7;}
+.rm-page{min-height:100vh;background:#000;padding:34px 0 80px;}
+.rm-body{max-width:900px;margin:0 auto;padding:0 20px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.rm-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.rm-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;letter-spacing:-.7px;}
+.rm-sub{font-size:13px;color:rgba(255,255,255,.35);margin-top:4px;}
+.rm-btn{padding:9px 20px;border-radius:10px;font-size:13.5px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:7px;transition:all .2s;border:1px solid transparent;}
+.rm-btn-primary{background:linear-gradient(135deg,var(--neon),#3a4aff);color:#fff;box-shadow:0 4px 18px rgba(91,107,255,.35);}
+.rm-btn-primary:hover{transform:translateY(-2px);color:#fff;}
+.rm-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:20px;margin-bottom:12px;animation:fadeUp .38s ease both;transition:border-color .2s;}
+.rm-card:hover{border-color:rgba(91,107,255,.18);}
+.rm-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap;}
+.rm-to{font-size:13px;color:rgba(255,255,255,.45);}
+.rm-to strong{color:#fff;}
+.rm-subject{font-family:'Syne',sans-serif;font-size:15.5px;font-weight:700;color:#fff;margin-bottom:5px;}
+.rm-preview{font-size:13.5px;color:rgba(255,255,255,.45);line-height:1.6;max-height:60px;overflow:hidden;}
+.rm-meta{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.rm-time{font-size:11.5px;color:rgba(255,255,255,.25);}
+.rm-badge{display:inline-flex;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;}
+.type-selected{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
+.type-rejected{background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.2);color:var(--red);}
+.type-interview{background:rgba(255,181,71,.1);border:1px solid rgba(255,181,71,.2);color:var(--amber);}
+.type-offer{background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.2);color:#818cf8;}
+.type-general{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);}
+.rm-empty{text-align:center;padding:50px 20px;color:rgba(255,255,255,.2);font-size:15px;}
+</style>
+
+<div class="rm-page">
+<div class="rm-body">
+
+<div class="rm-header">
+  <div>
+    <div class="rm-title">💬 Sent Messages</div>
+    <div class="rm-sub">{{ recruiter_company }} · {{ msgs|length }} message{{ 's' if msgs|length != 1 else '' }}</div>
+  </div>
+  <a href="/recruiter/send-message" class="rm-btn rm-btn-primary">+ New Message</a>
+</div>
+
+{% if msgs %}
+{% for m in msgs %}
+<div class="rm-card" style="animation-delay:{{ loop.index0 * 0.04 }}s">
+  <div class="rm-card-top">
+    <div>
+      <div class="rm-to">To: <strong>{{ m.receiver.name if m.receiver else 'Unknown' }}</strong>
+        {% if m.receiver %}<span style="color:rgba(255,255,255,.3)"> · {{ m.receiver.email }}</span>{% endif %}
+      </div>
+      <div class="rm-subject">{{ m.subject or '(No subject)' }}</div>
+    </div>
+    <span class="rm-badge type-{{ m.message_type }}">
+      {% if m.message_type == 'selected' %}✅ Selected
+      {% elif m.message_type == 'rejected' %}❌ Rejected
+      {% elif m.message_type == 'interview' %}📅 Interview
+      {% elif m.message_type == 'offer' %}🎁 Offer
+      {% else %}💬 General{% endif %}
+    </span>
+  </div>
+  <div class="rm-preview">{{ m.content }}</div>
+  <div class="rm-meta">
+    <span class="rm-time">{{ m.created_at.strftime('%b %d, %Y · %I:%M %p') if m.created_at else '—' }}</span>
+    {% if m.receiver %}<a href="/recruiter/student/{{ m.receiver_id }}" style="font-size:12px;color:rgba(91,107,255,.7);text-decoration:none;padding:4px 10px;border-radius:7px;border:1px solid rgba(91,107,255,.2);transition:all .2s" onmouseover="this.style.background='rgba(91,107,255,.1)'" onmouseout="this.style.background=''">👤 View Profile</a>{% endif %}
+    {% if m.allow_reply %}<span style="font-size:11.5px;color:rgba(0,229,200,.6)">↩ Reply allowed</span>{% endif %}
+    {% if m.is_read %}<span style="font-size:11.5px;color:rgba(255,255,255,.3)">👁 Read</span>
+    {% else %}<span style="font-size:11.5px;color:rgba(255,181,71,.6)">● Unread</span>{% endif %}
+  </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="rm-empty">
+  <div style="font-size:36px;margin-bottom:12px">📭</div>
+  No messages sent yet.
+  <br><a href="/recruiter/send-message" style="color:var(--neon);text-decoration:none;font-weight:600;margin-top:8px;display:inline-block">Send your first message →</a>
+</div>
+{% endif %}
+
+</div>
+</div>
+{% endblock %}

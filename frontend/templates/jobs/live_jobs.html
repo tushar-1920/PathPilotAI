@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+body,html{background:#000!important;}
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;--red:#ff5757;--purple:#a855f7;}
+*,*::before,*::after{box-sizing:border-box;}
+.lj-page{min-height:100vh;background:#000;padding:32px 0 80px;}
+.lj-body{max-width:1000px;margin:0 auto;padding:0 20px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* Header */
+.lj-header{margin-bottom:28px;animation:fadeUp .35s ease both;}
+.lj-title{font-family:'Syne',sans-serif;font-size:clamp(22px,3vw,30px);font-weight:800;color:#fff;letter-spacing:-.8px;display:flex;align-items:center;gap:10px;}
+.lj-live-dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;box-shadow:0 0 8px rgba(34,197,94,.6);}
+.lj-sub{font-size:13.5px;color:rgba(255,255,255,.35);margin-top:6px;}
+
+/* Sub navbar */
+.lj-subnav{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+.lj-subnav a{padding:9px 18px;border-radius:10px;font-size:13.5px;font-weight:600;text-decoration:none;transition:all .2s;border:1px solid rgba(255,255,255,.08);}
+.lj-subnav a.active{background:rgba(91,107,255,.12);border-color:rgba(91,107,255,.25);color:#818cf8;}
+.lj-subnav a:not(.active){color:rgba(255,255,255,.4);background:rgba(255,255,255,.02);}
+.lj-subnav a:not(.active):hover{background:rgba(255,255,255,.07);color:#fff;}
+
+/* Job cards */
+.lj-grid{display:flex;flex-direction:column;gap:14px;}
+.lj-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:22px;animation:fadeUp .4s ease both;transition:border-color .2s,transform .2s;position:relative;overflow:hidden;}
+.lj-card::before{content:"";position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(91,107,255,.15),rgba(0,229,200,.08),transparent);}
+.lj-card:hover{border-color:rgba(91,107,255,.22);transform:translateY(-2px);}
+.lj-card.applied{border-color:rgba(34,197,94,.2);background:rgba(34,197,94,.02);}
+.lj-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px;flex-wrap:wrap;}
+.lj-company{display:flex;align-items:center;gap:12px;}
+.lj-co-logo{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,rgba(91,107,255,.2),rgba(0,229,200,.15));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.lj-job-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:-.3px;}
+.lj-company-name{font-size:13px;color:rgba(255,255,255,.45);margin-top:2px;}
+.lj-badge{display:inline-flex;padding:3px 11px;border-radius:100px;font-size:11px;font-weight:600;}
+.lj-badge-type{background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.2);color:#818cf8;}
+.lj-badge-applied{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
+/* Tags */
+.lj-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+.lj-tag{padding:4px 11px;border-radius:100px;font-size:11.5px;font-weight:500;}
+.lj-tag-loc{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.45);}
+.lj-tag-cgpa{background:rgba(255,181,71,.07);border:1px solid rgba(255,181,71,.15);color:var(--amber);}
+.lj-tag-batch{background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.15);color:var(--purple);}
+.lj-tag-ctc{background:rgba(0,229,200,.07);border:1px solid rgba(0,229,200,.15);color:rgba(0,229,200,.85);}
+.lj-tag-deadline{background:rgba(255,87,87,.07);border:1px solid rgba(255,87,87,.15);color:var(--red);}
+/* Description */
+.lj-desc{font-size:13.5px;color:rgba(255,255,255,.4);line-height:1.75;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+/* Skills */
+.lj-skills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+.lj-skill{padding:3px 10px;border-radius:100px;font-size:11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.45);}
+/* Rounds */
+.lj-rounds{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.lj-round{padding:4px 11px;border-radius:8px;font-size:11.5px;background:rgba(91,107,255,.07);border:1px solid rgba(91,107,255,.15);color:rgba(255,255,255,.5);display:flex;align-items:center;gap:5px;}
+.lj-round::before{content:"→";font-size:10px;color:rgba(91,107,255,.6);}
+/* Footer */
+.lj-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-top:14px;border-top:1px solid rgba(255,255,255,.05);}
+.lj-apply-btn{padding:10px 26px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--neon),#3a4aff);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 18px rgba(91,107,255,.35);}
+.lj-apply-btn:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(91,107,255,.5);color:#fff;}
+.lj-apply-btn.applied-btn{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:var(--green);box-shadow:none;cursor:default;}
+.lj-apply-btn.applied-btn:hover{transform:none;}
+.lj-posted{font-size:11.5px;color:rgba(255,255,255,.25);}
+.lj-empty{text-align:center;padding:60px 20px;color:rgba(255,255,255,.2);font-size:16px;}
+</style>
+
+<div class="lj-page">
+<div class="lj-body">
+
+<!-- Header -->
+<div class="lj-header">
+  <div class="lj-title"><div class="lj-live-dot"></div> Live Jobs</div>
+  <div class="lj-sub">{{ jobs|length }} active job{{ 's' if jobs|length != 1 else '' }} posted by recruiters</div>
+</div>
+
+<!-- Sub-nav -->
+<div class="lj-subnav">
+  <a href="/live-jobs" class="active">🔴 Live Jobs</a>
+  <a href="/my-applications">📋 My Applications</a>
+  <a href="/my-messages">💬 Recruiter Messages</a>
+</div>
+
+{% if jobs %}
+<div class="lj-grid">
+{% for job in jobs %}
+{% set is_applied = job.id in applied_ids %}
+<div class="lj-card {{ 'applied' if is_applied else '' }}" style="animation-delay:{{ loop.index0 * 0.04 }}s">
+  <div class="lj-card-top">
+    <div class="lj-company">
+      <div class="lj-co-logo">🏢</div>
+      <div>
+        <div class="lj-job-title">{{ job.title }}</div>
+        <div class="lj-company-name">{{ job.company_name }}</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span class="lj-badge lj-badge-type">{{ job.job_type }}</span>
+      {% if is_applied %}<span class="lj-badge lj-badge-applied">✓ Applied</span>{% endif %}
+    </div>
+  </div>
+
+  <!-- Tags -->
+  <div class="lj-tags">
+    {% if job.location %}<span class="lj-tag lj-tag-loc">📍 {{ job.location }}</span>{% endif %}
+    {% if job.ctc %}<span class="lj-tag lj-tag-ctc">💰 {{ job.ctc }}</span>{% endif %}
+    {% if job.min_cgpa %}<span class="lj-tag lj-tag-cgpa">📊 CGPA ≥ {{ job.min_cgpa }}</span>{% endif %}
+    {% if job.batch %}<span class="lj-tag lj-tag-batch">🎓 Batch {{ job.batch }}</span>{% endif %}
+    {% if job.stream_required %}<span class="lj-tag lj-tag-loc">🔬 {{ job.stream_required }}</span>{% endif %}
+    {% if job.deadline %}<span class="lj-tag lj-tag-deadline">⏰ Deadline: {{ job.deadline.strftime('%b %d, %Y') }}</span>{% endif %}
+  </div>
+
+  <!-- Description -->
+  <div class="lj-desc">{{ job.description }}</div>
+
+  <!-- Skills -->
+  {% if job.get_skills() %}
+  <div class="lj-skills">
+    {% for skill in job.get_skills() %}<span class="lj-skill">{{ skill }}</span>{% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Selection Rounds -->
+  {% if job.get_rounds() %}
+  <div style="font-size:11.5px;color:rgba(255,255,255,.3);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px">Selection Process</div>
+  <div class="lj-rounds">
+    {% for r in job.get_rounds() %}<span class="lj-round">{{ r }}</span>{% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Footer -->
+  <div class="lj-footer">
+    <div class="lj-posted">Posted {{ job.created_at.strftime('%b %d, %Y') if job.created_at else '' }}</div>
+    {% if is_applied %}
+      <span class="lj-apply-btn applied-btn">✓ Already Applied</span>
+    {% else %}
+      <a href="/live-jobs/{{ job.id }}/apply" class="lj-apply-btn">Apply Now →</a>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="lj-empty">
+  <div style="font-size:40px;margin-bottom:12px">🔍</div>
+  No active jobs posted yet. Check back soon!
+</div>
+{% endif %}
+
+</div>
+</div>
+{% endblock %}

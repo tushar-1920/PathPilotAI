@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+body,html{background:#000!important;}
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;}
+*,*::before,*::after{box-sizing:border-box;}
+.aj-page{min-height:100vh;background:#000;padding:34px 0 80px;}
+.aj-body{max-width:760px;margin:0 auto;padding:0 20px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.aj-back{display:inline-flex;align-items:center;gap:7px;color:rgba(255,255,255,.35);text-decoration:none;font-size:13px;margin-bottom:20px;transition:color .2s;}
+.aj-back:hover{color:#fff;}
+
+/* Job summary */
+.aj-job-banner{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:20px 22px;margin-bottom:24px;animation:fadeUp .35s ease both;display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;}
+.aj-co-logo{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,rgba(91,107,255,.2),rgba(0,229,200,.15));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.aj-job-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:-.4px;}
+.aj-company{font-size:13px;color:rgba(255,255,255,.4);margin-top:2px;}
+.aj-job-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;}
+.aj-tag{padding:3px 10px;border-radius:100px;font-size:11.5px;font-weight:500;}
+.aj-tag-type{background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.2);color:#818cf8;}
+.aj-tag-ctc{background:rgba(0,229,200,.07);border:1px solid rgba(0,229,200,.15);color:rgba(0,229,200,.85);}
+.aj-tag-dl{background:rgba(255,87,87,.07);border:1px solid rgba(255,87,87,.15);color:#ff5757;}
+
+/* Form */
+.aj-form-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:4px;}
+.aj-form-sub{font-size:13px;color:rgba(255,255,255,.35);margin-bottom:22px;}
+.aj-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:24px;margin-bottom:18px;animation:fadeUp .4s ease both;}
+.aj-section{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:rgba(0,229,200,.8);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;}
+.aj-row{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px;}
+.aj-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;margin-bottom:13px;}
+.aj-field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px;}
+.aj-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.5px;}
+.aj-inp{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:11px;padding:10px 14px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13.5px;outline:none;transition:border-color .2s;width:100%;}
+.aj-inp:focus{border-color:rgba(91,107,255,.4);}
+.aj-inp::placeholder{color:rgba(255,255,255,.2);}
+.aj-ta{height:100px;resize:vertical;}
+
+/* Resume upload */
+.aj-resume-area{border:2px dashed rgba(255,255,255,.12);border-radius:14px;padding:24px;text-align:center;transition:all .2s;cursor:pointer;}
+.aj-resume-area:hover{border-color:rgba(91,107,255,.35);background:rgba(91,107,255,.04);}
+.aj-resume-area.dragging{border-color:rgba(91,107,255,.5);background:rgba(91,107,255,.07);}
+.aj-resume-icon{font-size:32px;margin-bottom:8px;}
+.aj-resume-lbl{font-size:13.5px;color:rgba(255,255,255,.45);margin-bottom:4px;}
+.aj-resume-sub{font-size:12px;color:rgba(255,255,255,.22);}
+.aj-resume-name{font-size:13px;color:var(--green);margin-top:8px;font-weight:600;}
+
+/* Submit */
+.aj-submit{width:100%;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,var(--neon),#3a4aff);color:#fff;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 6px 24px rgba(91,107,255,.4);transition:all .2s;margin-top:4px;}
+.aj-submit:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(91,107,255,.55);}
+
+/* Flash */
+.aj-flash{padding:12px 18px;border-radius:12px;margin-bottom:18px;font-size:14px;background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.2);color:#ff5757;}
+
+@media(max-width:600px){.aj-row,.aj-row-3{grid-template-columns:1fr;}}
+</style>
+
+<div class="aj-page">
+<div class="aj-body">
+
+{% with msgs = get_flashed_messages() %}{% if msgs %}{% for m in msgs %}<div class="aj-flash">{{ m }}</div>{% endfor %}{% endif %}{% endwith %}
+
+<a href="/live-jobs" class="aj-back">← Back to Live Jobs</a>
+
+<!-- Job summary banner -->
+<div class="aj-job-banner">
+  <div class="aj-co-logo">🏢</div>
+  <div>
+    <div class="aj-job-title">{{ job.title }}</div>
+    <div class="aj-company">{{ job.company_name }}</div>
+    <div class="aj-job-tags">
+      <span class="aj-tag aj-tag-type">{{ job.job_type }}</span>
+      {% if job.ctc %}<span class="aj-tag aj-tag-ctc">💰 {{ job.ctc }}</span>{% endif %}
+      {% if job.deadline %}<span class="aj-tag aj-tag-dl">⏰ Deadline: {{ job.deadline.strftime('%b %d, %Y') }}</span>{% endif %}
+      {% if job.min_cgpa %}<span class="aj-tag" style="background:rgba(255,181,71,.07);border:1px solid rgba(255,181,71,.15);color:var(--amber)">📊 CGPA ≥ {{ job.min_cgpa }}</span>{% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="aj-form-title">📝 Application Form</div>
+<div class="aj-form-sub">Fill in your details carefully. All fields marked * are required.</div>
+
+<form method="POST" action="/live-jobs/{{ job.id }}/apply" enctype="multipart/form-data">
+
+  <!-- Personal Info -->
+  <div class="aj-card">
+    <div class="aj-section">👤 Personal Information</div>
+    <div class="aj-row">
+      <div class="aj-field" style="margin-bottom:0">
+        <label class="aj-label">Full Name *</label>
+        <input class="aj-inp" name="full_name" value="{{ user.name if user else '' }}" required>
+      </div>
+      <div class="aj-field" style="margin-bottom:0">
+        <label class="aj-label">Email Address *</label>
+        <input class="aj-inp" type="email" name="contact_email" value="{{ user.email if user else '' }}" required>
+      </div>
+    </div>
+    <div class="aj-field">
+      <label class="aj-label">Phone Number *</label>
+      <input class="aj-inp" name="phone" placeholder="+91 XXXXX XXXXX" required>
+    </div>
+  </div>
+
+  <!-- Academic Details -->
+  <div class="aj-card" style="animation-delay:.05s">
+    <div class="aj-section">🎓 Academic Details</div>
+    <div class="aj-row">
+      <div class="aj-field" style="margin-bottom:0">
+        <label class="aj-label">10th % *</label>
+        <input class="aj-inp" type="number" name="tenth_percent" step="0.01" min="0" max="100" placeholder="e.g. 85.5" required>
+      </div>
+      <div class="aj-field" style="margin-bottom:0">
+        <label class="aj-label">12th % *</label>
+        <input class="aj-inp" type="number" name="twelfth_percent" step="0.01" min="0" max="100" placeholder="e.g. 78.0" required>
+      </div>
+    </div>
+    <div class="aj-row" style="margin-top:13px">
+      <div class="aj-field" style="margin-bottom:0">
+        <label class="aj-label">CGPA *</label>
+        <input class="aj-inp" type="number" name="cgpa" step="0.01" min="0" max="10" placeholder="e.g. 8.5" required>
+      </div>
+      <div class="aj-field" style="margin-bottom:0">
+        <label class="aj-label">Batch / Passing Year *</label>
+        <input class="aj-inp" name="batch" placeholder="e.g. 2025, 2026" required>
+      </div>
+    </div>
+    <div class="aj-row" style="margin-top:13px">
+      <div class="aj-field" style="margin-bottom:0">
+        <label class="aj-label">Degree *</label>
+        <input class="aj-inp" name="degree" placeholder="e.g. B.Tech, MCA" required>
+      </div>
+      <div class="aj-field" style="margin-bottom:0">
+        <label class="aj-label">Stream / Branch *</label>
+        <input class="aj-inp" name="stream" placeholder="e.g. CSE, AIML, ECE" required>
+      </div>
+    </div>
+    <div class="aj-field" style="margin-top:13px">
+      <label class="aj-label">College / University Name *</label>
+      <input class="aj-inp" name="college" placeholder="e.g. IIT Delhi, VIT Vellore" required>
+    </div>
+    <div class="aj-field">
+      <label class="aj-label">School Name (12th)</label>
+      <input class="aj-inp" name="school_name" placeholder="e.g. Delhi Public School">
+    </div>
+  </div>
+
+  <!-- Skills & Motivation -->
+  <div class="aj-card" style="animation-delay:.08s">
+    <div class="aj-section">⚡ Skills & Motivation</div>
+    <div class="aj-field">
+      <label class="aj-label">Key Strengths / DSA Level *</label>
+      <textarea class="aj-inp aj-ta" name="strengths" placeholder="Describe your core strengths, DSA skills, projects, or anything that makes you stand out..." required></textarea>
+    </div>
+    <div class="aj-field">
+      <label class="aj-label">Why Should We Hire You?</label>
+      <textarea class="aj-inp aj-ta" name="why_hire" placeholder="Tell us why you're the best fit for this role..."></textarea>
+    </div>
+  </div>
+
+  <!-- Resume Upload -->
+  <div class="aj-card" style="animation-delay:.1s">
+    <div class="aj-section">📄 Resume Upload *</div>
+    <div class="aj-resume-area" id="resumeArea" onclick="document.getElementById('resumeInput').click()"
+         ondragover="this.classList.add('dragging');event.preventDefault()"
+         ondragleave="this.classList.remove('dragging')"
+         ondrop="handleDrop(event)">
+      <div class="aj-resume-icon">📎</div>
+      <div class="aj-resume-lbl">Click to upload or drag & drop your resume</div>
+      <div class="aj-resume-sub">PDF, DOC, DOCX — Max 5MB</div>
+      <div class="aj-resume-name" id="resumeNameDisplay"></div>
+    </div>
+    <input type="file" id="resumeInput" name="resume_file" accept=".pdf,.doc,.docx" style="display:none" onchange="showFileName(this)">
+  </div>
+
+  <button type="submit" class="aj-submit">🚀 Submit Application</button>
+</form>
+</div>
+</div>
+
+<script>
+function showFileName(input){
+  const f = input.files[0];
+  document.getElementById("resumeNameDisplay").textContent = f ? "📄 " + f.name : "";
+}
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById("resumeArea").classList.remove("dragging");
+  const files = e.dataTransfer.files;
+  if(files.length){
+    document.getElementById("resumeInput").files = files;
+    document.getElementById("resumeNameDisplay").textContent = "📄 " + files[0].name;
+  }
+}
+</script>
+{% endblock %}
