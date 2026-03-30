@@ -394,6 +394,23 @@ def register_socketio_events(socketio):
         if target_sid:
             emit("vc_ice_candidate", data, room=target_sid)
 
+    # ── MEDIA STATE (mic/cam on/off) broadcast ──
+    @socketio.on("vc_media_state")
+    def on_media_state(data):
+        room_code = data.get("room_code", "").upper()
+        user_id   = data.get("user_id")
+        mic       = data.get("mic", True)
+        cam       = data.get("cam", True)
+        # Update room state
+        room = svc.get_room(room_code)
+        if room and str(user_id) in room["participants"]:
+            room["participants"][str(user_id)]["muted"]     = not mic
+            room["participants"][str(user_id)]["video_off"] = not cam
+        # Broadcast to everyone else
+        emit("vc_media_state_update", {
+            "user_id": user_id, "mic": mic, "cam": cam
+        }, room=room_code, include_self=False)
+
     # ── CURSOR POSITION (show other users' cursors) ──
     @socketio.on("vc_cursor")
     def on_cursor(data):

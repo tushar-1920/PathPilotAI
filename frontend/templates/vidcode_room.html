@@ -7,213 +7,205 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.min.css">
 <style>
-:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;--red:#ff5757;--purple:#a855f7;--font-d:"Syne",sans-serif;--font-b:"DM Sans",sans-serif;--font-c:"JetBrains Mono",monospace;--topbar:52px;--side:310px;}
+:root{
+  --neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;
+  --red:#ff5757;--purple:#a855f7;--blue:#38bdf8;
+  --font-d:"Syne",sans-serif;--font-b:"DM Sans",sans-serif;--font-c:"JetBrains Mono",monospace;
+  --topbar:52px;--side:320px;--video-w:230px;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{background:#080810!important;color:#fff!important;font-family:var(--font-b);height:100%;overflow:hidden;}
-
+html,body{background:#070711!important;color:#fff!important;font-family:var(--font-b);height:100%;overflow:hidden;}
 /* ── TOPBAR ── */
-.vc-topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar);z-index:200;background:rgba(8,8,16,.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:0;padding:0;}
-.vc-tb-brand{padding:0 18px;display:flex;align-items:center;gap:10px;border-right:1px solid rgba(255,255,255,.07);}
+.vc-topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar);z-index:200;background:rgba(7,7,17,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:0;padding:0;}
+.vc-tb-brand{padding:0 16px;display:flex;align-items:center;gap:9px;border-right:1px solid rgba(255,255,255,.07);}
 .vc-tb-logo{font-family:var(--font-d);font-size:17px;font-weight:800;letter-spacing:-.5px;}
 .vc-tb-logo .v{color:#fff;}.vc-tb-logo .c{color:var(--cyan);}
-.vc-tb-room-code{font-family:var(--font-c);font-size:13px;font-weight:700;color:rgba(0,229,200,.8);background:rgba(0,229,200,.08);border:1px solid rgba(0,229,200,.18);padding:4px 12px;border-radius:8px;letter-spacing:2px;cursor:pointer;transition:all .2s;}
-.vc-tb-room-code:hover{background:rgba(0,229,200,.15);}
-.vc-tb-title{font-size:13.5px;color:rgba(255,255,255,.45);padding:0 16px;border-right:1px solid rgba(255,255,255,.07);}
+.vc-room-pill{display:flex;align-items:center;gap:8px;padding:0 16px;border-right:1px solid rgba(255,255,255,.07);}
+.vc-room-code{font-family:var(--font-c);font-size:13px;font-weight:700;color:rgba(0,229,200,.85);background:rgba(0,229,200,.08);border:1px solid rgba(0,229,200,.18);padding:4px 13px;border-radius:8px;letter-spacing:2px;cursor:pointer;transition:all .2s;}
+.vc-room-code:hover{background:rgba(0,229,200,.16);}
+.vc-tb-title{font-size:13px;color:rgba(255,255,255,.4);padding:0 14px;border-right:1px solid rgba(255,255,255,.07);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .vc-tb-spacer{flex:1;}
-/* Lang selector */
-.vc-lang-sel{display:flex;align-items:center;gap:8px;padding:0 14px;border-right:1px solid rgba(255,255,255,.07);}
-.vc-lang-select{background:#0d0d1e;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px 12px;color:#fff;font-family:var(--font-b);font-size:13px;font-weight:600;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;}
-.vc-lang-select option{background:#0d0d1e;color:#fff;}
+.vc-live-badge{display:flex;align-items:center;gap:6px;padding:4px 12px;border-radius:100px;background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.2);font-size:11px;font-weight:700;color:var(--red);margin-right:8px;}
+.vc-live-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:livePulse 1.5s infinite;}
+@keyframes livePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,87,87,.5)}50%{box-shadow:0 0 0 5px rgba(255,87,87,0)}}
+.vc-lang-sel{display:flex;align-items:center;gap:7px;padding:0 12px;border-right:1px solid rgba(255,255,255,.07);}
+.vc-lang-select{background:#0d0d20;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:6px 11px;color:#fff;font-family:var(--font-b);font-size:13px;font-weight:600;outline:none;cursor:pointer;-webkit-appearance:none;}
+.vc-lang-select option{background:#0d0d20;color:#fff;}
 .vc-lang-select:disabled{opacity:.4;}
-/* Controls */
-.vc-tb-controls{display:flex;align-items:center;gap:8px;padding:0 14px;}
-.vc-ctrl-btn{width:36px;height:36px;border-radius:9px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;transition:all .2s;position:relative;}
+.vc-tb-controls{display:flex;align-items:center;gap:7px;padding:0 12px;}
+.vc-ctrl-btn{width:36px;height:36px;border-radius:9px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;transition:all .2s;}
 .vc-ctrl-btn:hover{background:rgba(255,255,255,.12);}
-.vc-ctrl-btn.active{background:rgba(255,87,87,.15);border-color:rgba(255,87,87,.3);}
 .vc-ctrl-btn.locked{background:rgba(255,181,71,.12);border-color:rgba(255,181,71,.25);}
 .vc-run-btn{display:flex;align-items:center;gap:7px;padding:8px 20px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--green),#16a34a);color:#fff;font-family:var(--font-b);font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(34,197,94,.3);transition:all .2s;}
 .vc-run-btn:hover{transform:translateY(-1px);box-shadow:0 7px 22px rgba(34,197,94,.45);}
 .vc-run-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
-.vc-run-btn.running{background:rgba(255,181,71,.2);border:1px solid rgba(255,181,71,.3);box-shadow:none;color:var(--amber);}
-.vc-end-btn{padding:8px 16px;border-radius:9px;border:1px solid rgba(255,87,87,.3);background:rgba(255,87,87,.1);color:rgba(255,87,87,.8);font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
-.vc-end-btn:hover{background:rgba(255,87,87,.2);}
-
-
+.vc-run-btn.running{background:rgba(255,181,71,.18);border:1px solid rgba(255,181,71,.3);box-shadow:none;color:var(--amber);}
+.vc-end-btn{padding:8px 16px;border-radius:9px;border:1px solid rgba(255,87,87,.3);background:rgba(255,87,87,.1);color:rgba(255,87,87,.85);font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.vc-end-btn:hover{background:rgba(255,87,87,.22);}
 /* ── SHARE BANNER ── */
-.vc-share-banner{position:fixed;top:var(--topbar);left:0;right:0;height:36px;z-index:150;background:rgba(0,0,0,.9);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,229,200,.12);display:flex;align-items:center;gap:12px;padding:0 18px;}
+.vc-share-banner{position:fixed;top:var(--topbar);left:0;right:0;height:34px;z-index:150;background:rgba(0,0,0,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,229,200,.1);display:flex;align-items:center;gap:12px;padding:0 18px;}
 /* ── MAIN LAYOUT ── */
-.vc-layout{position:fixed;top:calc(var(--topbar) + 36px);left:0;right:0;bottom:0;display:flex;}
-
-/* ── VIDEO PANEL (left) ── */
-.vc-video-panel{width:240px;background:#0a0a14;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
-.vc-video-grid{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;}
-.vc-vid-tile{border-radius:12px;background:linear-gradient(135deg,rgba(91,107,255,.15),rgba(0,229,200,.08));border:1px solid rgba(255,255,255,.07);position:relative;overflow:hidden;aspect-ratio:4/3;}
-.vc-vid-tile.speaking{border-color:var(--green);box-shadow:0 0 14px rgba(34,197,94,.3);}
-.vc-vid-tile video{width:100%;height:100%;object-fit:cover;border-radius:11px;}
-.vc-vid-tile .no-video{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:24px;font-weight:800;color:rgba(255,255,255,.6);}
-.vc-vid-name{position:absolute;bottom:6px;left:7px;right:7px;font-size:10.5px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.vc-vid-badges{position:absolute;top:6px;right:6px;display:flex;gap:4px;}
-.vc-vid-badge{width:20px;height:20px;border-radius:6px;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font-size:9px;}
-.vc-vid-role{position:absolute;top:6px;left:6px;padding:2px 7px;border-radius:100px;font-size:9px;font-weight:700;}
-.vc-vid-role.host{background:rgba(255,181,71,.8);color:#000;}
-.vc-vid-role.me{background:rgba(91,107,255,.8);color:#fff;}
-/* Video controls at bottom */
-.vc-video-controls{padding:10px;border-top:1px solid rgba(255,255,255,.07);display:flex;justify-content:center;gap:8px;}
-.vc-v-btn{width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;}
-.vc-v-btn:hover{background:rgba(255,255,255,.12);}
-.vc-v-btn.off{background:rgba(255,87,87,.15);border-color:rgba(255,87,87,.3);}
-
-/* ── EDITOR PANEL (center) ── */
+.vc-layout{position:fixed;top:calc(var(--topbar) + 34px);left:0;right:0;bottom:0;display:flex;}
+/* ── VIDEO PANEL ── */
+.vc-video-panel{width:var(--video-w);background:#080812;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+.vc-video-grid{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:7px;}
+.vc-vid-tile{border-radius:13px;background:linear-gradient(135deg,rgba(91,107,255,.12),rgba(0,229,200,.06));border:2px solid rgba(255,255,255,.07);position:relative;overflow:hidden;aspect-ratio:4/3;transition:border-color .25s,box-shadow .25s;flex-shrink:0;}
+.vc-vid-tile.speaking{border-color:var(--green)!important;box-shadow:0 0 0 2px rgba(34,197,94,.35),0 0 18px rgba(34,197,94,.2);}
+.vc-vid-tile.cam-off{background:linear-gradient(135deg,#0d0d20,#0a0a18);}
+.vc-vid-tile video{width:100%;height:100%;object-fit:cover;border-radius:11px;display:block;}
+.no-vid-av{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.vc-no-vid-circle{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,rgba(91,107,255,.4),rgba(0,229,200,.2));display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:20px;font-weight:800;color:#fff;overflow:hidden;border:2px solid rgba(255,255,255,.15);}
+.vc-no-vid-circle img{width:100%;height:100%;object-fit:cover;}
+.vc-vid-name{position:absolute;bottom:0;left:0;right:0;padding:18px 8px 7px;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 100%);font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.vc-vid-status{position:absolute;top:6px;right:6px;display:flex;gap:3px;}
+.vc-vid-status-icon{width:20px;height:20px;border-radius:6px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;font-size:9px;border:1px solid rgba(255,255,255,.08);transition:all .2s;}
+.vc-vid-status-icon.muted{background:rgba(255,87,87,.4);border-color:rgba(255,87,87,.5);}
+.vc-vid-status-icon.cam-muted{background:rgba(255,87,87,.4);border-color:rgba(255,87,87,.5);}
+.vc-vid-role{position:absolute;top:6px;left:6px;padding:2px 8px;border-radius:100px;font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;}
+.vc-vid-role.host{background:rgba(255,181,71,.85);color:#000;}
+.vc-vid-role.me{background:rgba(91,107,255,.85);color:#fff;}
+.vc-connecting-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);font-size:11px;color:rgba(255,255,255,.5);flex-direction:column;gap:6px;border-radius:11px;}
+/* Video controls */
+.vc-video-controls{padding:10px 8px;border-top:1px solid rgba(255,255,255,.07);display:flex;justify-content:center;gap:10px;background:#080812;}
+.vc-v-btn-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.vc-v-btn{width:40px;height:40px;border-radius:11px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;transition:all .2s;position:relative;}
+.vc-v-btn:hover{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.2);}
+.vc-v-btn.off{background:rgba(255,87,87,.18);border-color:rgba(255,87,87,.4);}
+.vc-v-btn.off::after{content:"";position:absolute;width:2px;height:22px;background:var(--red);border-radius:1px;transform:rotate(45deg);pointer-events:none;}
+.vc-v-btn-label{font-size:9px;color:rgba(255,255,255,.3);text-align:center;font-weight:600;}
+/* ── EDITOR PANEL ── */
 .vc-editor-panel{flex:1;display:flex;flex-direction:column;min-width:0;position:relative;}
-.vc-editor-header{height:38px;background:#0d0d1e;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;}
+.vc-editor-header{height:38px;background:#0c0c1e;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;}
 .vc-editor-tab{font-family:var(--font-c);font-size:12px;color:rgba(255,255,255,.5);padding:4px 14px;border-radius:6px 6px 0 0;border:1px solid rgba(255,255,255,.08);border-bottom:none;background:rgba(255,255,255,.04);}
 .vc-editor-tab.active{color:#fff;background:rgba(91,107,255,.12);border-color:rgba(91,107,255,.2);}
 .vc-editor-status{margin-left:auto;font-family:var(--font-c);font-size:11px;color:rgba(255,255,255,.25);}
 #monacoEditor{flex:1;min-height:0;}
-
-/* Cursor overlays */
-.vc-cursor-label{position:absolute;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:700;pointer-events:none;z-index:50;white-space:nowrap;}
-
-/* ── OUTPUT PANEL (bottom of editor) ── */
-.vc-output-panel{height:180px;background:#060610;border-top:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;flex-shrink:0;}
+.vc-output-panel{height:175px;background:#050510;border-top:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;flex-shrink:0;}
 .vc-output-header{height:34px;display:flex;align-items:center;padding:0 14px;gap:10px;border-bottom:1px solid rgba(255,255,255,.07);}
 .vc-output-title{font-family:var(--font-c);font-size:11.5px;color:rgba(255,255,255,.4);font-weight:700;}
 .vc-output-badge{padding:2px 8px;border-radius:100px;font-size:9.5px;font-weight:700;}
 .vc-output-badge.success{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.25);color:var(--green);}
 .vc-output-badge.error{background:rgba(255,87,87,.12);border:1px solid rgba(255,87,87,.2);color:var(--red);}
 .vc-output-badge.running{background:rgba(255,181,71,.1);border:1px solid rgba(255,181,71,.2);color:var(--amber);}
-.vc-output-badge.info{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);color:#38bdf8;}
+.vc-output-badge.info{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);color:var(--blue);}
 .vc-output-body{flex:1;overflow-y:auto;padding:10px 16px;}
 .vc-output-body pre{font-family:var(--font-c);font-size:12.5px;color:rgba(255,255,255,.65);line-height:1.7;white-space:pre-wrap;word-break:break-all;}
 .vc-output-body pre.error-out{color:var(--red);}
-
-/* ── SIDE PANEL (right) ── */
-.vc-side-panel{width:var(--side);background:#0a0a14;border-left:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;flex-shrink:0;}
+/* ── SIDE PANEL ── */
+.vc-side-panel{width:var(--side);background:#080812;border-left:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;flex-shrink:0;}
 .vc-side-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.07);}
 .vc-side-tab{flex:1;padding:11px 0;text-align:center;font-size:12px;font-weight:600;color:rgba(255,255,255,.35);cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;}
+.vc-side-tab:hover{color:rgba(255,255,255,.65);}
 .vc-side-tab.active{color:#fff;border-bottom-color:var(--cyan);}
 .vc-side-content{flex:1;overflow:hidden;display:flex;flex-direction:column;}
-
-/* Participants tab */
 .vc-participants-list{flex:1;overflow-y:auto;padding:10px;}
-.vc-participant-row{display:flex;align-items:center;gap:10px;padding:10px 10px;border-radius:11px;margin-bottom:6px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);transition:border-color .2s;}
+.vc-participant-row{display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;margin-bottom:6px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);transition:all .2s;}
 .vc-participant-row:hover{border-color:rgba(255,255,255,.12);}
+.vc-participant-row.speaking-row{border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.03);}
 .vc-p-av{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,rgba(91,107,255,.3),rgba(0,229,200,.15));display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:13px;font-weight:800;flex-shrink:0;overflow:hidden;}
 .vc-p-av img{width:100%;height:100%;object-fit:cover;}
 .vc-p-name{font-size:13px;font-weight:600;color:#fff;margin-bottom:2px;}
 .vc-p-role{font-size:10.5px;}
-.vc-p-role.host{color:var(--amber);}
-.vc-p-role.can-code{color:var(--green);}
-.vc-p-role.viewer{color:rgba(255,255,255,.3);}
-.vc-p-actions{margin-left:auto;display:flex;gap:5px;}
+.vc-p-role.host{color:var(--amber);}.vc-p-role.can-code{color:var(--green);}.vc-p-role.viewer{color:rgba(255,255,255,.3);}
+.vc-p-status{display:flex;gap:4px;margin-left:auto;align-items:center;}
+.vc-p-status-icon{font-size:12px;opacity:.35;transition:opacity .2s;}
+.vc-p-status-icon.active-icon{opacity:1;}
+.vc-p-status-icon.off-icon{opacity:1;filter:hue-rotate(180deg);}
+.vc-p-actions{display:flex;gap:4px;margin-left:4px;}
 .vc-p-btn{width:26px;height:26px;border-radius:7px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;transition:all .2s;}
 .vc-p-btn:hover{background:rgba(255,255,255,.1);}
 .vc-p-btn.grant{border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.06);}
 .vc-p-btn.revoke{border-color:rgba(255,87,87,.25);background:rgba(255,87,87,.06);}
 .vc-p-btn.kick{border-color:rgba(255,87,87,.2);background:rgba(255,87,87,.04);}
-
-/* Chat tab */
-.vc-chat-messages{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px;}
-.vc-chat-msg{animation:fadeIn .25s ease both;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.vc-chat-messages{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:7px;}
+.vc-chat-msg{animation:fadeIn .2s ease both;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 .vc-chat-msg.system{text-align:center;}
 .vc-chat-msg.system .vc-cm-text{font-size:11px;color:rgba(255,255,255,.25);font-style:italic;}
 .vc-cm-header{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
-.vc-cm-name{font-size:12px;font-weight:700;color:rgba(255,255,255,.65);}
+.vc-cm-name{font-size:12px;font-weight:700;}
 .vc-cm-time{font-size:10.5px;color:rgba(255,255,255,.2);}
-.vc-cm-text{font-size:13px;color:rgba(255,255,255,.6);line-height:1.6;word-break:break-word;}
+.vc-cm-text{font-size:13px;color:rgba(255,255,255,.65);line-height:1.6;word-break:break-word;}
 .vc-chat-input-wrap{padding:10px 12px;border-top:1px solid rgba(255,255,255,.07);display:flex;gap:8px;}
 .vc-chat-inp{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:9px 12px;color:#fff;font-family:var(--font-b);font-size:13px;outline:none;transition:border-color .2s;}
 .vc-chat-inp:focus{border-color:rgba(0,229,200,.3);}
-.vc-chat-inp::placeholder{color:rgba(255,255,255,.2);}
-.vc-chat-send{width:34px;height:34px;border-radius:9px;border:none;background:rgba(0,229,200,.1);border:1px solid rgba(0,229,200,.2);color:rgba(0,229,200,.8);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:14px;}
+.vc-chat-inp::placeholder{color:rgba(255,255,255,.22);}
+.vc-chat-send{width:34px;height:34px;border-radius:9px;border:1px solid rgba(0,229,200,.22);background:rgba(0,229,200,.1);color:rgba(0,229,200,.85);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:14px;flex-shrink:0;}
 .vc-chat-send:hover{background:rgba(0,229,200,.2);}
-
-/* Typing indicator */
-.vc-typing-ind{font-size:11px;color:rgba(255,255,255,.25);font-style:italic;padding:0 12px 6px;min-height:20px;}
-
-/* ── OVERLAYS ── */
-.vc-kicked-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.95);display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.vc-typing-ind{font-size:11px;color:rgba(255,255,255,.28);font-style:italic;padding:0 12px 6px;min-height:20px;}
+.vc-kicked-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.97);display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
 .vc-kicked-overlay.show{display:flex;}
-.vc-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);z-index:9999;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;color:#fff;opacity:0;transition:all .3s;white-space:nowrap;}
+.vc-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);z-index:9999;padding:11px 22px;border-radius:12px;font-size:14px;font-weight:600;color:#fff;opacity:0;transition:all .28s;white-space:nowrap;pointer-events:none;}
 .vc-toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
-.vc-toast-ok{background:rgba(34,197,94,.9);}
-.vc-toast-err{background:rgba(255,87,87,.9);}
-.vc-toast-info{background:rgba(91,107,255,.9);}
-
-/* Scrollbars */
+.vc-toast-ok{background:rgba(34,197,94,.92);}
+.vc-toast-err{background:rgba(255,87,87,.92);}
+.vc-toast-info{background:rgba(91,107,255,.92);}
+@keyframes spin{to{transform:rotate(360deg)}}
+.vc-spin{width:14px;height:14px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;}
+.vc-spin-sm{width:18px;height:18px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite;}
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
-
-@keyframes spin{to{transform:rotate(360deg)}}
-.vc-spin{width:14px;height:14px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;}
 </style>
 
-<!-- Socket.IO + Monaco -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
-
 </head>
 <body>
+
 <div class="vc-topbar">
   <div class="vc-tb-brand">
     <div class="vc-tb-logo"><span class="v">Vid</span><span class="c">Code</span></div>
-    <div style="display:flex;align-items:center;gap:8px;border-right:1px solid rgba(255,255,255,.07);padding:0 16px;">
-    <span style="font-size:11px;color:rgba(255,255,255,.3);font-weight:600;text-transform:uppercase;letter-spacing:1px;">Room:</span>
-    <div class="vc-tb-room-code" onclick="copyCode()" title="Click to copy — Share this code with others to join">
-      📋 {{ room.room_code }}
-    </div>
-    <span style="font-size:10.5px;color:rgba(255,255,255,.2);">click to copy</span>
   </div>
+  <div class="vc-room-pill">
+    <span style="font-size:11px;color:rgba(255,255,255,.3);font-weight:600;text-transform:uppercase;letter-spacing:1px">Room:</span>
+    <div class="vc-room-code" onclick="copyCode()" title="Click to copy">📋 {{ room.room_code }}</div>
+    <span style="font-size:11px;color:rgba(255,255,255,.25)">click to copy</span>
   </div>
-  <div class="vc-tb-title" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ room.title }}</div>
+  <div class="vc-tb-title">{{ room.title }}</div>
   <div class="vc-tb-spacer"></div>
-
-  <!-- Language selector -->
+  <div class="vc-live-badge"><div class="vc-live-dot"></div>LIVE</div>
   <div class="vc-lang-sel">
     <span style="font-size:12px;color:rgba(255,255,255,.3)">Lang:</span>
-    <select class="vc-lang-select" id="langSelect" onchange="changeLanguage(this.value)"
-            {% if not is_host %}disabled{% endif %}>
+    <select class="vc-lang-select" id="langSelect" onchange="changeLanguage(this.value)" {% if not is_host %}disabled{% endif %}>
       {% for key, cfg in languages.items() %}
       <option value="{{ key }}" {% if key == room.language %}selected{% endif %}>{{ cfg.icon }} {{ cfg.label }}</option>
       {% endfor %}
     </select>
   </div>
-
-  <!-- Controls -->
   <div class="vc-tb-controls">
-    {% if is_host %}
-    <div class="vc-ctrl-btn" id="lockBtn" onclick="toggleLock()" title="Lock/unlock editor">🔓</div>
-    {% endif %}
-    <button class="vc-run-btn" id="runBtn" onclick="runCode()" style="padding:9px 24px;font-size:14px;">▶ Run Code</button>
+    {% if is_host %}<div class="vc-ctrl-btn" id="lockBtn" onclick="toggleLock()" title="Lock/unlock editor">🔓</div>{% endif %}
+    <button class="vc-run-btn" id="runBtn" onclick="runCode()">▶ Run Code</button>
     <button class="vc-end-btn" onclick="endSession()">✕ Leave</button>
   </div>
 </div>
 
 <div class="vc-share-banner" id="shareBanner">
-  <span style="font-size:13px;color:rgba(255,255,255,.5);">🔗 Invite others:</span>
-  <span style="font-family:var(--font-c);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:2px;background:rgba(0,229,200,.08);border:1px solid rgba(0,229,200,.18);padding:3px 14px;border-radius:7px;cursor:pointer;" onclick="copyCode()">{{ room.room_code }}</span>
-  <span style="font-size:12px;color:rgba(255,255,255,.3);">Share this code so others can join · <a href="/vidcode" style="color:rgba(91,107,255,.7);text-decoration:none;">vidcode home</a></span>
-  <button onclick="document.getElementById('shareBanner').style.display='none'" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:16px;">×</button>
+  <span style="font-size:12.5px;color:rgba(255,255,255,.4)">🔗 Invite:</span>
+  <span style="font-family:var(--font-c);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:2px;background:rgba(0,229,200,.07);border:1px solid rgba(0,229,200,.16);padding:3px 13px;border-radius:7px;cursor:pointer" onclick="copyCode()">{{ room.room_code }}</span>
+  <span style="font-size:12px;color:rgba(255,255,255,.3)">Share this code to join · <a href="/vidcode" style="color:rgba(91,107,255,.7);text-decoration:none">vidcode home</a></span>
+  <button onclick="document.getElementById('shareBanner').style.display='none'" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:16px">×</button>
 </div>
 
-<!-- MAIN LAYOUT -->
 <div class="vc-layout">
-
   <!-- VIDEO PANEL -->
   <div class="vc-video-panel">
-    <div class="vc-video-grid" id="videoGrid">
-      <!-- Populated by JS -->
-    </div>
-    <!-- My controls -->
+    <div class="vc-video-grid" id="videoGrid"></div>
     <div class="vc-video-controls">
-      <div class="vc-v-btn" id="micBtn" onclick="toggleMic()" title="Toggle mic">🎤</div>
-      <div class="vc-v-btn" id="camBtn" onclick="toggleCam()" title="Toggle camera">📷</div>
-      <div class="vc-v-btn" onclick="toggleFullscreen()" title="Fullscreen">⛶</div>
+      <div class="vc-v-btn-wrap">
+        <div class="vc-v-btn" id="micBtn" onclick="toggleMic()" title="Toggle microphone">🎤</div>
+        <div class="vc-v-btn-label" id="micLabel">Mute</div>
+      </div>
+      <div class="vc-v-btn-wrap">
+        <div class="vc-v-btn" id="camBtn" onclick="toggleCam()" title="Toggle camera">📷</div>
+        <div class="vc-v-btn-label" id="camLabel">Stop</div>
+      </div>
+      <div class="vc-v-btn-wrap">
+        <div class="vc-v-btn" onclick="toggleFullscreen()" title="Fullscreen">⛶</div>
+        <div class="vc-v-btn-label">Full</div>
+      </div>
     </div>
   </div>
-
   <!-- EDITOR PANEL -->
   <div class="vc-editor-panel" style="display:flex;flex-direction:column;">
     <div class="vc-editor-header">
@@ -221,643 +213,579 @@ html,body{background:#080810!important;color:#fff!important;font-family:var(--fo
       <div class="vc-editor-status" id="editorStatus"></div>
     </div>
     <div id="monacoEditor" style="flex:1;min-height:0;"></div>
-
-    <!-- OUTPUT -->
     <div class="vc-output-panel">
       <div class="vc-output-header">
         <div class="vc-output-title">▶ OUTPUT</div>
         <div class="vc-output-badge" id="outputBadge" style="display:none"></div>
-        <div style="margin-left:auto;font-size:11px;color:rgba(255,255,255,.2);" id="outputLang"></div>
+        <div style="margin-left:auto;font-size:11px;color:rgba(255,255,255,.2)" id="outputLang"></div>
       </div>
-      <div class="vc-output-body" id="outputBody">
-        <pre>Run your code to see output here...</pre>
-      </div>
+      <div class="vc-output-body" id="outputBody"><pre>Run your code to see output here...</pre></div>
     </div>
   </div>
-
   <!-- SIDE PANEL -->
   <div class="vc-side-panel">
     <div class="vc-side-tabs">
       <div class="vc-side-tab active" id="tab-participants" onclick="switchTab('participants')">
-        👥 People <span id="pCount" style="font-size:10px;background:rgba(91,107,255,.2);padding:1px 6px;border-radius:100px;margin-left:3px;">{{ room.participants|length }}</span>
+        👥 People <span id="pCount" style="font-size:10px;background:rgba(91,107,255,.2);padding:1px 6px;border-radius:100px;margin-left:3px">{{ room.participants|length }}</span>
       </div>
       <div class="vc-side-tab" id="tab-chat" onclick="switchTab('chat')">
         💬 Chat <span id="unreadBadge" style="display:none;font-size:10px;background:rgba(0,229,200,.2);padding:1px 6px;border-radius:100px;margin-left:3px;color:var(--cyan)">0</span>
       </div>
     </div>
     <div class="vc-side-content">
-      <!-- Participants -->
       <div id="panel-participants" class="vc-participants-list"></div>
-      <!-- Chat -->
-      <div id="panel-chat" style="display:none;flex:1;overflow:hidden;flex-direction:column;display:none">
+      <div id="panel-chat" style="display:none;flex:1;flex-direction:column;overflow:hidden">
         <div class="vc-chat-messages" id="chatMessages"></div>
         <div class="vc-typing-ind" id="typingInd"></div>
         <div class="vc-chat-input-wrap">
-          <input class="vc-chat-inp" id="chatInp" placeholder="Message..."
-                 onkeydown="if(event.key==='Enter')sendChat()"
-                 oninput="sendTyping()">
+          <input class="vc-chat-inp" id="chatInp" placeholder="Message..." onkeydown="if(event.key==='Enter')sendChat()" oninput="sendTyping()">
           <button class="vc-chat-send" onclick="sendChat()">➤</button>
         </div>
       </div>
     </div>
   </div>
-
 </div>
 
-<!-- KICKED OVERLAY -->
 <div class="vc-kicked-overlay" id="kickedOverlay">
   <div style="font-size:52px;margin-bottom:16px">🚫</div>
   <div style="font-family:var(--font-d);font-size:28px;font-weight:800;color:#fff;margin-bottom:8px">Removed</div>
   <div style="font-size:15px;color:rgba(255,255,255,.4);margin-bottom:24px">You were removed from this session by the host.</div>
-  <a href="/vidcode" style="padding:12px 28px;border-radius:11px;background:rgba(255,255,255,.08);color:#fff;text-decoration:none;font-weight:600;">← Back to VidCode</a>
+  <a href="/vidcode" style="padding:12px 28px;border-radius:11px;background:rgba(255,255,255,.08);color:#fff;text-decoration:none;font-weight:600">← Back to VidCode</a>
 </div>
-
 <div id="vcToast" class="vc-toast"></div>
 
 <script>
-// ══════════════════════════════════════════════════════════════
-//  CONFIG
-// ══════════════════════════════════════════════════════════════
-const ROOM_CODE   = "{{ room.room_code }}";
-const MY_ID       = parseInt("{{ user_id }}") || 0;
-const MY_NAME     = "{{ user_name }}";
-const MY_IMAGE    = "{{ user_image }}";
-const IS_HOST     = {{ "true" if is_host else "false" }};
-const HOST_ID     = parseInt("{{ room.host_id }}") || 0;
-const INIT_CODE   = {{ room.code | tojson }};
-const INIT_LANG   = "{{ room.language }}";
-const INIT_CHAT   = {{ room.chat | tojson }};
-const INIT_PARTS  = {{ room.participants | tojson }};
-const LANG_EXTS   = {python:"py",javascript:"js",java:"java",cpp:"cpp",typescript:"ts",go:"go",rust:"rs",sql:"sql"};
+const ROOM_CODE = "{{ room.room_code }}";
+const MY_ID     = parseInt("{{ user_id }}") || 0;
+const MY_NAME   = "{{ user_name }}";
+const MY_IMAGE  = "{{ user_image }}";
+const IS_HOST   = {{ "true" if is_host else "false" }};
+const HOST_ID   = parseInt("{{ room.host_id }}") || 0;
+const INIT_CODE = {{ room.code | tojson }};
+const INIT_LANG = "{{ room.language }}";
+const INIT_CHAT = {{ room.chat | tojson }};
+const INIT_PARTS= {{ room.participants | tojson }};
+const LANG_EXTS = {python:"py",javascript:"js",java:"java",cpp:"cpp",typescript:"ts",go:"go",rust:"rs",sql:"sql"};
 
-let editor, socket, monacoLang;
-let myStream = null, peers = {}, localMicOn = true, localCamOn = true;
-let isLocked = {{ "true" if room.locked else "false" }};
-let currentTab = "participants";
-let typingTimer = null, unreadCount = 0;
+// STUN + TURN servers for cross-network video
+const ICE_SERVERS = [
+  {urls:"stun:stun.l.google.com:19302"},
+  {urls:"stun:stun1.l.google.com:19302"},
+  {urls:"stun:stun2.l.google.com:19302"},
+  {urls:"stun:stun3.l.google.com:19302"},
+  {urls:"stun:stun4.l.google.com:19302"},
+  {urls:"turn:openrelay.metered.ca:80",        username:"openrelayproject",credential:"openrelayproject"},
+  {urls:"turn:openrelay.metered.ca:443",       username:"openrelayproject",credential:"openrelayproject"},
+  {urls:"turn:openrelay.metered.ca:443?transport=tcp",username:"openrelayproject",credential:"openrelayproject"},
+];
+
+let editor, socket;
+let myStream     = null;
+let peers        = {};        // remoteSid -> RTCPeerConnection
+let peerStreams   = {};        // remoteSid -> MediaStream
+let localMicOn   = true;
+let localCamOn   = true;
+let isLocked     = {{ "true" if room.locked else "false" }};
+let currentTab   = "participants";
+let unreadCount  = 0;
 let suppressCodeEvent = false;
+let participants = [...INIT_PARTS];
 
-// ══════════════════════════════════════════════════════════════
-//  MONACO EDITOR
-// ══════════════════════════════════════════════════════════════
-require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs" }});
+// ── MONACO ─────────────────────────────────────────────────
+require.config({paths:{vs:"https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs"}});
 require(["vs/editor/editor.main"], function() {
-  // Dark theme
-  monaco.editor.defineTheme("vidcode", {
-    base: "vs-dark", inherit: true,
-    rules: [
-      {token:"comment", foreground:"4a5568", fontStyle:"italic"},
-      {token:"keyword", foreground:"818cf8"},
-      {token:"string",  foreground:"ffb547"},
-      {token:"number",  foreground:"22c55e"},
-    ],
-    colors: {
-      "editor.background":           "#080810",
-      "editor.lineHighlightBackground": "#0d0d20",
-      "editorLineNumber.foreground": "#2d3748",
-      "editorCursor.foreground":     "#00e5c8",
-      "editor.selectionBackground":  "#5b6bff33",
-    }
+  monaco.editor.defineTheme("vidcode",{
+    base:"vs-dark",inherit:true,
+    rules:[{token:"comment",foreground:"4a5568",fontStyle:"italic"},{token:"keyword",foreground:"818cf8"},
+           {token:"string",foreground:"ffb547"},{token:"number",foreground:"22c55e"}],
+    colors:{"editor.background":"#080811","editor.lineHighlightBackground":"#0d0d20",
+             "editorLineNumber.foreground":"#2d3748","editorCursor.foreground":"#00e5c8",
+             "editor.selectionBackground":"#5b6bff33"}
   });
-
-  monacoLang = INIT_LANG === "cpp" ? "cpp" :
-               INIT_LANG === "typescript" ? "typescript" :
-               INIT_LANG === "javascript" ? "javascript" :
-               INIT_LANG === "java" ? "java" :
-               INIT_LANG === "go" ? "go" :
-               INIT_LANG === "rust" ? "rust" :
-               INIT_LANG === "sql" ? "sql" : "python";
-
-  editor = monaco.editor.create(document.getElementById("monacoEditor"), {
-    value:            INIT_CODE,
-    language:         monacoLang,
-    theme:            "vidcode",
-    fontSize:         14,
-    fontFamily:       "JetBrains Mono, monospace",
-    fontLigatures:    true,
-    lineNumbers:      "on",
-    minimap:          {enabled: true},
-    scrollBeyondLastLine: false,
-    wordWrap:         "off",
-    automaticLayout:  true,
-    renderLineHighlight: "line",
-    smoothScrolling:  true,
-    cursorBlinking:   "smooth",
-    cursorSmoothCaretAnimation: "on",
-    suggestOnTriggerCharacters: true,
-    quickSuggestions: true,
-    bracketPairColorization: {enabled: true},
-    readOnly:         !IS_HOST && !canCode(),
+  const ml={cpp:"cpp",typescript:"typescript",javascript:"javascript",java:"java",go:"go",rust:"rust",sql:"sql"}[INIT_LANG]||"python";
+  editor = monaco.editor.create(document.getElementById("monacoEditor"),{
+    value:INIT_CODE,language:ml,theme:"vidcode",fontSize:14,fontFamily:"JetBrains Mono, monospace",
+    fontLigatures:true,lineNumbers:"on",minimap:{enabled:true},scrollBeyondLastLine:false,
+    wordWrap:"off",automaticLayout:true,renderLineHighlight:"line",smoothScrolling:true,
+    cursorBlinking:"smooth",cursorSmoothCaretAnimation:"on",suggestOnTriggerCharacters:true,
+    quickSuggestions:true,bracketPairColorization:{enabled:true},readOnly:!IS_HOST&&!canCode(),
   });
-
-  // Sync code on change
   editor.onDidChangeModelContent(() => {
     if (suppressCodeEvent) return;
-    const code = editor.getValue();
-    const pos  = editor.getPosition();
-    socket.emit("vc_code_change", {
-      room_code: ROOM_CODE, code, language: currentLang(),
-      user_id: MY_ID, cursor: pos,
-    });
+    socket.emit("vc_code_change",{room_code:ROOM_CODE,code:editor.getValue(),language:currentLang(),user_id:MY_ID,cursor:editor.getPosition()});
   });
-
-  // Cursor position broadcast
   editor.onDidChangeCursorPosition(e => {
-    socket.emit("vc_cursor", {
-      room_code: ROOM_CODE, user_id: MY_ID, user_name: MY_NAME,
-      line: e.position.lineNumber, col: e.position.column,
-    });
+    socket.emit("vc_cursor",{room_code:ROOM_CODE,user_id:MY_ID,user_name:MY_NAME,line:e.position.lineNumber,col:e.position.column});
   });
-
-  // Connect socket after editor ready
   initSocket();
   initVideo();
   renderParticipants(INIT_PARTS);
   renderInitialChat(INIT_CHAT);
 });
 
-function canCode() {
-  const p = INIT_PARTS.find(p => p.user_id === MY_ID);
-  return p ? p.can_code : false;
-}
-function currentLang() {
-  return document.getElementById("langSelect").value || INIT_LANG;
-}
-function updateEditorReadOnly() {
-  if (!editor) return;
-  const myP = getParticipant(MY_ID);
-  const canEdit = IS_HOST || (myP && myP.can_code && !isLocked);
-  editor.updateOptions({readOnly: !canEdit});
-  document.getElementById("editorStatus").textContent = canEdit ? "" : (isLocked ? "🔒 Locked" : "👁 View only");
+function canCode(){const p=INIT_PARTS.find(p=>p.user_id===MY_ID);return p?p.can_code:false;}
+function currentLang(){return document.getElementById("langSelect").value||INIT_LANG;}
+function getParticipant(uid){return participants.find(p=>p.user_id===uid);}
+function updateEditorReadOnly(){
+  if(!editor)return;
+  const myP=getParticipant(MY_ID);
+  const canEdit=IS_HOST||(myP&&myP.can_code&&!isLocked);
+  editor.updateOptions({readOnly:!canEdit});
+  document.getElementById("editorStatus").textContent=canEdit?"":(isLocked?"🔒 Locked":"👁 View only");
 }
 
-// ══════════════════════════════════════════════════════════════
-//  SOCKET.IO
-// ══════════════════════════════════════════════════════════════
-let participants = [...INIT_PARTS];
+// ── SOCKET ─────────────────────────────────────────────────
+function initSocket(){
+  socket=io({transports:["websocket","polling"],reconnectionAttempts:10,reconnectionDelay:1500});
+  socket.emit("vc_join",{room_code:ROOM_CODE,user_id:MY_ID,user_name:MY_NAME});
 
-function getParticipant(uid) {
-  return participants.find(p => p.user_id === uid);
-}
-
-function initSocket() {
-  socket = io();
-
-  socket.emit("vc_join", {room_code: ROOM_CODE, user_id: MY_ID, user_name: MY_NAME});
-
-  // Room state sync
   socket.on("vc_room_state", state => {
-    participants = state.participants;
+    participants=state.participants;
     renderParticipants(participants);
-    suppressCodeEvent = true;
-    editor.setValue(state.code);
-    suppressCodeEvent = false;
-    if (state.output) updateOutput(state.output, state.output_status);
-    isLocked = state.locked;
-    updateEditorReadOnly();
-    // FIX: new joiner calls offer to ALL existing participants
-    setTimeout(() => {
-      state.participants.forEach(p => {
-        if (p.sid && p.sid !== socket.id && p.user_id !== MY_ID) {
-          initPeerConnection(p.sid, true);
+    suppressCodeEvent=true; editor.setValue(state.code); suppressCodeEvent=false;
+    if(state.output)updateOutput(state.output,state.output_status);
+    isLocked=state.locked; updateEditorReadOnly();
+    // Connect to ALL existing participants after camera is ready
+    setTimeout(()=>{
+      state.participants.forEach(p=>{
+        if(p.sid&&p.sid!==socket.id&&p.user_id!==MY_ID){
+          console.log("[RTC] Offer to existing:",p.name);
+          initPeerConnection(p.sid,true);
         }
       });
-    }, 1200);
+    },1200);
   });
 
-  // Real-time code sync
-  socket.on("vc_code_update", data => {
-    if (data.changed_by === MY_ID) return;
-    suppressCodeEvent = true;
-    const pos = editor.getPosition();
+  socket.on("vc_code_update", data=>{
+    if(data.changed_by===MY_ID)return;
+    suppressCodeEvent=true;
+    const pos=editor.getPosition();
     editor.setValue(data.code);
     editor.setPosition(pos);
-    suppressCodeEvent = false;
+    suppressCodeEvent=false;
   });
 
-  // Language changed
-  socket.on("vc_language_changed", data => {
-    document.getElementById("langSelect").value = data.language;
-    const ml = data.language === "cpp" ? "cpp" : data.language === "typescript" ? "typescript" : data.language;
-    monaco.editor.setModelLanguage(editor.getModel(), ml);
-    suppressCodeEvent = true;
-    editor.setValue(data.code);
-    suppressCodeEvent = false;
-    const ext = LANG_EXTS[data.language] || data.language;
-    document.getElementById("editorTabName").textContent = `solution.${ext}`;
+  socket.on("vc_language_changed", data=>{
+    document.getElementById("langSelect").value=data.language;
+    const ml={cpp:"cpp",typescript:"typescript",javascript:"javascript",java:"java",go:"go",rust:"rust",sql:"sql"}[data.language]||"python";
+    monaco.editor.setModelLanguage(editor.getModel(),ml);
+    suppressCodeEvent=true; editor.setValue(data.code); suppressCodeEvent=false;
+    document.getElementById("editorTabName").textContent=`solution.${LANG_EXTS[data.language]||data.language}`;
   });
 
-  // User events
-  socket.on("vc_user_joined", data => {
-    participants = data.participants;
+  socket.on("vc_user_joined", data=>{
+    participants=data.participants;
     renderParticipants(participants);
-    vcToast(`${data.user_name} joined`, "info");
-    // FIX: existing users send offer to new joiner
-    initPeerConnection(data.sid, true);
-  });
-
-  socket.on("vc_user_left", data => {
-    participants = data.participants;
-    renderParticipants(participants);
-    removeVideoTile(data.user_id);
-  });
-
-  // Participants update (permissions changed)
-  socket.on("vc_participants_update", data => {
-    participants = data.participants;
-    renderParticipants(participants);
-    updateEditorReadOnly();
-  });
-
-  // Chat
-  socket.on("vc_chat_msg", msg => {
-    appendChatMessage(msg);
-    if (currentTab !== "chat") {
-      unreadCount++;
-      const badge = document.getElementById("unreadBadge");
-      badge.textContent = unreadCount;
-      badge.style.display = "inline";
+    vcToast(`${data.user_name} joined 👋`,"info");
+    if(data.sid&&data.sid!==socket.id){
+      console.log("[RTC] New joiner, sending offer:",data.user_name);
+      initPeerConnection(data.sid,true); // Existing user sends offer to new joiner
     }
   });
 
-  // Output
-  socket.on("vc_output_update", data => updateOutput(data.output, data.status));
-
-  // Lock
-  socket.on("vc_lock_changed", data => {
-    isLocked = data.locked;
-    const btn = document.getElementById("lockBtn");
-    if (btn) { btn.textContent = isLocked ? "🔒" : "🔓"; btn.classList.toggle("locked", isLocked); }
-    updateEditorReadOnly();
+  socket.on("vc_user_left", data=>{
+    participants=data.participants;
+    renderParticipants(participants);
+    removeVideoTile(data.user_id);
+    // Find and close peer by looking for removed user's sid
+    if(data.sid&&peers[data.sid]){peers[data.sid].close();delete peers[data.sid];delete peerStreams[data.sid];}
   });
 
-  // Host controls received
-  socket.on("vc_force_mute", data => {
-    localMicOn = !data.muted;
-    if (myStream) myStream.getAudioTracks().forEach(t => t.enabled = localMicOn);
-    document.getElementById("micBtn").classList.toggle("off", !localMicOn);
-    vcToast(data.muted ? "🔇 Muted by host" : "🎤 Unmuted by host", "info");
+  socket.on("vc_participants_update", data=>{participants=data.participants;renderParticipants(participants);updateEditorReadOnly();});
+  socket.on("vc_chat_msg", msg=>{appendChatMessage(msg);if(currentTab!=="chat"){unreadCount++;const b=document.getElementById("unreadBadge");b.textContent=unreadCount;b.style.display="inline";}});
+  socket.on("vc_output_update", data=>updateOutput(data.output,data.status));
+  socket.on("vc_lock_changed", data=>{isLocked=data.locked;const btn=document.getElementById("lockBtn");if(btn){btn.textContent=isLocked?"🔒":"🔓";btn.classList.toggle("locked",isLocked);}updateEditorReadOnly();});
+
+  // Mute from host
+  socket.on("vc_force_mute", data=>{
+    if(data.muted){
+      localMicOn=false;
+      if(myStream)myStream.getAudioTracks().forEach(t=>t.enabled=false);
+      setMicUI(false); updateMediaIcon(MY_ID,"mic",false);
+      socket.emit("vc_media_state",{room_code:ROOM_CODE,user_id:MY_ID,mic:false,cam:localCamOn});
+      vcToast("🔇 Muted by host","info");
+    }
   });
 
-  socket.on("vc_kicked", () => {
-    document.getElementById("kickedOverlay").classList.add("show");
+  socket.on("vc_kicked",()=>{document.getElementById("kickedOverlay").classList.add("show");if(myStream)myStream.getTracks().forEach(t=>t.stop());Object.values(peers).forEach(pc=>pc.close());});
+
+  // Live mic/cam state from other users
+  socket.on("vc_media_state_update", data=>{
+    if(data.user_id===MY_ID)return;
+    updateMediaIcon(data.user_id,"mic",data.mic);
+    updateMediaIcon(data.user_id,"cam",data.cam);
+    if(!data.cam)showNoVideo(data.user_id);
+    else hideNoVideo(data.user_id);
   });
 
-  // Cursor updates
-  socket.on("vc_cursor_update", data => {
-    if (data.user_id === MY_ID) return;
-    // Show cursor in editor (decorations)
-    const color = stringToColor(data.user_name);
-    const deco = [{
-      range: new monaco.Range(data.line, data.col, data.line, data.col + 1),
-      options: {
-        className: "cursor-" + data.user_id,
-        afterContentClassName: "cursor-label-" + data.user_id,
-        zIndex: 100,
-        stickiness: 1,
-        inlineClassName: "vc-remote-cursor",
-      }
-    }];
-    // Simple approach: just show in status bar
-    document.getElementById("editorStatus").textContent =
-      `${data.user_name} at L${data.line}:${data.col}`;
+  socket.on("vc_cursor_update", data=>{
+    if(data.user_id===MY_ID)return;
+    document.getElementById("editorStatus").textContent=`${data.user_name} at L${data.line}:${data.col}`;
+    clearTimeout(window._cc);window._cc=setTimeout(()=>document.getElementById("editorStatus").textContent="",2000);
+  });
+  socket.on("vc_typing_update", data=>{
+    if(data.user_id===MY_ID)return;
+    const ind=document.getElementById("typingInd");
+    ind.textContent=`${data.user_name} is typing...`;
+    clearTimeout(window._tc);window._tc=setTimeout(()=>ind.textContent="",2000);
   });
 
-  // Typing in chat
-  socket.on("vc_typing_update", data => {
-    if (data.user_id === MY_ID) return;
-    const ind = document.getElementById("typingInd");
-    ind.textContent = `${data.user_name} is typing...`;
-    clearTimeout(window._typingClear);
-    window._typingClear = setTimeout(() => ind.textContent = "", 2000);
+  // ══ WebRTC signaling ══
+  socket.on("vc_webrtc_offer", async data=>{
+    if(data.from===socket.id)return;
+    console.log("[RTC] Got offer from",data.from);
+    let pc=peers[data.from]||createPeer(data.from);
+    try{
+      await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+      const answer=await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      socket.emit("vc_webrtc_answer",{target_sid:data.from,answer,from:socket.id});
+    }catch(e){console.error("[RTC] Answer err",e);}
   });
 
-  // WebRTC signaling
-  socket.on("vc_webrtc_offer",  async data => {
-    if (data.from === socket.id) return;
-    let pc = peers[data.from] || createPeer(data.from);
-    await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
-    const answer = await pc.createAnswer();
-    await pc.setLocalDescription(answer);
-    socket.emit("vc_webrtc_answer", {target_sid: data.from, answer, from: socket.id});
+  socket.on("vc_webrtc_answer", async data=>{
+    const pc=peers[data.from];if(!pc)return;
+    try{if(pc.signalingState!=="stable")await pc.setRemoteDescription(new RTCSessionDescription(data.answer));}
+    catch(e){console.error("[RTC] Set answer err",e);}
   });
 
-  socket.on("vc_webrtc_answer", async data => {
-    const pc = peers[data.from];
-    if (pc) await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+  socket.on("vc_ice_candidate", async data=>{
+    const pc=peers[data.from];if(!pc||!data.candidate)return;
+    try{await pc.addIceCandidate(new RTCIceCandidate(data.candidate));}catch(e){}
   });
 
-  socket.on("vc_ice_candidate", async data => {
-    const pc = peers[data.from];
-    if (pc && data.candidate) await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
-  });
+  socket.on("reconnect",()=>{vcToast("Reconnected ✓","ok");socket.emit("vc_join",{room_code:ROOM_CODE,user_id:MY_ID,user_name:MY_NAME});});
+  socket.on("disconnect",()=>vcToast("Connection lost, reconnecting...","err"));
 }
 
-// ══════════════════════════════════════════════════════════════
-//  VIDEO — WebRTC
-// ══════════════════════════════════════════════════════════════
-async function initVideo() {
-  try {
-    myStream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
-    addVideoTile(MY_ID, MY_NAME, MY_IMAGE, myStream, true);
-  } catch(e) {
-    addVideoTile(MY_ID, MY_NAME, MY_IMAGE, null, true);
-    vcToast("Camera/mic unavailable", "err");
+// ── WebRTC ──────────────────────────────────────────────────
+async function initVideo(){
+  try{
+    myStream=await navigator.mediaDevices.getUserMedia({
+      video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30,min:15}},
+      audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}
+    });
+    addVideoTile(MY_ID,MY_NAME,MY_IMAGE,myStream,true);
+    startSpeakingDetection(MY_ID,myStream,true);
+    vcToast("Camera & mic ready ✓","ok");
+  }catch(e){
+    console.warn("[cam]",e);
+    try{myStream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});addNoVideoTile(MY_ID,MY_NAME,MY_IMAGE,true);vcToast("Audio only","info");}
+    catch(e2){addNoVideoTile(MY_ID,MY_NAME,MY_IMAGE,true);vcToast("Camera/mic unavailable","err");}
   }
 }
 
-function createPeer(remoteSid) {
-  const pc = new RTCPeerConnection({
-    iceServers: [
-      {urls: "stun:stun.l.google.com:19302"},
-      {urls: "stun:stun1.l.google.com:19302"},
-      {urls: "stun:stun2.l.google.com:19302"},
-      {urls: "stun:stun3.l.google.com:19302"},
-      {urls:"turn:openrelay.metered.ca:80",username:"openrelayproject",credential:"openrelayproject"},
-      {urls:"turn:openrelay.metered.ca:443",username:"openrelayproject",credential:"openrelayproject"},
-      {urls:"turn:openrelay.metered.ca:443?transport=tcp",username:"openrelayproject",credential:"openrelayproject"}
-    ],
-    iceCandidatePoolSize: 10
-  });
-  peers[remoteSid] = pc;
+function createPeer(remoteSid){
+  if(peers[remoteSid]){peers[remoteSid].close();}
+  const pc=new RTCPeerConnection({iceServers:ICE_SERVERS,iceCandidatePoolSize:10,bundlePolicy:"max-bundle",rtcpMuxPolicy:"require"});
+  peers[remoteSid]=pc;
 
-  if (myStream) myStream.getTracks().forEach(t => pc.addTrack(t, myStream));
+  // Add all local tracks
+  if(myStream){
+    myStream.getTracks().forEach(t=>{
+      pc.addTrack(t,myStream);
+      console.log("[RTC] Added track:",t.kind,"to peer",remoteSid);
+    });
+  }
 
-  pc.ontrack = e => {
-    const uid = Object.values(participants).find(p => p.sid === remoteSid)?.user_id;
-    const name= Object.values(participants).find(p => p.sid === remoteSid)?.name || "User";
-    const img = Object.values(participants).find(p => p.sid === remoteSid)?.image || "";
-    if (uid) addVideoTile(uid, name, img, e.streams[0], false);
+  // Receive remote tracks
+  pc.ontrack=e=>{
+    console.log("[RTC] Got",e.track.kind,"from",remoteSid);
+    if(e.streams&&e.streams[0]){
+      peerStreams[remoteSid]=e.streams[0];
+      const p=participants.find(p=>p.sid===remoteSid);
+      if(p){
+        // If audio track, start speaking detection
+        if(e.track.kind==="audio")startSpeakingDetection(p.user_id,e.streams[0],false);
+        // If video track, show video tile
+        if(e.track.kind==="video"){
+          addVideoTile(p.user_id,p.name,p.image||"",e.streams[0],false);
+          removeConnecting(p.user_id);
+        }
+      }
+    }
   };
 
-  pc.onicecandidate = e => {
-    if (e.candidate)
-      socket.emit("vc_ice_candidate", {target_sid: remoteSid, candidate: e.candidate, from: socket.id});
+  pc.onicecandidate=e=>{
+    if(e.candidate)socket.emit("vc_ice_candidate",{target_sid:remoteSid,candidate:e.candidate,from:socket.id});
   };
 
+  pc.onconnectionstatechange=()=>{
+    console.log("[RTC] State with",remoteSid,":",pc.connectionState);
+    const p=participants.find(p=>p.sid===remoteSid);
+    if(!p)return;
+    if(pc.connectionState==="connected"){
+      vcToast(`Video connected with ${p.name} ✓`,"ok");
+      removeConnecting(p.user_id);
+    } else if(pc.connectionState==="failed"){
+      vcToast(`Retrying video with ${p.name}...`,"info");
+      setTimeout(()=>{if(peers[remoteSid])initPeerConnection(remoteSid,true);},2000);
+    }
+  };
   return pc;
 }
 
-async function initPeerConnection(remoteSid, createOffer) {
-  if (!remoteSid || remoteSid === socket.id) return;
-  const pc = createPeer(remoteSid);
-  if (createOffer) {
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-    socket.emit("vc_webrtc_offer", {target_sid: remoteSid, offer, from: socket.id});
+async function initPeerConnection(remoteSid,makeOffer){
+  if(!remoteSid||remoteSid===socket.id)return;
+  if(peers[remoteSid]&&peers[remoteSid].connectionState==="connected")return;
+  const pc=createPeer(remoteSid);
+  // Show connecting tile for this participant
+  const p=participants.find(p=>p.sid===remoteSid);
+  if(p&&!document.getElementById(`tile-${p.user_id}`))addConnectingTile(p.user_id,p.name,p.image||"");
+  if(makeOffer){
+    try{
+      const offer=await pc.createOffer({offerToReceiveAudio:true,offerToReceiveVideo:true});
+      await pc.setLocalDescription(offer);
+      socket.emit("vc_webrtc_offer",{target_sid:remoteSid,offer,from:socket.id});
+      console.log("[RTC] Sent offer to",remoteSid);
+    }catch(e){console.error("[RTC] Offer err",e);}
   }
 }
 
-function addVideoTile(userId, name, image, stream, isMe) {
-  const grid = document.getElementById("videoGrid");
-  const existing = document.getElementById(`tile-${userId}`);
-  if (existing) existing.remove();
-
-  const role = isMe ? (IS_HOST ? "host" : "me") : (userId === HOST_ID ? "host" : "");
-  const tile = document.createElement("div");
-  tile.className = "vc-vid-tile";
-  tile.id = `tile-${userId}`;
-  tile.innerHTML = `
-    ${role ? `<div class="vc-vid-role ${role}">${role === "host" ? "HOST" : "YOU"}</div>` : ""}
-    <div class="vc-vid-badges">
-      <div class="vc-vid-badge" id="mic-badge-${userId}">🎤</div>
-      <div class="vc-vid-badge" id="cam-badge-${userId}">📷</div>
+// ── VIDEO TILE ─────────────────────────────────────────────
+function addVideoTile(uid,name,image,stream,isMe){
+  const grid=document.getElementById("videoGrid");
+  document.getElementById(`tile-${uid}`)?.remove();
+  const isHost=uid===HOST_ID;
+  const role=isMe?(IS_HOST?"host":"me"):(isHost?"host":"");
+  const tile=document.createElement("div");
+  tile.className="vc-vid-tile";tile.id=`tile-${uid}`;
+  tile.innerHTML=`
+    ${role?`<div class="vc-vid-role ${role}">${role==="host"?"HOST":"YOU"}</div>`:""}
+    <div class="vc-vid-status">
+      <div class="vc-vid-status-icon" id="mic-icon-${uid}" title="Mic">🎤</div>
+      <div class="vc-vid-status-icon" id="cam-icon-${uid}" title="Cam">📷</div>
     </div>
-    ${stream ? `<video id="vid-${userId}" autoplay playsinline ${isMe?"muted":""}></video>` :
-      `<div class="no-video">${name[0].toUpperCase()}</div>`}
-    <div class="vc-vid-name">${name}${isMe?" (You)":""}</div>
-  `;
+    <video id="vid-${uid}" autoplay playsinline ${isMe?"muted":""} style="width:100%;height:100%;object-fit:cover;border-radius:11px;display:block"></video>
+    <div class="vc-vid-name">${name}${isMe?" (You)":""}</div>`;
   grid.appendChild(tile);
-  if (stream) {
-    const vid = document.getElementById(`vid-${userId}`);
-    if (vid) vid.srcObject = stream;
+  const vid=document.getElementById(`vid-${uid}`);
+  if(vid)vid.srcObject=stream;
+}
+
+function addNoVideoTile(uid,name,image,isMe){
+  const grid=document.getElementById("videoGrid");
+  document.getElementById(`tile-${uid}`)?.remove();
+  const isHost=uid===HOST_ID;
+  const role=isMe?(IS_HOST?"host":"me"):(isHost?"host":"");
+  const initials=(name||"?")[0].toUpperCase();
+  const tile=document.createElement("div");
+  tile.className="vc-vid-tile cam-off";tile.id=`tile-${uid}`;
+  tile.innerHTML=`
+    ${role?`<div class="vc-vid-role ${role}">${role==="host"?"HOST":"YOU"}</div>`:""}
+    <div class="vc-vid-status">
+      <div class="vc-vid-status-icon" id="mic-icon-${uid}">🎤</div>
+      <div class="vc-vid-status-icon cam-muted" id="cam-icon-${uid}">📷</div>
+    </div>
+    <div class="no-vid-av" id="novid-${uid}">
+      <div class="vc-no-vid-circle">${image?`<img src="${image}" alt="${name}">`:`${initials}`}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:6px">${name}${isMe?" (You)":""}</div>
+    </div>
+    <div class="vc-vid-name">${name}${isMe?" (You)":""}</div>`;
+  grid.appendChild(tile);
+}
+
+function addConnectingTile(uid,name,image){
+  if(document.getElementById(`tile-${uid}`))return;
+  const grid=document.getElementById("videoGrid");
+  const initials=(name||"?")[0].toUpperCase();
+  const tile=document.createElement("div");
+  tile.className="vc-vid-tile cam-off";tile.id=`tile-${uid}`;
+  tile.innerHTML=`
+    <div class="vc-vid-status"><div class="vc-vid-status-icon" id="mic-icon-${uid}">🎤</div><div class="vc-vid-status-icon" id="cam-icon-${uid}">📷</div></div>
+    <div class="no-vid-av">${image?`<div class="vc-no-vid-circle"><img src="${image}"></div>`:`<div class="vc-no-vid-circle">${initials}</div>`}</div>
+    <div class="vc-connecting-overlay" id="conn-${uid}"><div class="vc-spin-sm"></div><span>Connecting...</span></div>
+    <div class="vc-vid-name">${name}</div>`;
+  grid.appendChild(tile);
+}
+
+function removeConnecting(uid){document.getElementById(`conn-${uid}`)?.remove();}
+function removeVideoTile(uid){document.getElementById(`tile-${uid}`)?.remove();}
+
+function showNoVideo(uid){
+  const tile=document.getElementById(`tile-${uid}`);if(!tile)return;
+  tile.classList.add("cam-off");
+  const vid=document.getElementById(`vid-${uid}`);
+  if(vid)vid.style.display="none";
+  let noVid=document.getElementById(`novid-${uid}`);
+  if(!noVid){
+    noVid=document.createElement("div");noVid.className="no-vid-av";noVid.id=`novid-${uid}`;
+    const p=getParticipant(uid);
+    noVid.innerHTML=`<div class="vc-no-vid-circle">${p?(p.name||"?")[0].toUpperCase():"?"}</div>`;
+    tile.insertBefore(noVid,tile.querySelector(".vc-vid-name"));
+  }
+  noVid.style.display="flex";
+}
+
+function hideNoVideo(uid){
+  const tile=document.getElementById(`tile-${uid}`);if(!tile)return;
+  tile.classList.remove("cam-off");
+  const vid=document.getElementById(`vid-${uid}`);
+  if(vid)vid.style.display="block";
+  document.getElementById(`novid-${uid}`)?.remove();
+}
+
+function updateMediaIcon(uid,type,on){
+  const icon=document.getElementById(`${type==="mic"?"mic":"cam"}-icon-${uid}`);
+  if(!icon)return;
+  icon.className=`vc-vid-status-icon${on?"":(type==="mic"?" muted":" cam-muted")}`;
+  icon.title=on?(type==="mic"?"Mic on":"Camera on"):(type==="mic"?"Muted":"Camera off");
+}
+
+// ── SPEAKING DETECTION ─────────────────────────────────────
+function startSpeakingDetection(uid,stream,isLocal){
+  if(!stream||!window.AudioContext)return;
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const analyser=ctx.createAnalyser();analyser.fftSize=512;
+    const src=ctx.createMediaStreamSource(stream);src.connect(analyser);
+    const data=new Uint8Array(analyser.frequencyBinCount);
+    function check(){
+      if(isLocal&&!myStream)return;
+      analyser.getByteFrequencyData(data);
+      const avg=data.reduce((a,b)=>a+b,0)/data.length;
+      const threshold=isLocal?18:12;
+      const speaking=avg>threshold&&(isLocal?localMicOn:true);
+      document.getElementById(`tile-${uid}`)?.classList.toggle("speaking",speaking);
+      document.querySelector(`[data-uid="${uid}"]`)?.classList.toggle("speaking-row",speaking);
+      requestAnimationFrame(check);
+    }
+    check();
+  }catch(e){}
+}
+
+// ── MIC TOGGLE ─────────────────────────────────────────────
+function toggleMic(){
+  if(!myStream||myStream.getAudioTracks().length===0){vcToast("No microphone","err");return;}
+  localMicOn=!localMicOn;
+  myStream.getAudioTracks().forEach(t=>t.enabled=localMicOn);
+  setMicUI(localMicOn);
+  updateMediaIcon(MY_ID,"mic",localMicOn);
+  socket.emit("vc_media_state",{room_code:ROOM_CODE,user_id:MY_ID,mic:localMicOn,cam:localCamOn});
+  vcToast(localMicOn?"🎤 Mic on":"🔇 Muted","info");
+}
+function setMicUI(on){
+  document.getElementById("micBtn").classList.toggle("off",!on);
+  const lbl=document.getElementById("micLabel");if(lbl)lbl.textContent=on?"Mute":"Unmute";
+}
+
+// ── CAM TOGGLE ─────────────────────────────────────────────
+async function toggleCam(){
+  if(!myStream){vcToast("No camera","err");return;}
+  localCamOn=!localCamOn;
+  if(!localCamOn){
+    myStream.getVideoTracks().forEach(t=>t.enabled=false);
+    setCamUI(false); updateMediaIcon(MY_ID,"cam",false); showNoVideo(MY_ID);
+    socket.emit("vc_media_state",{room_code:ROOM_CODE,user_id:MY_ID,mic:localMicOn,cam:false});
+    vcToast("📷 Camera off","info");
+  } else {
+    const vt=myStream.getVideoTracks();
+    if(vt.length>0){
+      vt.forEach(t=>t.enabled=true);
+      const vid=document.getElementById(`vid-${MY_ID}`);
+      if(vid)vid.srcObject=myStream;
+      hideNoVideo(MY_ID);
+    } else {
+      try{
+        const ns=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720}}});
+        const nt=ns.getVideoTracks()[0];myStream.addTrack(nt);
+        Object.values(peers).forEach(pc=>{const s=pc.getSenders().find(s=>s.track&&s.track.kind==="video");if(s)s.replaceTrack(nt);});
+        const vid=document.getElementById(`vid-${MY_ID}`);if(vid)vid.srcObject=myStream;
+        hideNoVideo(MY_ID);
+      }catch(e){localCamOn=false;vcToast("Cannot restart camera","err");setCamUI(false);return;}
+    }
+    setCamUI(true); updateMediaIcon(MY_ID,"cam",true);
+    socket.emit("vc_media_state",{room_code:ROOM_CODE,user_id:MY_ID,mic:localMicOn,cam:true});
+    vcToast("📷 Camera on","info");
   }
 }
-
-function removeVideoTile(userId) {
-  document.getElementById(`tile-${userId}`)?.remove();
+function setCamUI(on){
+  document.getElementById("camBtn").classList.toggle("off",!on);
+  const lbl=document.getElementById("camLabel");if(lbl)lbl.textContent=on?"Stop":"Start";
 }
 
-function toggleMic() {
-  if (!myStream) return;
-  localMicOn = !localMicOn;
-  myStream.getAudioTracks().forEach(t => t.enabled = localMicOn);
-  document.getElementById("micBtn").classList.toggle("off", !localMicOn);
-  document.getElementById("mic-badge-" + MY_ID)?.style && (
-    document.getElementById("mic-badge-" + MY_ID).style.opacity = localMicOn ? "1" : "0.3"
-  );
+// ── EDITOR CONTROLS ────────────────────────────────────────
+function changeLanguage(lang){if(!IS_HOST)return;socket.emit("vc_change_language",{room_code:ROOM_CODE,language:lang,user_id:MY_ID});document.getElementById("editorTabName").textContent=`solution.${LANG_EXTS[lang]||lang}`;}
+async function runCode(){
+  const btn=document.getElementById("runBtn"),code=editor.getValue(),lang=currentLang();
+  btn.disabled=true;btn.innerHTML=`<div class="vc-spin"></div> Running`;btn.className="vc-run-btn running";
+  socket.emit("vc_run_code",{room_code:ROOM_CODE,code,language:lang,user_id:MY_ID});
 }
-
-function toggleCam() {
-  if (!myStream) return;
-  localCamOn = !localCamOn;
-  myStream.getVideoTracks().forEach(t => t.enabled = localCamOn);
-  document.getElementById("camBtn").classList.toggle("off", !localCamOn);
+function updateOutput(output,status){
+  const body=document.getElementById("outputBody"),badge=document.getElementById("outputBadge"),btn=document.getElementById("runBtn");
+  btn.disabled=false;btn.innerHTML="▶ Run Code";btn.className="vc-run-btn";
+  const pre=document.createElement("pre");pre.textContent=output||"(no output)";pre.className=status==="error"?"error-out":"";
+  body.innerHTML="";body.appendChild(pre);
+  badge.style.display="block";badge.className=`vc-output-badge ${status}`;
+  badge.textContent=status==="success"?"✓ Success":status==="error"?"✗ Error":status==="running"?"⏳ Running":"ℹ Info";
+  document.getElementById("outputLang").textContent=currentLang().toUpperCase();
+  body.scrollTop=body.scrollHeight;
 }
+function toggleLock(){socket.emit("vc_toggle_lock",{room_code:ROOM_CODE,host_id:MY_ID});}
 
-// ══════════════════════════════════════════════════════════════
-//  EDITOR CONTROLS
-// ══════════════════════════════════════════════════════════════
-function changeLanguage(lang) {
-  if (!IS_HOST) return;
-  socket.emit("vc_change_language", {room_code: ROOM_CODE, language: lang, user_id: MY_ID});
-  const ext = LANG_EXTS[lang] || lang;
-  document.getElementById("editorTabName").textContent = `solution.${ext}`;
-}
-
-async function runCode() {
-  const btn  = document.getElementById("runBtn");
-  const code = editor.getValue();
-  const lang = currentLang();
-
-  btn.disabled = true;
-  btn.innerHTML = `<div class="vc-spin"></div> Running`;
-  btn.className = "vc-run-btn running";
-
-  // Emit to all via socket — server handles execution + broadcast
-  socket.emit("vc_run_code", {room_code: ROOM_CODE, code, language: lang, user_id: MY_ID});
-}
-
-function updateOutput(output, status) {
-  const body  = document.getElementById("outputBody");
-  const badge = document.getElementById("outputBadge");
-  const btn   = document.getElementById("runBtn");
-
-  btn.disabled = false;
-  btn.innerHTML = "▶ Run";
-  btn.className = "vc-run-btn";
-
-  const pre = document.createElement("pre");
-  pre.textContent = output || "(no output)";
-  pre.className   = status === "error" ? "error-out" : "";
-  body.innerHTML  = "";
-  body.appendChild(pre);
-
-  badge.style.display = "block";
-  badge.className = `vc-output-badge ${status}`;
-  badge.textContent = status === "success" ? "✓ Success" :
-                      status === "error"   ? "✗ Error" :
-                      status === "running" ? "⏳ Running" : "ℹ Info";
-  document.getElementById("outputLang").textContent = currentLang().toUpperCase();
-  body.scrollTop = body.scrollHeight;
-}
-
-function toggleLock() {
-  socket.emit("vc_toggle_lock", {room_code: ROOM_CODE, host_id: MY_ID});
-}
-
-// ══════════════════════════════════════════════════════════════
-//  PARTICIPANTS RENDER
-// ══════════════════════════════════════════════════════════════
-function renderParticipants(parts) {
-  participants = parts;
-  const list = document.getElementById("panel-participants");
-  document.getElementById("pCount").textContent = parts.length;
-  list.innerHTML = "";
-  parts.forEach(p => {
-    const isMe   = p.user_id === MY_ID;
-    const isHost = p.user_id === HOST_ID;
-    const av = p.image
-      ? `<div class="vc-p-av"><img src="${p.image}"></div>`
-      : `<div class="vc-p-av">${(p.name||"?")[0].toUpperCase()}</div>`;
-    const roleLabel = isHost ? `<div class="vc-p-role host">👑 Host</div>` :
-                      p.can_code ? `<div class="vc-p-role can-code">✏️ Can code</div>` :
-                      `<div class="vc-p-role viewer">👁 Viewer</div>`;
-    // Host actions for non-host participants
-    let actions = "";
-    if (IS_HOST && !isHost && !isMe) {
-      if (!p.can_code) {
-        actions += `<div class="vc-p-btn grant" onclick="grantCoding(${p.user_id})" title="Allow coding">✏️</div>`;
-      } else {
-        actions += `<div class="vc-p-btn revoke" onclick="revokeCoding(${p.user_id})" title="Revoke coding">✋</div>`;
-      }
-      actions += `<div class="vc-p-btn" onclick="muteUser(${p.user_id})" title="Mute">🔇</div>`;
-      actions += `<div class="vc-p-btn kick" onclick="kickUser(${p.user_id}, '${p.name}')" title="Kick">🚫</div>`;
+// ── PARTICIPANTS ────────────────────────────────────────────
+function renderParticipants(parts){
+  participants=Array.isArray(parts)?parts:Object.values(parts);
+  const list=document.getElementById("panel-participants");
+  document.getElementById("pCount").textContent=participants.length;
+  list.innerHTML="";
+  participants.forEach(p=>{
+    const isMe=p.user_id===MY_ID,isHost=p.user_id===HOST_ID;
+    const av=p.image?`<div class="vc-p-av"><img src="${p.image}" alt="${p.name}"></div>`:`<div class="vc-p-av">${(p.name||"?")[0].toUpperCase()}</div>`;
+    const roleLabel=isHost?`<div class="vc-p-role host">👑 Host</div>`:p.can_code?`<div class="vc-p-role can-code">✏️ Can code</div>`:`<div class="vc-p-role viewer">👁 Viewer</div>`;
+    const micClass=p.muted?"off-icon":"active-icon",camClass=p.video_off?"off-icon":"active-icon";
+    let actions="";
+    if(IS_HOST&&!isHost&&!isMe){
+      actions+=!p.can_code?`<div class="vc-p-btn grant" onclick="grantCoding(${p.user_id})" title="Allow coding">✏️</div>`:`<div class="vc-p-btn revoke" onclick="revokeCoding(${p.user_id})" title="Revoke">✋</div>`;
+      actions+=`<div class="vc-p-btn" onclick="muteUser(${p.user_id})" title="Mute">🔇</div>`;
+      actions+=`<div class="vc-p-btn kick" onclick="kickUser(${p.user_id},'${p.name.replace(/'/g,"\\'")}')">🚫</div>`;
     }
-
-    const row = document.createElement("div");
-    row.className = "vc-participant-row";
-    row.innerHTML = `${av}<div style="flex:1;min-width:0"><div class="vc-p-name">${p.name}${isMe?" (You)":""}</div>${roleLabel}</div><div class="vc-p-actions">${actions}</div>`;
+    const row=document.createElement("div");
+    row.className="vc-participant-row";row.setAttribute("data-uid",p.user_id);
+    row.innerHTML=`${av}<div style="flex:1;min-width:0"><div class="vc-p-name">${p.name}${isMe?" (You)":""}</div>${roleLabel}</div>
+      <div class="vc-p-status"><span class="vc-p-status-icon ${micClass}" title="Mic">🎤</span><span class="vc-p-status-icon ${camClass}" title="Cam">📷</span></div>
+      <div class="vc-p-actions">${actions}</div>`;
     list.appendChild(row);
   });
   updateEditorReadOnly();
 }
 
-// ══════════════════════════════════════════════════════════════
-//  HOST CONTROLS
-// ══════════════════════════════════════════════════════════════
-function grantCoding(targetId)  { socket.emit("vc_grant_coding", {room_code:ROOM_CODE,host_id:MY_ID,target_id:targetId,allow:true}); }
-function revokeCoding(targetId) { socket.emit("vc_grant_coding", {room_code:ROOM_CODE,host_id:MY_ID,target_id:targetId,allow:false}); }
-function muteUser(targetId)     { socket.emit("vc_mute", {room_code:ROOM_CODE,host_id:MY_ID,target_id:targetId}); }
-function kickUser(targetId, name) {
-  if (!confirm(`Remove ${name} from this session?`)) return;
-  socket.emit("vc_kick", {room_code:ROOM_CODE,host_id:MY_ID,target_id:targetId,target_name:name});
-}
+// ── HOST CONTROLS ───────────────────────────────────────────
+function grantCoding(id){socket.emit("vc_grant_coding",{room_code:ROOM_CODE,host_id:MY_ID,target_id:id,allow:true});}
+function revokeCoding(id){socket.emit("vc_grant_coding",{room_code:ROOM_CODE,host_id:MY_ID,target_id:id,allow:false});}
+function muteUser(id){socket.emit("vc_mute",{room_code:ROOM_CODE,host_id:MY_ID,target_id:id});}
+function kickUser(id,name){if(!confirm(`Remove ${name}?`))return;socket.emit("vc_kick",{room_code:ROOM_CODE,host_id:MY_ID,target_id:id,target_name:name});}
 
-// ══════════════════════════════════════════════════════════════
-//  CHAT
-// ══════════════════════════════════════════════════════════════
-function renderInitialChat(msgs) {
-  msgs.forEach(m => appendChatMessage(m, false));
-  scrollChatBottom();
+// ── CHAT ────────────────────────────────────────────────────
+function renderInitialChat(msgs){msgs.forEach(m=>appendChatMessage(m,false));scrollChatBottom();}
+function appendChatMessage(msg,scroll=true){
+  const box=document.getElementById("chatMessages"),div=document.createElement("div");
+  if(msg.user_id===0||msg.name==="System"||msg.name==="Host"){div.className="vc-chat-msg system";div.innerHTML=`<div class="vc-cm-text">${escapeHtml(msg.message)}</div>`;}
+  else{const isMe=msg.user_id===MY_ID;div.className="vc-chat-msg";div.innerHTML=`<div class="vc-cm-header"><span class="vc-cm-name" style="color:${strColor(msg.name)}">${msg.name}${isMe?" (You)":""}</span><span class="vc-cm-time">${msg.time}</span></div><div class="vc-cm-text">${escapeHtml(msg.message)}</div>`;}
+  box.appendChild(div);if(scroll)scrollChatBottom();
 }
-
-function appendChatMessage(msg, scroll=true) {
-  const box = document.getElementById("chatMessages");
-  const div = document.createElement("div");
-  if (msg.user_id === 0 || msg.name === "System" || msg.name === "Host") {
-    div.className = "vc-chat-msg system";
-    div.innerHTML = `<div class="vc-cm-text">${msg.message}</div>`;
-  } else {
-    const isMe = msg.user_id === MY_ID;
-    div.className = "vc-chat-msg";
-    div.innerHTML = `
-      <div class="vc-cm-header">
-        <span class="vc-cm-name" style="color:${stringToColor(msg.name)}">${msg.name}${isMe?" (You)":""}</span>
-        <span class="vc-cm-time">${msg.time}</span>
-      </div>
-      <div class="vc-cm-text">${escapeHtml(msg.message)}</div>`;
-  }
-  box.appendChild(div);
-  if (scroll) scrollChatBottom();
-}
-
-function scrollChatBottom() {
-  const box = document.getElementById("chatMessages");
-  box.scrollTop = box.scrollHeight;
-}
-
-function sendChat() {
-  const inp = document.getElementById("chatInp");
-  const msg = inp.value.trim();
-  if (!msg) return;
-  socket.emit("vc_chat", {room_code:ROOM_CODE,user_id:MY_ID,user_name:MY_NAME,message:msg});
-  inp.value = "";
-}
-
+function scrollChatBottom(){const box=document.getElementById("chatMessages");box.scrollTop=box.scrollHeight;}
+function sendChat(){const inp=document.getElementById("chatInp"),msg=inp.value.trim();if(!msg)return;socket.emit("vc_chat",{room_code:ROOM_CODE,user_id:MY_ID,user_name:MY_NAME,message:msg});inp.value="";}
 let typingEmitTimer;
-function sendTyping() {
-  clearTimeout(typingEmitTimer);
-  typingEmitTimer = setTimeout(() => {
-    socket.emit("vc_typing", {room_code:ROOM_CODE,user_id:MY_ID,user_name:MY_NAME});
-  }, 200);
-}
+function sendTyping(){clearTimeout(typingEmitTimer);typingEmitTimer=setTimeout(()=>socket.emit("vc_typing",{room_code:ROOM_CODE,user_id:MY_ID,user_name:MY_NAME}),200);}
 
-// ══════════════════════════════════════════════════════════════
-//  UI HELPERS
-// ══════════════════════════════════════════════════════════════
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll(".vc-side-tab").forEach(t => t.classList.remove("active"));
+// ── UI ──────────────────────────────────────────────────────
+function switchTab(tab){
+  currentTab=tab;
+  document.querySelectorAll(".vc-side-tab").forEach(t=>t.classList.remove("active"));
   document.getElementById(`tab-${tab}`).classList.add("active");
-  document.getElementById("panel-participants").style.display = tab==="participants" ? "block" : "none";
-  const chatPanel = document.getElementById("panel-chat");
-  chatPanel.style.display = tab==="chat" ? "flex" : "none";
-  if (tab === "chat") {
-    unreadCount = 0;
-    document.getElementById("unreadBadge").style.display = "none";
-    scrollChatBottom();
-  }
+  document.getElementById("panel-participants").style.display=tab==="participants"?"block":"none";
+  const cp=document.getElementById("panel-chat");cp.style.display=tab==="chat"?"flex":"none";
+  if(tab==="chat"){unreadCount=0;document.getElementById("unreadBadge").style.display="none";scrollChatBottom();}
 }
+function copyCode(){navigator.clipboard.writeText(ROOM_CODE).then(()=>vcToast("Room code copied! 📋","ok"));}
+function endSession(){socket.emit("vc_leave",{room_code:ROOM_CODE,user_id:MY_ID,user_name:MY_NAME});if(myStream)myStream.getTracks().forEach(t=>t.stop());Object.values(peers).forEach(pc=>pc.close());window.location.href="/vidcode";}
+function toggleFullscreen(){if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.();}
+function vcToast(msg,type="info"){const t=document.getElementById("vcToast");t.textContent=msg;t.className=`vc-toast show vc-toast-${type==="ok"?"ok":type==="err"?"err":"info"}`;clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove("show"),3000);}
+function escapeHtml(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function strColor(s){let h=0;for(let i=0;i<s.length;i++)h=s.charCodeAt(i)+((h<<5)-h);return["#818cf8","#00e5c8","#22c55e","#ffb547","#a855f7","#38bdf8","#f472b6"][Math.abs(h)%7];}
 
-function copyCode() {
-  navigator.clipboard.writeText(ROOM_CODE).then(() => vcToast("Room code copied!", "ok"));
-}
-
-function endSession() {
-  socket.emit("vc_leave", {room_code:ROOM_CODE,user_id:MY_ID,user_name:MY_NAME});
-  if (myStream) myStream.getTracks().forEach(t=>t.stop());
-  window.location.href = "/vidcode";
-}
-
-function toggleFullscreen() {
-  if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
-  else document.exitFullscreen?.();
-}
-
-function vcToast(msg, type="info") {
-  const t = document.getElementById("vcToast");
-  t.textContent = msg;
-  t.className = `vc-toast show vc-toast-${type}`;
-  clearTimeout(window._toastTimer);
-  window._toastTimer = setTimeout(() => t.classList.remove("show"), 3000);
-}
-
-function escapeHtml(str) {
-  return (str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-}
-
-function stringToColor(str) {
-  let h = 0;
-  for (let i=0; i<str.length; i++) h = str.charCodeAt(i) + ((h<<5)-h);
-  const colors = ["#818cf8","#00e5c8","#22c55e","#ffb547","#a855f7","#38bdf8","#f472b6"];
-  return colors[Math.abs(h) % colors.length];
-}
-
-// Handle window unload
-window.addEventListener("beforeunload", () => {
-  socket?.emit("vc_leave", {room_code:ROOM_CODE,user_id:MY_ID,user_name:MY_NAME});
-});
+window.addEventListener("beforeunload",()=>{socket?.emit("vc_leave",{room_code:ROOM_CODE,user_id:MY_ID,user_name:MY_NAME});if(myStream)myStream.getTracks().forEach(t=>t.stop());});
 </script>
 </body>
 </html>
