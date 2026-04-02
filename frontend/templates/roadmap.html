@@ -5,250 +5,316 @@
 
 <style>
 :root {
-  --neon:  #5b6bff;
-  --cyan:  #00e5c8;
-  --amber: #ffb547;
-  --red:   #ff5757;
-  --green: #22c55e;
-  --rim:   rgba(255,255,255,0.06);
-  --glass: rgba(255,255,255,0.028);
-  --font-d: 'Syne', sans-serif;
-  --font-b: 'DM Sans', sans-serif;
-  --ease: cubic-bezier(.16,1,.3,1);
+  --neon:    #5b6bff;
+  --cyan:    #00e5c8;
+  --amber:   #ffb547;
+  --red:     #ff5757;
+  --green:   #22c55e;
+  --purple:  #a855f7;
+  --pink:    #ec4899;
+  --rim:     rgba(255,255,255,0.06);
+  --glass:   rgba(255,255,255,0.028);
+  --glass2:  rgba(255,255,255,0.05);
+  --font-d:  'Syne', sans-serif;
+  --font-b:  'DM Sans', sans-serif;
+  --ease:    cubic-bezier(.16,1,.3,1);
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { background: #000 !important; color: #fff !important; font-family: var(--font-b); }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#050508!important;color:#fff!important;font-family:var(--font-b)}
 
-.rm-page { min-height: 100vh; background: #000; position: relative; overflow-x: hidden; width: 100%; }
-.rm-glow {
-  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+.rm-page{min-height:100vh;background:#050508;position:relative;overflow-x:hidden;width:100%}
+.rm-glow{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
   background:
-    radial-gradient(ellipse 55% 45% at 8% 12%,  rgba(91,107,255,.1)  0%, transparent 65%),
-    radial-gradient(ellipse 45% 40% at 92% 80%,  rgba(0,229,200,.07)  0%, transparent 60%),
-    radial-gradient(ellipse 35% 30% at 55% 45%,  rgba(91,107,255,.04) 0%, transparent 70%);
+    radial-gradient(ellipse 55% 45% at 8% 12%,rgba(91,107,255,.07) 0%,transparent 65%),
+    radial-gradient(ellipse 45% 40% at 92% 80%,rgba(0,229,200,.05) 0%,transparent 60%),
+    radial-gradient(ellipse 35% 30% at 55% 45%,rgba(91,107,255,.03) 0%,transparent 70%);
 }
-.rm-grid {
-  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+.rm-grid{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
   background-image:
-    linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px);
-  background-size: 60px 60px;
+    linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:60px 60px;
 }
-.rm-body { position: relative; z-index: 1; max-width: 1060px; margin: 0 auto; padding: 60px 40px 140px; }
+.rm-body{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:60px 40px 140px}
 
-/* ── HEADER ── */
-.rm-head { margin-bottom: 56px; animation: fadeUp .7s ease both; }
-.rm-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 5px 16px; border-radius: 100px;
-  background: rgba(91,107,255,.08); border: 1px solid rgba(91,107,255,.22);
-  font-size: 10.5px; font-weight: 600; color: var(--cyan);
-  letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 22px;
+.rm-head{margin-bottom:56px;animation:fadeUp .7s ease both}
+.rm-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:5px 16px;border-radius:100px;
+  background:rgba(91,107,255,.08);border:1px solid rgba(91,107,255,.22);
+  font-size:10.5px;font-weight:600;color:var(--cyan);
+  letter-spacing:2.5px;text-transform:uppercase;margin-bottom:22px;
 }
-.rm-eyebrow-dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: var(--cyan); box-shadow: 0 0 6px var(--cyan);
-  animation: blink 2s ease-in-out infinite;
+.rm-eyebrow-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--cyan);box-shadow:0 0 6px var(--cyan);
+  animation:blink 2s ease-in-out infinite;
 }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
-.rm-title {
-  font-family: var(--font-d);
-  font-size: clamp(34px, 5vw, 58px);
-  font-weight: 300; letter-spacing: -2.5px;
-  color: rgba(255,255,255,.7); line-height: 1.05; margin-bottom: 6px;
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.rm-title{
+  font-family:var(--font-d);font-size:clamp(34px,5vw,58px);
+  font-weight:300;letter-spacing:-2.5px;
+  color:rgba(255,255,255,.7);line-height:1.05;margin-bottom:6px;
 }
-.rm-title strong { font-weight: 800; color: #fff; display: block; }
-.rm-title .grad {
-  background: linear-gradient(110deg, #fff 0%, var(--neon) 50%, var(--cyan) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 300;
+.rm-title strong{font-weight:800;color:#fff;display:block}
+.rm-title .grad{
+  background:linear-gradient(110deg,#fff 0%,var(--neon) 50%,var(--cyan) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:300;
 }
-.rm-sub { font-size: 15.5px; color: rgba(255,255,255,.32); font-weight: 300; margin-top: 18px; line-height: 1.75; max-width: 520px; }
+.rm-sub{font-size:15.5px;color:rgba(255,255,255,.32);font-weight:300;margin-top:18px;line-height:1.75;max-width:520px}
 
-/* ── CARD ── */
-.rm-card {
-  background: var(--glass); border: 1px solid rgba(255,255,255,.08);
-  border-radius: 22px; position: relative; overflow: hidden;
+.rm-card{
+  background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);
+  border-radius:22px;position:relative;overflow:hidden;
 }
-.rm-card::before {
-  content: ''; position: absolute; top: 0; left: 12%; right: 12%; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(91,107,255,.4), rgba(0,229,200,.25), transparent);
+.rm-card::before{
+  content:'';position:absolute;top:0;left:12%;right:12%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(91,107,255,.3),rgba(0,229,200,.18),transparent);
 }
-.rm-card-pad { padding: 38px 44px; }
+.rm-card-pad{padding:38px 44px}
 
-/* ── ROLE SEARCH ── */
-.rm-search-wrap { position: relative; margin-bottom: 16px; }
-.rm-search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 15px; opacity: .4; pointer-events: none; }
-#roleSearch {
-  width: 100%;
-  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
-  border-radius: 13px; color: #fff; font-family: var(--font-b);
-  font-size: 14.5px; padding: 13px 18px 13px 44px;
-  outline: none; transition: border-color .25s, box-shadow .25s;
+.rm-search-wrap{position:relative;margin-bottom:16px}
+.rm-search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:15px;opacity:.4;pointer-events:none}
+#roleSearch{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+  border-radius:13px;color:#fff;font-family:var(--font-b);
+  font-size:14.5px;padding:13px 18px 13px 44px;
+  outline:none;transition:border-color .25s,box-shadow .25s;
 }
-#roleSearch:focus { border-color: var(--neon); box-shadow: 0 0 0 3px rgba(91,107,255,.15); }
-#roleSearch::placeholder { color: rgba(255,255,255,.22); }
-
-/* ── ROLE DROPDOWN CUSTOM ── */
-.rm-lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 2.5px; color: rgba(255,255,255,.28); margin-bottom: 10px; }
-
-.role-picker-wrap { position: relative; }
-#roleSelect {
-  width: 100%;
-  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
-  border-radius: 13px; color: #fff; font-family: var(--font-b);
-  font-size: 14.5px; font-weight: 400; padding: 14px 44px 14px 18px;
-  outline: none; appearance: none; cursor: pointer;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba(255,255,255,0.35)' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-  background-repeat: no-repeat; background-position: right 16px center; background-size: 13px;
-  transition: border-color .25s, box-shadow .25s;
-  max-height: 320px;
+#roleSearch:focus{border-color:var(--neon);box-shadow:0 0 0 3px rgba(91,107,255,.12)}
+#roleSearch::placeholder{color:rgba(255,255,255,.22)}
+.rm-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2.5px;color:rgba(255,255,255,.28);margin-bottom:10px}
+#roleSelect{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:13px;color:#fff;font-family:var(--font-b);
+  font-size:14.5px;font-weight:400;padding:14px 44px 14px 18px;
+  outline:none;appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba(255,255,255,0.35)' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat:no-repeat;background-position:right 16px center;background-size:13px;
+  transition:border-color .25s,box-shadow .25s;
 }
-#roleSelect:focus { border-color: var(--neon); box-shadow: 0 0 0 3px rgba(91,107,255,.15); }
-#roleSelect option { background: #0d0d12; color: #fff; padding: 8px; }
-#roleSelect optgroup { background: #0d0d12; color: rgba(255,255,255,.45); font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+#roleSelect:focus{border-color:var(--neon);box-shadow:0 0 0 3px rgba(91,107,255,.12)}
+#roleSelect option{background:#0d0d12;color:#fff}
+#roleSelect optgroup{background:#0d0d12;color:rgba(255,255,255,.45);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
 
-/* ── ACTION ROW ── */
-.rm-action-row { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: stretch; margin-top: 14px; }
-
-.rm-btn {
-  padding: 14px 30px; border-radius: 13px; border: none;
-  background: linear-gradient(135deg, var(--neon), #3a4aff);
-  color: #fff; font-family: var(--font-b); font-size: 14.5px; font-weight: 600;
-  cursor: pointer; white-space: nowrap;
-  box-shadow: 0 8px 32px rgba(91,107,255,.4);
-  transition: transform .2s, box-shadow .2s;
-  display: flex; align-items: center; gap: 9px; position: relative; overflow: hidden;
+.rm-action-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:stretch;margin-top:14px}
+.rm-btn{
+  padding:14px 30px;border-radius:13px;border:none;
+  background:linear-gradient(135deg,var(--neon),#3a4aff);
+  color:#fff;font-family:var(--font-b);font-size:14.5px;font-weight:600;
+  cursor:pointer;white-space:nowrap;
+  box-shadow:0 6px 24px rgba(91,107,255,.35);
+  transition:transform .2s,box-shadow .2s;
+  display:flex;align-items:center;gap:9px;position:relative;overflow:hidden;
 }
-.rm-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,.12),transparent); opacity:0; transition:opacity .2s; }
-.rm-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 42px rgba(91,107,255,.6); }
-.rm-btn:hover::before { opacity: 1; }
-
-.rm-btn-auto {
-  padding: 14px 22px; border-radius: 13px; border: 1px solid rgba(0,229,200,.25);
-  background: rgba(0,229,200,.08); color: rgba(0,229,200,.9);
-  font-family: var(--font-b); font-size: 14px; font-weight: 600;
-  cursor: pointer; white-space: nowrap;
-  transition: all .2s;
-  display: flex; align-items: center; gap: 8px;
+.rm-btn:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(91,107,255,.5)}
+.rm-btn-auto{
+  padding:14px 22px;border-radius:13px;border:1px solid rgba(0,229,200,.22);
+  background:rgba(0,229,200,.07);color:rgba(0,229,200,.9);
+  font-family:var(--font-b);font-size:14px;font-weight:600;
+  cursor:pointer;white-space:nowrap;transition:all .2s;
+  display:flex;align-items:center;gap:8px;
 }
-.rm-btn-auto:hover { background: rgba(0,229,200,.16); box-shadow: 0 4px 20px rgba(0,229,200,.25); transform: translateY(-1px); }
+.rm-btn-auto:hover{background:rgba(0,229,200,.14);box-shadow:0 4px 20px rgba(0,229,200,.2);transform:translateY(-1px)}
 
-/* ── ROLE COUNT BADGE ── */
-.rm-role-count {
-  font-size: 12px; color: rgba(255,255,255,.3); margin-top: 10px;
-  display: flex; align-items: center; gap: 6px;
+.rm-role-count{font-size:12px;color:rgba(255,255,255,.3);margin-top:10px;display:flex;align-items:center;gap:6px}
+.rm-role-count-num{color:var(--cyan);font-weight:700;font-family:var(--font-d)}
+.rm-hints{display:flex;gap:20px;flex-wrap:wrap;margin-top:22px}
+.rm-hint{display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(255,255,255,.28)}
+.rh-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+
+.rm-div{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06) 25%,rgba(255,255,255,.06) 75%,transparent);margin:52px 0}
+.rm-sec-eyebrow{
+  font-size:10.5px;font-weight:600;text-transform:uppercase;
+  letter-spacing:2.5px;color:rgba(255,255,255,.28);
+  display:flex;align-items:center;gap:12px;margin-bottom:22px;
 }
-.rm-role-count-num { color: var(--cyan); font-weight: 700; font-family: var(--font-d); }
+.rm-sec-eyebrow::after{content:'';flex:1;height:1px;background:var(--rim)}
+.rm-sec-title{font-family:var(--font-d);font-size:clamp(20px,2.5vw,30px);font-weight:700;letter-spacing:-1px;color:#fff;margin-bottom:28px}
 
-/* ── HINTS ── */
-.rm-hints { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 22px; }
-.rm-hint { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: rgba(255,255,255,.28); }
-.rh-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-
-/* ── DETECTED ROLE BANNER ── */
-.rm-detected-banner {
-  padding: 18px 24px; border-radius: 14px;
-  background: rgba(0,229,200,.07); border: 1px solid rgba(0,229,200,.2);
-  display: flex; align-items: center; gap: 14px; margin-bottom: 28px;
-  animation: fadeUp .5s var(--ease) both;
+.rm-detected-banner{
+  padding:18px 24px;border-radius:14px;
+  background:rgba(0,229,200,.06);border:1px solid rgba(0,229,200,.18);
+  display:flex;align-items:center;gap:14px;margin-bottom:28px;
+  animation:fadeUp .5s var(--ease) both;
 }
-.rm-detected-icon { font-size: 22px; flex-shrink: 0; }
-.rm-detected-text { font-size: 14px; color: rgba(255,255,255,.55); line-height: 1.6; }
-.rm-detected-text strong { color: var(--cyan); font-family: var(--font-d); font-size: 16px; font-weight: 700; }
+.rm-detected-icon{font-size:22px;flex-shrink:0}
+.rm-detected-text{font-size:14px;color:rgba(255,255,255,.55);line-height:1.6}
+.rm-detected-text strong{color:var(--cyan);font-family:var(--font-d);font-size:16px;font-weight:700}
 
-/* ── DIV ── */
-.rm-div { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.07) 25%, rgba(255,255,255,.07) 75%, transparent); margin: 52px 0; }
-
-/* ── SEC EYEBROW ── */
-.rm-sec-eyebrow {
-  font-size: 10.5px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 2.5px; color: rgba(255,255,255,.28);
-  display: flex; align-items: center; gap: 12px; margin-bottom: 22px;
+#analyticsContainer{display:none}
+.analytics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.an-box{
+  padding:28px 16px 24px;border-radius:18px;text-align:center;
+  background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);
+  position:relative;overflow:hidden;
+  min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:border-color .3s,transform .3s;
 }
-.rm-sec-eyebrow::after { content:''; flex:1; height:1px; background:var(--rim); }
-.rm-sec-title { font-family: var(--font-d); font-size: clamp(20px,2.5vw,30px); font-weight: 700; letter-spacing: -1px; color: #fff; margin-bottom: 28px; }
+.an-box:hover{border-color:rgba(255,255,255,.12);transform:translateY(-3px)}
+.an-box::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;opacity:0;transition:opacity .3s}
+.an-box:nth-child(1)::after{background:linear-gradient(90deg,var(--neon),var(--cyan))}
+.an-box:nth-child(2)::after{background:linear-gradient(90deg,var(--cyan),rgba(0,229,200,.3))}
+.an-box:nth-child(3)::after{background:linear-gradient(90deg,var(--amber),rgba(255,181,71,.3))}
+.an-box:nth-child(4)::after{background:linear-gradient(90deg,var(--red),rgba(255,87,87,.3))}
+.an-box:hover::after{opacity:1}
+.an-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.3);margin-bottom:12px;line-height:1.4}
+.an-val{font-family:var(--font-d);font-size:clamp(22px,3.5vw,40px);font-weight:800;color:#fff;line-height:1.1;letter-spacing:-1.5px;word-break:break-word;text-align:center;width:100%}
 
-/* ── ANALYTICS ── */
-#analyticsContainer { display: none; }
-.analytics-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
-.an-box {
-  padding: 28px 16px 24px; border-radius: 18px; text-align: center;
-  background: var(--glass); border: 1px solid rgba(255,255,255,.07);
-  position: relative; overflow: hidden;
-  min-height: 130px; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  transition: border-color .3s, transform .3s;
+.sp-row{margin-bottom:22px}
+.sp-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sp-name{font-family:var(--font-d);font-size:14px;font-weight:600;color:rgba(255,255,255,.8)}
+.sp-pct{font-family:var(--font-d);font-size:14px;font-weight:700;color:var(--cyan)}
+.sp-track{height:7px;border-radius:100px;background:rgba(255,255,255,.06);overflow:hidden}
+.sp-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--neon),var(--cyan));transition:width 1.3s var(--ease);width:0}
+
+.ms-title{font-family:var(--font-d);font-size:19px;font-weight:700;color:#fff;margin-bottom:20px}
+.chip-red{display:inline-flex;padding:6px 16px;border-radius:100px;background:rgba(255,87,87,.08);border:1px solid rgba(255,87,87,.22);font-size:13px;font-weight:500;color:rgba(255,160,160,.9);margin:0 6px 8px 0}
+.chip-blue{display:inline-flex;padding:6px 16px;border-radius:100px;background:rgba(91,107,255,.08);border:1px solid rgba(91,107,255,.2);font-size:13px;font-weight:500;color:rgba(180,190,255,.9);margin:0 6px 8px 0}
+.chip-cyan{display:inline-flex;padding:6px 16px;border-radius:100px;background:rgba(0,229,200,.07);border:1px solid rgba(0,229,200,.18);font-size:13px;font-weight:500;color:rgba(0,229,200,.85);margin:0 6px 8px 0}
+.chip-green{display:inline-flex;padding:6px 16px;border-radius:100px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.18);font-size:13px;font-weight:500;color:rgba(134,239,172,.9);margin:0 6px 8px 0}
+.alert-good{padding:20px 24px;border-radius:14px;background:rgba(91,107,255,.07);border:1px solid rgba(91,107,255,.18);font-size:14px;color:rgba(255,255,255,.55);line-height:1.6}
+
+.stage-card{margin-bottom:16px}
+.stage-head{font-family:var(--font-d);font-size:18px;font-weight:700;color:#fff;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--rim)}
+
+.lp-card{margin-bottom:16px;animation:fadeUp .5s var(--ease) both}
+.lp-inner{padding:32px 40px}
+.lp-week{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--cyan);margin-bottom:8px}
+.lp-skill{font-family:var(--font-d);font-size:22px;font-weight:700;color:#fff;margin-bottom:18px;letter-spacing:-.5px}
+.lp-meta{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:18px}
+.lp-meta-item{display:flex;align-items:center;gap:7px;font-size:13px;color:rgba(255,255,255,.4)}
+.lp-meta-dot{width:6px;height:6px;border-radius:50%;background:var(--neon)}
+.lp-sep{height:1px;background:var(--rim);margin:18px 0}
+.lp-dl{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.28);margin-bottom:5px;margin-top:14px}
+.lp-dv{font-size:14px;color:rgba(255,255,255,.5);line-height:1.75;font-weight:300}
+
+.lp-courses{margin-top:20px;padding-top:18px;border-top:1px solid var(--rim)}
+.lp-courses-title{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:rgba(0,229,200,.7);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.course-links{display:flex;flex-wrap:wrap;gap:8px}
+.course-link{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:10px;font-size:12.5px;font-weight:500;text-decoration:none;transition:all .2s;white-space:nowrap;}
+.course-link.udemy{background:rgba(236,107,17,.1);border:1px solid rgba(236,107,17,.25);color:rgba(253,186,116,.9)}
+.course-link.udemy:hover{background:rgba(236,107,17,.2);transform:translateY(-1px)}
+.course-link.yt{background:rgba(255,0,0,.08);border:1px solid rgba(255,0,0,.2);color:rgba(252,165,165,.9)}
+.course-link.yt:hover{background:rgba(255,0,0,.16);transform:translateY(-1px)}
+.course-link.coursera{background:rgba(0,86,210,.1);border:1px solid rgba(0,86,210,.25);color:rgba(147,197,253,.9)}
+.course-link.coursera:hover{background:rgba(0,86,210,.18);transform:translateY(-1px)}
+.course-link.docs{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6)}
+.course-link.docs:hover{background:rgba(255,255,255,.1);transform:translateY(-1px)}
+.course-link.github{background:rgba(88,166,255,.07);border:1px solid rgba(88,166,255,.2);color:rgba(147,197,253,.9)}
+.course-link.github:hover{background:rgba(88,166,255,.15);transform:translateY(-1px)}
+.course-link.freecodecamp{background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);color:rgba(103,232,249,.9)}
+.course-link.freecodecamp:hover{background:rgba(6,182,212,.16);transform:translateY(-1px)}
+.course-link.kaggle{background:rgba(32,158,210,.08);border:1px solid rgba(32,158,210,.22);color:rgba(125,211,252,.9)}
+.course-link.kaggle:hover{background:rgba(32,158,210,.16);transform:translateY(-1px)}
+
+.mkt-inner{padding:36px 40px}
+.mkt-title{font-family:var(--font-d);font-size:20px;font-weight:700;color:#fff;margin-bottom:28px}
+.mkt-section{margin-bottom:22px}
+.mkt-lbl{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.28);margin-bottom:12px}
+.mkt-sep{height:1px;background:var(--rim);margin:20px 0}
+.mkt-empty{font-size:13px;color:rgba(255,255,255,.28)}
+
+.rm-loading{display:flex;align-items:center;gap:16px;padding:40px 0}
+.rm-spinner{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,.07);border-top-color:var(--neon);animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rm-loading-txt{font-size:15px;color:rgba(255,255,255,.35);font-weight:300}
+
+.view-toggle-bar{
+  display:flex;gap:8px;margin-bottom:28px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+  border-radius:16px;padding:6px;
 }
-.an-box:hover { border-color: rgba(255,255,255,.14); transform: translateY(-3px); }
-.an-box::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; opacity:0; transition:opacity .3s; }
-.an-box:nth-child(1)::after { background: linear-gradient(90deg,var(--neon),var(--cyan)); }
-.an-box:nth-child(2)::after { background: linear-gradient(90deg,var(--cyan),rgba(0,229,200,.3)); }
-.an-box:nth-child(3)::after { background: linear-gradient(90deg,var(--amber),rgba(255,181,71,.3)); }
-.an-box:nth-child(4)::after { background: linear-gradient(90deg,var(--red),rgba(255,87,87,.3)); }
-.an-box:hover::after { opacity: 1; }
-.an-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,.3); margin-bottom: 12px; white-space: normal; text-align: center; line-height: 1.4; }
-.an-val { font-family: var(--font-d); font-size: clamp(22px,3.5vw,40px); font-weight: 800; color: #fff; line-height: 1.1; letter-spacing: -1.5px; word-break: break-word; text-align: center; width: 100%; }
+.view-tab{
+  flex:1;padding:11px 16px;border-radius:11px;border:none;
+  background:transparent;color:rgba(255,255,255,.35);
+  font-family:var(--font-b);font-size:13px;font-weight:600;
+  cursor:pointer;transition:all .25s;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.view-tab.active{
+  background:linear-gradient(135deg,rgba(91,107,255,.18),rgba(0,229,200,.1));
+  color:#fff;border:1px solid rgba(91,107,255,.28);
+  box-shadow:0 4px 20px rgba(91,107,255,.15);
+}
+.view-tab:hover:not(.active){color:rgba(255,255,255,.6);background:rgba(255,255,255,.05)}
 
-/* ── STAGE PROGRESS ── */
-.sp-row { margin-bottom: 22px; }
-.sp-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.sp-name { font-family: var(--font-d); font-size: 14px; font-weight: 600; color: rgba(255,255,255,.8); }
-.sp-pct { font-family: var(--font-d); font-size: 14px; font-weight: 700; color: var(--cyan); }
-.sp-track { height: 7px; border-radius: 100px; background: rgba(255,255,255,.07); overflow: hidden; }
-.sp-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg,var(--neon),var(--cyan)); box-shadow: 0 0 10px rgba(0,229,200,.25); transition: width 1.3s var(--ease); width: 0; }
+#visualRoadmapSection{display:none}
+#textRoadmapSection{display:block}
 
-/* ── SKILLS ── */
-.ms-title { font-family: var(--font-d); font-size: 19px; font-weight: 700; color: #fff; margin-bottom: 20px; }
-.chip-red { display: inline-flex; padding: 6px 16px; border-radius: 100px; background: rgba(255,87,87,.1); border: 1px solid rgba(255,87,87,.25); font-size: 13px; font-weight: 500; color: rgba(255,160,160,.9); margin: 0 6px 8px 0; }
-.chip-blue { display: inline-flex; padding: 6px 16px; border-radius: 100px; background: rgba(91,107,255,.1); border: 1px solid rgba(91,107,255,.22); font-size: 13px; font-weight: 500; color: rgba(180,190,255,.9); margin: 0 6px 8px 0; }
-.chip-cyan { display: inline-flex; padding: 6px 16px; border-radius: 100px; background: rgba(0,229,200,.08); border: 1px solid rgba(0,229,200,.2); font-size: 13px; font-weight: 500; color: rgba(0,229,200,.85); margin: 0 6px 8px 0; }
-.chip-green { display: inline-flex; padding: 6px 16px; border-radius: 100px; background: rgba(34,197,94,.08); border: 1px solid rgba(34,197,94,.2); font-size: 13px; font-weight: 500; color: rgba(134,239,172,.9); margin: 0 6px 8px 0; }
+.visual-canvas-wrap{
+  position:relative;width:100%;
+  background:#070711;border:1px solid rgba(91,107,255,.15);
+  border-radius:22px;overflow:hidden;min-height:640px;
+}
+.visual-canvas-wrap::after{display:none;}
+#roadmapCanvas{display:block;width:100%;position:relative;z-index:1;cursor:grab;touch-action:none;}
+#roadmapCanvas:active{cursor:grabbing}
 
-.alert-good { padding: 20px 24px; border-radius: 14px; background: rgba(91,107,255,.08); border: 1px solid rgba(91,107,255,.2); font-size: 14px; color: rgba(255,255,255,.55); line-height: 1.6; }
+.canvas-controls{position:absolute;top:16px;right:16px;z-index:20;display:flex;gap:8px;}
+.canvas-ctrl-btn{
+  width:40px;height:40px;border-radius:12px;
+  background:rgba(10,12,30,.85);border:1px solid rgba(255,255,255,.14);
+  color:rgba(255,255,255,.75);font-size:17px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  font-family:var(--font-b);font-weight:600;user-select:none;
+}
+.canvas-ctrl-btn:hover{background:rgba(91,107,255,.25);color:#fff;border-color:rgba(91,107,255,.5);transform:scale(1.08);}
+.canvas-ctrl-btn:active{transform:scale(.95)}
+.canvas-ctrl-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;pointer-events:none;}
 
-/* ── ROADMAP STAGE ── */
-.stage-card { margin-bottom: 16px; }
-.stage-head { font-family: var(--font-d); font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--rim); }
+.canvas-legend{
+  position:absolute;bottom:16px;left:16px;z-index:20;
+  display:flex;gap:14px;flex-wrap:wrap;
+  padding:10px 16px;background:rgba(5,5,20,.82);
+  border:1px solid rgba(255,255,255,.09);border-radius:12px;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,.5)}
+.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
 
-/* ── LEARNING PLAN ── */
-.lp-card { margin-bottom: 16px; animation: fadeUp .5s var(--ease) both; }
-.lp-inner { padding: 32px 40px; }
-.lp-week { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--cyan); margin-bottom: 8px; }
-.lp-skill { font-family: var(--font-d); font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 18px; letter-spacing: -.5px; }
-.lp-meta { display: flex; gap: 22px; flex-wrap: wrap; margin-bottom: 18px; }
-.lp-meta-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: rgba(255,255,255,.4); }
-.lp-meta-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--neon); }
-.lp-sep { height: 1px; background: var(--rim); margin: 18px 0; }
-.lp-dl { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,.28); margin-bottom: 5px; margin-top: 14px; }
-.lp-dv { font-size: 14px; color: rgba(255,255,255,.5); line-height: 1.75; font-weight: 300; }
+.canvas-stats-bar{
+  position:absolute;top:16px;left:16px;z-index:20;display:none;gap:16px;
+  padding:10px 18px;background:rgba(5,5,20,.82);
+  border:1px solid rgba(255,255,255,.09);border-radius:12px;
+  backdrop-filter:blur(16px);font-size:12px;color:rgba(255,255,255,.5);
+}
+.canvas-stat{display:flex;align-items:center;gap:5px}
+.canvas-stat-val{font-family:var(--font-d);font-weight:700;font-size:13px}
 
-/* ── MARKET ── */
-.mkt-inner { padding: 36px 40px; }
-.mkt-title { font-family: var(--font-d); font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 28px; }
-.mkt-section { margin-bottom: 22px; }
-.mkt-lbl { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,.28); margin-bottom: 12px; }
-.mkt-sep { height: 1px; background: var(--rim); margin: 20px 0; }
-.mkt-empty { font-size: 13px; color: rgba(255,255,255,.28); }
+/* NODE TOOLTIP */
+#nodeTooltip{
+  position:fixed;z-index:9999;pointer-events:none;
+  padding:14px 18px;background:rgba(8,8,20,.97);
+  border:1px solid rgba(91,107,255,.3);border-radius:14px;
+  font-family:var(--font-b);font-size:13px;color:rgba(255,255,255,.85);
+  max-width:260px;line-height:1.5;backdrop-filter:blur(20px);
+  box-shadow:0 16px 48px rgba(0,0,0,.8),0 0 0 1px rgba(91,107,255,.12);
+  opacity:0;transition:opacity .15s;
+}
+#nodeTooltip.visible{opacity:1}
+#nodeTooltip .tt-title{font-weight:700;color:#fff;margin-bottom:4px;font-family:var(--font-d);font-size:14px}
+#nodeTooltip .tt-status{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;}
 
-/* ── LOADING STATE ── */
-.rm-loading { display: flex; align-items: center; gap: 16px; padding: 40px 0; }
-.rm-spinner { width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(255,255,255,.08); border-top-color: var(--neon); animation: spin .8s linear infinite; flex-shrink: 0; }
-@keyframes spin { to{transform:rotate(360deg)} }
-.rm-loading-txt { font-size: 15px; color: rgba(255,255,255,.35); font-weight: 300; }
+.canvas-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:5;}
+.canvas-empty-icon{font-size:48px;opacity:.25}
+.canvas-empty-text{font-size:14px;color:rgba(255,255,255,.22);text-align:center;line-height:1.7}
 
-/* ── ANIM ── */
-@keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── RESPONSIVE ── */
 @media(max-width:860px){
-  .rm-body { padding: 40px 20px 100px; }
-  .analytics-grid { grid-template-columns: 1fr 1fr; }
-  .rm-action-row { grid-template-columns: 1fr; }
-  .rm-card-pad, .lp-inner, .mkt-inner { padding: 24px 22px; }
+  .rm-body{padding:40px 20px 100px}
+  .analytics-grid{grid-template-columns:1fr 1fr}
+  .rm-action-row{grid-template-columns:1fr}
+  .rm-card-pad,.lp-inner,.mkt-inner{padding:24px 22px}
+  .view-toggle-bar{flex-wrap:wrap}
 }
 @media(max-width:480px){
-  .analytics-grid { grid-template-columns: 1fr 1fr; }
-  .an-box { min-height: 110px; padding: 20px 12px; }
+  .analytics-grid{grid-template-columns:1fr 1fr}
+  .an-box{min-height:110px;padding:20px 12px}
 }
 </style>
 
@@ -258,7 +324,7 @@ html, body { background: #000 !important; color: #fff !important; font-family: v
 
 <div class="rm-body">
 
-  <!-- ── HEADER ── -->
+  <!-- HEADER -->
   <div class="rm-head">
     <div class="rm-eyebrow"><div class="rm-eyebrow-dot"></div>AI-Powered Intelligence</div>
     <div class="rm-title">
@@ -271,142 +337,84 @@ html, body { background: #000 !important; color: #fff !important; font-family: v
     </div>
   </div>
 
-  <!-- ── ROLE SELECTOR ── -->
-  <div style="animation: fadeUp .7s .1s ease both">
+  <!-- ROLE SELECTOR -->
+  <div style="animation:fadeUp .7s .1s ease both">
     <div class="rm-card">
       <div class="rm-card-pad">
-
-        <!-- Search filter -->
         <div class="rm-lbl" style="margin-bottom:8px">Search or choose your target role</div>
         <div class="rm-search-wrap">
           <span class="rm-search-icon">🔍</span>
           <input type="text" id="roleSearch" placeholder="Type to search roles… e.g. AI Engineer, DevOps, Data Scientist">
         </div>
-
-        <!-- Role select -->
         <div class="rm-lbl">Select from 50+ global roles</div>
         <div class="role-picker-wrap">
           <select id="roleSelect" size="1">
             <option value="" disabled selected>— Select Target Role —</option>
-
             <optgroup label="🖥  Software Engineering">
-              <option>Full Stack Developer</option>
-              <option>Frontend Developer</option>
-              <option>Backend Developer</option>
-              <option>Python Developer</option>
-              <option>Java Developer</option>
-              <option>Go Developer</option>
-              <option>Rust Developer</option>
+              <option>Full Stack Developer</option><option>Frontend Developer</option>
+              <option>Backend Developer</option><option>Python Developer</option>
+              <option>Java Developer</option><option>Go Developer</option><option>Rust Developer</option>
             </optgroup>
-
             <optgroup label="📱  Mobile Development">
-              <option>Mobile Developer (iOS)</option>
-              <option>Mobile Developer (Android)</option>
-              <option>React Native Developer</option>
-              <option>Flutter Developer</option>
+              <option>Mobile Developer (iOS)</option><option>Mobile Developer (Android)</option>
+              <option>React Native Developer</option><option>Flutter Developer</option>
             </optgroup>
-
             <optgroup label="🤖  AI / ML / Data">
-              <option>AI Engineer</option>
-              <option>Machine Learning Engineer</option>
-              <option>Data Scientist</option>
-              <option>Data Analyst</option>
-              <option>Data Engineer</option>
-              <option>Business Intelligence Developer</option>
-              <option>NLP Engineer</option>
-              <option>Computer Vision Engineer</option>
-              <option>MLOps Engineer</option>
-              <option>Prompt Engineer</option>
-              <option>Research Scientist (AI)</option>
+              <option>AI Engineer</option><option>Machine Learning Engineer</option>
+              <option>Data Scientist</option><option>Data Analyst</option><option>Data Engineer</option>
+              <option>Business Intelligence Developer</option><option>NLP Engineer</option>
+              <option>Computer Vision Engineer</option><option>MLOps Engineer</option>
+              <option>Prompt Engineer</option><option>Research Scientist (AI)</option>
             </optgroup>
-
             <optgroup label="☁️  Cloud / DevOps / SRE">
-              <option>DevOps Engineer</option>
-              <option>Cloud Engineer (AWS)</option>
-              <option>Cloud Engineer (GCP)</option>
-              <option>Site Reliability Engineer (SRE)</option>
-              <option>Platform Engineer</option>
-              <option>Kubernetes Engineer</option>
+              <option>DevOps Engineer</option><option>Cloud Engineer (AWS)</option>
+              <option>Cloud Engineer (GCP)</option><option>Site Reliability Engineer (SRE)</option>
+              <option>Platform Engineer</option><option>Kubernetes Engineer</option>
             </optgroup>
-
             <optgroup label="🔒  Security">
-              <option>Cybersecurity Engineer</option>
-              <option>Application Security Engineer</option>
+              <option>Cybersecurity Engineer</option><option>Application Security Engineer</option>
               <option>Cloud Security Engineer</option>
             </optgroup>
-
             <optgroup label="⛓  Blockchain / Web3">
-              <option>Blockchain Developer</option>
-              <option>Web3 Frontend Developer</option>
+              <option>Blockchain Developer</option><option>Web3 Frontend Developer</option>
             </optgroup>
-
             <optgroup label="🔧  Systems / Embedded">
-              <option>Embedded Systems Engineer</option>
-              <option>Systems Programmer</option>
+              <option>Embedded Systems Engineer</option><option>Systems Programmer</option>
             </optgroup>
-
             <optgroup label="🎮  Game Development">
-              <option>Game Developer (Unity)</option>
-              <option>Game Developer (Unreal)</option>
+              <option>Game Developer (Unity)</option><option>Game Developer (Unreal)</option>
             </optgroup>
-
             <optgroup label="🧪  QA / Testing">
-              <option>QA Engineer</option>
-              <option>SDET (Software Dev Engineer in Test)</option>
+              <option>QA Engineer</option><option>SDET (Software Dev Engineer in Test)</option>
             </optgroup>
-
             <optgroup label="🗄  Database">
-              <option>Database Administrator</option>
-              <option>Database Engineer</option>
+              <option>Database Administrator</option><option>Database Engineer</option>
             </optgroup>
-
-            <optgroup label="🌐  Networking">
-              <option>Network Engineer</option>
-            </optgroup>
-
+            <optgroup label="🌐  Networking"><option>Network Engineer</option></optgroup>
             <optgroup label="💰  Finance Tech">
-              <option>Quantitative Analyst</option>
-              <option>FinTech Developer</option>
+              <option>Quantitative Analyst</option><option>FinTech Developer</option>
             </optgroup>
-
             <optgroup label="🧠  Product / Design">
-              <option>Product Manager</option>
-              <option>UX/UI Designer</option>
+              <option>Product Manager</option><option>UX/UI Designer</option>
             </optgroup>
-
             <optgroup label="🤝  Leadership / Strategy">
-              <option>Solutions Architect</option>
-              <option>Engineering Manager</option>
-              <option>Startup CTO</option>
+              <option>Solutions Architect</option><option>Engineering Manager</option><option>Startup CTO</option>
             </optgroup>
-
             <optgroup label="⚙️  Automation / APIs / Other">
-              <option>Automation Engineer</option>
-              <option>API Developer</option>
-              <option>Technical Writer</option>
+              <option>Automation Engineer</option><option>API Developer</option><option>Technical Writer</option>
             </optgroup>
-
           </select>
         </div>
-
         <div class="rm-role-count">
           <span class="rm-role-count-num" id="roleCountNum">50+</span> roles available globally
-          <span style="color:rgba(255,255,255,.15)">·</span>
-          <span id="selectedRoleDisplay" style="color:rgba(255,255,255,.45)">No role selected</span>
+          <span style="color:rgba(255,255,255,.12)">·</span>
+          <span id="selectedRoleDisplay" style="color:rgba(255,255,255,.4)">No role selected</span>
         </div>
-
-        <!-- Action buttons -->
         <div class="rm-action-row">
-          <select id="roleSelectHidden" style="display:none"></select>
           <div style="flex:1"></div>
-          <button class="rm-btn-auto" onclick="autoDetect()">
-            🧠 Auto-Detect My Best Role
-          </button>
-          <button class="rm-btn" onclick="loadRoadmap()">
-            Analyze Career Path →
-          </button>
+          <button class="rm-btn-auto" onclick="autoDetect()">🧠 Auto-Detect My Best Role</button>
+          <button class="rm-btn" onclick="loadRoadmap()">Analyze Career Path →</button>
         </div>
-
         <div class="rm-hints">
           <div class="rm-hint"><div class="rh-dot" style="background:var(--neon)"></div>Skill gap detection</div>
           <div class="rm-hint"><div class="rh-dot" style="background:var(--cyan)"></div>Placement probability</div>
@@ -418,7 +426,7 @@ html, body { background: #000 !important; color: #fff !important; font-family: v
     </div>
   </div>
 
-  <!-- ── LOADING ── -->
+  <!-- LOADING -->
   <div id="loadingState" style="display:none">
     <div class="rm-div"></div>
     <div class="rm-loading">
@@ -427,7 +435,7 @@ html, body { background: #000 !important; color: #fff !important; font-family: v
     </div>
   </div>
 
-  <!-- ── DETECTED ROLE BANNER ── -->
+  <!-- DETECTED BANNER -->
   <div id="detectedBanner" style="display:none">
     <div class="rm-div"></div>
     <div class="rm-detected-banner">
@@ -439,31 +447,19 @@ html, body { background: #000 !important; color: #fff !important; font-family: v
     </div>
   </div>
 
-  <!-- ── ANALYTICS ── -->
+  <!-- ANALYTICS -->
   <div id="analyticsContainer">
     <div class="rm-div"></div>
     <div class="rm-sec-eyebrow">Overview</div>
     <div class="analytics-grid">
-      <div class="an-box">
-        <div class="an-label">Role Match</div>
-        <div class="an-val" id="roleScore">—</div>
-      </div>
-      <div class="an-box">
-        <div class="an-label">Placement Probability</div>
-        <div class="an-val" id="placementScore">—</div>
-      </div>
-      <div class="an-box">
-        <div class="an-label">Learning Time</div>
-        <div class="an-val" id="totalWeeks">—</div>
-      </div>
-      <div class="an-box">
-        <div class="an-label">Skill Gaps</div>
-        <div class="an-val" id="missingCount">—</div>
-      </div>
+      <div class="an-box"><div class="an-label">Role Match</div><div class="an-val" id="roleScore">—</div></div>
+      <div class="an-box"><div class="an-label">Placement Probability</div><div class="an-val" id="placementScore">—</div></div>
+      <div class="an-box"><div class="an-label">Learning Time</div><div class="an-val" id="totalWeeks">—</div></div>
+      <div class="an-box"><div class="an-label">Skill Gaps</div><div class="an-val" id="missingCount">—</div></div>
     </div>
   </div>
 
-  <!-- ── STAGE PROGRESS ── -->
+  <!-- STAGE PROGRESS -->
   <div class="rm-div"></div>
   <div class="rm-sec-eyebrow">Stage Completion</div>
   <div class="rm-sec-title">Your Learning Stages</div>
@@ -475,7 +471,7 @@ html, body { background: #000 !important; color: #fff !important; font-family: v
     </div>
   </div>
 
-  <!-- ── MISSING SKILLS ── -->
+  <!-- MISSING SKILLS -->
   <div class="rm-div"></div>
   <div class="rm-sec-eyebrow">Skill Gaps</div>
   <div class="rm-sec-title">Skills to Acquire</div>
@@ -483,15 +479,66 @@ html, body { background: #000 !important; color: #fff !important; font-family: v
     <div class="rm-card"><div class="rm-card-pad" style="font-size:14px;color:rgba(255,255,255,.2);font-style:italic">Run the analysis to see your skill gaps.</div></div>
   </div>
 
-  <!-- ── ROADMAP STAGES ── -->
+  <!-- VISUAL ROADMAP -->
   <div class="rm-div"></div>
-  <div class="rm-sec-eyebrow">Roadmap</div>
-  <div class="rm-sec-title">Your Career Stages</div>
-  <div id="roadmapContainer">
-    <div class="rm-card"><div class="rm-card-pad" style="font-size:14px;color:rgba(255,255,255,.2);font-style:italic">Run the analysis to see your full roadmap.</div></div>
+  <div class="rm-sec-eyebrow">Visual Roadmap</div>
+  <div class="rm-sec-title">Interactive Career Map</div>
+
+  <div class="view-toggle-bar">
+    <button class="view-tab active" id="tabVisual" onclick="switchView('visual')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      Visual Mind Map
+    </button>
+    <button class="view-tab" id="tabText" onclick="switchView('text')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+      Stage Cards
+    </button>
   </div>
 
-  <!-- ── LEARNING PLAN ── -->
+  <!-- CANVAS VISUAL -->
+  <div id="visualRoadmapSection">
+    <div class="visual-canvas-wrap" id="canvasWrap">
+      <div class="canvas-empty" id="canvasEmpty">
+        <div class="canvas-empty-icon">🗺</div>
+        <div class="canvas-empty-text">Select a role to instantly preview<br>your interactive career roadmap</div>
+      </div>
+      <canvas id="roadmapCanvas" width="1000" height="700" style="display:none"></canvas>
+      <div class="canvas-stats-bar" id="canvasStatsBar">
+        <div class="canvas-stat"><span>✅</span><span class="canvas-stat-val" id="csCompleted" style="color:#22c55e">0</span><span>done</span></div>
+        <div class="canvas-stat"><span>⚠️</span><span class="canvas-stat-val" id="csMissing" style="color:#ff5757">0</span><span>to learn</span></div>
+        <div class="canvas-stat"><span>📌</span><span class="canvas-stat-val" id="csStages" style="color:#5b6bff">0</span><span>stages</span></div>
+      </div>
+      <div class="canvas-controls" id="canvasControls">
+        <button class="canvas-ctrl-btn" title="Zoom In" id="btnZoomIn">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button class="canvas-ctrl-btn" title="Zoom Out" id="btnZoomOut">
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button class="canvas-ctrl-btn" title="Reset View" id="btnReset">
+          <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+        </button>
+        <button class="canvas-ctrl-btn" title="Fit to Screen" id="btnFit">
+          <svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+        </button>
+      </div>
+      <div class="canvas-legend" id="canvasLegend" style="display:none">
+        <div class="legend-item"><div class="legend-dot" style="background:#4ade80"></div>Completed</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#fb923c"></div>In Progress</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div>To Learn</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#818cf8;border-radius:50%"></div>Stage Hub</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEXT STAGE CARDS -->
+  <div id="textRoadmapSection">
+    <div id="roadmapContainer">
+      <div class="rm-card"><div class="rm-card-pad" style="font-size:14px;color:rgba(255,255,255,.2);font-style:italic">Run the analysis to see your full roadmap.</div></div>
+    </div>
+  </div>
+
+  <!-- LEARNING PLAN -->
   <div class="rm-div"></div>
   <div class="rm-sec-eyebrow">Personalized Plan</div>
   <div class="rm-sec-title">Week-by-Week Learning Plan</div>
@@ -499,7 +546,7 @@ html, body { background: #000 !important; color: #fff !important; font-family: v
     <div class="rm-card"><div class="rm-card-pad" style="font-size:14px;color:rgba(255,255,255,.2);font-style:italic">Run the analysis to generate your personalized learning plan.</div></div>
   </div>
 
-  <!-- ── MARKET INTELLIGENCE ── -->
+  <!-- MARKET INTELLIGENCE -->
   <div class="rm-div"></div>
   <div class="rm-sec-eyebrow">Market Intelligence</div>
   <div class="rm-sec-title">Live Market Data</div>
@@ -507,34 +554,207 @@ html, body { background: #000 !important; color: #fff !important; font-family: v
     <div class="rm-card"><div class="rm-card-pad" style="font-size:14px;color:rgba(255,255,255,.2);font-style:italic">Run the analysis to see live market intelligence for your role.</div></div>
   </div>
 
-</div>
+</div><!-- end rm-body -->
+</div><!-- end rm-page -->
+
+<!-- TOOLTIP (no links div) -->
+<div id="nodeTooltip">
+  <div class="tt-title" id="ttTitle"></div>
+  <div class="tt-status" id="ttStatus"></div>
 </div>
 
 <script>
-/* ── SEARCH FILTER ── */
+/* ══════════════════════════════════════════════════════════
+   COURSE DATABASE
+══════════════════════════════════════════════════════════ */
+const COURSES = {
+  'Python': [
+    {name:'Python for Everybody',platform:'Coursera',icon:'🎓',url:'https://www.coursera.org/specializations/python',type:'coursera',free:false,level:'Beginner'},
+    {name:'100 Days of Code – Python',platform:'Udemy',icon:'🎯',url:'https://www.udemy.com/course/100-days-of-code/',type:'udemy',free:false,level:'Beginner'},
+    {name:'Python Tutorial – FreeCodeCamp',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=rfscVS0vtbw',type:'yt',free:true,level:'Beginner'},
+    {name:'Official Python Docs',platform:'Docs',icon:'📖',url:'https://docs.python.org/3/tutorial/',type:'docs',free:true,level:'All'},
+  ],
+  'JavaScript ES6+': [
+    {name:'JavaScript – The Complete Guide',platform:'Udemy',icon:'🎯',url:'https://www.udemy.com/course/javascript-the-complete-guide-2020-beginner-advanced/',type:'udemy',free:false,level:'Beginner'},
+    {name:'JS Crash Course',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=hdI2bqOjy3c',type:'yt',free:true,level:'Beginner'},
+    {name:'MDN JavaScript Guide',platform:'Docs',icon:'📖',url:'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide',type:'docs',free:true,level:'All'},
+  ],
+  'React': [
+    {name:'React – The Complete Guide',platform:'Udemy',icon:'🎯',url:'https://www.udemy.com/course/react-the-complete-guide-incl-redux/',type:'udemy',free:false,level:'Intermediate'},
+    {name:'React Official Docs',platform:'Docs',icon:'📖',url:'https://react.dev/learn',type:'docs',free:true,level:'All'},
+    {name:'React Full Course – FCC',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=bMknfKXIFA8',type:'yt',free:true,level:'Beginner'},
+  ],
+  'Node.js': [
+    {name:'Node.js – The Complete Guide',platform:'Udemy',icon:'🎯',url:'https://www.udemy.com/course/nodejs-the-complete-guide/',type:'udemy',free:false,level:'Intermediate'},
+    {name:'Node.js Crash Course',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=fBNz5xF-Kx4',type:'yt',free:true,level:'Beginner'},
+    {name:'Node.js Docs',platform:'Docs',icon:'📖',url:'https://nodejs.org/en/docs/',type:'docs',free:true,level:'All'},
+  ],
+  'TypeScript': [
+    {name:'TypeScript – The Complete Dev Guide',platform:'Udemy',icon:'🎯',url:'https://www.udemy.com/course/typescript-the-complete-developers-guide/',type:'udemy',free:false,level:'Intermediate'},
+    {name:'TS Handbook',platform:'Docs',icon:'📖',url:'https://www.typescriptlang.org/docs/handbook/intro.html',type:'docs',free:true,level:'All'},
+  ],
+  'Docker': [
+    {name:'Docker Mastery',platform:'Udemy',icon:'🎯',url:'https://www.udemy.com/course/docker-mastery/',type:'udemy',free:false,level:'Intermediate'},
+    {name:'Docker in 100 Seconds',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=Gjnup-PuquQ',type:'yt',free:true,level:'Beginner'},
+    {name:'Official Docker Docs',platform:'Docs',icon:'📖',url:'https://docs.docker.com/',type:'docs',free:true,level:'All'},
+  ],
+  'Kubernetes': [
+    {name:'Kubernetes for Absolute Beginners',platform:'Udemy',icon:'🎯',url:'https://www.udemy.com/course/learn-kubernetes/',type:'udemy',free:false,level:'Beginner'},
+    {name:'Kubernetes Crash Course',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=s_o8dwzRlu4',type:'yt',free:true,level:'Beginner'},
+    {name:'Kubernetes Docs',platform:'Docs',icon:'📖',url:'https://kubernetes.io/docs/home/',type:'docs',free:true,level:'All'},
+  ],
+  'Machine Learning': [
+    {name:'Machine Learning Specialization',platform:'Coursera',icon:'🎓',url:'https://www.coursera.org/specializations/machine-learning-introduction',type:'coursera',free:false,level:'Intermediate'},
+    {name:'ML with Python – FreeCodeCamp',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=7eh4d6sabA0',type:'yt',free:true,level:'Beginner'},
+    {name:'Kaggle ML Course',platform:'Kaggle',icon:'📊',url:'https://www.kaggle.com/learn/intro-to-machine-learning',type:'kaggle',free:true,level:'Beginner'},
+  ],
+  'Deep Learning': [
+    {name:'Deep Learning Specialization',platform:'Coursera',icon:'🎓',url:'https://www.coursera.org/specializations/deep-learning',type:'coursera',free:false,level:'Advanced'},
+    {name:'MIT Deep Learning',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/playlist?list=PLtBw6njQRU-rwp5__7C0oIVt26ZgjG9NI',type:'yt',free:true,level:'Advanced'},
+    {name:'fast.ai Practical DL',platform:'Docs',icon:'📖',url:'https://course.fast.ai/',type:'docs',free:true,level:'Intermediate'},
+  ],
+  'PyTorch': [
+    {name:'PyTorch for Deep Learning',platform:'Udemy',icon:'🎯',url:'https://www.udemy.com/course/pytorch-for-deep-learning-in-python-bootcamp/',type:'udemy',free:false,level:'Intermediate'},
+    {name:'PyTorch Official Tutorials',platform:'Docs',icon:'📖',url:'https://pytorch.org/tutorials/',type:'docs',free:true,level:'All'},
+    {name:'Learn PyTorch – Zero to Mastery',platform:'Docs',icon:'📖',url:'https://www.learnpytorch.io/',type:'docs',free:true,level:'Beginner'},
+  ],
+  'TensorFlow': [
+    {name:'TensorFlow Developer Certificate',platform:'Coursera',icon:'🎓',url:'https://www.coursera.org/professional-certificates/tensorflow-in-practice',type:'coursera',free:false,level:'Intermediate'},
+    {name:'TensorFlow Tutorials',platform:'Docs',icon:'📖',url:'https://www.tensorflow.org/tutorials',type:'docs',free:true,level:'All'},
+  ],
+  'Pandas': [
+    {name:'Pandas – Kaggle',platform:'Kaggle',icon:'📊',url:'https://www.kaggle.com/learn/pandas',type:'kaggle',free:true,level:'Beginner'},
+    {name:'Pandas Docs',platform:'Docs',icon:'📖',url:'https://pandas.pydata.org/docs/',type:'docs',free:true,level:'All'},
+  ],
+  'NumPy': [
+    {name:'NumPy Quickstart',platform:'Docs',icon:'📖',url:'https://numpy.org/doc/stable/user/quickstart.html',type:'docs',free:true,level:'Beginner'},
+    {name:'NumPy Full Tutorial',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=QUT1VHiLmmI',type:'yt',free:true,level:'Beginner'},
+  ],
+  'SQL': [
+    {name:'SQL for Data Science',platform:'Coursera',icon:'🎓',url:'https://www.coursera.org/learn/sql-for-data-science',type:'coursera',free:false,level:'Beginner'},
+    {name:'SQL Tutorial – FreeCodeCamp',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=HXV3zeQKqGY',type:'yt',free:true,level:'Beginner'},
+    {name:'SQLZoo',platform:'Docs',icon:'📖',url:'https://sqlzoo.net/',type:'docs',free:true,level:'Beginner'},
+  ],
+  'PostgreSQL': [
+    {name:'PostgreSQL Tutorial',platform:'Docs',icon:'📖',url:'https://www.postgresqltutorial.com/',type:'docs',free:true,level:'Beginner'},
+    {name:'PG Full Course',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=qw--VYLpxG4',type:'yt',free:true,level:'Beginner'},
+  ],
+  'Git': [
+    {name:'Git & GitHub – FreeCodeCamp',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=RGOj5yH7evk',type:'yt',free:true,level:'Beginner'},
+    {name:'Pro Git Book',platform:'Docs',icon:'📖',url:'https://git-scm.com/book/en/v2',type:'docs',free:true,level:'All'},
+  ],
+  'AWS Core': [
+    {name:'AWS Cloud Practitioner',platform:'Udemy',icon:'🎯',url:'https://www.udemy.com/course/aws-certified-cloud-practitioner-new/',type:'udemy',free:false,level:'Beginner'},
+    {name:'AWS Free Tier + Docs',platform:'Docs',icon:'📖',url:'https://aws.amazon.com/getting-started/',type:'docs',free:true,level:'Beginner'},
+  ],
+  'Terraform': [
+    {name:'HashiCorp Terraform Associate',platform:'Udemy',icon:'🎯',url:'https://www.udemy.com/course/terraform-beginner-to-advanced/',type:'udemy',free:false,level:'Intermediate'},
+    {name:'Terraform Docs',platform:'Docs',icon:'📖',url:'https://developer.hashicorp.com/terraform/docs',type:'docs',free:true,level:'All'},
+  ],
+  'Scikit-Learn': [
+    {name:'Scikit-Learn User Guide',platform:'Docs',icon:'📖',url:'https://scikit-learn.org/stable/user_guide.html',type:'docs',free:true,level:'All'},
+    {name:'Sklearn – Kaggle',platform:'Kaggle',icon:'📊',url:'https://www.kaggle.com/learn',type:'kaggle',free:true,level:'Intermediate'},
+  ],
+  'Scikit-learn': [
+    {name:'Scikit-Learn User Guide',platform:'Docs',icon:'📖',url:'https://scikit-learn.org/stable/user_guide.html',type:'docs',free:true,level:'All'},
+    {name:'ML with Scikit-Learn',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=0Lt9w-BxKFQ',type:'yt',free:true,level:'Intermediate'},
+  ],
+  'Next.js': [
+    {name:'Next.js Official Docs',platform:'Docs',icon:'📖',url:'https://nextjs.org/docs',type:'docs',free:true,level:'All'},
+    {name:'Next.js 14 Full Course',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=wm5gMKuwSYk',type:'yt',free:true,level:'Intermediate'},
+  ],
+  'Prometheus': [
+    {name:'Prometheus Official Docs',platform:'Docs',icon:'📖',url:'https://prometheus.io/docs/introduction/overview/',type:'docs',free:true,level:'All'},
+    {name:'Monitoring with Prometheus',platform:'Udemy',icon:'🎯',url:'https://www.udemy.com/course/monitoring-and-alerting-with-prometheus/',type:'udemy',free:false,level:'Intermediate'},
+  ],
+  'Grafana': [
+    {name:'Grafana Fundamentals',platform:'Docs',icon:'📖',url:'https://grafana.com/tutorials/grafana-fundamentals/',type:'docs',free:true,level:'Beginner'},
+  ],
+  'NLP': [
+    {name:'NLP with Python – NLTK',platform:'Docs',icon:'📖',url:'https://www.nltk.org/book/',type:'docs',free:true,level:'Intermediate'},
+    {name:'Hugging Face NLP Course',platform:'Docs',icon:'📖',url:'https://huggingface.co/learn/nlp-course/',type:'docs',free:true,level:'Intermediate'},
+  ],
+  'Transformers': [
+    {name:'Hugging Face Course',platform:'Docs',icon:'📖',url:'https://huggingface.co/learn/nlp-course/chapter1/1',type:'docs',free:true,level:'Intermediate'},
+    {name:'Transformers from Scratch',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=U0s0f995w14',type:'yt',free:true,level:'Advanced'},
+  ],
+  'HTML5': [
+    {name:'Responsive Web Design – FCC',platform:'FreeCodeCamp',icon:'🆓',url:'https://www.freecodecamp.org/learn/2022/responsive-web-design/',type:'freecodecamp',free:true,level:'Beginner'},
+    {name:'MDN HTML',platform:'Docs',icon:'📖',url:'https://developer.mozilla.org/en-US/docs/Learn/HTML',type:'docs',free:true,level:'All'},
+  ],
+  'CSS3': [
+    {name:'CSS Full Course',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=1Rs2ND1ryYc',type:'yt',free:true,level:'Beginner'},
+    {name:'MDN CSS Docs',platform:'Docs',icon:'📖',url:'https://developer.mozilla.org/en-US/docs/Web/CSS',type:'docs',free:true,level:'All'},
+  ],
+  'Linux CLI': [
+    {name:'Linux Command Line – FCC',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=ZtqBQ68cfJc',type:'yt',free:true,level:'Beginner'},
+    {name:'The Linux Command Line Book',platform:'Docs',icon:'📖',url:'https://linuxcommand.org/tlcl.php',type:'docs',free:true,level:'Beginner'},
+  ],
+  'Bash Scripting': [
+    {name:'Bash Scripting Tutorial',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=tK9Oc6AEnR4',type:'yt',free:true,level:'Beginner'},
+    {name:'GNU Bash Manual',platform:'Docs',icon:'📖',url:'https://www.gnu.org/software/bash/manual/',type:'docs',free:true,level:'All'},
+  ],
+  'LangChain': [
+    {name:'LangChain Docs',platform:'Docs',icon:'📖',url:'https://docs.langchain.com/',type:'docs',free:true,level:'Intermediate'},
+    {name:'LangChain Full Course',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=lG7Uxts9SXs',type:'yt',free:true,level:'Intermediate'},
+  ],
+  'RAG': [
+    {name:'RAG Tutorial – LangChain',platform:'Docs',icon:'📖',url:'https://python.langchain.com/docs/tutorials/rag/',type:'docs',free:true,level:'Advanced'},
+  ],
+  'Prompt Engineering': [
+    {name:'Prompt Engineering Guide',platform:'Docs',icon:'📖',url:'https://www.promptingguide.ai/',type:'docs',free:true,level:'Beginner'},
+    {name:'ChatGPT Prompt Engineering',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/watch?v=H4YK_7MAckk',type:'yt',free:true,level:'Beginner'},
+  ],
+  'Statistics': [
+    {name:'Statistics – Khan Academy',platform:'Docs',icon:'📖',url:'https://www.khanacademy.org/math/statistics-probability',type:'docs',free:true,level:'Beginner'},
+    {name:'Statistics for Data Science',platform:'Udemy',icon:'🎯',url:'https://www.udemy.com/course/statistics-probability/',type:'udemy',free:false,level:'Beginner'},
+  ],
+  'Data Cleaning': [
+    {name:'Data Cleaning – Kaggle',platform:'Kaggle',icon:'📊',url:'https://www.kaggle.com/learn/data-cleaning',type:'kaggle',free:true,level:'Beginner'},
+  ],
+  'Feature Engineering': [
+    {name:'Feature Engineering – Kaggle',platform:'Kaggle',icon:'📊',url:'https://www.kaggle.com/learn/feature-engineering',type:'kaggle',free:true,level:'Intermediate'},
+  ],
+  'default': [
+    {name:'Search on Udemy',platform:'Udemy',icon:'🎯',url:'https://www.udemy.com/',type:'udemy',free:false,level:'All'},
+    {name:'YouTube Tutorials',platform:'YouTube',icon:'▶️',url:'https://www.youtube.com/',type:'yt',free:true,level:'All'},
+    {name:'Coursera Courses',platform:'Coursera',icon:'🎓',url:'https://www.coursera.org/',type:'coursera',free:false,level:'All'},
+    {name:'Official Documentation',platform:'Docs',icon:'📖',url:'https://devdocs.io/',type:'docs',free:true,level:'All'},
+  ],
+};
+
+function getCoursesForSkill(skillName) {
+  if (COURSES[skillName]) return COURSES[skillName];
+  const lower = skillName.toLowerCase();
+  for (const key in COURSES) {
+    if (key.toLowerCase() === lower || lower.includes(key.toLowerCase()) || key.toLowerCase().includes(lower)) {
+      return COURSES[key];
+    }
+  }
+  return COURSES['default'];
+}
+
+/* ══════════════════════════════════════════════════════════
+   SEARCH FILTER
+══════════════════════════════════════════════════════════ */
 document.getElementById('roleSearch').addEventListener('input', function() {
   const query = this.value.toLowerCase().trim();
   const select = document.getElementById('roleSelect');
   const groups = select.querySelectorAll('optgroup');
-
   groups.forEach(group => {
-    let groupVisible = false;
+    let vis = false;
     group.querySelectorAll('option').forEach(opt => {
-      const match = opt.textContent.toLowerCase().includes(query);
-      opt.style.display = match ? '' : 'none';
-      if (match) groupVisible = true;
+      const m = opt.textContent.toLowerCase().includes(query);
+      opt.style.display = m ? '' : 'none';
+      if (m) vis = true;
     });
-    group.style.display = groupVisible ? '' : 'none';
+    group.style.display = vis ? '' : 'none';
   });
-
-  // Auto-select first visible match
   if (query.length > 1) {
-    for (const group of groups) {
-      for (const opt of group.querySelectorAll('option')) {
-        if (opt.style.display !== 'none' && opt.value) {
-          select.value = opt.value;
-          updateSelectedDisplay(opt.value);
-          break;
+    for (const g of groups) {
+      for (const o of g.querySelectorAll('option')) {
+        if (o.style.display !== 'none' && o.value) {
+          select.value = o.value; updateSelectedDisplay(o.value); break;
         }
       }
       break;
@@ -542,242 +762,650 @@ document.getElementById('roleSearch').addEventListener('input', function() {
   }
 });
 
-/* ── UPDATE SELECTED DISPLAY ── */
 document.getElementById('roleSelect').addEventListener('change', function() {
   updateSelectedDisplay(this.value);
   document.getElementById('roleSearch').value = this.value;
+  const map = STATIC_ROADMAPS[this.value] || STATIC_ROADMAPS['default'];
+  const fakeRoadmap = {};
+  for (const stage in map) fakeRoadmap[stage] = map[stage].map(s => ({skill:s,status:'Not Started'}));
+  switchView('visual');
+  buildVisualRoadmap(fakeRoadmap, {});
 });
 
 function updateSelectedDisplay(role) {
   const el = document.getElementById('selectedRoleDisplay');
-  if (role) {
-    el.textContent = '✓ ' + role;
-    el.style.color = 'rgba(0,229,200,.8)';
-  } else {
-    el.textContent = 'No role selected';
-    el.style.color = 'rgba(255,255,255,.45)';
-  }
+  if (role) { el.textContent = '✓ ' + role; el.style.color = 'rgba(0,229,200,.8)'; }
+  else { el.textContent = 'No role selected'; el.style.color = 'rgba(255,255,255,.4)'; }
 }
 
-/* ── AUTO DETECT ── */
+/* ══════════════════════════════════════════════════════════
+   AUTO DETECT
+══════════════════════════════════════════════════════════ */
 async function autoDetect() {
   showLoading('🧠 Auto-detecting your best role from resume…');
   try {
     const response = await fetch('/api/roadmap', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role: 'AUTO' })
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({role:'AUTO'})
     });
     const data = await response.json();
     if (data.error) { alert(data.error); hideLoading(); return; }
-
-    // Show detected banner
     document.getElementById('detectedBanner').style.display = 'block';
     document.getElementById('detectedRoleName').textContent = data.detected_role || data.target_role;
     document.getElementById('detectedScore').textContent = data.role_match_score || data.role_score;
-
-    // Update dropdown
     const sel = document.getElementById('roleSelect');
     for (let opt of sel.options) {
       if (opt.value === (data.detected_role || data.target_role)) {
-        sel.value = opt.value;
-        updateSelectedDisplay(opt.value);
-        document.getElementById('roleSearch').value = opt.value;
-        break;
+        sel.value = opt.value; updateSelectedDisplay(opt.value);
+        document.getElementById('roleSearch').value = opt.value; break;
       }
     }
-
-    renderAll(data);
-    hideLoading();
-  } catch(e) {
-    hideLoading(); alert('Auto-detection failed. Please try again.');
-  }
+    renderAll(data); hideLoading();
+  } catch(e) { hideLoading(); alert('Auto-detection failed. Please try again.'); }
 }
 
-/* ── LOAD ROADMAP ── */
+/* ══════════════════════════════════════════════════════════
+   LOAD ROADMAP
+══════════════════════════════════════════════════════════ */
 async function loadRoadmap() {
   const role = document.getElementById('roleSelect').value;
   if (!role) { alert('Please select a role first.'); return; }
-
   showLoading(`Analyzing your path to ${role}…`);
   try {
     const response = await fetch('/api/roadmap', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role })
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({role})
     });
     const data = await response.json();
     if (data.error) { hideLoading(); alert(data.error); return; }
-
     document.getElementById('detectedBanner').style.display = 'none';
-    renderAll(data);
-    hideLoading();
-    // Scroll to analytics
+    renderAll(data); hideLoading();
     setTimeout(() => {
-      document.getElementById('analyticsContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById('analyticsContainer').scrollIntoView({behavior:'smooth',block:'start'});
     }, 200);
-  } catch(e) {
-    hideLoading(); alert('Something went wrong. Please try again.');
-  }
+  } catch(e) { hideLoading(); alert('Something went wrong. Please try again.'); }
 }
 
-/* ── RENDER ALL ── */
+/* ══════════════════════════════════════════════════════════
+   RENDER ALL
+══════════════════════════════════════════════════════════ */
 function renderAll(data) {
   document.getElementById('analyticsContainer').style.display = 'block';
   document.getElementById('roleScore').innerText    = (data.role_score || 0) + '%';
   document.getElementById('placementScore').innerText = (data.placement_probability || 0) + '%';
   document.getElementById('totalWeeks').innerText   = (data.total_learning_weeks || 0) + ' Wks';
   document.getElementById('missingCount').innerText = (data.missing_skills?.length || 0);
-
   renderStageProgress(data.stage_completion);
   renderMissingSkills(data);
   renderRoadmap(data);
   renderLearningPlan(data);
   renderMarket(data.market_intelligence);
+  if (data.roadmap) buildVisualRoadmap(data.roadmap, data.stage_completion || {});
 }
 
-/* ── LOADING ── */
 function showLoading(msg) {
   document.getElementById('loadingState').style.display = 'block';
   document.getElementById('loadingMsg').textContent = msg || 'Loading…';
 }
-function hideLoading() {
-  document.getElementById('loadingState').style.display = 'none';
-}
+function hideLoading() { document.getElementById('loadingState').style.display = 'none'; }
 
-/* ── STAGE PROGRESS ── */
+/* ══════════════════════════════════════════════════════════
+   STAGE PROGRESS
+══════════════════════════════════════════════════════════ */
 function renderStageProgress(stages) {
-  const container = document.getElementById('stageProgressContainer');
-  container.innerHTML = '';
-  if (!stages || Object.keys(stages).length === 0) {
-    container.innerHTML = '<div style="font-size:14px;color:rgba(255,255,255,.2);font-style:italic">No stage data available.</div>';
-    return;
+  const c = document.getElementById('stageProgressContainer');
+  c.innerHTML = '';
+  if (!stages || !Object.keys(stages).length) {
+    c.innerHTML = '<div style="font-size:14px;color:rgba(255,255,255,.2);font-style:italic">No stage data available.</div>'; return;
   }
   for (const stage in stages) {
-    const percent = stages[stage];
-    const color = percent >= 80 ? 'var(--green)' : percent >= 50 ? 'var(--cyan)' : percent > 0 ? 'var(--amber)' : 'var(--red)';
-    container.innerHTML += `
-      <div class="sp-row">
-        <div class="sp-top">
-          <span class="sp-name">${stage}</span>
-          <span class="sp-pct" style="color:${color}">${percent}%</span>
-        </div>
-        <div class="sp-track">
-          <div class="sp-fill" style="width:${percent}%;background:linear-gradient(90deg,var(--neon),${color})"></div>
-        </div>
-      </div>`;
-  }
-  // Trigger animations
-  setTimeout(() => {
-    document.querySelectorAll('.sp-fill').forEach(el => { el.style.width = el.style.width; });
-  }, 50);
-}
-
-/* ── MISSING SKILLS ── */
-function renderMissingSkills(data) {
-  const container = document.getElementById('missingSkillsContainer');
-  container.innerHTML = '';
-  if (!data.missing_skills || data.missing_skills.length === 0) {
-    container.innerHTML = `<div class="rm-card"><div class="rm-card-pad"><div class="alert-good">🎉 Amazing! You already have all required skills for this role!</div></div></div>`;
-    return;
-  }
-  let html = '';
-  data.missing_skills.forEach(skill => { html += `<span class="chip-red">${skill}</span>`; });
-  container.innerHTML = `
-    <div class="rm-card">
-      <div class="rm-card-pad">
-        <div class="ms-title">⚠️ ${data.missing_skills.length} Skill${data.missing_skills.length!==1?'s':''} to Acquire</div>
-        ${html}
-      </div>
+    const pct = stages[stage];
+    const col = pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--cyan)' : pct > 0 ? 'var(--amber)' : 'var(--red)';
+    c.innerHTML += `<div class="sp-row">
+      <div class="sp-top"><span class="sp-name">${stage}</span><span class="sp-pct" style="color:${col}">${pct}%</span></div>
+      <div class="sp-track"><div class="sp-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--neon),${col})"></div></div>
     </div>`;
+  }
 }
 
-/* ── ROADMAP ── */
+/* ══════════════════════════════════════════════════════════
+   MISSING SKILLS
+══════════════════════════════════════════════════════════ */
+function renderMissingSkills(data) {
+  const c = document.getElementById('missingSkillsContainer'); c.innerHTML = '';
+  if (!data.missing_skills?.length) {
+    c.innerHTML = '<div class="rm-card"><div class="rm-card-pad"><div class="alert-good">🎉 Amazing! You already have all required skills for this role!</div></div></div>'; return;
+  }
+  let html = data.missing_skills.map(s => `<span class="chip-red">${s}</span>`).join('');
+  c.innerHTML = `<div class="rm-card"><div class="rm-card-pad"><div class="ms-title">⚠️ ${data.missing_skills.length} Skill${data.missing_skills.length!==1?'s':''} to Acquire</div>${html}</div></div>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   TEXT ROADMAP CARDS
+══════════════════════════════════════════════════════════ */
 function renderRoadmap(data) {
-  const container = document.getElementById('roadmapContainer');
-  container.innerHTML = '';
+  const c = document.getElementById('roadmapContainer'); c.innerHTML = '';
   if (!data.roadmap) return;
   for (const stage in data.roadmap) {
     const skills = data.roadmap[stage];
-    const completed = skills.filter(s => s.status === 'Completed').length;
-    const pct = Math.round((completed / skills.length) * 100);
-    const card = document.createElement('div');
-    card.className = 'rm-card stage-card';
-    const body = document.createElement('div');
-    body.className = 'rm-card-pad';
-    body.innerHTML = `<div class="stage-head">${stage} <span style="font-size:12px;color:rgba(255,255,255,.3);font-family:var(--font-b);font-weight:400">${completed}/${skills.length} complete</span></div>`;
+    const done = skills.filter(s => s.status === 'Completed').length;
+    const card = document.createElement('div'); card.className = 'rm-card stage-card';
+    const body = document.createElement('div'); body.className = 'rm-card-pad';
+    body.innerHTML = `<div class="stage-head">${stage} <span style="font-size:12px;color:rgba(255,255,255,.3);font-weight:400">${done}/${skills.length} complete</span></div>`;
     skills.forEach(s => {
-      body.innerHTML += s.status === 'Completed'
-        ? `<span class="chip-green">✓ ${s.skill}</span>`
-        : `<span class="chip-red">${s.skill}</span>`;
+      const cls = s.status === 'Completed' ? 'chip-green' : 'chip-red';
+      body.innerHTML += `<span class="${cls}">${s.status==='Completed'?'✓ ':''}${s.skill}</span>`;
     });
-    card.appendChild(body);
-    container.appendChild(card);
+    card.appendChild(body); c.appendChild(card);
   }
 }
 
-/* ── LEARNING PLAN ── */
+/* ══════════════════════════════════════════════════════════
+   LEARNING PLAN
+══════════════════════════════════════════════════════════ */
 function renderLearningPlan(data) {
-  const container = document.getElementById('learningPlanContainer');
-  container.innerHTML = '';
-  if (!data.learning_plan || Object.keys(data.learning_plan).length === 0) {
-    container.innerHTML = '<div class="rm-card"><div class="rm-card-pad"><div style="font-size:14px;color:rgba(255,255,255,.3)">No learning plan available — you may already have all the required skills!</div></div></div>';
-    return;
+  const c = document.getElementById('learningPlanContainer'); c.innerHTML = '';
+  if (!data.learning_plan || !Object.keys(data.learning_plan).length) {
+    c.innerHTML = '<div class="rm-card"><div class="rm-card-pad"><div style="font-size:14px;color:rgba(255,255,255,.3)">No learning plan available — you may already have all the required skills!</div></div></div>'; return;
   }
   let delay = 0;
   for (const week in data.learning_plan) {
     const plan = data.learning_plan[week];
+    const courses = getCoursesForSkill(plan.skill);
+    const courseLinksHtml = courses.slice(0,4).map(cr => {
+      const freeStr = cr.free ? '🆓 Free' : '💳 Paid';
+      return `<a class="course-link ${cr.type}" href="${cr.url}" target="_blank" rel="noopener">${cr.icon} ${cr.platform} — ${freeStr}</a>`;
+    }).join('');
     const card = document.createElement('div');
-    card.className = 'rm-card lp-card';
-    card.style.animationDelay = `${delay}s`;
-    card.innerHTML = `
-      <div class="rm-card-pad lp-inner">
-        <div class="lp-week">${week}</div>
-        <div class="lp-skill">${plan.skill}</div>
-        <div class="lp-meta">
-          <div class="lp-meta-item"><div class="lp-meta-dot"></div>${plan.difficulty}</div>
-          <div class="lp-meta-item"><div class="lp-meta-dot" style="background:var(--cyan)"></div>${plan.duration_weeks} week${plan.duration_weeks!==1?'s':''}</div>
-        </div>
-        ${plan.explanation ? `
-        <div class="lp-sep"></div>
-        <div class="lp-dl">Why Important</div>
-        <div class="lp-dv">${plan.explanation.why_important || '—'}</div>
-        <div class="lp-dl">Real World Usage</div>
-        <div class="lp-dv">${plan.explanation.real_world_usage || '—'}</div>
-        <div class="lp-dl">Career Impact</div>
-        <div class="lp-dv">${plan.explanation.career_impact || '—'}</div>
-        <div class="lp-dl">Project Suggestion</div>
-        <div class="lp-dv">${plan.explanation.project_suggestion || '—'}</div>
-        ` : ''}
-      </div>`;
-    container.appendChild(card);
-    delay += 0.08;
+    card.className = 'rm-card lp-card'; card.style.animationDelay = `${delay}s`;
+    card.innerHTML = `<div class="rm-card-pad lp-inner">
+      <div class="lp-week">${week}</div>
+      <div class="lp-skill">${plan.skill}</div>
+      <div class="lp-meta">
+        <div class="lp-meta-item"><div class="lp-meta-dot"></div>${plan.difficulty}</div>
+        <div class="lp-meta-item"><div class="lp-meta-dot" style="background:var(--cyan)"></div>${plan.duration_weeks} week${plan.duration_weeks!==1?'s':''}</div>
+      </div>
+      ${plan.explanation ? `
+      <div class="lp-sep"></div>
+      <div class="lp-dl">Why Important</div><div class="lp-dv">${plan.explanation.why_important||'—'}</div>
+      <div class="lp-dl">Real World Usage</div><div class="lp-dv">${plan.explanation.real_world_usage||'—'}</div>
+      <div class="lp-dl">Career Impact</div><div class="lp-dv">${plan.explanation.career_impact||'—'}</div>
+      <div class="lp-dl">Project Suggestion</div><div class="lp-dv">${plan.explanation.project_suggestion||'—'}</div>
+      ` : ''}
+      <div class="lp-courses">
+        <div class="lp-courses-title">📚 Recommended Courses &amp; Resources</div>
+        <div class="course-links">${courseLinksHtml}</div>
+      </div>
+    </div>`;
+    c.appendChild(card); delay += 0.08;
   }
 }
 
-/* ── MARKET ── */
+/* ══════════════════════════════════════════════════════════
+   MARKET INTELLIGENCE
+══════════════════════════════════════════════════════════ */
 function renderMarket(market) {
-  const container = document.getElementById('marketContainer');
-  container.innerHTML = '';
+  const c = document.getElementById('marketContainer'); c.innerHTML = '';
   if (!market) {
-    container.innerHTML = '<div class="rm-card"><div class="rm-card-pad"><div style="font-size:14px;color:rgba(255,255,255,.3)">No market data available.</div></div></div>';
-    return;
+    c.innerHTML = '<div class="rm-card"><div class="rm-card-pad"><div style="font-size:14px;color:rgba(255,255,255,.3)">No market data available.</div></div></div>'; return;
   }
-  let trendingHtml = (market.trending_skills||[]).slice(0,12).map(s=>`<span class="chip-blue">${s}</span>`).join('') || '<span class="mkt-empty">No data</span>';
-  let missingHtml  = (market.high_demand_missing||[]).slice(0,10).map(s=>`<span class="chip-red">${s}</span>`).join('')  || '<span class="mkt-empty">You\'re aligned with market demand ✓</span>';
-  let overlapHtml  = (market.role_market_overlap||[]).map(s=>`<span class="chip-cyan">${s}</span>`).join('')               || '<span class="mkt-empty">No overlap found</span>';
-  container.innerHTML = `
-    <div class="rm-card">
-      <div class="rm-card-pad mkt-inner">
-        <div class="mkt-title">📊 Market Intelligence for ${document.getElementById('roleSelect').value || 'Your Role'}</div>
-        <div class="mkt-section"><div class="mkt-lbl">🔥 Trending Market Skills</div>${trendingHtml}</div>
-        <div class="mkt-sep"></div>
-        <div class="mkt-section"><div class="mkt-lbl">🚀 High Demand Skills You Don't Have</div>${missingHtml}</div>
-        <div class="mkt-sep"></div>
-        <div class="mkt-section"><div class="mkt-lbl">🎯 Role + Market Overlap (Your Strengths)</div>${overlapHtml}</div>
-      </div>
-    </div>`;
+  const tH = (market.trending_skills||[]).slice(0,12).map(s=>`<span class="chip-blue">${s}</span>`).join('')||'<span class="mkt-empty">No data</span>';
+  const mH = (market.high_demand_missing||[]).slice(0,10).map(s=>`<span class="chip-red">${s}</span>`).join('')||'<span class="mkt-empty">You\'re aligned ✓</span>';
+  const oH = (market.role_market_overlap||[]).map(s=>`<span class="chip-cyan">${s}</span>`).join('')||'<span class="mkt-empty">No overlap</span>';
+  c.innerHTML = `<div class="rm-card"><div class="rm-card-pad mkt-inner">
+    <div class="mkt-title">📊 Market Intelligence for ${document.getElementById('roleSelect').value||'Your Role'}</div>
+    <div class="mkt-section"><div class="mkt-lbl">🔥 Trending Market Skills</div>${tH}</div>
+    <div class="mkt-sep"></div>
+    <div class="mkt-section"><div class="mkt-lbl">🚀 High Demand Skills You Don't Have</div>${mH}</div>
+    <div class="mkt-sep"></div>
+    <div class="mkt-section"><div class="mkt-lbl">🎯 Role + Market Overlap (Your Strengths)</div>${oH}</div>
+  </div></div>`;
 }
+
+/* ══════════════════════════════════════════════════════════
+   VIEW TOGGLE
+══════════════════════════════════════════════════════════ */
+function switchView(mode) {
+  document.getElementById('tabVisual').classList.toggle('active', mode === 'visual');
+  document.getElementById('tabText').classList.toggle('active', mode === 'text');
+  document.getElementById('visualRoadmapSection').style.display = mode === 'visual' ? 'block' : 'none';
+  document.getElementById('textRoadmapSection').style.display   = mode === 'text'   ? 'block' : 'none';
+  if (mode === 'visual' && nodes.length) requestAnimationFrame(drawCanvas);
+}
+
+/* ══════════════════════════════════════════════════════════
+   CANVAS VISUAL ENGINE
+══════════════════════════════════════════════════════════ */
+let canvasData = null;
+let cam = { x: 0, y: 0, scale: 1 };
+let isDragging = false, lastMouse = { x: 0, y: 0 };
+let clickStartPos = { x: 0, y: 0 };
+let animFrame = null, animProgress = 0;
+let hoveredNode = null;
+let nodes = [], edges = [];
+let activeCanvas = null;
+let _mouseupRef = null;
+
+const PAL = {
+  root: { bg: '#12122a', border: '#818cf8', text: '#c7d2fe' },
+  hub:  { bg: '#10102a', border: '#5b6bff', text: '#a5b4fc' },
+  done: { bg: '#0b1f12', border: '#4ade80', text: '#86efac' },
+  prog: { bg: '#1e1306', border: '#fb923c', text: '#fdba74' },
+  miss: { bg: '#1a0909', border: '#f87171', text: '#fca5a5' },
+};
+
+function rrect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
+
+function toWorld(ex, ey) {
+  const c = activeCanvas, r = c.getBoundingClientRect();
+  return {
+    x: (ex - r.left) * (c.width / r.width)  / cam.scale - cam.x / cam.scale,
+    y: (ey - r.top)  * (c.height / r.height) / cam.scale - cam.y / cam.scale,
+  };
+}
+
+function nodeAt(wx, wy) {
+  for (let i = nodes.length - 1; i >= 0; i--) {
+    const n = nodes[i];
+    if (wx >= n.x-n.w/2 && wx <= n.x+n.w/2 && wy >= n.y-n.h/2 && wy <= n.y+n.h/2) return n;
+  }
+  return null;
+}
+
+function drawCanvas() {
+  const canvas = activeCanvas;
+  if (!canvas || canvas.style.display === 'none') return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#080810'; ctx.fillRect(0,0,W,H);
+  const p = Math.min(animProgress, 1);
+  ctx.save();
+  ctx.translate(cam.x, cam.y);
+  ctx.scale(cam.scale, cam.scale);
+
+  edges.forEach(edge => {
+    const fn = nodes.find(n => n.id === edge.from);
+    const tn = nodes.find(n => n.id === edge.to);
+    if (!fn || !tn) return;
+    const isMain = fn.type === 'root';
+    const x1=fn.x, y1=fn.y+fn.h/2+1, x2=tn.x, y2=tn.y-tn.h/2-1;
+    const midY = (y1+y2)/2;
+    ctx.save();
+    ctx.globalAlpha = p * (isMain ? 0.55 : 0.4);
+    ctx.strokeStyle = isMain ? '#818cf8' : '#5b6bff';
+    ctx.lineWidth   = isMain ? 1.5 : 1;
+    ctx.setLineDash([5,6]);
+    ctx.beginPath();
+    ctx.moveTo(x1,y1); ctx.bezierCurveTo(x1,midY,x2,midY,x2,y2); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = p * (isMain ? 0.7 : 0.55);
+    ctx.fillStyle   = isMain ? '#818cf8' : '#5b6bff';
+    const as=5, ang=Math.atan2(y2-midY,x2-x1)+Math.PI/2;
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-as*Math.cos(ang-0.5), y2-as*Math.sin(ang-0.5));
+    ctx.lineTo(x2-as*Math.cos(ang+0.5), y2-as*Math.sin(ang+0.5));
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  });
+
+  nodes.forEach(node => {
+    const col = PAL[node.type] || PAL.miss;
+    const isHov = hoveredNode === node.id;
+    const nx=node.x-node.w/2, ny=node.y-node.h/2;
+    const rad = node.type==='root'?14:node.type==='hub'?11:9;
+    ctx.save();
+    ctx.globalAlpha = p;
+    if (isHov) { ctx.shadowColor=col.border; ctx.shadowBlur=10; }
+    rrect(ctx,nx,ny,node.w,node.h,rad);
+    ctx.fillStyle=col.bg; ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.strokeStyle = isHov ? '#fff' : col.border;
+    ctx.lineWidth   = node.type==='root' ? 2 : 1.5;
+    ctx.stroke();
+    if (node.type==='hub' && typeof node.pct==='number') {
+      const bx=nx+8, by=ny+node.h-7, bw=node.w-16;
+      ctx.fillStyle='rgba(255,255,255,0.05)';
+      rrect(ctx,bx,by,bw,4,2); ctx.fill();
+      if (node.pct>0) {
+        ctx.fillStyle = node.pct>=80?'#4ade80':node.pct>=40?'#818cf8':'#fb923c';
+        rrect(ctx,bx,by,bw*(node.pct/100),4,2); ctx.fill();
+      }
+    }
+    const fs=node.type==='root'?13.5:node.type==='hub'?12:11;
+    const fw=node.type==='root'?'700':node.type==='hub'?'600':'500';
+    ctx.font=`${fw} ${fs}px 'DM Sans','Segoe UI',system-ui,sans-serif`;
+    ctx.fillStyle=isHov?'#fff':col.text;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    let lbl=node.label, maxW=node.w-22;
+    if (ctx.measureText(lbl).width>maxW) {
+      while (lbl.length>1 && ctx.measureText(lbl+'…').width>maxW) lbl=lbl.slice(0,-1);
+      lbl+='…';
+    }
+    const ty=(node.type==='hub'&&typeof node.pct==='number')?node.y-4:node.y;
+    ctx.fillText(lbl,node.x,ty);
+    if (node.type==='done') {
+      ctx.font='bold 10px sans-serif'; ctx.fillStyle='#4ade80';
+      ctx.textAlign='right'; ctx.fillText('✓',nx+node.w-6,node.y);
+    }
+    ctx.restore();
+  });
+
+  ctx.restore();
+}
+
+function animateCanvas() {
+  animProgress += 0.055;
+  drawCanvas();
+  if (animProgress < 1) animFrame = requestAnimationFrame(animateCanvas);
+}
+
+function buildVisualRoadmap(roadmap, stageCompletion) {
+  nodes=[]; edges=[];
+  const wrap=document.getElementById('canvasWrap');
+  const canvas=document.getElementById('roadmapCanvas');
+  const CW=Math.max(wrap.clientWidth||960,640);
+  const role=document.getElementById('roleSelect').value||'Career Path';
+  const stages=Object.keys(roadmap), N=stages.length;
+  const COLS=Math.min(N,3), ROWS=Math.ceil(N/COLS);
+  const COL_W=Math.floor(CW/COLS), ROW_H=285;
+  const CH=Math.max(660,130+ROWS*ROW_H+50);
+  canvas.width=CW; canvas.height=CH;
+  canvas.style.height=CH+'px'; canvas.style.display='block';
+
+  const rw=Math.min(role.length*9.5+60,270);
+  nodes.push({id:'root',label:role,x:CW/2,y:55,type:'root',w:rw,h:38,skill:role,status:'hub',stage:''});
+
+  let totalDone=0, totalMissing=0;
+  stages.forEach((stageName,si)=>{
+    const col=si%COLS, row=Math.floor(si/COLS);
+    const hx=COL_W*col+COL_W/2, hy=132+row*ROW_H;
+    const pct=stageCompletion[stageName]||0;
+    const sw=Math.min(stageName.length*8.5+44,200);
+    nodes.push({id:`h${si}`,label:stageName,x:hx,y:hy,type:'hub',w:sw,h:36,pct,skill:stageName,status:'hub',stage:stageName});
+    edges.push({from:'root',to:`h${si}`});
+    const skills=roadmap[stageName]||[];
+    skills.forEach((skillObj,ki)=>{
+      const isLeft=ki%2===0, rowIdx=Math.floor(ki/2), dir=isLeft?-1:1;
+      const sx=hx+dir*Math.min(COL_W*0.38,150);
+      const sy=hy+56+rowIdx*40;
+      const status=skillObj.status||'Not Started';
+      const type=status==='Completed'?'done':status==='In Progress'?'prog':'miss';
+      const skw=Math.min(skillObj.skill.length*7.2+28,152);
+      nodes.push({id:`s${si}_${ki}`,label:skillObj.skill,x:sx,y:sy,type,w:skw,h:30,skill:skillObj.skill,status,stage:stageName});
+      edges.push({from:`h${si}`,to:`s${si}_${ki}`});
+      if(type==='done') totalDone++; else totalMissing++;
+    });
+  });
+
+  const statsBar=document.getElementById('canvasStatsBar');
+  if(statsBar){
+    statsBar.style.display='flex';
+    document.getElementById('csCompleted').textContent=totalDone;
+    document.getElementById('csMissing').textContent=totalMissing;
+    document.getElementById('csStages').textContent=N;
+  }
+  document.getElementById('canvasEmpty').style.display='none';
+  document.getElementById('canvasLegend').style.display='flex';
+  canvasData={roadmap,stageCompletion};
+  cam={x:0,y:0,scale:1}; animProgress=0; activeCanvas=canvas;
+  if(animFrame) cancelAnimationFrame(animFrame);
+  setupCanvasEvents(canvas);
+  animateCanvas();
+}
+
+/* ══════════════════════════════════════════════════════════
+   CANVAS EVENTS — single clean function
+══════════════════════════════════════════════════════════ */
+function setupCanvasEvents(canvas) {
+  if(_mouseupRef) window.removeEventListener('mouseup',_mouseupRef);
+  activeCanvas=canvas;
+
+  canvas.addEventListener('mousemove',function(e){
+    if(isDragging){
+      cam.x+=e.clientX-lastMouse.x; cam.y+=e.clientY-lastMouse.y;
+      lastMouse={x:e.clientX,y:e.clientY}; drawCanvas(); return;
+    }
+    const w=toWorld(e.clientX,e.clientY), found=nodeAt(w.x,w.y);
+    canvas.style.cursor=found?'pointer':'grab';
+    if(found){
+      if(hoveredNode!==found.id){hoveredNode=found.id;drawCanvas();}
+      const tt=document.getElementById('nodeTooltip');
+      if(tt){
+        document.getElementById('ttTitle').textContent=found.skill||found.label;
+        const ttSt=document.getElementById('ttStatus');
+        ttSt.textContent=found.type==='hub'?'Stage':(found.status||'Not Started');
+        ttSt.style.color=found.type==='done'?'#4ade80':found.type==='prog'?'#fb923c':found.type==='miss'?'#f87171':'#818cf8';
+        tt.style.left=(e.clientX+16)+'px'; tt.style.top=(e.clientY-14)+'px';
+        tt.classList.add('visible');
+      }
+    } else {
+      if(hoveredNode!==null){hoveredNode=null;drawCanvas();}
+      const tt=document.getElementById('nodeTooltip');
+      if(tt) tt.classList.remove('visible');
+    }
+  });
+
+  canvas.addEventListener('mousedown',function(e){
+    isDragging=true; lastMouse={x:e.clientX,y:e.clientY};
+    clickStartPos={x:e.clientX,y:e.clientY};
+    canvas.style.cursor='grabbing';
+  });
+
+  _mouseupRef=function(e){
+    isDragging=false;
+    if(activeCanvas) activeCanvas.style.cursor='grab';
+  };
+  window.addEventListener('mouseup',_mouseupRef);
+
+  canvas.addEventListener('mouseleave',function(){
+    const tt=document.getElementById('nodeTooltip');
+    if(tt) tt.classList.remove('visible');
+  });
+
+  canvas.addEventListener('wheel',function(e){
+    e.preventDefault();
+    const f=e.deltaY<0?1.12:0.89;
+    const r=canvas.getBoundingClientRect();
+    const mx=(e.clientX-r.left)*(canvas.width/r.width);
+    const my=(e.clientY-r.top)*(canvas.height/r.height);
+    cam.x=mx-f*(mx-cam.x); cam.y=my-f*(my-cam.y);
+    cam.scale=Math.min(Math.max(cam.scale*f,0.15),6);
+    drawCanvas();
+  },{passive:false});
+
+  let lastPinchDist=null;
+  canvas.addEventListener('touchstart',function(e){
+    if(e.touches.length===1){isDragging=true;lastMouse={x:e.touches[0].clientX,y:e.touches[0].clientY};clickStartPos={x:e.touches[0].clientX,y:e.touches[0].clientY};}
+    if(e.touches.length===2) lastPinchDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+  },{passive:true});
+  canvas.addEventListener('touchmove',function(e){
+    e.preventDefault();
+    if(e.touches.length===1&&isDragging){cam.x+=e.touches[0].clientX-lastMouse.x;cam.y+=e.touches[0].clientY-lastMouse.y;lastMouse={x:e.touches[0].clientX,y:e.touches[0].clientY};drawCanvas();}
+    if(e.touches.length===2&&lastPinchDist){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);cam.scale=Math.min(Math.max(cam.scale*(d/lastPinchDist),0.15),6);lastPinchDist=d;drawCanvas();}
+  },{passive:false});
+  canvas.addEventListener('touchend',function(){isDragging=false;lastPinchDist=null;});
+}
+
+function getActiveCanvas(){ return activeCanvas||document.getElementById('roadmapCanvas'); }
+
+document.getElementById('btnZoomIn').addEventListener('click',function(){
+  const c=getActiveCanvas(),cx=c.width/2,cy=c.height/2,f=1.25;
+  cam.x=cx-f*(cx-cam.x);cam.y=cy-f*(cy-cam.y);cam.scale=Math.min(cam.scale*f,6);drawCanvas();
+});
+document.getElementById('btnZoomOut').addEventListener('click',function(){
+  const c=getActiveCanvas(),cx=c.width/2,cy=c.height/2,f=0.8;
+  cam.x=cx-f*(cx-cam.x);cam.y=cy-f*(cy-cam.y);cam.scale=Math.max(cam.scale*f,0.15);drawCanvas();
+});
+document.getElementById('btnReset').addEventListener('click',function(){
+  cam={x:0,y:0,scale:1};drawCanvas();
+});
+document.getElementById('btnFit').addEventListener('click',function(){
+  if(!nodes.length) return;
+  const c=getActiveCanvas(),pad=30;
+  const minX=Math.min(...nodes.map(n=>n.x-n.w/2))-pad, maxX=Math.max(...nodes.map(n=>n.x+n.w/2))+pad;
+  const minY=Math.min(...nodes.map(n=>n.y-n.h/2))-pad, maxY=Math.max(...nodes.map(n=>n.y+n.h/2))+pad;
+  cam.scale=Math.min(c.width/(maxX-minX),c.height/(maxY-minY),2.5);
+  cam.x=-minX*cam.scale+(c.width-(maxX-minX)*cam.scale)/2;
+  cam.y=-minY*cam.scale+(c.height-(maxY-minY)*cam.scale)/2;
+  drawCanvas();
+});
+
+/* ══════════════════════════════════════════════════════════
+   STATIC ROADMAPS
+══════════════════════════════════════════════════════════ */
+const STATIC_ROADMAPS = {
+  'Python Developer': {
+    'Learn the Basics': ['Basic Syntax','Variables & Data Types','Working with Strings','Conditionals','Loops'],
+    'Data Structures & Algorithms': ['Arrays & Linked Lists','Hash Maps','Binary Search Tree','Recursion','Sorting Algorithms'],
+    'Object Oriented Programming': ['Closures','Methods','Inheritance','Encapsulation'],
+    'Package Managers': ['PyPI','Pip','Conda','uv','Poetry'],
+    'Concurrency': ['Multiprocessing','Asyncio','GIL','Threading'],
+    'Learn a Framework': ['FastAPI','Django','Flask'],
+    'Testing': ['unittest / PyUnit','doctest','pytest'],
+  },
+  'Full Stack Developer': {
+    'Frontend Basics': ['HTML5','CSS3','JavaScript ES6+','Responsive Design','Browser APIs'],
+    'Frontend Framework': ['React','TypeScript','State Management','Next.js','Testing (Jest)'],
+    'Backend': ['Node.js','REST APIs','Authentication','Databases','ORMs'],
+    'Database': ['PostgreSQL','MongoDB','Redis','SQL Fundamentals'],
+    'DevOps Basics': ['Git','Docker','CI/CD','Cloud (AWS/GCP)','Nginx'],
+    'Advanced': ['GraphQL','WebSockets','Microservices','System Design'],
+  },
+  'Frontend Developer': {
+    'Fundamentals': ['HTML5','CSS3','JavaScript ES6+','Responsive Design'],
+    'Framework': ['React','TypeScript','Next.js','Tailwind CSS'],
+    'State & Data': ['Redux / Zustand','React Query','REST APIs','GraphQL'],
+    'Testing & Quality': ['Jest','Cypress','Lighthouse','Accessibility'],
+    'Performance': ['Web Vitals','Bundlers (Vite)','Lazy Loading','PWA'],
+    'Advanced': ['WebSockets','Micro-Frontends','CI/CD','Design Systems'],
+  },
+  'Backend Developer': {
+    'Language Mastery': ['Python / Node.js / Java','OOP Principles','Design Patterns'],
+    'API Design': ['REST APIs','GraphQL','gRPC','Authentication (JWT/OAuth)'],
+    'Databases': ['SQL','PostgreSQL','MongoDB','Redis','ORMs'],
+    'Architecture': ['Microservices','Message Queues','Event-Driven','CQRS'],
+    'DevOps': ['Docker','CI/CD','Cloud Basics','Linux','Nginx'],
+    'Security': ['OWASP Top 10','Rate Limiting','Data Validation','HTTPS'],
+  },
+  'AI Engineer': {
+    'Foundations': ['Python','Linear Algebra','Statistics','Probability','Calculus'],
+    'Machine Learning': ['Scikit-learn','Supervised Learning','Feature Engineering','Model Evaluation'],
+    'Deep Learning': ['Neural Networks','PyTorch','TensorFlow','CNNs','Transformers'],
+    'LLMs & Gen AI': ['Prompt Engineering','Fine-Tuning','RAG','LangChain','Vector Databases'],
+    'MLOps': ['Docker','MLflow','CI/CD','Cloud Deployment','Monitoring'],
+    'Advanced': ['Multi-Modal AI','Agents','RLHF','Diffusion Models'],
+  },
+  'Machine Learning Engineer': {
+    'Math Foundations': ['Linear Algebra','Statistics','Probability','Calculus'],
+    'ML Core': ['Scikit-learn','Supervised Learning','Unsupervised Learning','Ensemble Methods'],
+    'Deep Learning': ['PyTorch','TensorFlow','Neural Networks','CNNs','RNNs'],
+    'Data Engineering': ['Pandas','NumPy','Feature Engineering','Data Cleaning','SQL'],
+    'MLOps': ['MLflow','Docker','Kubernetes','Model Serving','Monitoring'],
+    'Specialization': ['NLP','Computer Vision','Time Series','Recommender Systems'],
+  },
+  'Data Scientist': {
+    'Foundation': ['Python','SQL','Git','Jupyter Notebooks','Statistics'],
+    'Machine Learning': ['Scikit-learn','Feature Engineering','Model Evaluation','Cross Validation'],
+    'Analysis': ['Pandas','NumPy','Matplotlib','Seaborn','EDA'],
+    'Advanced': ['TensorFlow','NLP','A/B Testing','Time Series'],
+    'Expert': ['MLOps','Causal Inference','Bayesian Methods','Big Data (Spark)','Research'],
+  },
+  'Data Analyst': {
+    'Programming': ['Python','SQL','R Basics'],
+    'Data Tools': ['Pandas','Excel','Google Sheets','Jupyter'],
+    'Visualization': ['Matplotlib','Seaborn','Tableau','Power BI','Plotly'],
+    'Statistics': ['Descriptive Stats','Hypothesis Testing','Regression','A/B Testing'],
+    'Business Skills': ['KPIs','Dashboards','Storytelling','Stakeholder Communication'],
+  },
+  'DevOps Engineer': {
+    'Linux & Scripting': ['Linux CLI','Bash Scripting','Python Scripting','Networking Basics'],
+    'Version Control': ['Git','GitHub Actions','GitLab CI','Branching Strategies'],
+    'Containers': ['Docker','Kubernetes','Helm','Container Registry'],
+    'Cloud': ['AWS Core','Terraform','CloudFormation','Serverless'],
+    'Monitoring': ['Prometheus','Grafana','ELK Stack','Alerting'],
+    'Security': ['IAM','Secrets Management','Network Security','Compliance'],
+  },
+  'Cloud Engineer (AWS)': {
+    'Fundamentals': ['Cloud Concepts','Networking Basics','Linux','Python'],
+    'AWS Core Services': ['EC2','S3','VPC','IAM','RDS'],
+    'Architecture': ['Well-Architected Framework','High Availability','Serverless','Auto Scaling'],
+    'Infrastructure as Code': ['Terraform','CloudFormation','CDK'],
+    'DevOps on AWS': ['CodePipeline','CodeBuild','ECS/EKS','GitHub Actions'],
+    'Security & Cost': ['AWS Security Hub','Config','Cost Explorer','Trusted Advisor'],
+  },
+  'Cybersecurity Engineer': {
+    'Foundations': ['Networking Basics','Linux','TCP/IP','Protocols','Cryptography'],
+    'Offensive Security': ['Penetration Testing','OWASP Top 10','Vulnerability Scanning','Metasploit'],
+    'Defensive Security': ['SIEM','Incident Response','Log Analysis','IDS/IPS'],
+    'Cloud Security': ['AWS Security','IAM Best Practices','Zero Trust','Cloud SIEM'],
+    'Compliance': ['GDPR','SOC 2','ISO 27001','HIPAA'],
+    'Advanced': ['Malware Analysis','Threat Hunting','Red Team / Blue Team','CTF Skills'],
+  },
+  'Blockchain Developer': {
+    'Foundations': ['Blockchain Basics','Cryptography','Distributed Systems','Consensus Algorithms'],
+    'Ethereum': ['Solidity','Smart Contracts','Hardhat','Foundry','EVM'],
+    'Web3 Tools': ['Ethers.js','Web3.js','MetaMask','IPFS','The Graph'],
+    'DeFi': ['Uniswap','Aave','Compound','Flash Loans','Yield Farming'],
+    'Security': ['Smart Contract Auditing','Reentrancy','Common Vulnerabilities','Slither'],
+    'Layer 2': ['Polygon','Arbitrum','Optimism','zkEVM','State Channels'],
+  },
+  'Mobile Developer (iOS)': {
+    'Language': ['Swift Basics','Swift Advanced','Objective-C Basics'],
+    'Frameworks': ['SwiftUI','UIKit','Combine','Core Data'],
+    'Architecture': ['MVC','MVVM','Clean Architecture','Dependency Injection'],
+    'Networking': ['URLSession','REST APIs','Codable','WebSockets'],
+    'App Store': ['Xcode','TestFlight','App Store Connect','In-App Purchase'],
+    'Advanced': ['Widgets','App Clips','WatchOS','ARKit','Core ML'],
+  },
+  'Mobile Developer (Android)': {
+    'Language': ['Kotlin Basics','Kotlin Advanced','Java for Android'],
+    'Frameworks': ['Jetpack Compose','Android SDK','Room','LiveData','ViewModel'],
+    'Architecture': ['MVVM','Clean Architecture','Hilt DI','Repository Pattern'],
+    'Networking': ['Retrofit','OkHttp','Coroutines','Flow'],
+    'Publishing': ['Android Studio','Play Console','Signing','ProGuard'],
+    'Advanced': ['Wear OS','Compose Multiplatform','Firebase','ML Kit'],
+  },
+  'UX/UI Designer': {
+    'Design Fundamentals': ['Typography','Color Theory','Spacing & Layout','Visual Hierarchy'],
+    'UX Research': ['User Interviews','Persona Creation','User Journeys','Usability Testing'],
+    'Tools': ['Figma','Adobe XD','Sketch','InVision','Protopie'],
+    'Design Systems': ['Component Libraries','Design Tokens','Accessibility (WCAG)','Atomic Design'],
+    'Interaction Design': ['Microinteractions','Animation','Motion Design','Gesture Design'],
+    'Frontend Basics': ['HTML/CSS Basics','Developer Handoff','Storybook','Zeplin'],
+  },
+  'Product Manager': {
+    'Product Thinking': ['Product Vision','Market Research','User Empathy','Jobs to Be Done'],
+    'Strategy': ['Roadmapping','OKRs','Prioritization Frameworks','Competitive Analysis'],
+    'Execution': ['Agile / Scrum','Sprint Planning','Backlog Management','Cross-Team Coordination'],
+    'Analytics': ['Product Metrics','A/B Testing','Funnel Analysis','Cohort Analysis'],
+    'Communication': ['PRDs','Stakeholder Management','Presentation','Negotiation'],
+    'Technical': ['API Basics','SQL Basics','System Design Basics','Data Literacy'],
+  },
+  'Solutions Architect': {
+    'Foundations': ['Cloud Fundamentals','Networking','Security Basics','Linux'],
+    'Architecture Patterns': ['Microservices','Event-Driven','CQRS','Serverless','SOA'],
+    'Cloud Platforms': ['AWS','GCP','Azure','Multi-Cloud Strategy'],
+    'Infrastructure': ['Terraform','Kubernetes','Docker','CI/CD'],
+    'Cost & Performance': ['Cost Optimization','Scalability','Caching','CDN','Load Balancing'],
+    'Leadership': ['Stakeholder Communication','Technical Docs','Trade-off Analysis','Pre-Sales'],
+  },
+  'default': {
+    'Foundation': ['Core Concepts','Programming Basics','Tools Setup','Version Control'],
+    'Core Skills': ['Domain Fundamentals','Key Libraries','Best Practices','Debugging'],
+    'Intermediate': ['Advanced Patterns','System Design','Testing','Performance'],
+    'Professional': ['Architecture','Leadership','Documentation','Industry Tools'],
+    'Mastery': ['Specialization','Open Source','Community','Mentorship'],
+  }
+};
 </script>
 
 {% endblock %}
