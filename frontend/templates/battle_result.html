@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;--red:#ff5757;--purple:#a855f7;--font-d:"Syne",sans-serif;--font-b:"DM Sans",sans-serif;--font-c:"JetBrains Mono",monospace;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body,html{background:#060610!important;}
+.res-wrap{max-width:860px;margin:0 auto;padding:90px 24px 80px;}
+
+/* ── RESULT HERO ── */
+.res-hero{text-align:center;padding:40px 0 36px;position:relative;}
+.res-hero::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:500px;height:280px;pointer-events:none;border-radius:50%;}
+.res-hero.you-win::before{background:radial-gradient(ellipse at 50% 0%,rgba(255,215,0,.15),transparent 70%);}
+.res-hero.you-lose::before{background:radial-gradient(ellipse at 50% 0%,rgba(255,87,87,.12),transparent 70%);}
+.res-hero.draw::before{background:radial-gradient(ellipse at 50% 0%,rgba(255,181,71,.12),transparent 70%);}
+.res-big-icon{font-size:80px;display:block;margin-bottom:16px;animation:dropIn .7s cubic-bezier(.34,1.56,.64,1);}
+@keyframes dropIn{0%{transform:translateY(-40px) scale(.5);opacity:0}100%{transform:translateY(0) scale(1);opacity:1}}
+.res-verdict{font-family:var(--font-d);font-size:clamp(44px,8vw,72px);font-weight:800;letter-spacing:-3px;margin-bottom:8px;}
+.res-verdict.you-win{background:linear-gradient(135deg,#ffd700,var(--amber));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.res-verdict.you-lose{color:var(--red);}
+.res-verdict.draw{color:var(--amber);}
+.res-sub{font-size:15px;color:rgba(255,255,255,.35);max-width:440px;margin:0 auto 28px;}
+
+/* XP / Trophy chips */
+.res-chips{display:flex;justify-content:center;gap:14px;margin-bottom:10px;}
+.res-chip{padding:12px 24px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);text-align:center;min-width:120px;}
+.res-chip-n{font-family:var(--font-d);font-size:28px;font-weight:800;}
+.res-chip-l{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.3);margin-top:4px;}
+.res-chip.xp .res-chip-n{color:var(--cyan);}
+.res-chip.trophy .res-chip-n{color:var(--amber);}
+
+/* ── PLAYERS CARD ── */
+.res-card{background:rgba(10,10,28,.97);border:1px solid rgba(255,255,255,.07);border-radius:24px;padding:26px;margin-bottom:18px;position:relative;overflow:hidden;}
+.res-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;}
+.res-card.players-card::before{background:linear-gradient(90deg,var(--neon),var(--cyan));}
+.res-card.stats-card::before{background:linear-gradient(90deg,var(--amber),var(--purple));}
+.res-card.league-card::before{background:linear-gradient(90deg,var(--green),var(--cyan));}
+.res-card-title{font-family:var(--font-d);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.3);margin-bottom:20px;}
+
+/* VS layout */
+.res-vs-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;}
+.res-player{display:flex;flex-direction:column;align-items:center;gap:10px;}
+.res-player.right{align-items:flex-end;}
+.res-player-av{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,rgba(91,107,255,.4),rgba(0,229,200,.2));display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:24px;font-weight:800;overflow:hidden;border:3px solid transparent;}
+.res-player-av.winner{border-color:#ffd700;box-shadow:0 0 20px rgba(255,215,0,.3);}
+.res-player-av.loser{border-color:rgba(255,87,87,.3);}
+.res-player-av img{width:100%;height:100%;object-fit:cover;}
+.res-player-name{font-family:var(--font-d);font-size:16px;font-weight:800;color:#fff;}
+.res-player-tag{font-size:11px;font-weight:700;padding:4px 12px;border-radius:100px;text-transform:uppercase;letter-spacing:1px;}
+.res-player-tag.winner-tag{background:rgba(255,215,0,.15);color:#ffd700;border:1px solid rgba(255,215,0,.2);}
+.res-player-tag.loser-tag{background:rgba(255,87,87,.1);color:var(--red);border:1px solid rgba(255,87,87,.15);}
+.res-player-tag.draw-tag{background:rgba(255,181,71,.1);color:var(--amber);border:1px solid rgba(255,181,71,.15);}
+.res-player-result{font-family:var(--font-c);font-size:13px;color:rgba(255,255,255,.4);}
+.res-vs{font-family:var(--font-d);font-size:24px;font-weight:800;color:rgba(255,255,255,.12);}
+
+/* Stats row */
+.res-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.res-stat{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:16px;text-align:center;}
+.res-stat-n{font-family:var(--font-d);font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px;}
+.res-stat-l{font-size:11px;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:1px;}
+
+/* League progress */
+.res-league-row{display:flex;align-items:center;gap:16px;margin-bottom:18px;}
+.res-league-icon{font-size:40px;filter:drop-shadow(0 0 10px rgba(255,255,255,.2));}
+.res-league-name{font-family:var(--font-d);font-size:20px;font-weight:800;color:#fff;}
+.res-league-sub{font-size:12px;color:rgba(255,255,255,.3);margin-top:3px;}
+.res-prog-labels{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.25);margin-bottom:6px;}
+.res-prog-track{height:8px;background:rgba(255,255,255,.06);border-radius:100px;overflow:hidden;}
+.res-prog-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--amber),#ff8c42);width:0%;transition:width 1.4s cubic-bezier(.4,0,.2,1);}
+
+/* Problem info */
+.res-problem-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:14px;margin-bottom:14px;}
+.res-prob-name{font-family:var(--font-d);font-size:15px;font-weight:800;color:#fff;}
+.res-prob-tags{display:flex;gap:6px;margin-top:4px;}
+.res-prob-tag{font-size:10px;padding:2px 9px;border-radius:100px;background:rgba(91,107,255,.1);border:1px solid rgba(91,107,255,.15);color:rgba(91,107,255,.9);}
+.res-diff-pill{padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.res-diff-pill.easy{background:rgba(34,197,94,.12);color:var(--green);}
+.res-diff-pill.medium{background:rgba(255,181,71,.12);color:var(--amber);}
+.res-diff-pill.hard{background:rgba(255,87,87,.12);color:var(--red);}
+
+/* Buttons */
+.res-btns{display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap;}
+.res-btn{padding:14px 28px;border-radius:14px;font-family:var(--font-d);font-size:14px;font-weight:800;cursor:pointer;border:none;transition:all .25s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+.res-btn-primary{background:linear-gradient(135deg,var(--neon),var(--cyan));color:#fff;}
+.res-btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(91,107,255,.3);}
+.res-btn-sec{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7);}
+.res-btn-sec:hover{color:#fff;border-color:rgba(255,255,255,.25);transform:translateY(-1px);}
+
+@media(max-width:600px){.res-stats-grid{grid-template-columns:repeat(2,1fr);}.res-chips{flex-wrap:wrap;}.res-btns{flex-direction:column;align-items:center;}}
+</style>
+
+{% set my_player = duel.players | selectattr('user_id', 'equalto', user_id) | first | default(None) %}
+{% set opp_player = duel.players | rejectattr('user_id', 'equalto', user_id) | first | default(None) %}
+{% set i_won = duel.winner_id == user_id %}
+{% set is_draw = duel.winner_id is none %}
+{% set verdict_class = 'you-win' if i_won else ('draw' if is_draw else 'you-lose') %}
+
+<div class="res-wrap">
+
+  <!-- HERO -->
+  <div class="res-hero {{ verdict_class }}">
+    <span class="res-big-icon">{{ '🏆' if i_won else ('🤝' if is_draw else '💀') }}</span>
+    <div class="res-verdict {{ verdict_class }}">{{ 'Victory!' if i_won else ('Draw!' if is_draw else 'Defeated') }}</div>
+    <p class="res-sub">
+      {% if i_won %}You solved it first — outstanding performance!
+      {% elif is_draw %}Both fighters gave their all — great battle!
+      {% else %}{{ opp_player.name if opp_player else 'Your opponent' }} was faster this time. Train harder!{% endif %}
+    </p>
+    <div class="res-chips">
+      {% if my_player %}
+      <div class="res-chip xp">
+        <div class="res-chip-n">{{ '+' if (my_player.xp_earned or 0) >= 0 else '' }}{{ my_player.xp_earned or 0 }}</div>
+        <div class="res-chip-l">⚡ XP Earned</div>
+      </div>
+      <div class="res-chip trophy">
+        <div class="res-chip-n">{{ '+' if (my_player.trophy_change or 0) >= 0 else '' }}{{ my_player.trophy_change or 0 }}</div>
+        <div class="res-chip-l">🏆 Trophies</div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- PLAYERS CARD -->
+  <div class="res-card players-card">
+    <div class="res-card-title">⚔️ Battle Result</div>
+    <div class="res-vs-row">
+      <!-- Me -->
+      <div class="res-player">
+        <div class="res-player-av {{ 'winner' if i_won else ('loser' if not is_draw else '') }}">
+          {% if user_image %}<img src="{{ user_image }}" alt="">{% else %}{{ user_name[0]|upper }}{% endif %}
+        </div>
+        <div class="res-player-name">{{ user_name }} (You)</div>
+        <div class="res-player-tag {{ 'winner-tag' if i_won else ('draw-tag' if is_draw else 'loser-tag') }}">
+          {{ 'Winner' if i_won else ('Draw' if is_draw else 'Defeated') }}
+        </div>
+        {% if my_player %}
+        <div class="res-player-result">
+          {{ my_player.passed_count or 0 }}/{{ my_player.total_tests or 0 }} tests
+          {{ '✅' if my_player.passed else '❌' }}
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="res-vs">VS</div>
+
+      <!-- Opponent -->
+      <div class="res-player right">
+        <div class="res-player-av {{ 'winner' if (duel.winner_id and duel.winner_id != user_id) else ('loser' if (not is_draw and i_won) else '') }}">
+          {% if opp_player %}{{ opp_player.name[0]|upper }}{% else %}?{% endif %}
+        </div>
+        <div class="res-player-name">{{ opp_player.name if opp_player else 'Unknown' }}</div>
+        <div class="res-player-tag {{ 'winner-tag' if (duel.winner_id and duel.winner_id != user_id) else ('draw-tag' if is_draw else 'loser-tag') }}">
+          {{ 'Winner' if (duel.winner_id and duel.winner_id != user_id) else ('Draw' if is_draw else 'Defeated') }}
+        </div>
+        {% if opp_player %}
+        <div class="res-player-result">
+          {{ opp_player.passed_count or 0 }}/{{ opp_player.total_tests or 0 }} tests
+          {{ '✅' if opp_player.passed else '❌' }}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- PROBLEM INFO -->
+  <div class="res-card" style="padding:20px 26px;">
+    <div class="res-card-title">📋 Problem</div>
+    <div class="res-problem-row">
+      <div>
+        <div class="res-prob-name">{{ duel.problem.title }}</div>
+        <div class="res-prob-tags">
+          {% for tag in duel.problem.tags %}<span class="res-prob-tag">{{ tag }}</span>{% endfor %}
+        </div>
+      </div>
+      <div class="res-diff-pill {{ duel.difficulty }}">{{ duel.difficulty }}</div>
+    </div>
+  </div>
+
+  <!-- YOUR STATS -->
+  <div class="res-card stats-card">
+    <div class="res-card-title">📊 Your Performance</div>
+    <div class="res-stats-grid">
+      <div class="res-stat">
+        <div class="res-stat-n" style="color:var(--cyan)">{{ my_player.passed_count if my_player else 0 }}/{{ my_player.total_tests if my_player else 0 }}</div>
+        <div class="res-stat-l">Tests Passed</div>
+      </div>
+      <div class="res-stat">
+        <div class="res-stat-n" style="color:{% if i_won %}var(--green){% elif is_draw %}var(--amber){% else %}var(--red){% endif %}">
+          {{ 'WIN' if i_won else ('DRAW' if is_draw else 'LOSS') }}
+        </div>
+        <div class="res-stat-l">Result</div>
+      </div>
+      <div class="res-stat">
+        <div class="res-stat-n" style="color:var(--amber)">{{ (my_player.xp_earned or 0)|abs }}</div>
+        <div class="res-stat-l">XP {{ 'Earned' if (my_player.xp_earned or 0) >= 0 else 'Lost' }}</div>
+      </div>
+      <div class="res-stat">
+        <div class="res-stat-n" style="color:var(--purple)">{{ (my_player.trophy_change or 0)|abs }}</div>
+        <div class="res-stat-l">Trophies {{ '+' if (my_player.trophy_change or 0) >= 0 else '-' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEAGUE PROGRESS -->
+  <div class="res-card league-card">
+    <div class="res-card-title">🏅 League Progress</div>
+    <div class="res-league-row">
+      <div class="res-league-icon" id="lgIcon">⏳</div>
+      <div>
+        <div class="res-league-name" id="lgName">Loading…</div>
+        <div class="res-league-sub" id="lgSub">—</div>
+      </div>
+    </div>
+    <div class="res-prog-labels">
+      <span id="lgFrom">—</span>
+      <span id="lgTo">—</span>
+    </div>
+    <div class="res-prog-track"><div class="res-prog-fill" id="lgBar"></div></div>
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="res-btns">
+    <a href="/battle" class="res-btn res-btn-primary">⚔️ New Battle</a>
+    <a href="/battle" class="res-btn res-btn-sec">🏠 Battle Lobby</a>
+    <a href="/dashboard" class="res-btn res-btn-sec">📊 Dashboard</a>
+  </div>
+
+</div>
+
+<script>
+async function loadLeagueProgress(){
+  try{
+    const r=await fetch("/api/battle/profile");
+    const d=await r.json();
+    const lg=d.profile.league;
+    document.getElementById("lgIcon").textContent=lg.icon;
+    document.getElementById("lgName").textContent=lg.full_name;
+    document.getElementById("lgSub").textContent=`🏆 ${d.profile.trophies} trophies · ${d.profile.wins}W / ${d.profile.losses}L`;
+    document.getElementById("lgFrom").textContent=lg.full_name;
+    document.getElementById("lgTo").textContent=lg.next?"→ "+lg.next.full_name+" ("+lg.next.trophies_needed+" more trophies)":"🔥 MAX LEAGUE!";
+    setTimeout(()=>{ document.getElementById("lgBar").style.width=(lg.progress_pct||0)+"%"; },400);
+  }catch(e){}
+}
+loadLeagueProgress();
+</script>
+{% endblock %}

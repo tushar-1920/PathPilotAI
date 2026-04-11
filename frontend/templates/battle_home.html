@@ -1,0 +1,447 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--neon:#5b6bff;--cyan:#00e5c8;--green:#22c55e;--amber:#ffb547;--red:#ff5757;--purple:#a855f7;--font-d:"Syne",sans-serif;--font-b:"DM Sans",sans-serif;--font-c:"JetBrains Mono",monospace;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body,html{background:#060610!important;}
+
+.bm-wrap{max-width:1200px;margin:0 auto;padding:90px 24px 80px;}
+
+/* ── HERO ── */
+.bm-hero{text-align:center;padding:56px 0 44px;position:relative;}
+.bm-hero::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse at 50% 0%,rgba(255,87,87,.15),transparent 70%);pointer-events:none;}
+.bm-live-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 20px;border-radius:100px;background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.3);font-size:11px;font-weight:700;color:var(--red);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:24px;}
+.bm-pulse{width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,87,87,.5)}50%{box-shadow:0 0 0 8px rgba(255,87,87,0)}}
+.bm-title{font-family:var(--font-d);font-size:clamp(40px,7vw,78px);font-weight:800;letter-spacing:-3px;color:#fff;margin-bottom:14px;line-height:1.0;}
+.bm-title .fire{background:linear-gradient(135deg,#ff5757,var(--amber));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.bm-sub{font-size:16px;color:rgba(255,255,255,.35);max-width:520px;margin:0 auto 40px;line-height:1.75;}
+
+/* ── MAIN GRID ── */
+.bm-grid{display:grid;grid-template-columns:1fr 390px;gap:22px;margin-bottom:22px;}
+.bm-left{display:flex;flex-direction:column;gap:18px;}
+.bm-right{display:flex;flex-direction:column;gap:18px;}
+
+/* ── CARD BASE ── */
+.bm-card{background:rgba(10,10,28,.97);border:1px solid rgba(255,255,255,.07);border-radius:24px;padding:28px;position:relative;overflow:hidden;}
+.bm-card-accent{position:absolute;top:0;left:0;right:0;height:2px;border-radius:24px 24px 0 0;}
+
+/* ── PROFILE CARD ── */
+.bm-profile-card .bm-card-accent{background:linear-gradient(90deg,var(--neon),var(--cyan));}
+.bm-pc-top{display:flex;align-items:center;gap:16px;margin-bottom:22px;}
+.bm-pc-av{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,rgba(91,107,255,.5),rgba(0,229,200,.25));display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:22px;font-weight:800;flex-shrink:0;overflow:hidden;border:2px solid rgba(255,255,255,.1);}
+.bm-pc-av img{width:100%;height:100%;object-fit:cover;}
+.bm-pc-name{font-family:var(--font-d);font-size:18px;font-weight:800;color:#fff;margin-bottom:3px;}
+.bm-pc-sub{font-size:12px;color:rgba(255,255,255,.3);letter-spacing:.5px;}
+
+/* league banner */
+.bm-league{display:flex;align-items:center;gap:14px;padding:16px 18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;margin-bottom:18px;cursor:default;}
+.bm-league-icon{font-size:36px;flex-shrink:0;filter:drop-shadow(0 0 10px rgba(255,255,255,.2));}
+.bm-league-name{font-family:var(--font-d);font-size:18px;font-weight:800;color:#fff;}
+.bm-league-trophies{font-family:var(--font-c);font-size:12px;color:rgba(255,181,71,.8);margin-top:3px;}
+
+/* progress */
+.bm-prog-labels{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.25);margin-bottom:6px;}
+.bm-prog-track{height:8px;background:rgba(255,255,255,.06);border-radius:100px;overflow:hidden;margin-bottom:18px;}
+.bm-prog-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--amber),#ff8c42);width:0%;transition:width 1.4s cubic-bezier(.4,0,.2,1);}
+
+/* stats */
+.bm-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+.bm-stat{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px 8px;text-align:center;}
+.bm-stat-n{font-family:var(--font-d);font-size:22px;font-weight:800;letter-spacing:-0.5px;}
+.bm-stat-l{font-size:10px;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
+.bm-stat-wins .bm-stat-n{color:var(--green);}
+.bm-stat-losses .bm-stat-n{color:var(--red);}
+.bm-stat-draws .bm-stat-n{color:var(--amber);}
+.bm-stat-wr .bm-stat-n{color:var(--cyan);}
+
+.bm-xp-strip{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid rgba(255,255,255,.06);}
+.bm-xp-l{font-size:12px;color:rgba(255,255,255,.3);}
+.bm-xp-v{font-family:var(--font-c);font-size:13px;font-weight:700;color:var(--cyan);}
+
+/* ── CREATE DUEL ── */
+.bm-card-create .bm-card-accent{background:linear-gradient(90deg,var(--red),var(--amber));}
+.bm-section-title{font-family:var(--font-d);font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.35);margin-bottom:20px;}
+.bm-diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;}
+.bm-diff-btn{padding:14px 8px;border-radius:14px;border:1.5px solid transparent;cursor:pointer;text-align:center;transition:all .25s;background:rgba(255,255,255,.03);}
+.bm-diff-btn:hover{transform:translateY(-2px);}
+.bm-diff-icon{font-size:24px;margin-bottom:6px;}
+.bm-diff-name{font-family:var(--font-d);font-size:13px;font-weight:700;margin-bottom:3px;}
+.bm-diff-count{font-size:10px;color:rgba(255,255,255,.3);}
+.bm-diff-btn[data-diff="easy"]{border-color:rgba(34,197,94,.25);}.bm-diff-btn[data-diff="easy"]:hover,.bm-diff-btn[data-diff="easy"].active{border-color:var(--green);background:rgba(34,197,94,.08);}
+.bm-diff-btn[data-diff="easy"] .bm-diff-name{color:var(--green);}
+.bm-diff-btn[data-diff="medium"]{border-color:rgba(255,181,71,.25);}.bm-diff-btn[data-diff="medium"]:hover,.bm-diff-btn[data-diff="medium"].active{border-color:var(--amber);background:rgba(255,181,71,.08);}
+.bm-diff-btn[data-diff="medium"] .bm-diff-name{color:var(--amber);}
+.bm-diff-btn[data-diff="hard"]{border-color:rgba(255,87,87,.25);}.bm-diff-btn[data-diff="hard"]:hover,.bm-diff-btn[data-diff="hard"].active{border-color:var(--red);background:rgba(255,87,87,.08);}
+.bm-diff-btn[data-diff="hard"] .bm-diff-name{color:var(--red);}
+
+.bm-lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;}
+.bm-lang-btn{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:14px;border:1.5px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);cursor:pointer;transition:all .25s;}
+.bm-lang-btn:hover,.bm-lang-btn.active{border-color:var(--neon);background:rgba(91,107,255,.08);}
+.bm-lang-icon{font-size:20px;}
+.bm-lang-name{font-family:var(--font-d);font-size:13px;font-weight:700;color:#fff;}
+
+.bm-create-btn{width:100%;padding:16px;border-radius:16px;background:linear-gradient(135deg,var(--red),var(--amber));border:none;cursor:pointer;font-family:var(--font-d);font-size:15px;font-weight:800;color:#fff;letter-spacing:.5px;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:10px;}
+.bm-create-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(255,87,87,.3);}
+.bm-create-btn:active{transform:translateY(0);}
+.bm-create-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+/* ── JOIN CARD ── */
+.bm-card-join .bm-card-accent{background:linear-gradient(90deg,var(--neon),var(--cyan));}
+.bm-join-input-wrap{display:flex;gap:10px;margin-bottom:0;}
+.bm-code-input{flex:1;padding:14px 18px;border-radius:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);color:#fff;font-family:var(--font-c);font-size:18px;font-weight:700;letter-spacing:4px;text-transform:uppercase;outline:none;transition:all .25s;}
+.bm-code-input::placeholder{letter-spacing:2px;font-size:14px;color:rgba(255,255,255,.18);}
+.bm-code-input:focus{border-color:var(--neon);background:rgba(91,107,255,.06);}
+.bm-join-btn{padding:14px 22px;border-radius:14px;background:linear-gradient(135deg,var(--neon),var(--cyan));border:none;cursor:pointer;font-family:var(--font-d);font-size:14px;font-weight:800;color:#fff;transition:all .25s;white-space:nowrap;}
+.bm-join-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(91,107,255,.35);}
+.bm-join-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+/* ── LEADERBOARD ── */
+.bm-card-lb .bm-card-accent{background:linear-gradient(90deg,var(--amber),var(--purple));}
+.bm-lb-list{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto;}
+.bm-lb-list::-webkit-scrollbar{width:4px;}
+.bm-lb-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
+.bm-lb-row{display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:12px;border:1px solid rgba(255,255,255,.04);transition:background .2s;}
+.bm-lb-row:hover{background:rgba(255,255,255,.04);}
+.bm-lb-rank{font-family:var(--font-c);font-size:12px;font-weight:700;color:rgba(255,255,255,.3);text-align:center;}
+.bm-lb-rank-1{color:#ffd700;font-size:16px;}
+.bm-lb-rank-2{color:#c0c0c0;font-size:16px;}
+.bm-lb-rank-3{color:#cd7f32;font-size:16px;}
+.bm-lb-name{font-family:var(--font-d);font-size:13px;font-weight:700;color:#fff;}
+.bm-lb-sub{font-size:10px;color:rgba(255,255,255,.28);margin-top:2px;}
+.bm-lb-trophy{font-family:var(--font-c);font-size:13px;font-weight:700;color:var(--amber);}
+
+/* ── HISTORY ── */
+.bm-card-hist .bm-card-accent{background:linear-gradient(90deg,var(--cyan),var(--neon));}
+.bm-hist-list{display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto;}
+.bm-hist-list::-webkit-scrollbar{width:4px;}
+.bm-hist-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
+.bm-hist-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.04);}
+.bm-hist-row.win{background:rgba(34,197,94,.05);border-color:rgba(34,197,94,.12);}
+.bm-hist-row.loss{background:rgba(255,87,87,.05);border-color:rgba(255,87,87,.08);}
+.bm-hist-row.draw{background:rgba(255,181,71,.05);border-color:rgba(255,181,71,.08);}
+.bm-hist-badge{font-size:10px;font-weight:800;padding:3px 9px;border-radius:100px;text-transform:uppercase;letter-spacing:1px;}
+.win .bm-hist-badge{background:rgba(34,197,94,.15);color:var(--green);}
+.loss .bm-hist-badge{background:rgba(255,87,87,.15);color:var(--red);}
+.draw .bm-hist-badge{background:rgba(255,181,71,.15);color:var(--amber);}
+.bm-hist-prob{font-family:var(--font-d);font-size:12px;font-weight:700;color:#fff;}
+.bm-hist-opp{font-size:10px;color:rgba(255,255,255,.28);margin-top:2px;}
+.bm-hist-xp{font-family:var(--font-c);font-size:12px;font-weight:700;color:var(--cyan);}
+
+/* ── HOW IT WORKS ── */
+.bm-how{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:24px;}
+.bm-how-step{background:rgba(10,10,28,.97);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:22px 18px;text-align:center;transition:border-color .25s;}
+.bm-how-step:hover{border-color:rgba(91,107,255,.3);}
+.bm-how-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,rgba(91,107,255,.3),rgba(0,229,200,.15));border:1px solid rgba(91,107,255,.3);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:14px;font-weight:800;color:var(--neon);margin:0 auto 12px;}
+.bm-how-icon{font-size:28px;margin-bottom:10px;}
+.bm-how-title{font-family:var(--font-d);font-size:13px;font-weight:800;color:#fff;margin-bottom:6px;}
+.bm-how-desc{font-size:11px;color:rgba(255,255,255,.3);line-height:1.6;}
+
+/* ── TOAST ── */
+.bm-toast{position:fixed;top:24px;right:24px;padding:14px 22px;border-radius:14px;font-family:var(--font-d);font-size:14px;font-weight:700;z-index:9999;transform:translateX(120%);transition:transform .35s cubic-bezier(.4,0,.2,1);}
+.bm-toast.show{transform:translateX(0);}
+.bm-toast.error{background:rgba(255,87,87,.15);border:1px solid rgba(255,87,87,.3);color:var(--red);}
+.bm-toast.success{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--green);}
+.bm-toast.info{background:rgba(91,107,255,.15);border:1px solid rgba(91,107,255,.3);color:var(--neon);}
+
+/* ── EMPTY STATES ── */
+.bm-empty{text-align:center;padding:32px 20px;color:rgba(255,255,255,.2);font-size:13px;}
+.bm-empty-icon{font-size:32px;margin-bottom:8px;opacity:.4;}
+
+/* ── ERROR MSG ── */
+.bm-errmsg{margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(255,87,87,.1);border:1px solid rgba(255,87,87,.2);color:var(--red);font-size:12px;display:none;}
+.bm-errmsg.show{display:block;}
+
+@media(max-width:900px){.bm-grid{grid-template-columns:1fr;}.bm-how{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:500px){.bm-stats{grid-template-columns:repeat(2,1fr);}.bm-diff-grid{grid-template-columns:1fr;}.bm-how{grid-template-columns:1fr;}}
+</style>
+
+<div id="bmToast" class="bm-toast"></div>
+
+<div class="bm-wrap">
+  <!-- HERO -->
+  <div class="bm-hero">
+    <div class="bm-live-badge"><div class="bm-pulse"></div>LIVE BATTLE MODE</div>
+    <h1 class="bm-title">Code. Fight. <span class="fire">Conquer.</span></h1>
+    <p class="bm-sub">Go head-to-head in real-time 1v1 coding duels. Solve faster, climb leagues, and prove your skills on the battlefield.</p>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="bm-grid">
+    <!-- LEFT COLUMN -->
+    <div class="bm-left">
+
+      <!-- CREATE DUEL -->
+      <div class="bm-card bm-card-create">
+        <div class="bm-card-accent"></div>
+        <p class="bm-section-title">⚔️ Create a Duel Room</p>
+
+        <p style="font-size:12px;color:rgba(255,255,255,.3);margin-bottom:14px;">Select difficulty</p>
+        <div class="bm-diff-grid" id="diffGrid">
+          <div class="bm-diff-btn active" data-diff="easy" onclick="selectDiff('easy')">
+            <div class="bm-diff-icon">🟢</div>
+            <div class="bm-diff-name">Easy</div>
+            <div class="bm-diff-count">{{ easy_count }} problems</div>
+          </div>
+          <div class="bm-diff-btn" data-diff="medium" onclick="selectDiff('medium')">
+            <div class="bm-diff-icon">🟡</div>
+            <div class="bm-diff-name">Medium</div>
+            <div class="bm-diff-count">{{ medium_count }} problems</div>
+          </div>
+          <div class="bm-diff-btn" data-diff="hard" onclick="selectDiff('hard')">
+            <div class="bm-diff-icon">🔴</div>
+            <div class="bm-diff-name">Hard</div>
+            <div class="bm-diff-count">{{ hard_count }} problems</div>
+          </div>
+        </div>
+
+        <p style="font-size:12px;color:rgba(255,255,255,.3);margin-bottom:14px;">Select language</p>
+        <div class="bm-lang-grid" id="langGrid">
+          {% for key, lang in languages.items() %}
+          <div class="bm-lang-btn {% if loop.first %}active{% endif %}" data-lang="{{ key }}" onclick="selectLang('{{ key }}')">
+            <span class="bm-lang-icon">{{ lang.icon }}</span>
+            <span class="bm-lang-name">{{ lang.label }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <button class="bm-create-btn" id="createBtn" onclick="createDuel()">
+          <span>⚔️</span> Create Battle Room
+        </button>
+        <div id="createError" class="bm-errmsg"></div>
+      </div>
+
+      <!-- JOIN DUEL -->
+      <div class="bm-card bm-card-join">
+        <div class="bm-card-accent"></div>
+        <p class="bm-section-title">🔗 Join a Battle</p>
+        <p style="font-size:13px;color:rgba(255,255,255,.35);margin-bottom:18px;">Enter the 6-character code your opponent shared with you</p>
+        <div class="bm-join-input-wrap">
+          <input type="text" id="joinCode" class="bm-code-input" maxlength="8" placeholder="ABC123" oninput="this.value=this.value.toUpperCase()">
+          <button class="bm-join-btn" id="joinBtn" onclick="joinDuel()">Enter Arena →</button>
+        </div>
+        <div id="joinError" class="bm-errmsg"></div>
+      </div>
+
+      <!-- HOW IT WORKS -->
+      <div class="bm-how">
+        <div class="bm-how-step">
+          <div class="bm-how-num">1</div>
+          <div class="bm-how-icon">⚔️</div>
+          <div class="bm-how-title">Create Room</div>
+          <div class="bm-how-desc">Pick difficulty and language, then share your 6-digit battle code</div>
+        </div>
+        <div class="bm-how-step">
+          <div class="bm-how-num">2</div>
+          <div class="bm-how-icon">👥</div>
+          <div class="bm-how-title">Opponent Joins</div>
+          <div class="bm-how-desc">Your opponent enters the code and the countdown begins</div>
+        </div>
+        <div class="bm-how-step">
+          <div class="bm-how-num">3</div>
+          <div class="bm-how-icon">⚡</div>
+          <div class="bm-how-title">Solve First</div>
+          <div class="bm-how-desc">Both see the same problem — first to get all tests accepted wins</div>
+        </div>
+        <div class="bm-how-step">
+          <div class="bm-how-num">4</div>
+          <div class="bm-how-icon">🏆</div>
+          <div class="bm-how-title">Earn Rewards</div>
+          <div class="bm-how-desc">Win trophies, XP, and climb the league ladder</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="bm-right">
+
+      <!-- PROFILE CARD -->
+      <div class="bm-card bm-profile-card">
+        <div class="bm-card-accent"></div>
+        <div class="bm-pc-top">
+          <div class="bm-pc-av" id="pcAv">
+            {% if user_image %}<img src="{{ user_image }}" alt="">{% else %}{{ user_name[0]|upper }}{% endif %}
+          </div>
+          <div>
+            <div class="bm-pc-name">{{ user_name }}</div>
+            <div class="bm-pc-sub" id="pcRank">Loading rank…</div>
+          </div>
+        </div>
+
+        <div class="bm-league" id="leagueBanner">
+          <div class="bm-league-icon" id="lgIcon">⏳</div>
+          <div>
+            <div class="bm-league-name" id="lgName">Loading…</div>
+            <div class="bm-league-trophies" id="lgTrophies">🏆 — trophies</div>
+          </div>
+        </div>
+
+        <div class="bm-prog-labels">
+          <span id="lgFrom">—</span>
+          <span id="lgPct">—%</span>
+        </div>
+        <div class="bm-prog-track"><div class="bm-prog-fill" id="lgBar"></div></div>
+
+        <div class="bm-stats" id="statGrid">
+          <div class="bm-stat bm-stat-wins"><div class="bm-stat-n" id="stWins">—</div><div class="bm-stat-l">Wins</div></div>
+          <div class="bm-stat bm-stat-losses"><div class="bm-stat-n" id="stLosses">—</div><div class="bm-stat-l">Losses</div></div>
+          <div class="bm-stat bm-stat-draws"><div class="bm-stat-n" id="stDraws">—</div><div class="bm-stat-l">Draws</div></div>
+          <div class="bm-stat bm-stat-wr"><div class="bm-stat-n" id="stWR">—</div><div class="bm-stat-l">Win %</div></div>
+        </div>
+
+        <div class="bm-xp-strip">
+          <span class="bm-xp-l">⚡ Total XP</span>
+          <span class="bm-xp-v" id="stXP">—</span>
+        </div>
+        <div class="bm-xp-strip">
+          <span class="bm-xp-l">🔥 Best Streak</span>
+          <span class="bm-xp-v" id="stStreak">—</span>
+        </div>
+        <div class="bm-xp-strip">
+          <span class="bm-xp-l">⚔️ Total Battles</span>
+          <span class="bm-xp-v" id="stBattles">—</span>
+        </div>
+      </div>
+
+      <!-- LEADERBOARD -->
+      <div class="bm-card bm-card-lb">
+        <div class="bm-card-accent"></div>
+        <p class="bm-section-title">🏆 Top Fighters</p>
+        <div class="bm-lb-list" id="lbList">
+          <div class="bm-empty"><div class="bm-empty-icon">🏆</div>Loading leaderboard…</div>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="bm-card bm-card-hist">
+        <div class="bm-card-accent"></div>
+        <p class="bm-section-title">📜 Recent Battles</p>
+        <div class="bm-hist-list" id="histList">
+          <div class="bm-empty"><div class="bm-empty-icon">📜</div>No battles yet — create your first duel!</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedDiff = 'easy';
+let selectedLang = '{{ languages.keys()|list|first }}';
+
+function selectDiff(d){
+  selectedDiff = d;
+  document.querySelectorAll('.bm-diff-btn').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+}
+function selectLang(l){
+  selectedLang = l;
+  document.querySelectorAll('.bm-lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+}
+
+function showToast(msg, type='info'){
+  const t = document.getElementById('bmToast');
+  t.textContent = msg; t.className = `bm-toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+async function createDuel(){
+  const btn = document.getElementById('createBtn');
+  const err = document.getElementById('createError');
+  btn.disabled = true; btn.innerHTML = '⏳ Creating…';
+  err.classList.remove('show');
+  try {
+    const r = await fetch('/api/battle/create', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({difficulty: selectedDiff, language: selectedLang})
+    });
+    const d = await r.json();
+    if(d.redirect){ showToast('⚔️ Battle room created!','success'); window.location.href = d.redirect; }
+    else { err.textContent = d.error || 'Failed to create room.'; err.classList.add('show'); }
+  } catch(e){ err.textContent = 'Network error.'; err.classList.add('show'); }
+  finally { btn.disabled = false; btn.innerHTML = '<span>⚔️</span> Create Battle Room'; }
+}
+
+async function joinDuel(){
+  const code = document.getElementById('joinCode').value.trim().toUpperCase();
+  if(!code){ showToast('Enter a battle code first!','error'); return; }
+  const btn = document.getElementById('joinBtn');
+  const err = document.getElementById('joinError');
+  btn.disabled = true; btn.textContent = 'Joining…';
+  err.classList.remove('show');
+  try {
+    const r = await fetch('/api/battle/join', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({duel_code: code})
+    });
+    const d = await r.json();
+    if(d.redirect){ showToast('⚔️ Entering arena!','success'); window.location.href = d.redirect; }
+    else { err.textContent = d.error || 'Could not join room.'; err.classList.add('show'); }
+  } catch(e){ err.textContent = 'Network error.'; err.classList.add('show'); }
+  finally { btn.disabled = false; btn.textContent = 'Enter Arena →'; }
+}
+
+document.getElementById('joinCode').addEventListener('keydown', e => { if(e.key==='Enter') joinDuel(); });
+
+async function loadProfile(){
+  try {
+    const r = await fetch('/api/battle/profile');
+    const d = await r.json();
+    const p = d.profile, lg = p.league, xr = p.xp_rank;
+
+    document.getElementById('pcRank').textContent = `${xr.icon} ${xr.name}`;
+    document.getElementById('lgIcon').textContent = lg.icon;
+    document.getElementById('lgName').textContent = lg.full_name;
+    document.getElementById('lgTrophies').textContent = `🏆 ${p.trophies} trophies`;
+    document.getElementById('lgFrom').textContent = lg.full_name;
+    document.getElementById('lgPct').textContent = (lg.progress_pct||0)+'%';
+    setTimeout(() => { document.getElementById('lgBar').style.width = (lg.progress_pct||0)+'%'; }, 200);
+
+    document.getElementById('stWins').textContent = p.wins;
+    document.getElementById('stLosses').textContent = p.losses;
+    document.getElementById('stDraws').textContent = p.draws;
+    document.getElementById('stWR').textContent = p.win_rate+'%';
+    document.getElementById('stXP').textContent = p.total_xp.toLocaleString()+' XP';
+    document.getElementById('stStreak').textContent = p.best_streak+' 🔥';
+    document.getElementById('stBattles').textContent = p.total_battles;
+
+    // History
+    const hist = d.history;
+    const hl = document.getElementById('histList');
+    if(!hist.length){
+      hl.innerHTML = '<div class="bm-empty"><div class="bm-empty-icon">📜</div>No battles yet — create your first duel!</div>';
+    } else {
+      hl.innerHTML = hist.map(h => {
+        const xpSign = h.xp_earned > 0 ? '+' : '';
+        return `<div class="bm-hist-row ${h.result}">
+          <div><div class="bm-hist-badge">${h.result}</div></div>
+          <div><div class="bm-hist-prob">${h.problem_title||'—'}</div><div class="bm-hist-opp">vs ${h.opponent_name} · ${h.difficulty}</div></div>
+          <div class="bm-hist-xp">${xpSign}${h.xp_earned} XP</div>
+        </div>`;
+      }).join('');
+    }
+  } catch(e){ console.warn('Profile load failed', e); }
+}
+
+async function loadLeaderboard(){
+  try {
+    const r = await fetch('/api/battle/leaderboard');
+    const d = await r.json();
+    const lb = d.leaderboard;
+    const el = document.getElementById('lbList');
+    if(!lb.length){ el.innerHTML = '<div class="bm-empty"><div class="bm-empty-icon">🏆</div>No battles yet. Be the first!</div>'; return; }
+    const rankIcons = ['🥇','🥈','🥉'];
+    el.innerHTML = lb.slice(0,15).map((row, i) => `
+      <div class="bm-lb-row">
+        <div class="bm-lb-rank ${i<3?'bm-lb-rank-'+(i+1):''}">${i<3?rankIcons[i]:i+1}</div>
+        <div><div class="bm-lb-name">${row.name}</div><div class="bm-lb-sub">${row.league_icon} ${row.league} · ${row.win_rate}% WR</div></div>
+        <div class="bm-lb-trophy">${row.trophies} 🏆</div>
+      </div>`).join('');
+  } catch(e){ console.warn('Leaderboard load failed', e); }
+}
+
+loadProfile();
+loadLeaderboard();
+</script>
+{% endblock %}

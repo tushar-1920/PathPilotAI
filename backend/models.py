@@ -77,8 +77,36 @@ class User(db.Model):
     subscription_expiry = db.Column(db.DateTime, nullable=True)
     stripe_customer_id = db.Column(db.String(255))
     stripe_subscription_id = db.Column(db.String(255))
-    billing_cycle = db.Column(db.String(20)) 
-    
+    billing_cycle = db.Column(db.String(20))
+
+    # ── Helper: always returns the profile photo URL (or None) ──
+    # Used by auth_routes and app.py before_request to populate session
+    @property
+    def profile_photo_url(self):
+        """
+        Returns '/static/uploads/profile_images/...' if the user has
+        uploaded a profile photo, otherwise None.
+        Safe to call even if no Profile row exists yet.
+        """
+        try:
+            if self.profile and self.profile.profile_image:
+                img = self.profile.profile_image
+                if img.startswith('/static/'):
+                    return img
+                return f"/static/{img}"
+        except Exception:
+            pass
+        return None
+
+    @property
+    def display_initial(self):
+        """Returns the first letter of the user's name, uppercased. Fallback: 'U'."""
+        try:
+            return (self.name or 'U')[0].upper()
+        except Exception:
+            return 'U'
+
+
 # =========================================================
 # RESUME (ONLY ONE DEFINITION)
 # =========================================================
@@ -710,3 +738,123 @@ class RecruiterMessage(db.Model):
 
     receiver = db.relationship("User", backref="recruiter_messages")
     job      = db.relationship("RecruiterJob", backref="messages")
+
+class BattleProfile(db.Model):
+    """Per-user Battle Mode stats, XP, trophies, league."""
+    __tablename__ = "battle_profiles"
+ 
+    id              = db.Column(db.Integer, primary_key=True)
+    user_id         = db.Column(db.Integer, db.ForeignKey("users.id"), unique=True, nullable=False)
+    # XP & Trophy system
+    total_xp        = db.Column(db.Integer, default=0)
+    battle_xp       = db.Column(db.Integer, default=0)   # XP this season
+    trophies        = db.Column(db.Integer, default=0)    # trophy count (wins give +15, loss -3)
+    # Win/Loss record
+    total_battles   = db.Column(db.Integer, default=0)
+    wins            = db.Column(db.Integer, default=0)
+    losses          = db.Column(db.Integer, default=0)
+    draws           = db.Column(db.Integer, default=0)
+    # Streaks
+    current_streak  = db.Column(db.Integer, default=0)
+    best_streak     = db.Column(db.Integer, default=0)
+    # Per-difficulty wins
+    easy_wins       = db.Column(db.Integer, default=0)
+    medium_wins     = db.Column(db.Integer, default=0)
+    hard_wins       = db.Column(db.Integer, default=0)
+    # Test cases
+    total_tests_passed = db.Column(db.Integer, default=0)
+    total_tests_attempted = db.Column(db.Integer, default=0)
+    # Timestamps
+    created_at      = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at      = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+ 
+    user = db.relationship("User", backref=db.backref("battle_profile", uselist=False))
+ 
+ 
+class BattleHistory(db.Model):
+    """Record of every completed battle for a user."""
+    __tablename__ = "battle_history"
+ 
+    id              = db.Column(db.Integer, primary_key=True)
+    user_id         = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    # Opponent info
+    opponent_id     = db.Column(db.Integer, nullable=True)
+    opponent_name   = db.Column(db.String(200), default="Unknown")
+    # Battle info
+    duel_code       = db.Column(db.String(20), nullable=False)
+    difficulty      = db.Column(db.String(20), default="easy")
+    language        = db.Column(db.String(30), default="python")
+    # Problem info
+    problem_id      = db.Column(db.String(20), nullable=True)
+    problem_title   = db.Column(db.String(300), nullable=True)
+    # Result
+    result          = db.Column(db.String(20), default="unknown")   # win | loss | draw
+    xp_earned       = db.Column(db.Integer, default=0)
+    trophies_change = db.Column(db.Integer, default=0)
+    tests_passed    = db.Column(db.Integer, default=0)
+    total_tests     = db.Column(db.Integer, default=0)
+    submitted       = db.Column(db.Boolean, default=False)
+    accepted        = db.Column(db.Boolean, default=False)
+    # Multi-question data (JSON: list of per-question results)
+    questions_data  = db.Column(db.Text, nullable=True)  # JSON
+    # Timestamps
+    played_at       = db.Column(db.DateTime, default=datetime.utcnow)
+ 
+    user = db.relationship("User", backref="battle_history")
+
+
+# ══════════════════════════════════════════════════════════════
+# APPEND THESE TWO CLASSES TO THE BOTTOM OF backend/models.py
+# ══════════════════════════════════════════════════════════════
+
+class Notification(db.Model):
+    """
+    Universal notification hub.
+    types:
+      recruiter_message  — a recruiter sent you a message
+      job_match          — a new job matches your skills
+      battle_invite      — someone challenged you to a battle
+      application_update — your application status changed
+      hiring_alert       — a company you follow posted a new job
+    """
+    __tablename__ = "notifications"
+
+    id          = db.Column(db.Integer, primary_key=True)
+    user_id     = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    notif_type  = db.Column(db.String(50), nullable=False)   # see types above
+    title       = db.Column(db.String(300), nullable=False)
+    body        = db.Column(db.Text)
+    link        = db.Column(db.String(500))                  # where to go on click
+    is_read     = db.Column(db.Boolean, default=False)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+
+    user = db.relationship("User", backref="notifications")
+
+    def to_dict(self):
+        return {
+            "id":         self.id,
+            "type":       self.notif_type,
+            "title":      self.title,
+            "body":       self.body,
+            "link":       self.link,
+            "is_read":    self.is_read,
+            "created_at": self.created_at.strftime("%b %d, %I:%M %p") if self.created_at else "",
+        }
+
+
+class CompanyFollow(db.Model):
+    """
+    User follows a company to get hiring alerts whenever
+    a new RecruiterJob from that company_name is posted.
+    """
+    __tablename__ = "company_follows"
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "company_name", name="uq_user_company_follow"),
+    )
+
+    id           = db.Column(db.Integer, primary_key=True)
+    user_id      = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    company_name = db.Column(db.String(300), nullable=False)
+    created_at   = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship("User", backref="company_follows")

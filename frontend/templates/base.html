@@ -1,504 +1,1011 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PathPilot AI</title>
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<!-- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"> -->
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
-:root {
-  --neon: #5b6bff;
-  --cyan: #00e5c8;
-  --amber: #ffb547;
-  --rim: rgba(255,255,255,0.06);
-  --font-d: 'Syne', sans-serif;
-  --font-b: 'DM Sans', sans-serif;
+/* ═══════════════════════════════════════════════════════════════
+   ROOT TOKENS
+═══════════════════════════════════════════════════════════════ */
+:root{
+  --neon:#5b6bff;--cyan:#00e5c8;--amber:#ffb547;--green:#22c55e;--red:#e24b4a;
+  --pink:#ec4899;--purple:#a855f7;
+  --rim:rgba(255,255,255,0.06);--rim2:rgba(255,255,255,0.1);
+  --font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;
+  --nav-h:62px;
 }
-*, *::before, *::after { box-sizing: border-box; }
-html {
-  background: #000 !important;
+*,*::before,*::after{box-sizing:border-box}
+html{background:#000!important;scroll-padding-top:70px}
+body{font-family:var(--font-b)!important;background:#000!important;color:#fff!important;margin:0;-webkit-font-smoothing:antialiased}
+.bg-white,.bg-light{background:rgba(255,255,255,.03)!important}
+select,select option{background:#0d0d18!important;color:#fff!important;border-color:rgba(255,255,255,.1)!important}
+
+/* ═══════════════════════════════════════════════════════════════
+   NAVBAR SHELL — premium glass with mesh gradient
+═══════════════════════════════════════════════════════════════ */
+#ppNav{
+  position:fixed;top:0;left:0;right:0;z-index:9000;
+  height:var(--nav-h);
+  background:rgba(3,3,9,.94);
+  backdrop-filter:blur(32px) saturate(200%);
+  border-bottom:1px solid rgba(255,255,255,.055);
 }
-body {
-  font-family: var(--font-b) !important;
-  background: #000 !important;
-  color: #fff !important;
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
+/* Animated top accent line */
+#ppNav::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(91,107,255,0) 10%,
+    rgba(91,107,255,.7) 30%,
+    rgba(0,229,200,.6) 50%,
+    rgba(168,85,247,.5) 70%,
+    rgba(91,107,255,0) 90%,
+    transparent 100%);
+  animation:accentFlow 4s ease-in-out infinite alternate;
 }
-/* Kill Bootstrap's white body/bg overrides */
-.bg-white, .bg-light { background: rgba(255,255,255,.03) !important; }
-/* Dark selects globally */
-select, select option {
-  background: #0d0d18 !important;
-  color: #fff !important;
-  border-color: rgba(255,255,255,.1) !important;
+@keyframes accentFlow{
+  0%{background-position:0% 50%}
+  100%{background-position:100% 50%}
 }
-select option:checked,
-select option:hover {
-  background: rgba(91,107,255,.3) !important;
+/* Subtle radial glow under navbar */
+#ppNav::after{
+  content:'';position:absolute;bottom:-1px;left:20%;right:20%;height:1px;
+  background:radial-gradient(ellipse at center,rgba(91,107,255,.25) 0%,transparent 70%);
 }
 
-/* NAVBAR */
-.navbar {
-  background: rgba(0,0,0,.9) !important;
-  backdrop-filter: blur(24px);
-  border-bottom: 1px solid var(--rim);
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  min-height: 64px;
-}
-.navbar .container { height: 64px; }
-
-/* LOGO */
-.navbar-brand {
-  font-family: var(--font-d) !important;
-  font-size: 17px !important;
-  font-weight: 800 !important;
-  letter-spacing: -.3px;
-  color: #fff !important;
-  display: flex; align-items: center; gap: 9px;
-  padding: 0 !important; margin-right: 32px !important;
-  text-decoration: none;
-}
-.nb-icon {
-  width: 30px; height: 30px; border-radius: 8px;
-  background: linear-gradient(135deg, var(--neon), var(--cyan));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; flex-shrink: 0;
-  box-shadow: 0 0 14px rgba(91,107,255,.45);
-}
-.nb-name { color: #fff; }
-.nb-dot { color: rgba(255,255,255,.28); font-weight: 300; }
-
-/* NAV LINKS */
-.navbar-nav { gap: 1px; }
-.nav-link {
-  font-family: var(--font-b) !important;
-  font-size: 13.5px !important;
-  font-weight: 500 !important;
-  color: rgba(255,255,255,.55) !important;
-  padding: 6px 12px !important;
-  border-radius: 7px;
-  transition: color .2s, background .2s !important;
-  white-space: nowrap;
-}
-.nav-link:hover {
-  color: #fff !important;
-  background: rgba(255,255,255,.07) !important;
+#ppNavInner{
+  height:var(--nav-h);
+  display:flex;align-items:center;
+  padding:0 24px;gap:0;max-width:1700px;margin:0 auto;
 }
 
-/* DROPDOWN */
-.dropdown-menu {
-  background: rgba(8,8,8,.97) !important;
-  border: 1px solid rgba(255,255,255,.09) !important;
-  border-radius: 14px !important;
-  padding: 8px !important;
-  backdrop-filter: blur(24px);
-  box-shadow: 0 20px 50px rgba(0,0,0,.8) !important;
-  min-width: 200px;
-  margin-top: 6px !important;
+/* ═══════════════════════════════════════════════════════════════
+   LOGO
+═══════════════════════════════════════════════════════════════ */
+.pp-logo{
+  display:inline-flex;align-items:center;gap:10px;
+  text-decoration:none!important;flex-shrink:0;margin-right:22px;padding:0;
 }
-.dropdown-item {
-  font-family: var(--font-b) !important;
-  font-size: 13.5px !important;
-  color: rgba(255,255,255,.55) !important;
-  border-radius: 8px !important;
-  padding: 9px 14px !important;
-  transition: background .2s, color .2s !important;
-}
-.dropdown-item:hover {
-  background: rgba(255,255,255,.07) !important;
-  color: #fff !important;
-}
-.dropdown-toggle::after { border-top-color: rgba(255,255,255,.4) !important; }
-
-/* Admin */
-.nav-link.text-warning {
-  color: var(--amber) !important;
-  background: rgba(255,181,71,.07) !important;
-}
-.nav-link.text-warning:hover { background: rgba(255,181,71,.14) !important; }
-
-/* LOGOUT BUTTON */
-.btn.btn-outline-light.btn-sm {
-  font-family: var(--font-b) !important;
-  font-size: 13px !important; font-weight: 500 !important;
-  padding: 6px 18px !important; border-radius: 8px !important;
-  border: 1px solid rgba(255,255,255,.15) !important;
-  background: transparent !important;
-  color: rgba(255,255,255,.6) !important;
-  transition: all .2s !important;
-}
-.btn.btn-outline-light.btn-sm:hover {
-  background: rgba(255,255,255,.08) !important;
-  color: #fff !important;
-  border-color: rgba(255,255,255,.25) !important;
-}
-
-/* GET STARTED BUTTON */
-.btn.btn-primary.btn-sm {
-  font-family: var(--font-b) !important;
-  font-size: 13px !important; font-weight: 600 !important;
-  padding: 7px 20px !important; border-radius: 8px !important;
-  border: none !important;
-  background: linear-gradient(135deg, var(--neon), #3a4dff) !important;
-  color: #fff !important;
-  box-shadow: 0 4px 16px rgba(91,107,255,.4) !important;
-  transition: all .2s !important;
-}
-.btn.btn-primary.btn-sm:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 8px 24px rgba(91,107,255,.55) !important;
-  opacity: 1 !important;
-}
-
-/* TOGGLER */
-.navbar-toggler {
-  border: 1px solid rgba(255,255,255,.12) !important;
-  border-radius: 8px !important;
-  padding: 6px 10px !important;
-}
-.navbar-toggler-icon {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,0.6)' stroke-linecap='round' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
-}
-
-/* ── MOBILE NAVBAR ── */
-@media (max-width: 991px) {
-  .navbar .container { height: auto; min-height: 56px; padding: 8px 16px; }
-  .navbar { min-height: 56px; }
-  #navbarNav {
-    background: rgba(6,6,16,.98);
-    border-top: 1px solid rgba(255,255,255,.07);
-    border-radius: 0 0 16px 16px;
-    padding: 10px 8px 14px;
-    margin-top: 8px;
-    max-height: 80vh;
-    overflow-y: auto;
-  }
-  .navbar-nav { gap: 2px; }
-  .nav-link {
-    padding: 10px 14px !important;
-    border-radius: 10px !important;
-    font-size: 14px !important;
-  }
-  .dropdown-menu {
-    background: rgba(15,15,28,.98) !important;
-    border: 1px solid rgba(255,255,255,.08) !important;
-    border-radius: 12px !important;
-    margin: 4px 0 4px 10px !important;
-    padding: 6px !important;
-    box-shadow: none !important;
-  }
-  .dropdown-item { padding: 10px 14px !important; font-size: 13.5px !important; }
-  .btn.btn-outline-light.btn-sm,
-  .btn.btn-primary.btn-sm {
-    width: 100% !important;
-    text-align: center !important;
-    margin: 4px 0 !important;
-  }
-  .navbar-brand { margin-right: 0 !important; }
-  /* Hide heavy nav items on very small screens to avoid clutter */
-  .nav-hide-xs { display: none; }
-}
-@media (max-width: 576px) {
-  .navbar .container { padding: 6px 12px; }
-  .pp-w-dot { display: none; }
-}
-
-/* GLASS CARD */
-.card-glass {
-  background: rgba(255,255,255,.03);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 16px;
-  backdrop-filter: blur(12px);
-}
-
-/* PAGE */
-.page-wrapper {
-  margin-top: 64px;
-  position: relative; z-index: 1;
-  background: #000 !important;
-  min-height: 100vh;
-  padding-bottom: 0;
-}
-.page-wrapper > .container,
-.page-wrapper > .container-fluid,
-.page-wrapper > .container > *,
-.container, .container-fluid {
-  background: transparent !important;
-}
-.page-wrapper > .container {
-  max-width: 100% !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  padding-bottom: 0 !important;
-  margin-bottom: 0 !important;
-}
-/* Footer always dark */
-body::after {
-  content: '';
-  display: block;
-  background: #000;
-}
-
-/* FOOTER */
-.footer {
-  background: #000 !important;
-  margin-top: 60px; padding: 28px 0;
-  text-align: center; font-size: 13px;
-  color: rgba(255,255,255,.2);
-  border-top: 1px solid var(--rim);
-  font-family: var(--font-b);
-}
-/* ── PathPilot Logo ── */
-
-a.navbar-brand.pp-logo{
-  padding:0!important;margin-right:24px!important;
-  display:inline-flex!important;align-items:center;
-  gap:0;text-decoration:none!important;
-}
-.pp-icon{
-  width:38px;height:38px;border-radius:10px;
-  background:linear-gradient(145deg,#1c1248 0%,#0e0822 100%);
-  border:1.5px solid rgba(91,107,255,.55);
+.pp-logo-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(145deg,#1a1040 0%,#0a0620 100%);
+  border:1.5px solid rgba(91,107,255,.52);
   display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;position:relative;overflow:hidden;
-  box-shadow:0 0 0 1px rgba(91,107,255,.12),0 4px 20px rgba(91,107,255,.22);
-  transition:box-shadow .22s,border-color .22s;
+  position:relative;overflow:hidden;flex-shrink:0;
+  box-shadow:0 0 0 3px rgba(91,107,255,.07),0 4px 20px rgba(91,107,255,.2);
+  transition:border-color .22s,box-shadow .22s;
 }
-.pp-icon::before{
-  content:"";position:absolute;inset:0;
-  background:conic-gradient(from 0deg at 50% 50%,
-    rgba(91,107,255,.2) 0deg,rgba(0,229,200,.08) 90deg,
-    rgba(91,107,255,.2) 180deg,rgba(168,85,247,.06) 270deg,
-    rgba(91,107,255,.2) 360deg);
-  animation:pp-spin 9s linear infinite;
+.pp-logo-icon::before{
+  content:'';position:absolute;inset:0;
+  background:conic-gradient(from 0deg,rgba(91,107,255,.22),rgba(0,229,200,.09),rgba(91,107,255,.22),rgba(168,85,247,.07),rgba(91,107,255,.22));
+  animation:spinConic 9s linear infinite;
 }
-@keyframes pp-spin{to{transform:rotate(360deg)}}
-.pp-icon svg{position:relative;z-index:1;}
-.pp-orbit{animation:pp-orb 5.5s linear infinite;transform-origin:12px 12px;}
-@keyframes pp-orb{to{transform:rotate(360deg)}}
-.pp-pulse{animation:pp-p 2.4s ease-in-out infinite;}
-@keyframes pp-p{0%,100%{opacity:1}50%{opacity:.3}}
-.pp-word{
-  margin-left:11px;display:flex;align-items:baseline;
-  font-family:'Syne','DM Sans',system-ui,sans-serif;
-  line-height:1;white-space:nowrap;
+@keyframes spinConic{to{transform:rotate(360deg)}}
+.pp-logo-icon svg{position:relative;z-index:1}
+.pp-logo:hover .pp-logo-icon{
+  border-color:rgba(91,107,255,.8);
+  box-shadow:0 0 0 3px rgba(91,107,255,.15),0 6px 28px rgba(91,107,255,.4);
 }
-.pp-w-path{font-size:18px;font-weight:800;color:#fff;letter-spacing:-.5px;}
-.pp-w-pilot{font-size:18px;font-weight:300;color:rgba(255,255,255,.58);letter-spacing:-.3px;}
-.pp-w-dot{
-  font-size:11px;font-weight:800;color:#00e5c8;
-  letter-spacing:.8px;margin-left:1px;
-  animation:pp-dot 2.8s ease-in-out infinite;
+.pp-logo-text{display:flex;align-items:baseline;gap:0;line-height:1;white-space:nowrap;font-family:var(--font-d)}
+.pp-logo-path{font-size:17px;font-weight:800;color:#fff;letter-spacing:-.5px}
+.pp-logo-pilot{font-size:17px;font-weight:300;color:rgba(255,255,255,.5);letter-spacing:-.3px}
+.pp-logo-dot{
+  font-size:10px;font-weight:800;color:#00e5c8;letter-spacing:.7px;margin-left:1px;
+  animation:dotGlow 2.8s ease-in-out infinite;
 }
-@keyframes pp-dot{
-  0%,100%{opacity:1;text-shadow:0 0 8px rgba(0,229,200,.5)}
-  50%{opacity:.6;text-shadow:0 0 16px rgba(0,229,200,.9)}
-}
-a.navbar-brand.pp-logo:hover .pp-icon{
-  box-shadow:0 0 0 1px rgba(91,107,255,.3),0 6px 28px rgba(91,107,255,.4);
-  border-color:rgba(91,107,255,.75);
-}
-a.navbar-brand.pp-logo:hover .pp-w-pilot{color:rgba(255,255,255,.82);}
-@keyframes pp-orb-rev { to { transform: rotate(-360deg); } }
-@keyframes pp-arrow-glow { 0%,100%{opacity:.85} 50%{opacity:1} }
+@keyframes dotGlow{0%,100%{opacity:1;text-shadow:0 0 8px rgba(0,229,200,.6)}50%{opacity:.6;text-shadow:0 0 18px rgba(0,229,200,1)}}
+@keyframes orbFwd{to{transform:rotate(360deg)}}
+@keyframes orbRev{to{transform:rotate(-360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* Mobile */
-@media(max-width:576px){
-  .pp-icon{width:34px;height:34px;border-radius:9px;}
-  .pp-word{margin-left:9px;}
-  .pp-w-path,.pp-w-pilot{font-size:15px;}
-  .pp-w-dot{font-size:9.5px;}
+/* ═══════════════════════════════════════════════════════════════
+   NAV REGIONS
+═══════════════════════════════════════════════════════════════ */
+.pp-nav-center{
+  display:flex;align-items:center;gap:1px;flex:1;justify-content:center;
 }
-/* ─────────────────────────────────────── */
+.pp-nav-right{
+  display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:12px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NAV LINKS
+═══════════════════════════════════════════════════════════════ */
+.pp-link{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--font-b);font-size:13px;font-weight:500;
+  color:rgba(255,255,255,.48);
+  padding:6px 11px;border-radius:8px;
+  text-decoration:none;cursor:pointer;
+  border:none;background:none;
+  transition:color .15s,background .15s;white-space:nowrap;line-height:1;
+  position:relative;
+}
+.pp-link:hover{color:#fff;background:rgba(255,255,255,.07)}
+.pp-link.active{color:#fff;background:rgba(91,107,255,.13)}
+/* Hover underline shimmer */
+.pp-link::after{
+  content:'';position:absolute;bottom:3px;left:50%;right:50%;
+  height:1px;background:linear-gradient(90deg,var(--neon),var(--cyan));
+  opacity:0;transition:left .2s,right .2s,opacity .2s;border-radius:1px;
+}
+.pp-link:hover::after{left:12px;right:12px;opacity:.5}
+.pp-link-caret{font-size:9px;color:rgba(255,255,255,.22);transition:transform .15s;margin-left:1px}
+.pp-dropdown.open>.pp-link .pp-link-caret{transform:rotate(180deg)}
+
+/* ═══════════════════════════════════════════════════════════════
+   HIRING ALERT PILL
+═══════════════════════════════════════════════════════════════ */
+.pp-hiring-link{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--font-b);font-size:12.5px;font-weight:600;
+  color:rgba(34,197,94,.88);
+  padding:5px 10px 5px 8px;border-radius:8px;
+  text-decoration:none;white-space:nowrap;
+  border:1px solid rgba(34,197,94,.2);
+  background:rgba(34,197,94,.06);
+  transition:all .15s;
+}
+.pp-hiring-link:hover{color:#22c55e;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.35)}
+.pp-hiring-pulse{
+  width:6px;height:6px;border-radius:50%;background:#22c55e;flex-shrink:0;
+  animation:hiringPulse 2s ease-in-out infinite;
+}
+@keyframes hiringPulse{
+  0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,.5)}
+  50%{opacity:.8;box-shadow:0 0 0 5px rgba(34,197,94,0)}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DROPDOWN MENUS
+═══════════════════════════════════════════════════════════════ */
+.pp-dropdown{position:relative}
+.pp-menu{
+  display:none;position:absolute;
+  top:calc(100% + 10px);left:50%;transform:translateX(-50%);
+  min-width:220px;
+  background:rgba(6,6,15,.98);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:16px;padding:7px;
+  backdrop-filter:blur(28px);
+  box-shadow:0 8px 16px rgba(0,0,0,.5),0 28px 56px rgba(0,0,0,.7),0 0 0 1px rgba(91,107,255,.04);
+  z-index:9999;
+  animation:menuIn .14s cubic-bezier(.16,1,.3,1);
+}
+.pp-menu.align-right{left:auto;right:0;transform:none;animation:menuInRight .14s cubic-bezier(.16,1,.3,1)}
+@keyframes menuIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes menuInRight{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.pp-dropdown.open .pp-menu,.pp-menu.open{display:block}
+.pp-menu-item{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 12px;border-radius:9px;
+  font-family:var(--font-b);font-size:13px;font-weight:400;
+  color:rgba(255,255,255,.52);
+  text-decoration:none;cursor:pointer;
+  transition:background .12s,color .12s;white-space:nowrap;
+  border:none;background:none;width:100%;text-align:left;
+}
+.pp-menu-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.pp-menu-item.danger:hover{background:rgba(226,75,74,.1);color:#e24b4a}
+.pp-menu-item .mi-icon{width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.pp-menu-sep{height:1px;background:rgba(255,255,255,.07);margin:5px 6px}
+.pp-menu-label{
+  font-size:10px;font-weight:700;letter-spacing:.09em;
+  color:rgba(255,255,255,.2);text-transform:uppercase;
+  padding:8px 12px 3px;
+}
+.mi-blue{background:rgba(91,107,255,.15)}
+.mi-cyan{background:rgba(0,229,200,.12)}
+.mi-amber{background:rgba(255,181,71,.12)}
+.mi-green{background:rgba(34,197,94,.12)}
+.mi-purple{background:rgba(168,85,247,.12)}
+.mi-red{background:rgba(226,75,74,.1)}
+.mi-pink{background:rgba(236,72,153,.12)}
+
+/* ═══════════════════════════════════════════════════════════════
+   SEARCH BUTTON
+═══════════════════════════════════════════════════════════════ */
+.pp-searchbtn{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:9px;padding:5px 11px 5px 9px;
+  color:rgba(255,255,255,.34);font-size:12.5px;
+  font-family:var(--font-b);cursor:pointer;
+  transition:all .15s;white-space:nowrap;
+}
+.pp-searchbtn:hover{border-color:rgba(91,107,255,.45);color:rgba(255,255,255,.65);background:rgba(91,107,255,.07)}
+.pp-searchbtn svg{width:13px;height:13px;flex-shrink:0}
+.pp-kbd{
+  font-size:9.5px;background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.1);border-radius:4px;
+  padding:1px 5px;color:rgba(255,255,255,.28);margin-left:2px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NOTIFICATION BELL
+═══════════════════════════════════════════════════════════════ */
+.pp-bell-wrap{position:relative}
+.pp-bellbtn{
+  display:flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:9px;
+  background:none;border:none;cursor:pointer;
+  color:rgba(255,255,255,.42);
+  transition:color .15s,background .15s;position:relative;
+}
+.pp-bellbtn:hover{color:#fff;background:rgba(255,255,255,.07)}
+.pp-bellbtn svg{width:17px;height:17px}
+.pp-bell-badge{
+  position:absolute;top:3px;right:3px;
+  min-width:14px;height:14px;
+  background:#e24b4a;border-radius:7px;
+  font-size:8.5px;font-weight:700;color:#fff;
+  display:none;align-items:center;justify-content:center;
+  padding:0 3px;border:1.5px solid rgba(3,3,9,1);
+}
+.pp-notif-panel{
+  display:none;position:absolute;top:calc(100% + 10px);right:0;
+  width:345px;background:rgba(6,6,15,.98);
+  border:1px solid rgba(255,255,255,.09);border-radius:18px;
+  box-shadow:0 8px 16px rgba(0,0,0,.5),0 28px 56px rgba(0,0,0,.7);
+  overflow:hidden;z-index:9999;
+  animation:menuInRight .14s cubic-bezier(.16,1,.3,1);
+}
+.pp-notif-panel.open{display:block}
+.pp-notif-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px 10px;border-bottom:1px solid rgba(255,255,255,.07);
+}
+.pp-notif-head-title{font-size:13.5px;font-weight:700;color:#fff}
+.pp-notif-mark{font-size:11px;color:var(--cyan);background:none;border:none;cursor:pointer;padding:0;transition:opacity .15s}
+.pp-notif-mark:hover{opacity:.7}
+.pp-notif-list{max-height:340px;overflow-y:auto}
+.pp-notif-list::-webkit-scrollbar{width:3px}
+.pp-notif-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.pp-notif-item{
+  display:flex;gap:11px;padding:11px 16px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  text-decoration:none;transition:background .12s;
+}
+.pp-notif-item:hover{background:rgba(255,255,255,.04)}
+.pp-notif-item.unread{background:rgba(91,107,255,.06);border-left:3px solid var(--neon)}
+.pp-ni-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ni-recruiter{background:rgba(91,107,255,.15)}
+.ni-job_match{background:rgba(0,229,200,.12)}
+.ni-battle_invite{background:rgba(255,181,71,.12)}
+.ni-hiring_alert{background:rgba(34,197,94,.12)}
+.ni-application_update{background:rgba(168,85,247,.12)}
+.pp-ni-body{flex:1;min-width:0}
+.pp-ni-title{font-size:12.5px;font-weight:600;color:#fff;margin-bottom:2px;line-height:1.3}
+.pp-ni-desc{font-size:11.5px;color:rgba(255,255,255,.38);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pp-ni-time{font-size:10px;color:rgba(255,255,255,.22);margin-top:3px}
+.pp-notif-empty{padding:36px 20px;text-align:center;color:rgba(255,255,255,.25);font-size:13px}
+.pp-notif-footer{padding:10px 16px;border-top:1px solid rgba(255,255,255,.07);text-align:center}
+.pp-notif-footer a{font-size:12px;color:var(--cyan);text-decoration:none}
+
+/* ═══════════════════════════════════════════════════════════════
+   ACTION BUTTONS
+═══════════════════════════════════════════════════════════════ */
+.pp-btn-ghost{
+  display:inline-flex;align-items:center;
+  font-family:var(--font-b);font-size:12.5px;font-weight:500;
+  padding:5px 15px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.12);
+  background:transparent;color:rgba(255,255,255,.5);
+  text-decoration:none;transition:all .15s;white-space:nowrap;cursor:pointer;
+}
+.pp-btn-ghost:hover{background:rgba(255,255,255,.07);color:#fff;border-color:rgba(255,255,255,.22)}
+.pp-btn-primary{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--font-b);font-size:12.5px;font-weight:600;
+  padding:6px 17px;border-radius:8px;border:none;
+  background:linear-gradient(135deg,var(--neon),#3a4dff);
+  color:#fff;text-decoration:none;
+  box-shadow:0 4px 16px rgba(91,107,255,.38);
+  transition:all .15s;white-space:nowrap;cursor:pointer;
+}
+.pp-btn-primary:hover{transform:translateY(-1px);box-shadow:0 7px 22px rgba(91,107,255,.55);color:#fff}
+
+/* recruiter badge */
+.pp-rec-badge{
+  font-size:11.5px;color:rgba(0,229,200,.65);
+  padding:4px 10px;border-radius:7px;
+  background:rgba(0,229,200,.06);border:1px solid rgba(0,229,200,.12);white-space:nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PROFILE AVATAR CHIP — shows real photo if available
+═══════════════════════════════════════════════════════════════ */
+.pp-profile-chip{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--font-b);font-size:13px;font-weight:500;
+  color:rgba(255,255,255,.52);
+  padding:4px 8px 4px 4px;border-radius:10px;
+  border:none;background:none;cursor:pointer;transition:all .18s;
+}
+.pp-profile-chip:hover{color:#fff;background:rgba(255,255,255,.07)}
+/* Avatar wrapper with ring */
+.pp-avatar-wrap{
+  position:relative;flex-shrink:0;
+  width:28px;height:28px;
+}
+/* Animated gradient ring */
+.pp-avatar-wrap::before{
+  content:'';position:absolute;inset:-2px;
+  border-radius:9px;
+  background:conic-gradient(var(--neon),var(--cyan),var(--purple),var(--neon));
+  animation:ringRotate 4s linear infinite;
+  opacity:0;
+  transition:opacity .2s;
+}
+.pp-profile-chip:hover .pp-avatar-wrap::before{opacity:1}
+@keyframes ringRotate{to{transform:rotate(360deg)}}
+/* The actual avatar — image or initial */
+.pp-avatar{
+  position:relative;z-index:1;
+  width:28px;height:28px;border-radius:8px;
+  background:linear-gradient(135deg,var(--neon),#3a4dff);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;
+  overflow:hidden;
+  border:1.5px solid rgba(255,255,255,.1);
+  transition:border-color .18s;
+}
+.pp-profile-chip:hover .pp-avatar{border-color:rgba(91,107,255,.5)}
+.pp-avatar img{
+  width:100%;height:100%;object-fit:cover;
+  border-radius:6px;display:block;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE HAMBURGER
+═══════════════════════════════════════════════════════════════ */
+.pp-hamburger{
+  display:none;flex-direction:column;gap:4.5px;
+  background:none;border:1px solid rgba(255,255,255,.12);
+  border-radius:9px;padding:8px 9px;cursor:pointer;
+  transition:background .15s,border-color .15s;margin-left:auto;flex-shrink:0;
+}
+.pp-hamburger:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.22)}
+.pp-hamburger span{width:18px;height:1.5px;background:rgba(255,255,255,.58);border-radius:2px;display:block;transition:all .22s}
+
+/* ═══════════════════════════════════════════════════════════════
+   GLOBAL SEARCH MODAL
+═══════════════════════════════════════════════════════════════ */
+.pp-search-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.8);backdrop-filter:blur(12px);
+  z-index:99999;align-items:flex-start;justify-content:center;padding-top:10vh;
+}
+.pp-search-overlay.open{display:flex}
+.pp-search-modal{
+  width:100%;max-width:590px;
+  background:rgba(7,7,17,.98);
+  border:1px solid rgba(255,255,255,.11);border-radius:20px;
+  overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.95);
+  animation:searchIn .15s cubic-bezier(.16,1,.3,1);
+}
+@keyframes searchIn{from{opacity:0;transform:translateY(-12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.pp-search-head{
+  display:flex;align-items:center;gap:11px;
+  padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.07);
+}
+.pp-search-head svg{width:17px;height:17px;color:rgba(255,255,255,.32);flex-shrink:0}
+#ppSearchInput{
+  flex:1;background:none;border:none;outline:none;
+  font-size:15.5px;color:#fff;font-family:var(--font-b);
+}
+#ppSearchInput::placeholder{color:rgba(255,255,255,.2)}
+.pp-search-esc-btn{
+  font-size:10.5px;background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.1);border-radius:4px;
+  padding:2px 7px;color:rgba(255,255,255,.28);cursor:pointer;flex-shrink:0;
+}
+.pp-search-results{max-height:420px;overflow-y:auto;padding:6px 0}
+.pp-search-results::-webkit-scrollbar{width:3px}
+.pp-search-results::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.pp-search-cat{
+  font-size:10px;font-weight:700;letter-spacing:.09em;
+  color:rgba(255,255,255,.22);text-transform:uppercase;
+  padding:8px 18px 4px;
+}
+.pp-search-row{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 18px;cursor:pointer;transition:background .1s;text-decoration:none;
+}
+.pp-search-row:hover,.pp-search-row.sel{background:rgba(91,107,255,.1)}
+.pp-search-ico{
+  width:30px;height:30px;border-radius:8px;
+  background:rgba(255,255,255,.06);
+  display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;
+}
+.pp-search-body{flex:1;min-width:0}
+.pp-search-title{font-size:13px;font-weight:600;color:#fff}
+.pp-search-sub{font-size:11px;color:rgba(255,255,255,.35);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pp-search-arr{color:rgba(255,255,255,.18);font-size:14px}
+.pp-search-empty{padding:32px 20px;text-align:center;color:rgba(255,255,255,.25);font-size:13px}
+.pp-search-hints{
+  padding:10px 18px;border-top:1px solid rgba(255,255,255,.06);
+  display:flex;gap:14px;flex-wrap:wrap;
+}
+.pp-search-hint{font-size:11px;color:rgba(255,255,255,.25);display:flex;align-items:center;gap:5px}
+.pp-hint-key{
+  font-size:9.5px;background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:1px 5px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE DRAWER
+═══════════════════════════════════════════════════════════════ */
+.pp-drawer{
+  display:none;position:fixed;top:var(--nav-h);left:0;right:0;bottom:0;
+  background:rgba(3,3,9,.97);backdrop-filter:blur(20px);
+  z-index:8999;overflow-y:auto;padding:16px;
+}
+.pp-drawer.open{display:block}
+.pp-drawer-link{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;border-radius:11px;
+  font-family:var(--font-b);font-size:14px;font-weight:500;
+  color:rgba(255,255,255,.52);text-decoration:none;
+  transition:background .12s,color .12s;
+}
+.pp-drawer-link:hover{color:#fff;background:rgba(255,255,255,.06)}
+.pp-drawer-section{
+  font-size:10px;font-weight:700;letter-spacing:.09em;
+  color:rgba(255,255,255,.2);text-transform:uppercase;
+  padding:14px 14px 5px;
+}
+.pp-drawer-sep{height:1px;background:rgba(255,255,255,.07);margin:8px 0}
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE LAYOUT
+═══════════════════════════════════════════════════════════════ */
+.page-wrapper{
+  margin-top:var(--nav-h);position:relative;z-index:1;
+  background:#000!important;min-height:100vh;
+}
+.page-wrapper>.container,
+.page-wrapper>.container-fluid,
+.page-wrapper>.container>*,
+.container,.container-fluid{background:transparent!important}
+.page-wrapper>.container{
+  max-width:100%!important;padding-left:0!important;
+  padding-right:0!important;padding-bottom:0!important;margin-bottom:0!important;
+}
+.card-glass{
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;backdrop-filter:blur(12px);
+}
+.footer{
+  background:#000!important;margin-top:60px;padding:28px 0;
+  text-align:center;font-size:13px;color:rgba(255,255,255,.18);
+  border-top:1px solid var(--rim);font-family:var(--font-b);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════════ */
+@media(max-width:991px){
+  .pp-nav-center,.pp-nav-right{display:none!important}
+  .pp-hamburger{display:flex}
+}
+@media(max-width:480px){
+  #ppNavInner{padding:0 14px}
+  .pp-searchbtn .pp-kbd,.pp-searchbtn span:not(svg){display:none}
+  .pp-logo-path,.pp-logo-pilot{font-size:15px}
+}
 </style>
 </head>
 <body>
 
-<!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm">
-<div class="container">
-
-<!-- <a class="navbar-brand" href="/">🚀 PathPilot AI</a> -->
-<a class="navbar-brand pp-logo" href="/">
-  <div class="pp-icon">
-    <svg width="24" height="24" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="19" cy="19" r="15" stroke="rgba(91,107,255,.18)" stroke-width=".6" stroke-dasharray="2 3"/>
-      <g style="animation:pp-orb-rev 18s linear infinite;transform-origin:19px 19px">
-        <circle cx="19" cy="19" r="11" fill="none" stroke="rgba(91,107,255,.28)" stroke-width=".55" stroke-dasharray="3.5 5"/>
-      </g>
-      <g style="animation:pp-orb 12s linear infinite;transform-origin:19px 19px">
-        <circle cx="19" cy="19" r="7.5" fill="none" stroke="rgba(0,229,200,.18)" stroke-width=".5" stroke-dasharray="2 4"/>
-      </g>
-      <circle cx="19" cy="3.5"  r="1.5" fill="#5b6bff" class="pp-pulse"/>
-      <circle cx="34.5" cy="19" r="1.2" fill="#5b6bff" opacity=".7"/>
-      <circle cx="19" cy="34.5" r="1"   fill="#5b6bff" opacity=".55"/>
-      <circle cx="3.5"  cy="19" r="1.2" fill="#5b6bff" opacity=".7"/>
-      <line x1="19"  y1="5.5"  x2="19"   y2="11.5" stroke="rgba(91,107,255,.38)" stroke-width=".55"/>
-      <line x1="33"  y1="19"   x2="27"   y2="19"   stroke="rgba(91,107,255,.28)" stroke-width=".55"/>
-      <line x1="19"  y1="33"   x2="19"   y2="27"   stroke="rgba(91,107,255,.22)" stroke-width=".5"/>
-      <line x1="5.5" y1="19"   x2="11.5" y2="19"   stroke="rgba(91,107,255,.28)" stroke-width=".55"/>
-      <circle cx="30" cy="8"  r=".85" fill="rgba(91,107,255,.5)" class="pp-pulse"/>
-      <circle cx="30" cy="30" r=".85" fill="rgba(91,107,255,.4)"/>
-      <circle cx="8"  cy="8"  r=".85" fill="rgba(91,107,255,.4)"/>
-      <circle cx="8"  cy="30" r=".85" fill="rgba(91,107,255,.35)"/>
-      <path d="M19 9.5 L22 16.5 L19 15 L16 16.5 Z" fill="#5b6bff" class="pp-pulse"/>
-      <path d="M19 15 L20.5 21 L19 20 L17.5 21 Z" fill="rgba(91,107,255,.35)"/>
-      <circle cx="19" cy="19" r="4.5" fill="#5b6bff" opacity=".1"/>
-      <circle cx="19" cy="19" r="3"   fill="#0f0822"/>
-      <circle cx="19" cy="19" r="2.2" fill="#5b6bff" opacity=".7" class="pp-pulse"/>
-      <circle cx="19" cy="19" r="1.3" fill="#00e5c8" class="pp-pulse"/>
-      <circle cx="19" cy="19" r=".65" fill="#fff" opacity=".95"/>
-    </svg>
+<!-- ══ GLOBAL SEARCH MODAL ══ -->
+<div class="pp-search-overlay" id="ppSearchOverlay" onclick="if(event.target===this)closeSearch()">
+  <div class="pp-search-modal">
+    <div class="pp-search-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="ppSearchInput" type="text" placeholder="Search jobs, users, tools..." autocomplete="off"
+        oninput="onSearchInput(this.value)" onkeydown="onSearchKey(event)">
+      <button class="pp-search-esc-btn" onclick="closeSearch()">Esc</button>
+    </div>
+    <div class="pp-search-results" id="ppSearchResults">
+      <div class="pp-search-cat">Quick access</div>
+      <a class="pp-search-row" href="/dashboard"><div class="pp-search-ico">🏠</div><div class="pp-search-body"><div class="pp-search-title">Dashboard</div></div><span class="pp-search-arr">›</span></a>
+      <a class="pp-search-row" href="/practice"><div class="pp-search-ico">⚡</div><div class="pp-search-body"><div class="pp-search-title">Code Practice</div></div><span class="pp-search-arr">›</span></a>
+      <a class="pp-search-row" href="/interview"><div class="pp-search-ico">🎯</div><div class="pp-search-body"><div class="pp-search-title">Interview Simulator</div></div><span class="pp-search-arr">›</span></a>
+      <a class="pp-search-row" href="/battle"><div class="pp-search-ico">⚔️</div><div class="pp-search-body"><div class="pp-search-title">Battle Mode</div></div><span class="pp-search-arr">›</span></a>
+      <a class="pp-search-row" href="/hiring-alerts"><div class="pp-search-ico">🔔</div><div class="pp-search-body"><div class="pp-search-title">Hiring Alerts</div></div><span class="pp-search-arr">›</span></a>
+    </div>
+    <div class="pp-search-hints">
+      <span class="pp-search-hint"><span class="pp-hint-key">↑↓</span> navigate</span>
+      <span class="pp-search-hint"><span class="pp-hint-key">Enter</span> open</span>
+      <span class="pp-search-hint"><span class="pp-hint-key">Esc</span> close</span>
+    </div>
   </div>
-  <div class="pp-word">
-    <span class="pp-w-path">Path</span><span class="pp-w-pilot">Pilot</span><span class="pp-w-dot">.AI</span>
-  </div>
-</a>
-<button class="navbar-toggler" type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav">
-<span class="navbar-toggler-icon"></span>
-</button>
+</div>
 
-<div class="collapse navbar-collapse" id="navbarNav">
-<ul class="navbar-nav ms-auto align-items-lg-center">
+<!-- ══ NAVBAR ══ -->
+<nav id="ppNav">
+<div id="ppNavInner">
 
-<li class="nav-item">
-<a class="nav-link" href="/">Home</a>
-</li>
-<li class="nav-item">
-<a class="nav-link" href="/about">About</a>
-</li>
-
-{% if session.get('role') == 'recruiter' %}
-
-<!-- ══ RECRUITER NAV ══ -->
-<li class="nav-item">
-  <a class="nav-link" href="/recruiter/dashboard">📊 Dashboard</a>
-</li>
-<li class="nav-item">
-  <a class="nav-link" href="/recruiter/post-job">📝 Post Job</a>
-</li>
-<li class="nav-item">
-  <a class="nav-link" href="/recruiter/search-students">🔍 Students</a>
-</li>
-<li class="nav-item">
-  <a class="nav-link" href="/recruiter/messages">💬 Messages</a>
-</li>
-<li class="nav-item" style="font-size:12px;color:rgba(0,229,200,.6);padding:6px 10px;align-self:center;white-space:nowrap">
-  🏢 {{ session.get('recruiter_company','Recruiter') }}
-</li>
-<li class="nav-item ms-2">
-  <a class="btn btn-outline-light btn-sm" href="/logout">Logout</a>
-</li>
-
-{% elif session.get('user_id') %}
-
-<!-- ══ AUTH USER NAV ══ -->
-
-<li class="nav-item">
-<a class="nav-link" href="/dashboard">Dashboard</a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="/forecast">Forecast</a>
-</li>
-
-{% if session.get('role') == 'admin' %}
-<li class="nav-item">
-    <a class="nav-link text-warning" href="/admin">Admin</a>
-</li>
-{% endif %}
-
-<li class="nav-item">
-<a class="nav-link" href="/upload">Upload</a>
-</li>
-<li class="nav-item">
-<a class="nav-link" href="/resume-ai">AI Resume</a>
-</li>
-<li class="nav-item">
-<a class="nav-link" href="/resume-builder">Resume Builder</a>
-</li>
-
-<!-- My Profile dropdown -->
-<li class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-    👤 My Profile
+  <!-- LOGO -->
+  <a class="pp-logo" href="/">
+    <div class="pp-logo-icon">
+      <svg width="20" height="20" viewBox="0 0 38 38" fill="none">
+        <circle cx="19" cy="19" r="15" stroke="rgba(91,107,255,.18)" stroke-width=".6" stroke-dasharray="2 3"/>
+        <g style="animation:orbRev 18s linear infinite;transform-origin:19px 19px">
+          <circle cx="19" cy="19" r="11" fill="none" stroke="rgba(91,107,255,.28)" stroke-width=".55" stroke-dasharray="3.5 5"/>
+        </g>
+        <g style="animation:orbFwd 12s linear infinite;transform-origin:19px 19px">
+          <circle cx="19" cy="19" r="7.5" fill="none" stroke="rgba(0,229,200,.18)" stroke-width=".5" stroke-dasharray="2 4"/>
+        </g>
+        <circle cx="19" cy="3.5" r="1.5" fill="#5b6bff" style="animation:pulse 2.4s ease-in-out infinite"/>
+        <circle cx="34.5" cy="19" r="1.2" fill="#5b6bff" opacity=".7"/>
+        <circle cx="19" cy="34.5" r="1" fill="#5b6bff" opacity=".55"/>
+        <circle cx="3.5" cy="19" r="1.2" fill="#5b6bff" opacity=".7"/>
+        <path d="M19 9.5 L22 16.5 L19 15 L16 16.5 Z" fill="#5b6bff" style="animation:pulse 2.4s ease-in-out infinite"/>
+        <circle cx="19" cy="19" r="3" fill="#0f0822"/>
+        <circle cx="19" cy="19" r="2.2" fill="#5b6bff" opacity=".7" style="animation:pulse 2.4s ease-in-out infinite"/>
+        <circle cx="19" cy="19" r="1.3" fill="#00e5c8" style="animation:pulse 2.4s ease-in-out infinite"/>
+        <circle cx="19" cy="19" r=".65" fill="#fff" opacity=".95"/>
+      </svg>
+    </div>
+    <div class="pp-logo-text">
+      <span class="pp-logo-path">Path</span><span class="pp-logo-pilot">Pilot</span><span class="pp-logo-dot">.AI</span>
+    </div>
   </a>
-  <ul class="dropdown-menu dropdown-menu-dark">
-    <li><a class="dropdown-item" href="/profile">My Profile</a></li>
-    <li><a class="dropdown-item" href="/edit-profile">Edit Profile</a></li>
-    <li><a class="dropdown-item" href="/feed">Feed</a></li>
-    <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,.08)"></li>
-    <li><a class="dropdown-item" href="/live-jobs" style="color:rgba(34,197,94,.85)">🔴 Live Jobs</a></li>
-    <li><a class="dropdown-item" href="/my-applications">📋 My Applications</a></li>
-    <li><a class="dropdown-item" href="/my-messages">💬 Recruiter Messages</a></li>
-  </ul>
-</li>
 
-<!-- Career Tools dropdown -->
-<li class="nav-item dropdown">
-<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Career Tools</a>
-<ul class="dropdown-menu dropdown-menu-end shadow">
-<li><a class="dropdown-item" href="/roadmap">Career Roadmap</a></li>
-<li><a class="dropdown-item" href="/salary">Salary Insights</a></li>
-<li><a class="dropdown-item" href="/market">Market Intelligence</a></li>
-<li><a class="dropdown-item" href="/resume-history">Resume History</a></li>
-<li><a class="dropdown-item" href="/jobs">Jobs</a></li>
-<li><a class="dropdown-item" href="/job-analyzer">Job Analyzer</a></li>
-<li><a class="dropdown-item" href="/saved-jobs">Saved Jobs</a></li>
-<li><a class="dropdown-item" href="/practice">⚡ Code Practice</a></li>
-<li><a class="dropdown-item" href="/interview">🎯 Interview Simulator</a></li>
-<li><a class="dropdown-item" href="/ai-recruiter">🎙️ AI Recruiter</a></li>
-<li><a class="dropdown-item" href="/vidcode">⚡ VidCode</a></li>
-<li><a class="dropdown-item" href="/cover-letter">✉️ Cover Letter</a></li>
-<li><a class="dropdown-item" href="/career-time-machine">⏳ Time Machine</a></li>
-<li><a class="dropdown-item" href="/blind-spot-detector">🔍 Blind Spots</a></li>
-</ul>
-</li>
+  <!-- ██ MOBILE HAMBURGER ██ -->
+  <button class="pp-hamburger" onclick="toggleDrawer()" id="ppHamburger">
+    <span></span><span></span><span></span>
+  </button>
 
-<li class="nav-item ms-3">
-<a class="btn btn-outline-light btn-sm" href="/logout">Logout</a>
-</li>
+  <!-- ██████████ RECRUITER NAV ██████████ -->
+  {% if session.get('role') == 'recruiter' %}
 
-{% else %}
+  <div class="pp-nav-center">
+    <a class="pp-link" href="/recruiter/dashboard">📊 Dashboard</a>
+    <a class="pp-link" href="/recruiter/post-job">📝 Post Job</a>
+    <a class="pp-link" href="/recruiter/search-students">🔍 Students</a>
+    <a class="pp-link" href="/recruiter/messages">💬 Messages</a>
+  </div>
+  <div class="pp-nav-right">
+    <span class="pp-rec-badge">🏢 {{ session.get('recruiter_company','Recruiter') }}</span>
+    <a class="pp-btn-ghost" href="/logout">Logout</a>
+  </div>
 
-<!-- GUEST NAV -->
-<!-- <li class="nav-item">
-    <a class="nav-link" href="/pricing">Pricing</a>
-</li> -->
-<li class="nav-item">
-<a class="nav-link" href="/login">Login</a>
-</li>
+  <!-- ██████████ AUTH USER NAV ██████████ -->
+  {% elif session.get('user_id') %}
 
-<li class="nav-item ms-3">
-<a class="btn btn-primary btn-sm" href="/register">Get Started</a>
-</li>
+  <div class="pp-nav-center">
 
-{% endif %}
+    <!-- Dashboard -->
+    <a class="pp-link" href="/dashboard">Dashboard</a>
 
-</ul>
-</div>
-</div>
+    <!-- Upload Resume -->
+    <a class="pp-link" href="/upload">Upload</a>
+
+    <!-- Practice ▾ -->
+    <div class="pp-dropdown" id="ddPractice">
+      <button class="pp-link" onclick="toggleDd('ddPractice')">
+        Practice <span class="pp-link-caret">▾</span>
+      </button>
+      <div class="pp-menu" id="ddPractice-menu">
+        <div class="pp-menu-label">Skill Building</div>
+        <a class="pp-menu-item" href="/practice"><div class="pp-ni-icon mi-blue">⚡</div>Code Practice</a>
+        <a class="pp-menu-item" href="/interview"><div class="pp-ni-icon mi-cyan">🎯</div>Interview Simulator</a>
+        <a class="pp-menu-item" href="/ai-recruiter"><div class="pp-ni-icon mi-purple">🎙️</div>AI Recruiter</a>
+        <a class="pp-menu-item" href="/vidcode"><div class="pp-ni-icon mi-pink">📹</div>VidCode</a>
+        <a class="pp-menu-item" href="/battle"><div class="pp-ni-icon mi-amber">⚔️</div>Battle Mode</a>
+      </div>
+    </div>
+
+    <!-- Career AI ▾ -->
+    <div class="pp-dropdown" id="ddCareer">
+      <button class="pp-link" onclick="toggleDd('ddCareer')">
+        Career AI <span class="pp-link-caret">▾</span>
+      </button>
+      <div class="pp-menu" id="ddCareer-menu">
+        <div class="pp-menu-label">Intelligence</div>
+        <a class="pp-menu-item" href="/roadmap"><div class="pp-ni-icon mi-blue">🗺️</div>Career Roadmap</a>
+        <a class="pp-menu-item" href="/salary"><div class="pp-ni-icon mi-green">💰</div>Salary Insights</a>
+        <a class="pp-menu-item" href="/market"><div class="pp-ni-icon mi-cyan">📊</div>Market Intelligence</a>
+        <a class="pp-menu-item" href="/forecast"><div class="pp-ni-icon mi-purple">📈</div>Career Forecast</a>
+        <a class="pp-menu-item" href="/career-time-machine"><div class="pp-ni-icon mi-amber">⏳</div>Time Machine</a>
+        <a class="pp-menu-item" href="/blind-spot-detector"><div class="pp-ni-icon mi-pink">🔍</div>Blind Spots</a>
+      </div>
+    </div>
+
+    <!-- Resume & Jobs ▾ -->
+    <div class="pp-dropdown" id="ddJobs">
+      <button class="pp-link" onclick="toggleDd('ddJobs')">
+        Resume &amp; Jobs <span class="pp-link-caret">▾</span>
+      </button>
+      <div class="pp-menu" id="ddJobs-menu">
+        <div class="pp-menu-label">Resume</div>
+        <a class="pp-menu-item" href="/resume-ai"><div class="pp-ni-icon mi-blue">🤖</div>AI Resume Analyzer</a>
+        <a class="pp-menu-item" href="/resume-builder"><div class="pp-ni-icon mi-cyan">📄</div>Resume Builder</a>
+        <a class="pp-menu-item" href="/cover-letter"><div class="pp-ni-icon mi-purple">✉️</div>Cover Letter</a>
+        <a class="pp-menu-item" href="/resume-history"><div class="pp-ni-icon mi-amber">📋</div>Resume History</a>
+        <div class="pp-menu-sep"></div>
+        <div class="pp-menu-label">Jobs</div>
+        <a class="pp-menu-item" href="/jobs"><div class="pp-ni-icon mi-blue">🔎</div>Job Search</a>
+        <a class="pp-menu-item" href="/live-jobs" style="color:rgba(34,197,94,.88)"><div class="pp-ni-icon mi-green">🔴</div>Live Jobs</a>
+        <a class="pp-menu-item" href="/job-analyzer"><div class="pp-ni-icon mi-cyan">🔬</div>Job Analyzer</a>
+        <a class="pp-menu-item" href="/saved-jobs"><div class="pp-ni-icon mi-amber">🔖</div>Saved Jobs</a>
+        <a class="pp-menu-item" href="/my-applications"><div class="pp-ni-icon mi-purple">📂</div>My Applications</a>
+      </div>
+    </div>
+
+    <!-- 🟢 Hiring Alerts pill -->
+    <a class="pp-hiring-link" href="/hiring-alerts">
+      <span class="pp-hiring-pulse"></span>
+      Hiring Alerts
+    </a>
+
+    {% if session.get('role') == 'admin' %}
+    <a class="pp-link" href="/admin" style="color:var(--amber)!important;background:rgba(255,181,71,.07)!important">⚡ Admin</a>
+    {% endif %}
+
+  </div><!-- /pp-nav-center -->
+
+  <div class="pp-nav-right">
+
+    <!-- ⌘K Search -->
+    <button class="pp-searchbtn" onclick="openSearch()" title="Search (⌘K)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span>Search</span>
+      <span class="pp-kbd">⌘K</span>
+    </button>
+
+    <!-- 🔔 Notification Bell -->
+    <div class="pp-bell-wrap">
+      <button class="pp-bellbtn" onclick="toggleBell()" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span class="pp-bell-badge" id="ppBellBadge">0</span>
+      </button>
+      <div class="pp-notif-panel" id="ppNotifPanel">
+        <div class="pp-notif-head">
+          <span class="pp-notif-head-title">Notifications</span>
+          <button class="pp-notif-mark" onclick="markAllRead()">Mark all read</button>
+        </div>
+        <div class="pp-notif-list" id="ppNotifList">
+          <div class="pp-notif-empty">Loading...</div>
+        </div>
+        <div class="pp-notif-footer"><a href="/hiring-alerts">View hiring alerts →</a></div>
+      </div>
+    </div>
+
+    <!-- 👤 Profile dropdown — shows real photo from session -->
+    <div class="pp-dropdown" id="ddProfile">
+      <button class="pp-profile-chip" onclick="toggleDd('ddProfile')">
+        <div class="pp-avatar-wrap">
+          <div class="pp-avatar">
+            {% if session.get('profile_photo') %}
+              {% set _ini = (session.get('user_name','U') or 'U')[0].upper() %}
+              <img src="{{ session.get('profile_photo') }}" alt="Profile" onerror="this.outerHTML='<span>{{ _ini }}</span>'">
+            {% else %}
+              {{ (session.get('user_name','U') or 'U')[0].upper() }}
+            {% endif %}
+          </div>
+        </div>
+        <span style="max-width:82px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ session.get('user_name','Profile') }}</span>
+        <span class="pp-link-caret">▾</span>
+      </button>
+      <div class="pp-menu align-right" id="ddProfile-menu">
+        <!-- Profile photo preview header -->
+        <div style="padding:10px 12px 8px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:5px">
+          <div style="width:38px;height:38px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,var(--neon),#3a4dff);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px">
+            {% if session.get('profile_photo') %}
+              <img src="{{ session.get('profile_photo') }}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">
+            {% else %}
+              {{ (session.get('user_name','U') or 'U')[0].upper() }}
+            {% endif %}
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#fff;line-height:1.2">{{ session.get('user_name','User') }}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.32);margin-top:1px">{{ session.get('user_email','') }}</div>
+          </div>
+        </div>
+        <a class="pp-menu-item" href="/profile"><div class="pp-ni-icon mi-blue">👤</div>My Profile</a>
+        <a class="pp-menu-item" href="/edit-profile"><div class="pp-ni-icon mi-cyan">✏️</div>Edit Profile</a>
+        <a class="pp-menu-item" href="/feed"><div class="pp-ni-icon mi-purple">📰</div>Feed</a>
+        <div class="pp-menu-sep"></div>
+        <a class="pp-menu-item" href="/my-messages"><div class="pp-ni-icon mi-amber">💬</div>Recruiter Messages</a>
+        <a class="pp-menu-item" href="/my-applications"><div class="pp-ni-icon mi-green">📂</div>My Applications</a>
+        <a class="pp-menu-item" href="/hiring-alerts"><div class="pp-ni-icon mi-green">🔔</div>Hiring Alerts</a>
+        <div class="pp-menu-sep"></div>
+        <a class="pp-menu-item danger" href="/logout"><div class="pp-ni-icon mi-red">⎋</div>Logout</a>
+      </div>
+    </div>
+
+  </div><!-- /pp-nav-right -->
+
+  <!-- ██████████ GUEST NAV ██████████ -->
+  {% else %}
+
+  <div class="pp-nav-center">
+    <a class="pp-link" href="/">Home</a>
+    <a class="pp-link" href="/about">About</a>
+  </div>
+  <div class="pp-nav-right">
+    <a class="pp-btn-ghost" href="/login">Login</a>
+    <a class="pp-btn-primary" href="/register">Get Started →</a>
+  </div>
+
+  {% endif %}
+
+</div><!-- /ppNavInner -->
 </nav>
 
-<!-- ================= PAGE CONTENT ================= -->
+<!-- ══ MOBILE DRAWER ══ -->
+<div class="pp-drawer" id="ppDrawer">
+  {% if session.get('role') == 'recruiter' %}
+    <a class="pp-drawer-link" href="/recruiter/dashboard">📊 Dashboard</a>
+    <a class="pp-drawer-link" href="/recruiter/post-job">📝 Post Job</a>
+    <a class="pp-drawer-link" href="/recruiter/search-students">🔍 Find Students</a>
+    <a class="pp-drawer-link" href="/recruiter/messages">💬 Messages</a>
+    <div class="pp-drawer-sep"></div>
+    <a class="pp-drawer-link" href="/logout" style="color:rgba(226,75,74,.8)">⎋ Logout</a>
+  {% elif session.get('user_id') %}
+    <a class="pp-drawer-link" href="/dashboard">🏠 Dashboard</a>
+    <a class="pp-drawer-link" href="/hiring-alerts" style="color:rgba(34,197,94,.88)">🟢 Hiring Alerts</a>
+    <a class="pp-drawer-link" href="/upload">📎 Upload Resume</a>
+    <div class="pp-drawer-section">Practice</div>
+    <a class="pp-drawer-link" href="/practice">⚡ Code Practice</a>
+    <a class="pp-drawer-link" href="/interview">🎯 Interview Simulator</a>
+    <a class="pp-drawer-link" href="/ai-recruiter">🎙️ AI Recruiter</a>
+    <a class="pp-drawer-link" href="/vidcode">📹 VidCode</a>
+    <a class="pp-drawer-link" href="/battle">⚔️ Battle Mode</a>
+    <div class="pp-drawer-section">Career AI</div>
+    <a class="pp-drawer-link" href="/roadmap">🗺️ Career Roadmap</a>
+    <a class="pp-drawer-link" href="/salary">💰 Salary Insights</a>
+    <a class="pp-drawer-link" href="/market">📊 Market Intelligence</a>
+    <a class="pp-drawer-link" href="/forecast">📈 Career Forecast</a>
+    <a class="pp-drawer-link" href="/career-time-machine">⏳ Time Machine</a>
+    <a class="pp-drawer-link" href="/blind-spot-detector">🔍 Blind Spots</a>
+    <div class="pp-drawer-section">Resume &amp; Jobs</div>
+    <a class="pp-drawer-link" href="/resume-ai">🤖 AI Resume Analyzer</a>
+    <a class="pp-drawer-link" href="/resume-builder">📄 Resume Builder</a>
+    <a class="pp-drawer-link" href="/cover-letter">✉️ Cover Letter</a>
+    <a class="pp-drawer-link" href="/resume-history">📋 Resume History</a>
+    <a class="pp-drawer-link" href="/jobs">🔎 Job Search</a>
+    <a class="pp-drawer-link" href="/live-jobs" style="color:rgba(34,197,94,.88)">🔴 Live Jobs</a>
+    <a class="pp-drawer-link" href="/job-analyzer">🔬 Job Analyzer</a>
+    <a class="pp-drawer-link" href="/saved-jobs">🔖 Saved Jobs</a>
+    <a class="pp-drawer-link" href="/my-applications">📂 My Applications</a>
+    <div class="pp-drawer-section">Account</div>
+    <a class="pp-drawer-link" href="/profile">👤 My Profile</a>
+    <a class="pp-drawer-link" href="/edit-profile">✏️ Edit Profile</a>
+    <a class="pp-drawer-link" href="/feed">📰 Feed</a>
+    <a class="pp-drawer-link" href="/my-messages">💬 Recruiter Messages</a>
+    {% if session.get('role') == 'admin' %}
+    <a class="pp-drawer-link" href="/admin" style="color:var(--amber)">⚡ Admin Panel</a>
+    {% endif %}
+    <div class="pp-drawer-sep"></div>
+    <a class="pp-drawer-link" href="/logout" style="color:rgba(226,75,74,.8)">⎋ Logout</a>
+  {% else %}
+    <a class="pp-drawer-link" href="/">🏠 Home</a>
+    <a class="pp-drawer-link" href="/about">ℹ️ About</a>
+    <div class="pp-drawer-sep"></div>
+    <a class="pp-drawer-link" href="/login">🔑 Login</a>
+    <a class="pp-drawer-link" href="/register" style="color:var(--neon)">🚀 Get Started →</a>
+  {% endif %}
+</div>
+
+<!-- ══ PAGE CONTENT ══ -->
 <div class="page-wrapper">
 <div class="container">
 {% block content %}{% endblock %}
 </div>
 </div>
 
-<!-- ================= FOOTER ================= -->
-<div class="footer">
-© 2026 PathPilot AI — Intelligent Career Intelligence Platform
-</div>
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div style="max-width:1100px;margin:0 auto;padding:0 24px">
+
+    {% if session.get('user_id') %}
+    <!-- Logged-in footer links -->
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px 20px;margin-bottom:14px">
+      <a href="/dashboard"    style="color:rgba(255,255,255,.32);text-decoration:none;font-size:12px;transition:color .15s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.32)'">Dashboard</a>
+      <a href="/roadmap"      style="color:rgba(255,255,255,.32);text-decoration:none;font-size:12px;transition:color .15s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.32)'">Career Roadmap</a>
+      <a href="/resume-ai"    style="color:rgba(255,255,255,.32);text-decoration:none;font-size:12px;transition:color .15s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.32)'">AI Resume</a>
+      <a href="/jobs"         style="color:rgba(255,255,255,.32);text-decoration:none;font-size:12px;transition:color .15s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.32)'">Jobs</a>
+      <a href="/practice"     style="color:rgba(255,255,255,.32);text-decoration:none;font-size:12px;transition:color .15s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.32)'">Code Practice</a>
+      <a href="/interview"    style="color:rgba(255,255,255,.32);text-decoration:none;font-size:12px;transition:color .15s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.32)'">Interview Sim</a>
+      <a href="/salary"       style="color:rgba(255,255,255,.32);text-decoration:none;font-size:12px;transition:color .15s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.32)'">Salary Insights</a>
+      <a href="/profile"      style="color:rgba(255,255,255,.32);text-decoration:none;font-size:12px;transition:color .15s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.32)'">My Profile</a>
+    </div>
+    {% else %}
+    <!-- Guest footer links — only public pages -->
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px 20px;margin-bottom:14px">
+      <a href="/"         style="color:rgba(255,255,255,.32);text-decoration:none;font-size:12px;transition:color .15s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.32)'">Home</a>
+      <a href="/about"    style="color:rgba(255,255,255,.32);text-decoration:none;font-size:12px;transition:color .15s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.32)'">About</a>
+      <a href="/login"    style="color:rgba(255,255,255,.32);text-decoration:none;font-size:12px;transition:color .15s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.32)'">Login</a>
+      <a href="/register" style="color:rgba(91,107,255,.6);text-decoration:none;font-size:12px;transition:color .15s" onmouseover="this.style.color='rgba(91,107,255,1)'" onmouseout="this.style.color='rgba(91,107,255,.6)'">Get Started</a>
+    </div>
+    {% endif %}
+
+    <div style="height:1px;background:rgba(255,255,255,.06);margin-bottom:14px"></div>
+    <div style="color:rgba(255,255,255,.16);font-size:12px">
+      © 2026 <span style="color:rgba(255,255,255,.28);font-weight:600">PathPilot AI</span> — Intelligent Career Intelligence Platform
+    </div>
+  </div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ══ DROPDOWN ══ */
+let _openDd = null;
+function toggleDd(id) {
+  const menu = document.getElementById(id + '-menu');
+  const wrap = document.getElementById(id);
+  if (!menu) return;
+  const isOpen = menu.classList.contains('open');
+  if (_openDd && _openDd !== id) {
+    const prev = document.getElementById(_openDd + '-menu');
+    const prevW = document.getElementById(_openDd);
+    if (prev) prev.classList.remove('open');
+    if (prevW) prevW.classList.remove('open');
+  }
+  menu.classList.toggle('open', !isOpen);
+  if (wrap) wrap.classList.toggle('open', !isOpen);
+  _openDd = isOpen ? null : id;
+}
+document.addEventListener('click', function(e) {
+  if (!_openDd) return;
+  const w = document.getElementById(_openDd);
+  if (w && !w.contains(e.target)) {
+    const m = document.getElementById(_openDd + '-menu');
+    if (m) m.classList.remove('open');
+    w.classList.remove('open');
+    _openDd = null;
+  }
+});
+
+/* ══ MOBILE DRAWER ══ */
+let drawerOpen = false;
+function toggleDrawer() {
+  drawerOpen = !drawerOpen;
+  document.getElementById('ppDrawer').classList.toggle('open', drawerOpen);
+  const h = document.getElementById('ppHamburger');
+  if (h) {
+    const spans = h.querySelectorAll('span');
+    if (drawerOpen) {
+      spans[0].style.transform = 'rotate(45deg) translate(4px,4px)';
+      spans[1].style.opacity = '0';
+      spans[2].style.transform = 'rotate(-45deg) translate(4px,-4px)';
+    } else {
+      spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+    }
+  }
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && drawerOpen) toggleDrawer(); });
+
+/* ══ NOTIFICATION BELL ══ */
+const NOTIF_ICONS = {
+  recruiter_message:  { icon: '💬', cls: 'ni-recruiter' },
+  job_match:          { icon: '💼', cls: 'ni-job_match' },
+  battle_invite:      { icon: '⚔️', cls: 'ni-battle_invite' },
+  hiring_alert:       { icon: '🔔', cls: 'ni-hiring_alert' },
+  application_update: { icon: '📋', cls: 'ni-application_update' },
+};
+let bellOpen = false, notifData = [];
+
+async function loadNotifications() {
+  try {
+    const res = await fetch('/api/notifications');
+    if (!res.ok) return;
+    const data = await res.json();
+    notifData = data.notifications || [];
+    const unread = data.unread || 0;
+    const badge = document.getElementById('ppBellBadge');
+    if (unread > 0) { badge.textContent = unread > 99 ? '99+' : unread; badge.style.display = 'flex'; }
+    else { badge.style.display = 'none'; }
+    renderNotifications(notifData);
+  } catch(e) {}
+}
+
+function renderNotifications(list) {
+  const el = document.getElementById('ppNotifList');
+  if (!list || !list.length) { el.innerHTML = '<div class="pp-notif-empty">You\'re all caught up! 🎉</div>'; return; }
+  el.innerHTML = list.map(n => {
+    const meta = NOTIF_ICONS[n.type] || { icon: '🔔', cls: 'ni-hiring_alert' };
+    return `<a class="pp-notif-item ${n.is_read ? '' : 'unread'}" href="${n.link || '#'}" onclick="markOneRead(${n.id})">
+      <div class="pp-ni-icon ${meta.cls}">${meta.icon}</div>
+      <div class="pp-ni-body">
+        <div class="pp-ni-title">${n.title}</div>
+        <div class="pp-ni-desc">${n.body || ''}</div>
+        <div class="pp-ni-time">${n.created_at}</div>
+      </div></a>`;
+  }).join('');
+}
+
+function toggleBell() {
+  const panel = document.getElementById('ppNotifPanel');
+  bellOpen = !bellOpen;
+  panel.classList.toggle('open', bellOpen);
+  if (bellOpen) loadNotifications();
+}
+async function markAllRead() {
+  await fetch('/api/notifications/mark-read', { method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}' });
+  document.getElementById('ppBellBadge').style.display = 'none';
+  notifData.forEach(n => n.is_read = true);
+  renderNotifications(notifData);
+}
+async function markOneRead(id) {
+  await fetch('/api/notifications/mark-read', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({id}) });
+}
+document.addEventListener('click', function(e) {
+  const w = document.querySelector('.pp-bell-wrap');
+  if (w && !w.contains(e.target) && bellOpen) { bellOpen = false; document.getElementById('ppNotifPanel').classList.remove('open'); }
+});
+{% if session.get('user_id') %}
+loadNotifications();
+setInterval(loadNotifications, 30000);
+{% endif %}
+
+/* ══ GLOBAL SEARCH ══ */
+let _searchTimeout = null, _selIdx = -1;
+
+function openSearch() {
+  document.getElementById('ppSearchOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('ppSearchInput').focus(), 50);
+  _selIdx = -1;
+}
+function closeSearch() {
+  document.getElementById('ppSearchOverlay').classList.remove('open');
+  document.getElementById('ppSearchInput').value = '';
+  resetQuick();
+}
+function resetQuick() {
+  document.getElementById('ppSearchResults').innerHTML = `
+    <div class="pp-search-cat">Quick access</div>
+    <a class="pp-search-row" href="/dashboard"><div class="pp-search-ico">🏠</div><div class="pp-search-body"><div class="pp-search-title">Dashboard</div></div><span class="pp-search-arr">›</span></a>
+    <a class="pp-search-row" href="/practice"><div class="pp-search-ico">⚡</div><div class="pp-search-body"><div class="pp-search-title">Code Practice</div></div><span class="pp-search-arr">›</span></a>
+    <a class="pp-search-row" href="/interview"><div class="pp-search-ico">🎯</div><div class="pp-search-body"><div class="pp-search-title">Interview Simulator</div></div><span class="pp-search-arr">›</span></a>
+    <a class="pp-search-row" href="/battle"><div class="pp-search-ico">⚔️</div><div class="pp-search-body"><div class="pp-search-title">Battle Mode</div></div><span class="pp-search-arr">›</span></a>
+    <a class="pp-search-row" href="/hiring-alerts"><div class="pp-search-ico">🔔</div><div class="pp-search-body"><div class="pp-search-title">Hiring Alerts</div></div><span class="pp-search-arr">›</span></a>`;
+  _selIdx = -1;
+}
+function onSearchInput(q) {
+  clearTimeout(_searchTimeout);
+  if (!q || q.length < 2) { resetQuick(); return; }
+  _searchTimeout = setTimeout(() => doSearch(q), 220);
+}
+async function doSearch(q) {
+  try {
+    const r = await fetch('/api/search?q=' + encodeURIComponent(q));
+    const d = await r.json();
+    renderResults(d, q);
+  } catch(e) { document.getElementById('ppSearchResults').innerHTML = '<div class="pp-search-empty">Search unavailable.</div>'; }
+}
+function renderResults(d, q) {
+  const el = document.getElementById('ppSearchResults');
+  let h = '';
+  if (d.tools && d.tools.length) { h += '<div class="pp-search-cat">Tools</div>'; d.tools.forEach(t => { h += `<a class="pp-search-row" href="${t.link}"><div class="pp-search-ico">${t.icon}</div><div class="pp-search-body"><div class="pp-search-title">${t.name}</div></div><span class="pp-search-arr">›</span></a>`; }); }
+  if (d.jobs && d.jobs.length) { h += '<div class="pp-search-cat">Jobs</div>'; d.jobs.forEach(j => { h += `<a class="pp-search-row" href="${j.link}"><div class="pp-search-ico">💼</div><div class="pp-search-body"><div class="pp-search-title">${j.title}</div><div class="pp-search-sub">${j.company} · ${j.type}</div></div><span class="pp-search-arr">›</span></a>`; }); }
+  if (d.users && d.users.length) { h += '<div class="pp-search-cat">People</div>'; d.users.forEach(u => { h += `<a class="pp-search-row" href="${u.link}"><div class="pp-search-ico">👤</div><div class="pp-search-body"><div class="pp-search-title">${u.name}</div><div class="pp-search-sub">${u.headline}</div></div><span class="pp-search-arr">›</span></a>`; }); }
+  if (!h) h = `<div class="pp-search-empty">No results for "<strong>${q}</strong>"</div>`;
+  el.innerHTML = h; _selIdx = -1;
+}
+function onSearchKey(e) {
+  const rows = document.querySelectorAll('.pp-search-row');
+  if (e.key === 'ArrowDown') { e.preventDefault(); _selIdx = Math.min(_selIdx + 1, rows.length - 1); rows.forEach((r,i) => r.classList.toggle('sel', i === _selIdx)); if (rows[_selIdx]) rows[_selIdx].scrollIntoView({block:'nearest'}); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); _selIdx = Math.max(_selIdx - 1, -1); rows.forEach((r,i) => r.classList.toggle('sel', i === _selIdx)); }
+  else if (e.key === 'Enter' && _selIdx >= 0 && rows[_selIdx]) { rows[_selIdx].click(); }
+  else if (e.key === 'Escape') { closeSearch(); }
+}
+document.addEventListener('keydown', function(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); document.getElementById('ppSearchOverlay').classList.contains('open') ? closeSearch() : openSearch(); }
+  if (e.key === 'Escape' && document.getElementById('ppSearchOverlay').classList.contains('open')) closeSearch();
+});
+</script>
 </body>
 </html>

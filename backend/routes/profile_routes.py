@@ -421,6 +421,10 @@ def upload_photo():
         prof.cover_image = rel
     db.session.commit()
 
+    # ── Sync navbar avatar immediately (no re-login needed) ──
+    if photo_type == "profile":
+        session["profile_photo"] = f"/static/{rel}"
+
     return jsonify({"success": True, "url": f"/static/{rel}"})
 
 

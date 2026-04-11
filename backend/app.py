@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, session, request
 from backend.config import Config
 from backend.extensions import db
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -146,6 +146,9 @@ def create_app():
     from backend.routes.career_time_machine_routes import ctm_routes
     from backend.routes.blind_spot_routes import blind_spot_routes
     from backend.routes.recruiter_routes import recruiter_routes
+    from backend.routes.recruiter_routes import recruiter_routes
+    from backend.routes.battle_routes import battle_routes, register_battle_socket_events
+    from backend.routes.navbar_routes import navbar_routes
 
     app.register_blueprint(main_routes)
     app.register_blueprint(resume_routes)
@@ -172,7 +175,45 @@ def create_app():
     app.register_blueprint(ctm_routes)
     app.register_blueprint(blind_spot_routes)
     app.register_blueprint(recruiter_routes)
-    
+    app.register_blueprint(battle_routes)
+    register_battle_socket_events(socketio)
+    app.register_blueprint(navbar_routes)
+
+    # ==============================
+    # Refresh session on every request
+    # Keeps user_name, user_email, profile_photo always in sync
+    # even after server restart or page refresh
+    # ==============================
+    @app.before_request
+    def refresh_user_session():
+        # Skip static files
+        if request.path.startswith('/static'):
+            return
+
+        uid = session.get('user_id')
+        if not uid:
+            return  # guest — nothing to refresh
+
+        # Only refresh if any key is missing (avoids DB hit every single request)
+        if session.get('user_name') and session.get('profile_photo') is not False:
+            return
+
+        try:
+            from backend.models import User, Profile
+            user = User.query.get(uid)
+            if not user:
+                session.clear()
+                return
+
+            session['user_name']  = user.name  or ''
+            session['user_email'] = user.email or ''
+            session['role']       = user.role  or 'user'
+
+            prof = Profile.query.filter_by(user_id=uid).first()
+            # Use the User model property — handles prefix/None safely
+            session['profile_photo'] = user.profile_photo_url
+        except Exception as e:
+            print(f"[session refresh] {e}")
 
     # ==============================
     # Start Background Scheduler

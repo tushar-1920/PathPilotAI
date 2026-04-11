@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+:root{--neon:#5b6bff;--cyan:#00e5c8;--rim:rgba(255,255,255,0.06);}
+.ha-wrap{max-width:1100px;margin:0 auto;padding:32px 20px 60px;}
+.ha-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.ha-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;}
+.ha-title span{color:var(--cyan);}
+.ha-subtitle{font-size:13px;color:rgba(255,255,255,.4);margin-top:4px;}
+.tabs{display:flex;gap:4px;background:rgba(255,255,255,.04);border:1px solid var(--rim);border-radius:12px;padding:4px;}
+.tab-btn{font-size:13px;font-weight:500;padding:7px 18px;border-radius:9px;border:none;background:transparent;color:rgba(255,255,255,.45);cursor:pointer;transition:all .18s;}
+.tab-btn.active{background:rgba(91,107,255,.18);color:#fff;border:1px solid rgba(91,107,255,.35);}
+.tab-panel{display:none;} .tab-panel.active{display:block;}
+
+/* Alert feed */
+.alert-card{background:rgba(255,255,255,.03);border:1px solid var(--rim);border-radius:14px;padding:16px 20px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;transition:border-color .18s;}
+.alert-card:hover{border-color:rgba(91,107,255,.3);}
+.alert-card.unread{border-left:3px solid var(--cyan);}
+.alert-icon{width:38px;height:38px;border-radius:10px;background:rgba(0,229,200,.1);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.alert-body{flex:1;}
+.alert-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:3px;}
+.alert-desc{font-size:12.5px;color:rgba(255,255,255,.45);}
+.alert-time{font-size:11px;color:rgba(255,255,255,.25);margin-top:5px;}
+.alert-link{font-size:12px;color:var(--cyan);text-decoration:none;margin-left:auto;white-space:nowrap;padding:5px 12px;border:1px solid rgba(0,229,200,.2);border-radius:7px;transition:background .15s;}
+.alert-link:hover{background:rgba(0,229,200,.08);}
+.empty-state{text-align:center;padding:60px 20px;color:rgba(255,255,255,.25);font-size:14px;}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+
+/* Job cards */
+.job-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+.job-card{background:rgba(255,255,255,.03);border:1px solid var(--rim);border-radius:14px;padding:16px 18px;transition:border-color .18s;}
+.job-card:hover{border-color:rgba(91,107,255,.3);}
+.job-company{font-size:12px;color:var(--cyan);font-weight:600;margin-bottom:6px;}
+.job-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:8px;}
+.job-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.job-tag{font-size:11px;padding:3px 9px;border-radius:6px;background:rgba(91,107,255,.12);color:rgba(91,107,255,.9);font-weight:500;}
+.job-tag.green{background:rgba(0,229,200,.1);color:rgba(0,229,200,.85);}
+.job-tag.amber{background:rgba(255,181,71,.1);color:rgba(255,181,71,.85);}
+.apply-btn{display:inline-block;font-size:12.5px;font-weight:600;padding:7px 16px;border-radius:8px;background:linear-gradient(135deg,var(--neon),#3a4dff);color:#fff;text-decoration:none;transition:opacity .15s;}
+.apply-btn:hover{opacity:.85;}
+
+/* Company search */
+.company-search-wrap{position:relative;margin-bottom:20px;}
+.company-search{width:100%;padding:11px 16px 11px 42px;background:rgba(255,255,255,.04);border:1px solid var(--rim);border-radius:12px;color:#fff;font-size:14px;outline:none;transition:border-color .18s;}
+.company-search:focus{border-color:rgba(91,107,255,.5);}
+.company-search::placeholder{color:rgba(255,255,255,.25);}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.3);font-size:15px;}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;}
+.company-card{background:rgba(255,255,255,.03);border:1px solid var(--rim);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border-color .15s;}
+.company-card:hover{border-color:rgba(91,107,255,.25);}
+.company-info{}
+.company-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:3px;}
+.company-stat{font-size:12px;color:rgba(255,255,255,.35);}
+.follow-btn{font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;border:none;cursor:pointer;transition:all .18s;white-space:nowrap;}
+.follow-btn.following{background:rgba(0,229,200,.12);color:var(--cyan);border:1px solid rgba(0,229,200,.25);}
+.follow-btn.follow{background:rgba(91,107,255,.15);color:rgba(91,107,255,.9);border:1px solid rgba(91,107,255,.25);}
+.follow-btn:hover{filter:brightness(1.2);}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:12px;}
+</style>
+
+<div class="ha-wrap">
+
+  <!-- Header -->
+  <div class="ha-header">
+    <div>
+      <div class="ha-title">Hiring <span>Alerts</span></div>
+      <div class="ha-subtitle">Follow companies — get notified the moment they post new roles</div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('alerts',this)">🔔 Alerts</button>
+      <button class="tab-btn" onclick="switchTab('jobs',this)">💼 Jobs from followed</button>
+      <button class="tab-btn" onclick="switchTab('companies',this)">🏢 Companies</button>
+    </div>
+  </div>
+
+  <!-- TAB: Alerts -->
+  <div class="tab-panel active" id="tab-alerts">
+    <div class="section-label">Recent hiring alerts</div>
+    {% if alerts %}
+      {% for a in alerts %}
+      <div class="alert-card {% if not a.is_read %}unread{% endif %}">
+        <div class="alert-icon">🔔</div>
+        <div class="alert-body">
+          <div class="alert-title">{{ a.title }}</div>
+          <div class="alert-desc">{{ a.body }}</div>
+          <div class="alert-time">{{ a.created_at.strftime('%b %d, %Y · %I:%M %p') }}</div>
+        </div>
+        {% if a.link %}
+        <a href="{{ a.link }}" class="alert-link">View Job →</a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">🔕</div>
+        <div>No hiring alerts yet.</div>
+        <div style="margin-top:6px;font-size:12px;">Follow companies in the Companies tab to get notified when they post new roles.</div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- TAB: Jobs from followed companies -->
+  <div class="tab-panel" id="tab-jobs">
+    <div class="section-label">Latest openings from companies you follow</div>
+    {% if hiring_jobs %}
+      <div class="job-grid">
+        {% for j in hiring_jobs %}
+        <div class="job-card">
+          <div class="job-company">{{ j.company_name }}</div>
+          <div class="job-title">{{ j.title }}</div>
+          <div class="job-meta">
+            {% if j.job_type %}<span class="job-tag">{{ j.job_type }}</span>{% endif %}
+            {% if j.location %}<span class="job-tag green">{{ j.location }}</span>{% endif %}
+            {% if j.ctc %}<span class="job-tag amber">{{ j.ctc }}</span>{% endif %}
+          </div>
+          <a href="/live-jobs/{{ j.id }}/apply" class="apply-btn">Apply Now →</a>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">💼</div>
+        <div>No active jobs from your followed companies right now.</div>
+        <div style="margin-top:6px;font-size:12px;">Follow more companies or check back soon.</div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- TAB: Companies -->
+  <div class="tab-panel" id="tab-companies">
+    <div class="company-search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="company-search" id="companySearch" placeholder="Search companies..." oninput="filterCompanies(this.value)">
+    </div>
+
+    {% if follows %}
+    <div class="section-label" style="margin-top:4px;">Following ({{ follows|length }})</div>
+    <div class="company-grid" id="followingGrid">
+      {% for f in follows %}
+      <div class="company-card" data-name="{{ f.company_name|lower }}">
+        <div class="company-info">
+          <div class="company-name">{{ f.company_name }}</div>
+          <div class="company-stat">Following since {{ f.created_at.strftime('%b %Y') }}</div>
+        </div>
+        <button class="follow-btn following" onclick="toggleFollow('{{ f.company_name }}', this)">✓ Following</button>
+      </div>
+      {% endfor %}
+    </div>
+    <div style="margin-top:24px;"></div>
+    {% endif %}
+
+    <div class="section-label">All companies on PathPilot</div>
+    <div class="company-grid" id="companiesGrid">
+      {% for c in all_companies %}
+      <div class="company-card" data-name="{{ c.name|lower }}">
+        <div class="company-info">
+          <div class="company-name">{{ c.name }}</div>
+          <div class="company-stat">{{ c.job_count }} active job{% if c.job_count != 1 %}s{% endif %} · Last posted {{ c.last_posted }}</div>
+        </div>
+        {% if c.following %}
+        <button class="follow-btn following" onclick="toggleFollow('{{ c.name }}', this)">✓ Following</button>
+        {% else %}
+        <button class="follow-btn follow" onclick="toggleFollow('{{ c.name }}', this)">+ Follow</button>
+        {% endif %}
+      </div>
+      {% endfor %}
+      {% if not all_companies %}
+      <div class="empty-state" style="grid-column:1/-1;">
+        <div class="empty-icon">🏢</div>
+        <div>No companies yet. They appear here once recruiters post jobs.</div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function filterCompanies(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('#companiesGrid .company-card, #followingGrid .company-card').forEach(card => {
+    card.style.display = card.dataset.name.includes(q) ? '' : 'none';
+  });
+}
+
+async function toggleFollow(companyName, btn) {
+  const isFollowing = btn.classList.contains('following');
+  const endpoint = isFollowing ? '/api/company-unfollow' : '/api/company-follow';
+
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({company_name: companyName})
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      if (isFollowing) {
+        btn.className = 'follow-btn follow';
+        btn.textContent = '+ Follow';
+      } else {
+        btn.className = 'follow-btn following';
+        btn.textContent = '✓ Following';
+      }
+    }
+  } catch(e) {
+    btn.textContent = 'Error';
+  }
+  btn.disabled = false;
+}
+</script>
+{% endblock %}

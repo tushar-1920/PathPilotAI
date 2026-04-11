@@ -120,6 +120,14 @@ class RecruiterService:
         )
         db.session.add(job)
         db.session.commit()
+
+        # Fire hiring alert notifications to all followers of this company
+        try:
+            from backend.routes.navbar_routes import fire_hiring_alerts
+            fire_hiring_alerts(company_name, job.title, f"/live-jobs/{job.id}/apply")
+        except Exception:
+            pass  # Don't let notification failure block job posting
+
         return job
 
     def get_job(self, job_id: int):

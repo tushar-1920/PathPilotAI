@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-from backend.models import User
+from backend.models import User, Profile
 from backend.extensions import db
 
 auth_routes = Blueprint("auth_routes", __name__)
@@ -21,6 +21,17 @@ RECRUITER_ACCOUNTS = {
     "wipro@recruiter.com":       ("wipro@123",   "Wipro"),
     "caelius@recruiter.com":     ("caelius@123", "Caelius Consulting"),
 }
+
+
+def _set_user_session(user):
+    """Helper: populate all session keys for a logged-in user."""
+    session["user_id"]   = user.id
+    session["role"]      = user.role
+    session["user_name"] = user.name or ""
+    session["user_email"] = user.email or ""
+
+    # Load profile photo using the model property — always correct path format
+    session["profile_photo"] = user.profile_photo_url
 
 
 # ================= REGISTER =================
@@ -49,8 +60,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        session["user_id"] = new_user.id
-        session["role"]    = new_user.role
+        _set_user_session(new_user)
         return redirect("/dashboard")
 
     return render_template("register.html")
@@ -76,14 +86,13 @@ def login():
                 flash("Invalid recruiter credentials")
                 return redirect(url_for("auth_routes.login"))
 
-        # ── NORMAL USER LOGIN (completely unchanged) ──
+        # ── NORMAL USER LOGIN ──
         user = User.query.filter_by(email=email).first()
         if not user or not check_password_hash(user.password_hash, password):
             flash("Invalid credentials")
             return redirect(url_for("auth_routes.login"))
 
-        session["user_id"] = user.id
-        session["role"]    = user.role
+        _set_user_session(user)
         return redirect("/dashboard")
 
     return render_template("login.html")
