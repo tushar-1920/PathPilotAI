@@ -232,8 +232,8 @@ def feed_page():
 @profile_routes.route("/search")
 @login_required
 def search_page():
-    return render_template("search_users.html", user=User.query.get(session["user_id"]))
-
+    q = request.args.get("q", "").strip()
+    return render_template("search_users.html", user=User.query.get(session["user_id"]), q=q)
 
 @profile_routes.route("/messages")
 @login_required
@@ -731,8 +731,8 @@ def delete_certificate_alt(cert_id):
 # ════════════════════════════════════════════════════════════
 
 def _search_users_logic(q):
-    me = session["user_id"]
-    if len(q) < 2:
+    me = session.get("user_id")
+    if not me or len(q) < 2:
         return []
     users = User.query.filter(
         or_(User.name.ilike(f"%{q}%"), User.email.ilike(f"%{q}%"))

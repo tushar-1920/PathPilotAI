@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --emerald:#00e676;--ice:#00d4ff;--plasma:#7b2fff;--solar:#ff9f43;--crimson:#ff4757;
+  --obsidian:#0a0a0f;--glass:rgba(255,255,255,.04);--border:rgba(255,255,255,.08);
+  --font-d:"Clash Display",sans-serif;--font-b:"Cabinet Grotesk",sans-serif;--font-c:"Fira Code",monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--obsidian)!important;color:#fff!important;font-family:var(--font-b)}
+.pg{min-height:100vh;position:relative;overflow-x:hidden}
+.aurora{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 50% at -5% 5%,rgba(0,230,118,.07) 0%,transparent 55%),
+             radial-gradient(ellipse 50% 40% at 105% 90%,rgba(0,212,255,.06) 0%,transparent 55%)}
+.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.014) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px);
+  background-size:80px 80px}
+.body{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:48px 24px 120px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.topbar{display:flex;align-items:center;gap:14px;margin-bottom:36px;animation:fadeUp .5s var(--ease) both}
+.back-btn{display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:100px;background:var(--glass);border:1px solid var(--border);color:rgba(255,255,255,.5);font-size:13px;text-decoration:none;transition:all .2s}
+.back-btn:hover{background:rgba(255,255,255,.06);color:#fff}
+
+.hdr{margin-bottom:36px;animation:fadeUp .6s .05s var(--ease) both}
+.hdr-badge{display:inline-flex;align-items:center;gap:9px;padding:5px 16px;border-radius:100px;background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.18);font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(0,230,118,.8);margin-bottom:14px}
+.hdr-dot{width:5px;height:5px;border-radius:50%;background:var(--emerald);animation:blink 1.5s infinite}
+.hdr-title{font-family:var(--font-d);font-size:clamp(24px,5vw,48px);font-weight:700;letter-spacing:-2px;margin-bottom:8px}
+.hdr-sub{font-size:14px;color:rgba(255,255,255,.3)}
+
+/* stats row */
+.stats-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:32px;animation:fadeUp .6s .1s var(--ease) both}
+.stat-box{background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:18px 24px;flex:1;min-width:130px}
+.stat-val{font-family:var(--font-c);font-size:28px;font-weight:700;color:var(--emerald);margin-bottom:4px}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.25);font-weight:700}
+
+/* history list */
+.hist-list{display:flex;flex-direction:column;gap:14px;animation:fadeUp .6s .15s var(--ease) both}
+.hist-card{background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:22px 26px;text-decoration:none;display:flex;align-items:center;gap:18px;transition:all .2s;position:relative;overflow:hidden}
+.hist-card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent)}
+.hist-card:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12);transform:translateY(-2px)}
+
+.hc-dial{width:56px;height:56px;position:relative;flex-shrink:0}
+.hc-dial svg{transform:rotate(-90deg)}
+.hc-dial-bg{fill:none;stroke:rgba(255,255,255,.05);stroke-width:5}
+.hc-dial-fg{fill:none;stroke-width:5;stroke-linecap:round;stroke-dasharray:150.8}
+.hc-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-c);font-size:13px;font-weight:700}
+
+.hc-body{flex:1;min-width:0}
+.hc-job{font-family:var(--font-d);font-size:17px;font-weight:700;color:#fff;margin-bottom:4px}
+.hc-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hc-company{font-size:13px;color:rgba(255,255,255,.4)}
+.hc-tier{font-size:11px;padding:3px 10px;border-radius:100px;font-weight:700}
+.hc-date{font-size:11px;color:rgba(255,255,255,.22)}
+
+.hc-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.hc-del{width:32px;height:32px;border-radius:50%;background:rgba(255,71,87,.07);border:1px solid rgba(255,71,87,.15);color:rgba(255,71,87,.6);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all .15s;flex-shrink:0}
+.hc-del:hover{background:rgba(255,71,87,.15);color:rgba(255,71,87,.9)}
+.hc-arr{font-size:22px;color:rgba(255,255,255,.2)}
+
+.empty-state{text-align:center;padding:80px 20px;animation:fadeUp .6s .2s var(--ease) both}
+.es-icon{font-size:56px;margin-bottom:18px;opacity:.5}
+.es-title{font-family:var(--font-d);font-size:24px;font-weight:700;margin-bottom:10px;color:rgba(255,255,255,.5)}
+.es-sub{font-size:14px;color:rgba(255,255,255,.25);margin-bottom:24px}
+.es-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:12px;background:linear-gradient(135deg,rgba(0,230,118,.8),rgba(0,212,255,.7));color:#000;font-family:var(--font-d);font-size:14px;font-weight:700;text-decoration:none}
+</style>
+
+<div class="pg">
+  <div class="aurora"></div>
+  <div class="grid-bg"></div>
+  <div class="body">
+
+    <div class="topbar">
+      <a href="/offer-predictor" class="back-btn">← New Prediction</a>
+    </div>
+
+    <div class="hdr">
+      <div class="hdr-badge"><div class="hdr-dot"></div> Offer Predictor</div>
+      <h1 class="hdr-title">Prediction History</h1>
+      <div class="hdr-sub">Every job you've analysed — track how your odds are improving over time.</div>
+    </div>
+
+    {% if history %}
+    {% set avg_prob = (history | map(attribute='offer_probability') | sum) / (history|length) %}
+    {% set best = history | sort(attribute='offer_probability', reverse=True) | first %}
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-val">{{ history|length }}</div>
+        <div class="stat-label">Total Predictions</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:var(--ice)">{{ avg_prob|int }}%</div>
+        <div class="stat-label">Average Probability</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:var(--solar)">{{ best.offer_probability|int }}%</div>
+        <div class="stat-label">Best Prediction</div>
+      </div>
+    </div>
+
+    <div class="hist-list" id="histList">
+      {% for h in history %}
+      {% set p = h.offer_probability %}
+      {% if p >= 72 %}{% set c = "#00e676" %}{% set cr = "0,230,118" %}{% set tc = "#00e676" %}{% set tb = "rgba(0,230,118,.1)" %}
+      {% elif p >= 50 %}{% set c = "#00d4ff" %}{% set cr = "0,212,255" %}{% set tc = "#00d4ff" %}{% set tb = "rgba(0,212,255,.1)" %}
+      {% elif p >= 30 %}{% set c = "#ff9f43" %}{% set cr = "255,159,67" %}{% set tc = "#ff9f43" %}{% set tb = "rgba(255,159,67,.1)" %}
+      {% else %}{% set c = "#ff4757" %}{% set cr = "255,71,87" %}{% set tc = "#ff4757" %}{% set tb = "rgba(255,71,87,.1)" %}
+      {% endif %}
+      {% set offset = 150.8 - (p / 100 * 150.8) %}
+
+      <a href="/offer-predictor/result/{{ h.id }}" class="hist-card" data-id="{{ h.id }}" style="animation-delay:{{ loop.index0 * 0.04 }}s">
+        <div class="hc-dial">
+          <svg width="56" height="56" viewBox="0 0 48 48">
+            <circle class="hc-dial-bg" cx="24" cy="24" r="24"/>
+            <circle class="hc-dial-fg" cx="24" cy="24" r="24" style="stroke:{{ c }};stroke-dashoffset:{{ offset }};filter:drop-shadow(0 0 4px rgba({{ cr }},.4))"/>
+          </svg>
+          <div class="hc-center" style="color:{{ c }}">{{ p|int }}%</div>
+        </div>
+        <div class="hc-body">
+          <div class="hc-job">{{ h.job_title or 'Unknown Role' }}</div>
+          <div class="hc-meta">
+            {% if h.company_name %}<div class="hc-company">🏢 {{ h.company_name }}</div>{% endif %}
+            <div class="hc-tier" style="background:{{ tb }};color:{{ tc }}">{{ h.readiness_tier }}</div>
+            <div class="hc-date">{{ h.created_at }}</div>
+          </div>
+        </div>
+        <div class="hc-right">
+          <div class="hc-del" onclick="event.preventDefault();deletePred({{ h.id }},this)" title="Delete">🗑</div>
+          <div class="hc-arr">›</div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+      <div class="es-icon">🎯</div>
+      <div class="es-title">No predictions yet</div>
+      <div class="es-sub">Run your first Offer Predictor analysis to see how strong your candidacy is for any job.</div>
+      <a href="/offer-predictor" class="es-btn">⚡ Run First Prediction</a>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<script>
+async function deletePred(id, btn){
+  if(!confirm('Delete this prediction?')) return;
+  const card = document.querySelector(`[data-id="${id}"]`);
+  try {
+    const res = await fetch('/api/offer-predictor/delete/' + id, {method:'DELETE'});
+    const data = await res.json();
+    if(data.success && card){ card.style.opacity='0'; card.style.transform='translateX(30px)'; card.style.transition='all .3s'; setTimeout(()=>card.remove(), 300); }
+  } catch(e){ alert('Delete failed. Try again.'); }
+}
+</script>
+{% endblock %}

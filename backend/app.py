@@ -149,6 +149,8 @@ def create_app():
     from backend.routes.recruiter_routes import recruiter_routes
     from backend.routes.battle_routes import battle_routes, register_battle_socket_events
     from backend.routes.navbar_routes import navbar_routes
+    from backend.routes.offer_predictor_routes import offer_predictor_routes
+    
 
     app.register_blueprint(main_routes)
     app.register_blueprint(resume_routes)
@@ -178,6 +180,7 @@ def create_app():
     app.register_blueprint(battle_routes)
     register_battle_socket_events(socketio)
     app.register_blueprint(navbar_routes)
+    app.register_blueprint(offer_predictor_routes)
 
     # ==============================
     # Refresh session on every request

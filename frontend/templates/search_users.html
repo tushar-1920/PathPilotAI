@@ -47,7 +47,7 @@ html,body{background:#000!important;color:#fff!important;font-family:var(--font-
   <div class="su-search-wrap">
     <div class="su-search-icon">🔍</div>
     <input class="su-search-inp" id="searchInp" placeholder="Search by name or @username..."
-           value="{{ q }}" oninput="search(this.value)" autofocus>
+           value="{{ q }}" oninput="doUserSearch(this.value)" autofocus>
   </div>
 
   <div id="results">
@@ -63,18 +63,21 @@ html,body{background:#000!important;color:#fff!important;font-family:var(--font-
 const ME = parseInt("{{ session.get('user_id', 0) }}") || 0;
 let searchTimer;
 
-function search(q) {
+function doUserSearch(q) {
   clearTimeout(searchTimer);
   const res = document.getElementById("results");
   if (!q.trim()) { res.innerHTML = `<div class="su-empty">Start typing to search for people</div>`; return; }
   res.innerHTML = `<div class="su-loading"><div class="su-spin"></div> Searching for "${q}"...</div>`;
   searchTimer = setTimeout(async () => {
-    const data = await fetch(`/api/users/search?q=${encodeURIComponent(q)}`).then(r=>r.json());
+    try {
+    const resp = await fetch(`/api/users/search?q=${encodeURIComponent(q)}`);
+    if (!resp.ok) { res.innerHTML = `<div class="su-empty">Search failed. Please try again.</div>`; return; }
+    const data = await resp.json();
     if (!data.length) { res.innerHTML = `<div class="su-empty">No users found for "<strong style="color:#fff">${q}</strong>"</div>`; return; }
     res.innerHTML = data.map((u, i) => {
       const av = u.image ? `<img src="${u.image}">` : (u.name?u.name[0].toUpperCase():"?");
       const uname = u.username ? `<div class="su-username">@${u.username}</div>` : "";
-      const followBtn = u.id === ME ? "" : u.is_following
+      const followBtn = u.id === ME ? "" : u.i_follow
         ? `<button class="su-follow-btn following" onclick="unfollow(${u.id},this)">✓ Following</button>`
         : `<button class="su-follow-btn" onclick="follow(${u.id},this)">+ Follow</button>`;
       return `<div class="su-user-card" style="animation-delay:${i*0.06}s">
@@ -86,20 +89,42 @@ function search(q) {
         </div>
       </div>`;
     }).join("");
+    } catch(e) {
+      console.error("Search error:", e);
+      res.innerHTML = `<div class="su-empty">Search failed. Please try again.</div>`;
+    }
   }, 280);
 }
 
 async function follow(userId, btn) {
-  const d = await fetch(`/api/follow/${userId}`,{method:"POST"}).then(r=>r.json());
-  if (d.success) { btn.textContent = "✓ Following"; btn.classList.add("following"); btn.onclick = () => unfollow(userId, btn); }
+  btn.disabled = true;
+  try {
+    const resp = await fetch(`/api/profile/follow`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({user_id: userId})
+    });
+    const d = await resp.json();
+    if (d.success) { btn.textContent = "✓ Following"; btn.classList.add("following"); btn.onclick = () => unfollow(userId, btn); }
+  } catch(e) { console.error("Follow error:", e); }
+  btn.disabled = false;
 }
 async function unfollow(userId, btn) {
-  const d = await fetch(`/api/unfollow/${userId}`,{method:"POST"}).then(r=>r.json());
-  if (d.success) { btn.textContent = "+ Follow"; btn.classList.remove("following"); btn.onclick = () => follow(userId, btn); }
+  btn.disabled = true;
+  try {
+    const resp = await fetch(`/api/profile/follow`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({user_id: userId})
+    });
+    const d = await resp.json();
+    if (d.success) { btn.textContent = "+ Follow"; btn.classList.remove("following"); btn.onclick = () => follow(userId, btn); }
+  } catch(e) { console.error("Unfollow error:", e); }
+  btn.disabled = false;
 }
 
 // Auto search if q is present
 const initQ = document.getElementById("searchInp").value;
-if (initQ) search(initQ);
+if (initQ) doUserSearch(initQ);
 </script>
 {% endblock %}

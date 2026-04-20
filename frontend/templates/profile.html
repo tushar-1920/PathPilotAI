@@ -466,7 +466,7 @@ html,body{background:#000!important;color:#fff!important;font-family:var(--font-
 
 
 <!-- ══ USER SEARCH WIDGET ══ -->
-<div class="pf-search-widget" id="searchWidget">
+<!-- <div class="pf-search-widget" id="searchWidget">
   <div class="pf-search-widget-title">🔍 Search & Follow Users</div>
   <div class="pf-search-row">
     <input class="pf-search-input" id="userSearchInp"
@@ -475,7 +475,7 @@ html,body{background:#000!important;color:#fff!important;font-family:var(--font-
            autocomplete="off">
   </div>
   <div class="pf-search-results" id="searchResults"></div>
-</div>
+</div> -->
 
 <!-- ══ MAIN LAYOUT ══ -->
 <div class="pf-layout">
@@ -1114,8 +1114,13 @@ function handleUserSearch(val) {
 async function doSearch(q) {
   const results = document.getElementById("searchResults");
   try {
-    const r = await fetch(`/api/profile/search?q=${encodeURIComponent(q)}`).then(r => r.json());
-    const users = r.users || [];
+    const resp = await fetch(`/api/profile/search?q=${encodeURIComponent(q)}`);
+    if (!resp.ok) {
+      results.innerHTML = '<div class="pf-search-empty">Search failed (server error). Try again.</div>';
+      return;
+    }
+    const data = await resp.json();
+    const users = data.users || [];
     if (!users.length) {
       results.innerHTML = '<div class="pf-search-empty">No users found for "' + q + '"</div>';
       return;
@@ -1139,6 +1144,7 @@ async function doSearch(q) {
       </div>
     `).join('');
   } catch(e) {
+    console.error("Search error:", e);
     results.innerHTML = '<div class="pf-search-empty">Search failed. Try again.</div>';
   }
 }

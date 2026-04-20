@@ -218,17 +218,30 @@ def global_search():
     ]
 
     # ── Users ─────────────────────────────────────────────────
+    # Search by name or email
     user_rows = (
         User.query
-        .filter(User.name.ilike(like))
-        .limit(5)
+        .filter(db.or_(User.name.ilike(like), User.email.ilike(like)))
+        .limit(10)
         .all()
     )
+    seen_ids = {u.id for u in user_rows}
+
+    # Also search by username in profiles
+    prof_matches = Profile.query.filter(Profile.username.ilike(like)).limit(10).all()
+    for pm in prof_matches:
+        if pm.user_id not in seen_ids:
+            u = User.query.get(pm.user_id)
+            if u:
+                user_rows.append(u)
+                seen_ids.add(u.id)
+
     users = []
-    for u in user_rows:
+    for u in user_rows[:8]:
         p = Profile.query.filter_by(user_id=u.id).first()
         users.append({
             "name":     u.name,
+            "username": p.username if p else None,
             "headline": p.headline if p else "PathPilot User",
             "link":     f"/profile/{u.id}",
         })

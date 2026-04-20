@@ -1,0 +1,579 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+{% set prob = prediction.offer_probability %}
+{% set tier = prediction.readiness_tier %}
+{% set risk = prediction.risk_level %}
+
+{% if prob >= 72 %}
+  {% set accent = "#00e676" %}
+  {% set accent_rgb = "0,230,118" %}
+  {% set tier_emoji = "🔥" %}
+{% elif prob >= 50 %}
+  {% set accent = "#00d4ff" %}
+  {% set accent_rgb = "0,212,255" %}
+  {% set tier_emoji = "⚡" %}
+{% elif prob >= 30 %}
+  {% set accent = "#ff9f43" %}
+  {% set accent_rgb = "255,159,67" %}
+  {% set tier_emoji = "⚠️" %}
+{% else %}
+  {% set accent = "#ff4757" %}
+  {% set accent_rgb = "255,71,87" %}
+  {% set tier_emoji = "🚨" %}
+{% endif %}
+
+<style>
+:root{
+  --accent:{{ accent }};--accent-rgb:{{ accent_rgb }};
+  --acid:#ff3cac;--volt:#00ff88;--plasma:#7b2fff;--solar:#ff9f43;--ice:#00d4ff;
+  --crimson:#ff4757;--obsidian:#0a0a0f;--emerald:#00e676;
+  --glass:rgba(255,255,255,.04);--border:rgba(255,255,255,.08);
+  --font-d:"Clash Display",sans-serif;--font-b:"Cabinet Grotesk",sans-serif;--font-c:"Fira Code",monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--obsidian)!important;color:#fff!important;font-family:var(--font-b);-webkit-font-smoothing:antialiased}
+
+.pg{min-height:100vh;position:relative;overflow-x:hidden}
+.aurora{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 50% at -5% 10%,rgba({{ accent_rgb }},.1) 0%,transparent 55%),
+    radial-gradient(ellipse 55% 45% at 108% 85%,rgba(123,47,255,.07) 0%,transparent 55%),
+    radial-gradient(ellipse 40% 35% at 50% 110%,rgba({{ accent_rgb }},.05) 0%,transparent 50%)}
+.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.014) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px);
+  background-size:80px 80px}
+
+.body{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:40px 24px 120px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes reveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes barFill{from{width:0}to{width:var(--w)}}
+@keyframes dialFill{from{stroke-dashoffset:251.2}to{stroke-dashoffset:var(--offset)}}
+@keyframes countUp{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(var(--accent-rgb),.3)}50%{box-shadow:0 0 0 16px transparent}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+/* ─── TOP BAR ─── */
+.topbar{display:flex;align-items:center;gap:16px;margin-bottom:36px;animation:fadeUp .5s var(--ease) both}
+.back-btn{display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:100px;background:var(--glass);border:1px solid var(--border);color:rgba(255,255,255,.5);font-size:13px;text-decoration:none;transition:all .2s}
+.back-btn:hover{background:rgba(255,255,255,.06);color:#fff}
+.tb-meta{font-size:13px;color:rgba(255,255,255,.3)}
+.tb-meta strong{color:rgba(255,255,255,.6)}
+
+/* ─── HERO SECTION ─── */
+.hero{display:grid;grid-template-columns:1fr auto;gap:32px;align-items:center;margin-bottom:36px;background:rgba({{ accent_rgb }},.04);border:1px solid rgba({{ accent_rgb }},.12);border-radius:26px;padding:36px;position:relative;overflow:hidden;animation:fadeUp .6s .05s var(--ease) both}
+.hero::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba({{ accent_rgb }},.5),transparent)}
+.hero::after{content:"{{ tier_emoji }}";position:absolute;right:-20px;top:-30px;font-size:160px;opacity:.04;pointer-events:none}
+.hero-left{}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:5px 16px;border-radius:100px;background:rgba({{ accent_rgb }},.08);border:1px solid rgba({{ accent_rgb }},.2);font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+.hero-job{font-family:var(--font-d);font-size:clamp(20px,3.5vw,34px);font-weight:700;letter-spacing:-1px;margin-bottom:6px;line-height:1.2}
+.hero-company{font-size:16px;color:rgba(255,255,255,.4);margin-bottom:20px}
+.hero-verdict{font-size:15px;color:rgba(255,255,255,.65);line-height:1.75;max-width:580px;padding:16px 20px;background:rgba(255,255,255,.03);border-radius:12px;border-left:3px solid var(--accent)}
+
+/* Probability dial */
+.prob-dial{display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0}
+.dial-wrap{position:relative;width:140px;height:140px}
+.dial-wrap svg{transform:rotate(-90deg)}
+.dial-bg{fill:none;stroke:rgba(255,255,255,.05);stroke-width:10}
+.dial-fg{fill:none;stroke:var(--accent);stroke-width:10;stroke-linecap:round;stroke-dasharray:251.2;stroke-dashoffset:var(--offset);animation:dialFill 1.5s cubic-bezier(.34,1.56,.64,1) .3s both;filter:drop-shadow(0 0 8px rgba({{ accent_rgb }},.5))}
+.dial-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dial-pct{font-family:var(--font-c);font-size:32px;font-weight:700;color:var(--accent);line-height:1;animation:countUp .6s .8s var(--ease) both}
+.dial-label{font-size:10px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px}
+.prob-tier{font-family:var(--font-d);font-size:15px;font-weight:700;color:var(--accent)}
+.prob-risk{font-size:11px;color:rgba(255,255,255,.3);text-align:center}
+
+@media(max-width:700px){.hero{grid-template-columns:1fr}.prob-dial{margin-top:20px}}
+
+/* ─── LAYOUT ─── */
+.layout{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+@media(max-width:960px){.layout{grid-template-columns:1fr}}
+
+/* ─── CARD BASE ─── */
+.card{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:26px;position:relative;overflow:hidden;margin-bottom:18px;animation:fadeUp .6s var(--ease) both}
+.card::before{content:"";position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba({{ accent_rgb }},.15),transparent)}
+.card-title{font-family:var(--font-d);font-size:17px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.card-title .ti{font-size:20px}
+.card-badge{margin-left:auto;font-size:10px;padding:3px 10px;border-radius:100px;background:rgba({{ accent_rgb }},.08);border:1px solid rgba({{ accent_rgb }},.15);color:var(--accent);font-weight:700;letter-spacing:1px;text-transform:uppercase}
+
+/* ─── SCORE BREAKDOWN ─── */
+.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.score-item{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:16px}
+.si-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.3);font-weight:700;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.si-val{font-family:var(--font-c);font-size:11px;color:var(--accent)}
+.si-bar-track{height:6px;background:rgba(255,255,255,.05);border-radius:100px;overflow:hidden}
+.si-bar-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,rgba({{ accent_rgb }},.6),var(--accent));transition:width 1.5s cubic-bezier(.34,1.2,.64,1);width:0}
+@media(max-width:600px){.score-grid{grid-template-columns:1fr}}
+
+/* ─── BLOCKERS ─── */
+.blocker{border-radius:16px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden}
+.blocker.critical{background:rgba(255,71,87,.05);border:1px solid rgba(255,71,87,.18)}
+.blocker.high{background:rgba(255,159,67,.05);border:1px solid rgba(255,159,67,.15)}
+.blocker.medium{background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.12)}
+.blocker-rank{position:absolute;top:18px;right:20px;font-family:var(--font-c);font-size:28px;font-weight:700;opacity:.08}
+.blocker-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.blocker-badge{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;flex-shrink:0;margin-top:2px}
+.blocker-badge.critical{background:rgba(255,71,87,.15);color:rgba(255,71,87,.9)}
+.blocker-badge.high{background:rgba(255,159,67,.15);color:rgba(255,159,67,.9)}
+.blocker-badge.medium{background:rgba(0,212,255,.12);color:rgba(0,212,255,.8)}
+.blocker-title{font-family:var(--font-d);font-size:16px;font-weight:700;line-height:1.3}
+.blocker-detail{font-size:13.5px;color:rgba(255,255,255,.45);line-height:1.75;margin-bottom:14px}
+.blocker-fix{display:flex;gap:10px;padding:12px 14px;background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.1);border-radius:10px;align-items:flex-start}
+.bf-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.bf-text{font-size:13px;color:rgba(0,230,118,.8);line-height:1.6}
+.bf-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(0,230,118,.4);font-weight:700;margin-bottom:3px}
+
+/* ─── SKILL MATCH ─── */
+.skill-section{margin-bottom:20px}
+.skill-section-title{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.3);font-weight:700;margin-bottom:12px}
+.skill-chips{display:flex;flex-wrap:wrap;gap:8px}
+.skill-chip{padding:5px 13px;border-radius:100px;font-size:12px;font-weight:500}
+.skill-chip.matched{background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);color:rgba(0,230,118,.85)}
+.skill-chip.missing{background:rgba(255,71,87,.07);border:1px solid rgba(255,71,87,.18);color:rgba(255,71,87,.8)}
+.skill-chip.bonus{background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);color:rgba(0,212,255,.75)}
+.skill-match-bar{height:10px;background:rgba(255,255,255,.05);border-radius:100px;overflow:hidden;margin-bottom:16px;position:relative}
+.smb-fill{height:100%;background:linear-gradient(90deg,rgba(0,230,118,.7),rgba(0,230,118,1));border-radius:100px;transition:width 1.5s var(--ease);width:0}
+.smb-label{position:absolute;right:0;top:-22px;font-family:var(--font-c);font-size:11px;color:rgba(0,230,118,.7)}
+
+/* ─── 30-DAY PLAN ─── */
+.week-card{border-radius:16px;padding:20px;margin-bottom:14px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);position:relative;overflow:hidden}
+.week-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);border-radius:0 3px 3px 0}
+.week-header{display:flex;align-items:center;gap:14px;margin-bottom:14px;cursor:pointer}
+.week-num{width:36px;height:36px;border-radius:50%;background:rgba({{ accent_rgb }},.1);border:1px solid rgba({{ accent_rgb }},.2);display:flex;align-items:center;justify-content:center;font-family:var(--font-c);font-size:13px;font-weight:700;color:var(--accent);flex-shrink:0}
+.week-title{font-family:var(--font-d);font-size:15px;font-weight:700;flex:1}
+.week-hours{font-size:11px;color:rgba(255,255,255,.25);display:flex;align-items:center;gap:5px}
+.week-toggle{font-size:18px;color:rgba(255,255,255,.25);transition:transform .2s}
+.week-toggle.open{transform:rotate(90deg)}
+.week-actions{display:none;padding-left:50px}
+.week-actions.open{display:block}
+.week-action{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13.5px;color:rgba(255,255,255,.55);line-height:1.6}
+.week-action:last-child{border-bottom:none}
+.wa-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px;opacity:.6}
+.week-milestone{margin-top:12px;padding:10px 14px;background:rgba({{ accent_rgb }},.05);border:1px solid rgba({{ accent_rgb }},.12);border-radius:10px;font-size:12.5px;color:rgba({{ accent_rgb }},.8);line-height:1.6}
+.wm-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:4px;color:rgba({{ accent_rgb }},.5)}
+
+/* ─── RESUME AUDIT ─── */
+.audit-item{padding:16px 20px;border-radius:14px;margin-bottom:12px;background:rgba(255,159,67,.04);border:1px solid rgba(255,159,67,.12)}
+.ai-issue{font-size:13.5px;font-weight:700;color:rgba(255,255,255,.8);margin-bottom:5px}
+.ai-impact{font-size:12.5px;color:rgba(255,255,255,.35);margin-bottom:10px;line-height:1.6}
+.ai-fix{font-size:12.5px;color:rgba(0,230,118,.75);line-height:1.6;padding:8px 12px;background:rgba(0,230,118,.04);border-radius:8px;border:1px solid rgba(0,230,118,.1)}
+.ai-fix-label{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:rgba(0,230,118,.4);font-weight:700;margin-bottom:3px}
+
+/* ─── SIDE: COMPANY INTEL ─── */
+.intel-card{background:rgba(123,47,255,.04);border:1px solid rgba(123,47,255,.12);border-radius:20px;padding:24px;margin-bottom:18px;animation:fadeUp .6s .2s var(--ease) both}
+.intel-tag-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.intel-tag{padding:5px 13px;border-radius:100px;background:rgba(123,47,255,.1);border:1px solid rgba(123,47,255,.2);font-size:11.5px;color:rgba(123,47,255,.9)}
+.intel-section{margin-bottom:16px}
+.intel-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.25);font-weight:700;margin-bottom:7px}
+.intel-text{font-size:13px;color:rgba(255,255,255,.5);line-height:1.75}
+.intel-tip{padding:12px 16px;background:rgba(123,47,255,.06);border:1px solid rgba(123,47,255,.12);border-radius:10px;font-size:13px;color:rgba(123,47,255,.85);line-height:1.7}
+
+/* ─── SIDE: SALARY ─── */
+.salary-card{background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.1);border-radius:20px;padding:24px;margin-bottom:18px;animation:fadeUp .6s .3s var(--ease) both}
+.salary-range{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+.sal-low{font-family:var(--font-c);font-size:14px;color:rgba(255,255,255,.3)}
+.sal-high{font-family:var(--font-c);font-size:14px;color:rgba(255,255,255,.3)}
+.sal-median{font-family:var(--font-d);font-size:32px;font-weight:700;color:var(--emerald);line-height:1}
+.sal-unit{font-size:13px;color:rgba(255,255,255,.3);margin-left:4px}
+.sal-bar{height:8px;background:rgba(255,255,255,.05);border-radius:100px;overflow:hidden;margin-bottom:12px;position:relative}
+.sal-fill{height:100%;background:linear-gradient(90deg,rgba(0,230,118,.4),rgba(0,230,118,.8));border-radius:100px;width:60%}
+.sal-tip{font-size:12.5px;color:rgba(255,255,255,.4);line-height:1.7;padding:10px 14px;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid rgba(255,255,255,.05)}
+.sal-context{font-size:12px;color:rgba(255,255,255,.25);line-height:1.65;margin-top:10px}
+
+/* ─── SIDE: STRENGTHS ─── */
+.strength-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.strength-item:last-child{border-bottom:none}
+.si-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.si-body{}
+.si-title{font-size:13.5px;font-weight:700;color:rgba(255,255,255,.8);margin-bottom:3px}
+.si-desc{font-size:12.5px;color:rgba(255,255,255,.35);line-height:1.65}
+
+/* ─── SIDE: INTERVIEW Qs ─── */
+.iq-item{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.iq-item:last-child{border-bottom:none}
+.iq-type{display:inline-flex;padding:3px 10px;border-radius:100px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.iq-type.technical{background:rgba(0,212,255,.1);color:rgba(0,212,255,.8)}
+.iq-type.behavioral{background:rgba(123,47,255,.1);color:rgba(123,47,255,.85)}
+.iq-type.system{background:rgba(255,159,67,.1);color:rgba(255,159,67,.85)}
+.iq-type.hr{background:rgba(0,230,118,.1);color:rgba(0,230,118,.8)}
+.iq-q{font-size:13.5px;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:6px;line-height:1.5}
+.iq-expand{font-size:12px;color:rgba(255,255,255,.25);cursor:pointer;display:flex;align-items:center;gap:6px;transition:color .15s}
+.iq-expand:hover{color:rgba({{ accent_rgb }},.7)}
+.iq-answer{display:none;font-size:12.5px;color:rgba(255,255,255,.4);line-height:1.7;margin-top:8px;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:8px;border-left:2px solid rgba({{ accent_rgb }},.3)}
+.iq-answer.open{display:block;animation:reveal .25s var(--ease)}
+
+/* ─── COACH MESSAGE ─── */
+.coach-card{background:linear-gradient(135deg,rgba({{ accent_rgb }},.06),rgba(123,47,255,.05));border:1px solid rgba({{ accent_rgb }},.15);border-radius:20px;padding:28px;margin-bottom:18px;position:relative;overflow:hidden;animation:fadeUp .6s var(--ease) both}
+.coach-card::before{content:"💬";position:absolute;right:-10px;top:-20px;font-size:110px;opacity:.05;pointer-events:none}
+.coach-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),rgba(123,47,255,.8));display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px;animation:float 3s ease-in-out infinite}
+.coach-label{font-size:10px;text-transform:uppercase;letter-spacing:2.5px;color:rgba({{ accent_rgb }},.5);font-weight:700;margin-bottom:10px}
+.coach-text{font-size:15px;color:rgba(255,255,255,.75);line-height:1.85;font-style:italic}
+
+/* ─── ACTION BUTTONS ─── */
+.action-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px;animation:fadeUp .6s .5s var(--ease) both}
+.btn-primary{padding:14px 28px;border-radius:12px;border:none;background:linear-gradient(135deg,rgba({{ accent_rgb }},.9),rgba(0,212,255,.7));color:#000;font-family:var(--font-d);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba({{ accent_rgb }},.2)}
+.btn-ghost{padding:14px 28px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.7);font-family:var(--font-b);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-ghost:hover{background:rgba(255,255,255,.07);color:#fff}
+
+/* ─── SHARE CARD ─── */
+.share-banner{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:rgba({{ accent_rgb }},.05);border:1px solid rgba({{ accent_rgb }},.12);border-radius:16px;margin-bottom:20px;gap:16px;flex-wrap:wrap;animation:fadeUp .6s .1s var(--ease) both}
+.sb-left{font-size:14px;color:rgba(255,255,255,.55);line-height:1.6}
+.sb-left strong{color:#fff}
+.sb-btn{padding:9px 20px;border-radius:100px;border:1px solid rgba({{ accent_rgb }},.3);background:rgba({{ accent_rgb }},.08);color:var(--accent);font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.sb-btn:hover{background:rgba({{ accent_rgb }},.15)}
+
+@media(max-width:640px){.score-grid{grid-template-columns:1fr}}
+</style>
+
+{% set sd = prediction.score_breakdown %}
+{% set sm = prediction.skill_match %}
+{% set salary = prediction.salary_intel %}
+{% set intel = prediction.company_intel %}
+{% set dial_offset = 251.2 - (prob / 100 * 251.2) %}
+
+<div class="pg">
+  <div class="aurora"></div>
+  <div class="grid-bg"></div>
+
+  <div class="body">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <a href="/offer-predictor" class="back-btn">← New Prediction</a>
+      <a href="/offer-predictor/history" class="back-btn">📋 History</a>
+      <span class="tb-meta" style="margin-left:auto">Analysed {{ prediction.created_at }}</span>
+    </div>
+
+    <!-- SHARE BANNER -->
+    <div class="share-banner">
+      <div class="sb-left"><strong>Share your result</strong> — show friends where you stand before applying</div>
+      <button class="sb-btn" onclick="copyResult()">📤 Copy Result Card</button>
+    </div>
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-left">
+        <div class="hero-badge">{{ tier_emoji }} {{ tier }}</div>
+        <div class="hero-job">{{ prediction.job_title or 'Target Role' }}</div>
+        <div class="hero-company">
+          {% if prediction.company_name %}🏢 {{ prediction.company_name }}{% else %}Company not specified{% endif %}
+          {% if prediction.risk_level %} &nbsp;·&nbsp; <span style="color:rgba({{ accent_rgb }},.7)">{{ risk }} Risk</span>{% endif %}
+        </div>
+        {% if prediction.verdict_headline %}
+        <div class="hero-verdict">{{ prediction.verdict_headline }}</div>
+        {% endif %}
+      </div>
+      <div class="prob-dial">
+        <div class="dial-wrap">
+          <svg width="140" height="140" viewBox="0 0 90 90">
+            <circle class="dial-bg" cx="45" cy="45" r="40"/>
+            <circle class="dial-fg" cx="45" cy="45" r="40" style="--offset:{{ dial_offset }}"/>
+          </svg>
+          <div class="dial-center">
+            <div class="dial-pct">{{ prob|int }}%</div>
+            <div class="dial-label">Probability</div>
+          </div>
+        </div>
+        <div class="prob-tier">{{ tier }}</div>
+        <div class="prob-risk">{{ risk }} Risk Level</div>
+      </div>
+    </div>
+
+    <!-- COACH MESSAGE -->
+    {% if prediction.coach_message %}
+    <div class="coach-card">
+      <div class="coach-avatar">🎯</div>
+      <div class="coach-label">AI Career Coach · Personal Message</div>
+      <div class="coach-text">"{{ prediction.coach_message }}"</div>
+    </div>
+    {% endif %}
+
+    <!-- MAIN LAYOUT -->
+    <div class="layout">
+
+      <!-- LEFT COLUMN -->
+      <div>
+
+        <!-- SCORE BREAKDOWN -->
+        {% if sd %}
+        <div class="card" style="animation-delay:.1s">
+          <div class="card-title"><span class="ti">📊</span> Score Breakdown <span class="card-badge">6 Dimensions</span></div>
+          <div class="score-grid">
+            {% set dims = [
+              ('Skill Match',     sd.get('skill_match', 0),     '🔧'),
+              ('Resume Quality',  sd.get('resume_quality', 0),  '📄'),
+              ('Project Depth',   sd.get('project_depth', 0),   '🏗️'),
+              ('Experience Fit',  sd.get('experience_fit', 0),  '💼'),
+              ('Cultural Signal', sd.get('cultural_signal', 0), '🤝'),
+              ('Overall',         sd.get('overall', 0),         '⭐'),
+            ] %}
+            {% for label, val, icon in dims %}
+            <div class="score-item">
+              <div class="si-label">{{ icon }} {{ label }}<span class="si-val">{{ val|int }}/100</span></div>
+              <div class="si-bar-track"><div class="si-bar-fill" style="--w:{{ val }}%;width:{{ val }}%"></div></div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- BLOCKERS -->
+        {% if prediction.blockers %}
+        <div class="card" style="animation-delay:.15s">
+          <div class="card-title"><span class="ti">🚧</span> What's Blocking You <span class="card-badge">{{ prediction.blockers|length }} Blockers</span></div>
+          {% for b in prediction.blockers %}
+          {% set sev = b.severity|lower if b.severity else 'medium' %}
+          <div class="blocker {{ sev }}">
+            <div class="blocker-rank">#{{ b.rank }}</div>
+            <div class="blocker-head">
+              <div class="blocker-badge {{ sev }}">{{ b.severity or 'Medium' }}</div>
+              <div class="blocker-title">{{ b.title }}</div>
+            </div>
+            <div class="blocker-detail">{{ b.detail }}</div>
+            {% if b.quick_fix %}
+            <div class="blocker-fix">
+              <span class="bf-icon">⚡</span>
+              <div><div class="bf-label">Quick Fix This Week</div><div class="bf-text">{{ b.quick_fix }}</div></div>
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- SKILL MATCH -->
+        {% if sm %}
+        <div class="card" style="animation-delay:.2s">
+          <div class="card-title">
+            <span class="ti">🔧</span> Skill Match Analysis
+            {% if sm.match_percentage %}<span class="card-badge">{{ sm.match_percentage|int }}% Match</span>{% endif %}
+          </div>
+          {% if sm.match_percentage %}
+          <div class="skill-match-bar" style="margin-bottom:20px">
+            <div class="smb-label">{{ sm.match_percentage|int }}% matched</div>
+            <div class="smb-fill" style="width:{{ sm.match_percentage }}%"></div>
+          </div>
+          {% endif %}
+          {% if sm.matched %}
+          <div class="skill-section">
+            <div class="skill-section-title">✅ Skills You Have</div>
+            <div class="skill-chips">
+              {% for s in sm.matched %}<div class="skill-chip matched">{{ s }}</div>{% endfor %}
+            </div>
+          </div>
+          {% endif %}
+          {% if sm.missing %}
+          <div class="skill-section">
+            <div class="skill-section-title">❌ Skills You're Missing</div>
+            <div class="skill-chips">
+              {% for s in sm.missing %}<div class="skill-chip missing">{{ s }}</div>{% endfor %}
+            </div>
+          </div>
+          {% endif %}
+          {% if sm.bonus %}
+          <div class="skill-section">
+            <div class="skill-section-title">🌟 Bonus Skills (Extra Edge)</div>
+            <div class="skill-chips">
+              {% for s in sm.bonus %}<div class="skill-chip bonus">{{ s }}</div>{% endfor %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- 30-DAY PLAN -->
+        {% if prediction.gap_plan %}
+        <div class="card" style="animation-delay:.25s">
+          <div class="card-title"><span class="ti">📅</span> 30-Day Gap-Closing Plan <span class="card-badge">4 Weeks</span></div>
+          {% for week in prediction.gap_plan %}
+          <div class="week-card">
+            <div class="week-header" onclick="toggleWeek(this)">
+              <div class="week-num">W{{ week.week }}</div>
+              <div class="week-title">{{ week.title }}</div>
+              {% if week.hours_required %}<div class="week-hours">⏱ {{ week.hours_required }}h</div>{% endif %}
+              <div class="week-toggle">›</div>
+            </div>
+            <div class="week-actions">
+              {% for action in week.actions %}
+              <div class="week-action"><div class="wa-dot"></div>{{ action }}</div>
+              {% endfor %}
+              {% if week.milestone %}
+              <div class="week-milestone">
+                <div class="wm-label">Milestone</div>
+                {{ week.milestone }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- RESUME AUDIT -->
+        {% if prediction.resume_audit %}
+        <div class="card" style="animation-delay:.3s">
+          <div class="card-title"><span class="ti">📄</span> Resume Audit <span class="card-badge">{{ prediction.resume_audit|length }} Issues</span></div>
+          {% for item in prediction.resume_audit %}
+          <div class="audit-item">
+            <div class="ai-issue">{{ item.issue }}</div>
+            <div class="ai-impact">{{ item.impact }}</div>
+            {% if item.fix %}
+            <div class="ai-fix"><div class="ai-fix-label">Fix</div>{{ item.fix }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- ACTION BUTTONS -->
+        <div class="action-row">
+          <a href="/offer-predictor" class="btn-primary">⚡ Run Another Prediction</a>
+          <a href="/career-time-machine" class="btn-ghost">🗺️ Career Time Machine</a>
+          <!-- <a href="/skill-gap" class="btn-ghost">🔧 Skill Gap Analyzer</a> -->
+        </div>
+
+      </div><!-- /left col -->
+
+      <!-- RIGHT COLUMN -->
+      <div>
+
+        <!-- STRENGTHS -->
+        {% if prediction.strengths %}
+        <div class="card" style="animation-delay:.15s">
+          <div class="card-title" style="font-size:16px"><span class="ti">💪</span> Your Strengths</div>
+          {% for s in prediction.strengths %}
+          <div class="strength-item">
+            <div class="si-icon">🌟</div>
+            <div class="si-body">
+              <div class="si-title">{{ s.title }}</div>
+              <div class="si-desc">{{ s.detail }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- COMPANY INTEL -->
+        {% if intel %}
+        <div class="intel-card">
+          <div class="card-title" style="font-size:16px"><span class="ti">🏢</span> Company Intel</div>
+          {% if intel.culture_tags %}
+          <div class="intel-tag-row">
+            {% for t in intel.culture_tags %}<div class="intel-tag">{{ t }}</div>{% endfor %}
+          </div>
+          {% endif %}
+          {% if intel.what_they_value %}
+          <div class="intel-section">
+            <div class="intel-label">What They Value</div>
+            <div class="intel-text">{{ intel.what_they_value }}</div>
+          </div>
+          {% endif %}
+          {% if intel.red_flags_for_them %}
+          <div class="intel-section">
+            <div class="intel-label">Instant Disqualifiers</div>
+            <div class="intel-text" style="color:rgba(255,71,87,.65)">{{ intel.red_flags_for_them }}</div>
+          </div>
+          {% endif %}
+          {% if intel.insider_tip %}
+          <div class="intel-section">
+            <div class="intel-label">Insider Tip</div>
+            <div class="intel-tip">💡 {{ intel.insider_tip }}</div>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- SALARY INTEL -->
+        {% if salary %}
+        <div class="salary-card">
+          <div class="card-title" style="font-size:16px"><span class="ti">💰</span> Salary Intelligence</div>
+          <div class="salary-range">
+            <span class="sal-low">₹{{ salary.range_low }}L</span>
+            <span style="color:rgba(255,255,255,.2)">—</span>
+            <span class="sal-median">{{ salary.median }}<span class="sal-unit">LPA</span></span>
+            <span style="color:rgba(255,255,255,.2)">—</span>
+            <span class="sal-high">₹{{ salary.range_high }}L</span>
+          </div>
+          <div class="sal-bar"><div class="sal-fill"></div></div>
+          {% if salary.negotiation_tip %}
+          <div class="sal-tip">🤝 {{ salary.negotiation_tip }}</div>
+          {% endif %}
+          {% if salary.context %}
+          <div class="sal-context">{{ salary.context }}</div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- PREDICTED INTERVIEW Qs -->
+        {% if prediction.interview_tips %}
+        <div class="card" style="animation-delay:.35s">
+          <div class="card-title" style="font-size:16px"><span class="ti">🎙️</span> Predicted Questions</div>
+          {% for q in prediction.interview_tips %}
+          {% set qtype = q.type|lower if q.type else 'technical' %}
+          <div class="iq-item">
+            <div class="iq-type {{ qtype.split()[0] }}">{{ q.type }}</div>
+            <div class="iq-q">{{ q.question }}</div>
+            {% if q.how_to_answer %}
+            <div class="iq-expand" onclick="toggleIQ(this)">
+              <span>›</span> How to answer
+            </div>
+            <div class="iq-answer">
+              {% if q.why_asked %}<div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.2);font-weight:700;margin-bottom:5px">Why they ask this</div>{{ q.why_asked }}<br><br>{% endif %}
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba({{ accent_rgb }},.3);font-weight:700;margin-bottom:5px">How to answer</div>{{ q.how_to_answer }}
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+      </div><!-- /right col -->
+    </div><!-- /layout -->
+  </div><!-- /body -->
+</div>
+
+<script>
+function toggleWeek(header){
+  const actions = header.nextElementSibling;
+  const toggle  = header.querySelector('.week-toggle');
+  actions.classList.toggle('open');
+  toggle.classList.toggle('open');
+}
+
+function toggleIQ(el){
+  const ans = el.nextElementSibling;
+  ans.classList.toggle('open');
+  el.querySelector('span').textContent = ans.classList.contains('open') ? '∨' : '›';
+}
+
+// Auto-open all week cards
+document.querySelectorAll('.week-header').forEach(h => h.click());
+
+// Animate score bars on load
+window.addEventListener('load', ()=>{
+  setTimeout(()=>{
+    document.querySelectorAll('.si-bar-fill').forEach(b=>{
+      b.style.transition = 'width 1.5s cubic-bezier(.34,1.2,.64,1)';
+    });
+  }, 200);
+});
+
+function copyResult(){
+  const prob  = "{{ prob|int }}";
+  const tier  = "{{ tier }}";
+  const job   = "{{ prediction.job_title or 'a role' }}";
+  const co    = "{{ prediction.company_name or '' }}";
+  const text  = `🎯 PathPilot AI Offer Predictor\n\n${prob}% chance of getting the offer for ${job}${co ? ' at ' + co : ''}\n\nTier: ${tier}\n\nAnalysed with PathPilot AI — pathpilot.ai`;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.querySelector('.sb-btn');
+    btn.textContent = '✅ Copied!';
+    setTimeout(()=>btn.textContent='📤 Copy Result Card', 2000);
+  });
+}
+</script>
+{% endblock %}

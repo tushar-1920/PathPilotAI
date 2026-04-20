@@ -45,6 +45,8 @@ class Config:
     STRIPE_ANNUAL_PRICE_ID = None
     STRIPE_WEBHOOK_SECRET = None
 
-    # OPENAI_API_KEY = "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"
+    OPENAI_API_KEY = "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"
 
     OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+
+    

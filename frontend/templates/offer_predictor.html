@@ -1,0 +1,455 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --acid:#ff3cac;--volt:#00ff88;--plasma:#7b2fff;--solar:#ff9f43;--ice:#00d4ff;
+  --crimson:#ff4757;--obsidian:#0a0a0f;--emerald:#00e676;
+  --glass:rgba(255,255,255,.04);--border:rgba(255,255,255,.08);
+  --font-d:"Clash Display",sans-serif;--font-b:"Cabinet Grotesk",sans-serif;--font-c:"Fira Code",monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--obsidian)!important;color:#fff!important;font-family:var(--font-b);-webkit-font-smoothing:antialiased}
+
+.pg{min-height:100vh;position:relative;overflow-x:hidden}
+.aurora{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 65% 50% at -5% 10%,rgba(0,255,136,.09) 0%,transparent 55%),
+    radial-gradient(ellipse 55% 45% at 108% 85%,rgba(0,212,255,.08) 0%,transparent 55%),
+    radial-gradient(ellipse 45% 35% at 50% 110%,rgba(123,47,255,.07) 0%,transparent 50%),
+    radial-gradient(ellipse 30% 25% at 80% 15%,rgba(255,60,172,.06) 0%,transparent 55%)}
+.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);
+  background-size:80px 80px}
+.scanline{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,255,136,.12),transparent);animation:scan 10s linear infinite;z-index:0;pointer-events:none}
+
+.body{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:48px 24px 140px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(0,230,118,.3)}70%{box-shadow:0 0 0 12px transparent}100%{box-shadow:0 0 0 0 transparent}}
+@keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
+@keyframes reveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes barFill{from{width:0}to{width:var(--w)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes countUp{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes glow{0%,100%{text-shadow:0 0 10px rgba(0,255,136,.3)}50%{text-shadow:0 0 30px rgba(0,255,136,.7)}}
+
+/* ─── HEADER ─── */
+.hdr{margin-bottom:48px;animation:fadeUp .6s var(--ease) both}
+.hdr-badge{display:inline-flex;align-items:center;gap:10px;padding:6px 18px;border-radius:100px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.22);font-size:10px;font-weight:700;color:rgba(0,230,118,.9);letter-spacing:3px;text-transform:uppercase;margin-bottom:18px}
+.hdr-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);animation:blink 1.5s ease-in-out infinite;animation:pulseRing 1.5s ease-out infinite}
+.hdr-title{font-family:var(--font-d);font-size:clamp(32px,6vw,72px);font-weight:700;letter-spacing:-3px;line-height:1;margin-bottom:14px}
+.hdr-title em{font-style:normal;background:linear-gradient(110deg,var(--emerald),var(--ice),var(--volt));background-size:200%;animation:gradShift 4s ease infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hdr-sub{font-size:16px;color:rgba(255,255,255,.35);line-height:1.85;max-width:600px;margin-bottom:22px}
+.hdr-pills{display:flex;flex-wrap:wrap;gap:10px}
+.hdr-pill{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:100px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);font-size:12px;color:rgba(255,255,255,.45)}
+.hdr-pill span{font-size:14px}
+
+/* ─── LAYOUT ─── */
+.layout{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+
+/* ─── CARD BASE ─── */
+.card{background:var(--glass);border:1px solid var(--border);border-radius:22px;padding:28px;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,230,118,.2),rgba(0,212,255,.15),transparent)}
+.card-title{font-family:var(--font-d);font-size:18px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.card-title .ti{font-size:22px}
+
+/* ─── FORM ELEMENTS ─── */
+.field{margin-bottom:18px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:rgba(255,255,255,.25);display:block;margin-bottom:7px}
+.inp{width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 16px;color:#fff;font-family:var(--font-b);font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
+.inp:focus{border-color:rgba(0,230,118,.35);box-shadow:0 0 0 3px rgba(0,230,118,.06)}
+.inp::placeholder{color:rgba(255,255,255,.18)}
+.ta{width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 16px;color:#fff;font-family:var(--font-b);font-size:13.5px;outline:none;resize:vertical;min-height:180px;line-height:1.75;transition:border-color .2s,box-shadow .2s}
+.ta:focus{border-color:rgba(0,230,118,.35);box-shadow:0 0 0 3px rgba(0,230,118,.06)}
+.ta::placeholder{color:rgba(255,255,255,.18)}
+
+/* char counter */
+.char-bar{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.char-hint{font-size:11px;color:rgba(255,255,255,.2)}
+.char-count{font-size:11px;font-family:var(--font-c);color:rgba(0,230,118,.5)}
+
+/* ─── ANALYZE BUTTON ─── */
+.btn-analyze{width:100%;padding:18px;border-radius:14px;border:none;background:linear-gradient(135deg,rgba(0,230,118,.9),rgba(0,212,255,.8));color:#000;font-family:var(--font-d);font-size:16px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:all .2s;position:relative;overflow:hidden;margin-top:8px}
+.btn-analyze::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);opacity:0;transition:opacity .2s}
+.btn-analyze:hover::before{opacity:1}
+.btn-analyze:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,230,118,.25)}
+.btn-analyze:active{transform:translateY(0)}
+.btn-analyze:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-analyze .btn-inner{display:flex;align-items:center;justify-content:center;gap:10px}
+
+/* ─── NO RESUME WARNING ─── */
+.warn-box{background:rgba(255,159,67,.06);border:1px solid rgba(255,159,67,.2);border-radius:14px;padding:18px 20px;margin-bottom:20px;display:flex;gap:14px;align-items:flex-start}
+.warn-icon{font-size:24px;flex-shrink:0}
+.warn-text{font-size:13px;color:rgba(255,255,255,.45);line-height:1.7}
+.warn-text strong{color:rgba(255,159,67,.85);display:block;margin-bottom:3px}
+.warn-link{color:rgba(0,212,255,.7);text-decoration:none;font-weight:600}
+.warn-link:hover{color:var(--ice)}
+
+/* ─── SIDE PANEL ─── */
+.side{display:flex;flex-direction:column;gap:18px}
+
+/* profile snapshot */
+.profile-snap{background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.1);border-radius:18px;padding:22px}
+.ps-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.ps-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--emerald),var(--ice));display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:18px;font-weight:700;color:#000;flex-shrink:0}
+.ps-name{font-family:var(--font-d);font-size:16px;font-weight:700}
+.ps-sub{font-size:12px;color:rgba(255,255,255,.3);margin-top:2px}
+.ps-skills{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.ps-skill{padding:4px 11px;border-radius:100px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.15);font-size:11px;color:rgba(0,230,118,.8)}
+.ps-more{padding:4px 11px;border-radius:100px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);font-size:11px;color:rgba(255,255,255,.3)}
+
+/* how it works */
+.how-card{background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:18px;padding:22px}
+.how-step{display:flex;gap:14px;margin-bottom:16px;align-items:flex-start}
+.how-step:last-child{margin-bottom:0}
+.how-num{width:28px;height:28px;border-radius:50%;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--ice);flex-shrink:0;font-family:var(--font-c)}
+.how-content{flex:1}
+.how-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px}
+.how-desc{font-size:12px;color:rgba(255,255,255,.3);line-height:1.6}
+
+/* history mini */
+.hist-card{background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:22px}
+.hist-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);text-decoration:none;transition:background .15s;border-radius:8px;padding:10px 8px;margin:0 -8px}
+.hist-item:hover{background:rgba(255,255,255,.03)}
+.hist-item:last-child{border-bottom:none}
+.hi-prob{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--font-c);font-size:13px;font-weight:700;flex-shrink:0}
+.hi-body{flex:1;min-width:0}
+.hi-title{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hi-company{font-size:11px;color:rgba(255,255,255,.3);margin-top:2px}
+.hi-arr{font-size:16px;color:rgba(255,255,255,.2)}
+
+/* ─── LOADING OVERLAY ─── */
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(10,10,15,.92);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:24px;backdrop-filter:blur(8px)}
+.loading-overlay.active{display:flex}
+.lo-ring{width:72px;height:72px;border-radius:50%;border:3px solid rgba(0,230,118,.1);border-top-color:var(--emerald);animation:spin 1s linear infinite}
+.lo-title{font-family:var(--font-d);font-size:26px;font-weight:700;animation:glow 2s ease-in-out infinite}
+.lo-sub{font-size:14px;color:rgba(255,255,255,.35);text-align:center;max-width:320px;line-height:1.7}
+.lo-steps{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.lo-step{display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,.3);transition:color .3s}
+.lo-step.active{color:rgba(0,230,118,.85)}
+.lo-step.done{color:rgba(255,255,255,.2);text-decoration:line-through}
+.lo-step-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+/* ─── ERROR ─── */
+.err-box{background:rgba(255,71,87,.06);border:1px solid rgba(255,71,87,.2);border-radius:14px;padding:16px 20px;margin-bottom:18px;font-size:13.5px;color:rgba(255,71,87,.9);display:none;animation:reveal .3s var(--ease)}
+.err-box.show{display:flex;align-items:center;gap:12px}
+
+/* ─── SECTION DIVIDER ─── */
+.divider{display:flex;align-items:center;gap:12px;margin:24px 0}
+.divider-line{flex:1;height:1px;background:rgba(255,255,255,.06)}
+.divider-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.2);font-weight:700}
+
+/* ─── TIPS CHIP ─── */
+.tip-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.tip-chip{padding:5px 13px;border-radius:100px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.12);font-size:11.5px;color:rgba(0,212,255,.7);cursor:pointer;transition:all .15s}
+.tip-chip:hover{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.25);color:var(--ice)}
+.tip-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.2);font-weight:700;margin-bottom:8px;display:block}
+
+@media(max-width:640px){.field-row{grid-template-columns:1fr}}
+</style>
+
+<div class="pg">
+  <div class="aurora"></div>
+  <div class="grid-bg"></div>
+  <div class="scanline"></div>
+
+  <div class="body">
+
+    <!-- HEADER -->
+    <div class="hdr">
+      <div class="hdr-badge"><div class="hdr-dot"></div> PATHPILOT AI · OFFER PREDICTOR</div>
+      <h1 class="hdr-title">Will You Get the <em>Offer?</em></h1>
+      <p class="hdr-sub">Paste any job description and we'll tell you your real probability of getting the offer — plus exactly what's blocking you and a 30-day plan to close the gap.</p>
+      <div class="hdr-pills">
+        <div class="hdr-pill"><span>🎯</span> AI Probability Score</div>
+        <div class="hdr-pill"><span>🚧</span> Top 3 Blockers</div>
+        <div class="hdr-pill"><span>📅</span> 30-Day Gap Plan</div>
+        <div class="hdr-pill"><span>💰</span> Salary Intelligence</div>
+        <div class="hdr-pill"><span>🎙️</span> Predicted Interview Qs</div>
+        <div class="hdr-pill"><span>🔬</span> Resume Audit</div>
+      </div>
+    </div>
+
+    <!-- LAYOUT -->
+    <div class="layout">
+
+      <!-- LEFT: MAIN FORM -->
+      <div class="main-col" style="animation:fadeUp .6s .1s var(--ease) both">
+
+        <!-- No resume warning -->
+        {% if not has_resume %}
+        <div class="warn-box">
+          <div class="warn-icon">⚠️</div>
+          <div class="warn-text">
+            <strong>Upload your resume for 3× better accuracy</strong>
+            Your resume hasn't been uploaded yet. The prediction will still work, but uploading your
+            resume unlocks resume audit, skill matching, and a far more personalised analysis.
+            <a href="/upload" class="warn-link">Upload Resume →</a>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Error box -->
+        <div class="err-box" id="errBox"><span>⚠️</span> <span id="errMsg">Something went wrong.</span></div>
+
+        <!-- FORM CARD -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-title"><span class="ti">🎯</span> Target Job</div>
+
+          <div class="field-row">
+            <div>
+              <label class="label">Job Title (optional)</label>
+              <input class="inp" id="jobTitle" type="text" placeholder="e.g. Software Engineer Intern">
+            </div>
+            <div>
+              <label class="label">Company Name (optional)</label>
+              <input class="inp" id="companyName" type="text" placeholder="e.g. Google, Infosys, Zomato">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Job URL (optional)</label>
+            <input class="inp" id="jobUrl" type="url" placeholder="https://linkedin.com/jobs/... or any job page">
+          </div>
+
+          <div class="field">
+            <label class="label">Job Description <span style="color:rgba(255,71,87,.7)">*required</span></label>
+            <textarea class="ta" id="jobDesc" placeholder="Paste the FULL job description here. The more detail, the more accurate the prediction. Include requirements, responsibilities, and nice-to-haves." maxlength="8000" oninput="updateChar(this)"></textarea>
+            <div class="char-bar">
+              <span class="char-hint">Paste the complete JD — don't trim it</span>
+              <span class="char-count" id="charCount">0 / 8000</span>
+            </div>
+          </div>
+
+          <!-- Quick-fill chips -->
+          <div class="tip-label">Quick fill — paste a JD for these common roles:</div>
+          <div class="tip-chips">
+            <div class="tip-chip" onclick="quickFill('swe')">SWE Intern</div>
+            <div class="tip-chip" onclick="quickFill('data')">Data Analyst</div>
+            <div class="tip-chip" onclick="quickFill('frontend')">Frontend Dev</div>
+            <div class="tip-chip" onclick="quickFill('ml')">ML Engineer</div>
+            <div class="tip-chip" onclick="quickFill('backend')">Backend Dev</div>
+            <div class="tip-chip" onclick="quickFill('product')">Product Manager</div>
+          </div>
+
+          <div class="divider"><div class="divider-line"></div><div class="divider-label">Ready?</div><div class="divider-line"></div></div>
+
+          <button class="btn-analyze" id="analyzeBtn" onclick="runAnalysis()">
+            <div class="btn-inner">
+              <span>⚡</span>
+              <span>Predict My Offer Probability</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- HISTORY -->
+        {% if history %}
+        <div class="card" style="animation:fadeUp .6s .25s var(--ease) both">
+          <div class="card-title"><span class="ti">📋</span> Recent Predictions <a href="/offer-predictor/history" style="margin-left:auto;font-size:12px;color:rgba(0,212,255,.6);text-decoration:none;font-family:var(--font-b);font-weight:500">View all →</a></div>
+          {% for h in history %}
+          {% set p = h.offer_probability %}
+          {% set color = "#00e676" if p >= 72 else "#00d4ff" if p >= 50 else "#ff9f43" if p >= 30 else "#ff4757" %}
+          <a href="/offer-predictor/result/{{ h.id }}" class="hist-item">
+            <div class="hi-prob" style="background:{{ color }}18;border:1px solid {{ color }}30;color:{{ color }}">{{ p|int }}%</div>
+            <div class="hi-body">
+              <div class="hi-title">{{ h.job_title or 'Unknown Role' }}</div>
+              <div class="hi-company">{{ h.company_name or 'Unknown Company' }} · {{ h.created_at }}</div>
+            </div>
+            <div class="hi-arr">›</div>
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+      </div><!-- /main-col -->
+
+      <!-- RIGHT: SIDE PANEL -->
+      <div class="side">
+
+        <!-- Profile Snapshot -->
+        <div class="profile-snap" style="animation:fadeUp .6s .2s var(--ease) both">
+          <div class="ps-head">
+            <div class="ps-avatar">{{ session.get('user_name', 'U')[0].upper() }}</div>
+            <div>
+              <div class="ps-name">{{ session.get('user_name', 'You') }}</div>
+              <div class="ps-sub">Your profile being analysed</div>
+            </div>
+          </div>
+          {% if skills %}
+            {% set skill_list = skills.split(',')[:8] %}
+            {% set total = skills.split(',')|length %}
+            <div class="ps-skills">
+              {% for s in skill_list %}
+                <div class="ps-skill">{{ s.strip() }}</div>
+              {% endfor %}
+              {% if total > 8 %}<div class="ps-more">+{{ total - 8 }} more</div>{% endif %}
+            </div>
+          {% else %}
+            <div style="font-size:12px;color:rgba(255,255,255,.25)">No skills detected yet. <a href="/upload" style="color:rgba(0,212,255,.6);text-decoration:none">Upload resume →</a></div>
+          {% endif %}
+        </div>
+
+        <!-- How It Works -->
+        <div class="how-card" style="animation:fadeUp .6s .3s var(--ease) both">
+          <div class="card-title" style="font-size:15px"><span class="ti">⚙️</span> How It Works</div>
+          <div class="how-step">
+            <div class="how-num">1</div>
+            <div class="how-content"><div class="how-title">Profile Collection</div><div class="how-desc">AI reads your resume, skills, GitHub, certifications and experience</div></div>
+          </div>
+          <div class="how-step">
+            <div class="how-num">2</div>
+            <div class="how-content"><div class="how-title">JD Analysis</div><div class="how-desc">Extracts every requirement, skill, and signal from the job description</div></div>
+          </div>
+          <div class="how-step">
+            <div class="how-num">3</div>
+            <div class="how-content"><div class="how-title">Gap Calculation</div><div class="how-desc">Compares profile vs job across 6 dimensions with ruthless accuracy</div></div>
+          </div>
+          <div class="how-step">
+            <div class="how-num">4</div>
+            <div class="how-content"><div class="how-title">Prediction + Plan</div><div class="how-desc">Returns probability, blockers, and a concrete 30-day action plan</div></div>
+          </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="card" style="animation:fadeUp .6s .4s var(--ease) both;background:rgba(123,47,255,.04);border-color:rgba(123,47,255,.12)">
+          <div class="card-title" style="font-size:15px"><span class="ti">💡</span> Pro Tips</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="font-size:13px;color:rgba(255,255,255,.4);line-height:1.7;padding:10px 14px;background:rgba(123,47,255,.06);border-radius:10px;border:1px solid rgba(123,47,255,.1)">
+              <strong style="color:rgba(123,47,255,.9);display:block;margin-bottom:3px">🎯 Be honest</strong>
+              The AI reads your actual profile. Don't add skills you don't have — it'll hurt the plan accuracy.
+            </div>
+            <div style="font-size:13px;color:rgba(255,255,255,.4);line-height:1.7;padding:10px 14px;background:rgba(0,212,255,.04);border-radius:10px;border:1px solid rgba(0,212,255,.08)">
+              <strong style="color:rgba(0,212,255,.8);display:block;margin-bottom:3px">📋 Paste the full JD</strong>
+              Don't summarize. Paste everything including "nice-to-haves" — those matter.
+            </div>
+            <div style="font-size:13px;color:rgba(255,255,255,.4);line-height:1.7;padding:10px 14px;background:rgba(0,230,118,.04);border-radius:10px;border:1px solid rgba(0,230,118,.08)">
+              <strong style="color:rgba(0,230,118,.8);display:block;margin-bottom:3px">🔁 Re-run after improving</strong>
+              Follow the 30-day plan, update your resume, then run again to see your score improve.
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /side -->
+    </div><!-- /layout -->
+  </div><!-- /body -->
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="lo-ring"></div>
+  <div class="lo-title">Analysing Your Chances...</div>
+  <div class="lo-sub">GPT-4o is going deep on your profile vs the job. This takes 15–30 seconds.</div>
+  <div class="lo-steps" id="loSteps">
+    <div class="lo-step" data-step="0"><div class="lo-step-dot"></div> Reading your profile & resume</div>
+    <div class="lo-step" data-step="1"><div class="lo-step-dot"></div> Parsing job requirements</div>
+    <div class="lo-step" data-step="2"><div class="lo-step-dot"></div> Calculating skill gaps</div>
+    <div class="lo-step" data-step="3"><div class="lo-step-dot"></div> Scoring 6 dimensions</div>
+    <div class="lo-step" data-step="4"><div class="lo-step-dot"></div> Building 30-day action plan</div>
+    <div class="lo-step" data-step="5"><div class="lo-step-dot"></div> Generating company intelligence</div>
+  </div>
+</div>
+
+<script>
+function updateChar(el){
+  document.getElementById('charCount').textContent = el.value.length.toLocaleString() + ' / 8,000';
+}
+
+const SAMPLE_JDS = {
+  swe: `We are looking for a Software Engineer Intern to join our engineering team.\n\nResponsibilities:\n- Work on scalable backend systems using Python or Java\n- Collaborate with senior engineers on real production features\n- Write clean, tested, and documented code\n- Participate in code reviews and sprint planning\n\nRequirements:\n- Currently pursuing B.Tech/B.E. in CS or related field\n- Strong fundamentals in Data Structures and Algorithms\n- Experience with at least one of: Python, Java, C++\n- Knowledge of REST APIs and basic SQL\n- Problem-solving skills (LeetCode Medium level expected)\n\nNice to have:\n- Experience with React or any frontend framework\n- Familiarity with Git and Docker\n- Any open-source contribution`,
+  data: `Data Analyst — Full Time\n\nAbout the role:\nWe need a sharp data analyst to join our growth team. You'll be working with large datasets to surface insights that drive product decisions.\n\nWhat you'll do:\n- Build dashboards and reports in Power BI / Tableau\n- Write SQL queries to extract and transform data\n- Work with Python (Pandas, NumPy) for data cleaning\n- Present findings to non-technical stakeholders\n\nRequired:\n- Bachelor's degree in any quantitative field\n- Strong SQL (joins, subqueries, window functions)\n- Proficiency in Excel and at least one BI tool\n- Python for data manipulation\n\nBonus:\n- Experience with Google Analytics or Mixpanel\n- Knowledge of A/B testing`,
+  frontend: `Frontend Developer (React) — Startup\n\nWe're a fast-growing fintech startup looking for a passionate frontend developer.\n\nResponsibilities:\n- Build responsive, pixel-perfect UIs using React and TypeScript\n- Integrate REST APIs and manage state with Redux or Zustand\n- Work closely with designers using Figma specifications\n- Optimize for performance and mobile-first experience\n\nMust Have:\n- 1+ years experience with React (or strong internship)\n- TypeScript proficiency\n- CSS/Tailwind CSS\n- Git workflow\n\nGood to Have:\n- Next.js\n- Testing with Jest/React Testing Library\n- Any Web3 experience`,
+  ml: `Machine Learning Engineer — AI Product Company\n\nWe're building AI-powered products and need an ML engineer who can take models from research to production.\n\nWhat you'll work on:\n- Fine-tuning LLMs for domain-specific tasks\n- Building ML pipelines and training infrastructure\n- Deploying models via FastAPI or Flask\n- Data preprocessing, feature engineering, experimentation\n\nRequired:\n- Strong Python and ML fundamentals\n- Experience with PyTorch or TensorFlow\n- Familiarity with Hugging Face Transformers\n- SQL and data wrangling skills\n\nBonus:\n- MLflow or similar experiment tracking\n- Experience with LangChain or vector databases\n- Published projects or Kaggle rankings`,
+  backend: `Backend Developer — Series B SaaS\n\nLooking for a backend engineer to help scale our platform to millions of users.\n\nRole:\n- Design and build RESTful APIs using Node.js or Django\n- Work with PostgreSQL, Redis, and message queues\n- Write performant, secure, production-ready code\n- Participate in system design discussions\n\nRequirements:\n- Strong in at least one backend language (Node.js, Python, Java, Go)\n- SQL database design and query optimization\n- Understanding of auth (JWT, OAuth2)\n- Basic knowledge of Docker and CI/CD\n\nBonus:\n- Microservices architecture experience\n- AWS or GCP knowledge`,
+  product: `Associate Product Manager — Consumer Tech\n\nWe're looking for a data-driven APM to join our product team.\n\nResponsibilities:\n- Define product requirements and work with engineering and design\n- Analyse user data to identify opportunities\n- Run A/B tests and measure feature impact\n- Write PRDs, user stories, and acceptance criteria\n\nWhat we look for:\n- Strong analytical and structured thinking\n- Excellent communication and stakeholder management\n- Basic SQL to pull your own data\n- UX sensitivity — you care about the user experience\n- MBA or engineering background preferred\n\nBonus:\n- Previous PM internship\n- Experience with Mixpanel, Amplitude, or similar`
+};
+
+function quickFill(type){
+  const jd = SAMPLE_JDS[type];
+  if(!jd) return;
+  document.getElementById('jobDesc').value = jd;
+  updateChar(document.getElementById('jobDesc'));
+  const titles = {swe:'Software Engineer Intern',data:'Data Analyst',frontend:'Frontend Developer',ml:'ML Engineer',backend:'Backend Developer',product:'Associate Product Manager'};
+  if(!document.getElementById('jobTitle').value) document.getElementById('jobTitle').value = titles[type] || '';
+}
+
+let stepTimer = null;
+function startLoadingSteps(){
+  const steps = document.querySelectorAll('.lo-step');
+  let idx = 0;
+  steps[0].classList.add('active');
+  stepTimer = setInterval(()=>{
+    if(idx < steps.length - 1){
+      steps[idx].classList.remove('active');
+      steps[idx].classList.add('done');
+      idx++;
+      steps[idx].classList.add('active');
+    }
+  }, 4500);
+}
+
+function stopLoadingSteps(){
+  if(stepTimer) clearInterval(stepTimer);
+}
+
+function showErr(msg){
+  const box = document.getElementById('errBox');
+  document.getElementById('errMsg').textContent = msg;
+  box.classList.add('show');
+  box.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function hideErr(){
+  document.getElementById('errBox').classList.remove('show');
+}
+
+async function runAnalysis(){
+  hideErr();
+  const jd = document.getElementById('jobDesc').value.trim();
+  if(!jd){ showErr('Please paste a job description to continue.'); return; }
+  if(jd.length < 50){ showErr('The job description is too short. Paste the full JD for accurate results.'); return; }
+
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true;
+  document.getElementById('loadingOverlay').classList.add('active');
+  startLoadingSteps();
+
+  try {
+    const res = await fetch('/api/offer-predictor/analyze', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        job_description: jd,
+        job_title:       document.getElementById('jobTitle').value.trim(),
+        company_name:    document.getElementById('companyName').value.trim(),
+        job_url:         document.getElementById('jobUrl').value.trim(),
+      })
+    });
+    const data = await res.json();
+
+    stopLoadingSteps();
+    document.getElementById('loadingOverlay').classList.remove('active');
+    btn.disabled = false;
+
+    if(data.success){
+      window.location.href = '/offer-predictor/result/' + data.id;
+    } else {
+      showErr(data.error || 'Analysis failed. Please try again.');
+    }
+  } catch(e){
+    stopLoadingSteps();
+    document.getElementById('loadingOverlay').classList.remove('active');
+    btn.disabled = false;
+    showErr('Network error. Please check your connection and try again.');
+  }
+}
+</script>
+{% endblock %}

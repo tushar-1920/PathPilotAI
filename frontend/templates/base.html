@@ -616,6 +616,9 @@ select,select option{background:#0d0d18!important;color:#fff!important;border-co
         <a class="pp-menu-item" href="/forecast"><div class="pp-ni-icon mi-purple">📈</div>Career Forecast</a>
         <a class="pp-menu-item" href="/career-time-machine"><div class="pp-ni-icon mi-amber">⏳</div>Time Machine</a>
         <a class="pp-menu-item" href="/blind-spot-detector"><div class="pp-ni-icon mi-pink">🔍</div>Blind Spots</a>
+        <a class="pp-menu-item" href="/offer-predictor">
+    <div class="pp-ni-icon mi-green">🎯</div>Offer Predictor
+  </a>
       </div>
     </div>
 
@@ -991,7 +994,7 @@ function renderResults(d, q) {
   let h = '';
   if (d.tools && d.tools.length) { h += '<div class="pp-search-cat">Tools</div>'; d.tools.forEach(t => { h += `<a class="pp-search-row" href="${t.link}"><div class="pp-search-ico">${t.icon}</div><div class="pp-search-body"><div class="pp-search-title">${t.name}</div></div><span class="pp-search-arr">›</span></a>`; }); }
   if (d.jobs && d.jobs.length) { h += '<div class="pp-search-cat">Jobs</div>'; d.jobs.forEach(j => { h += `<a class="pp-search-row" href="${j.link}"><div class="pp-search-ico">💼</div><div class="pp-search-body"><div class="pp-search-title">${j.title}</div><div class="pp-search-sub">${j.company} · ${j.type}</div></div><span class="pp-search-arr">›</span></a>`; }); }
-  if (d.users && d.users.length) { h += '<div class="pp-search-cat">People</div>'; d.users.forEach(u => { h += `<a class="pp-search-row" href="${u.link}"><div class="pp-search-ico">👤</div><div class="pp-search-body"><div class="pp-search-title">${u.name}</div><div class="pp-search-sub">${u.headline}</div></div><span class="pp-search-arr">›</span></a>`; }); }
+  if (d.users && d.users.length) { h += '<div class="pp-search-cat">People</div>'; d.users.forEach(u => { const sub = u.username ? '@' + u.username : (u.headline || 'PathPilot User'); h += `<a class="pp-search-row" href="${u.link}"><div class="pp-search-ico">👤</div><div class="pp-search-body"><div class="pp-search-title">${u.name}</div><div class="pp-search-sub">${sub}</div></div><span class="pp-search-arr">›</span></a>`; }); }
   if (!h) h = `<div class="pp-search-empty">No results for "<strong>${q}</strong>"</div>`;
   el.innerHTML = h; _selIdx = -1;
 }

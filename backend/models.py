@@ -858,3 +858,110 @@ class CompanyFollow(db.Model):
     created_at   = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship("User", backref="company_follows")
+
+"""
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  OFFER PREDICTOR — Add these classes to backend/models.py
+  Place them at the END of the existing models.py file
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+"""
+
+# ══════════════════════════════════════════════════════════════
+#  OFFER PREDICTOR MODELS
+# ══════════════════════════════════════════════════════════════
+
+class OfferPrediction(db.Model):
+    """Stores each Offer Predictor analysis run by a user."""
+    __tablename__ = "offer_predictions"
+
+    id                  = db.Column(db.Integer, primary_key=True)
+    user_id             = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
+    # Input
+    job_title           = db.Column(db.String(300))
+    company_name        = db.Column(db.String(300))
+    job_description     = db.Column(db.Text)          # raw JD text or scraped from URL
+    job_url             = db.Column(db.String(1000))   # original URL (optional)
+
+    # Core result
+    offer_probability   = db.Column(db.Float, default=0.0)   # 0–100 %
+    readiness_tier      = db.Column(db.String(50))            # "Strong", "Possible", "Long Shot", "Not Ready"
+    verdict_headline    = db.Column(db.String(500))
+
+    # Detailed JSON blobs
+    blockers_json       = db.Column(db.Text)    # top 3 things blocking the offer
+    strengths_json      = db.Column(db.Text)    # what's already impressive
+    gap_plan_json       = db.Column(db.Text)    # 30-day close-the-gap plan
+    skill_match_json    = db.Column(db.Text)    # matched vs missing skills
+    resume_audit_json   = db.Column(db.Text)    # resume-specific issues
+    company_intel_json  = db.Column(db.Text)    # company culture / what they look for
+    interview_tips_json = db.Column(db.Text)    # predicted interview questions
+    salary_intel_json   = db.Column(db.Text)    # salary data for this role/company
+    score_breakdown_json= db.Column(db.Text)    # sub-scores: skills, resume, projects, experience
+
+    # Meta
+    coach_message       = db.Column(db.Text)    # personalised brutally honest message
+    risk_level          = db.Column(db.String(30))  # "Low", "Medium", "High", "Critical"
+    created_at          = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship("User", backref="offer_predictions")
+
+    # ── JSON helpers ──────────────────────────────────────────
+    def get_blockers(self):
+        try: return json.loads(self.blockers_json) if self.blockers_json else []
+        except: return []
+
+    def get_strengths(self):
+        try: return json.loads(self.strengths_json) if self.strengths_json else []
+        except: return []
+
+    def get_gap_plan(self):
+        try: return json.loads(self.gap_plan_json) if self.gap_plan_json else []
+        except: return []
+
+    def get_skill_match(self):
+        try: return json.loads(self.skill_match_json) if self.skill_match_json else {}
+        except: return {}
+
+    def get_resume_audit(self):
+        try: return json.loads(self.resume_audit_json) if self.resume_audit_json else []
+        except: return []
+
+    def get_company_intel(self):
+        try: return json.loads(self.company_intel_json) if self.company_intel_json else {}
+        except: return {}
+
+    def get_interview_tips(self):
+        try: return json.loads(self.interview_tips_json) if self.interview_tips_json else []
+        except: return []
+
+    def get_salary_intel(self):
+        try: return json.loads(self.salary_intel_json) if self.salary_intel_json else {}
+        except: return {}
+
+    def get_score_breakdown(self):
+        try: return json.loads(self.score_breakdown_json) if self.score_breakdown_json else {}
+        except: return {}
+
+    def to_dict(self):
+        return {
+            "id":                self.id,
+            "job_title":         self.job_title,
+            "company_name":      self.company_name,
+            "job_url":           self.job_url,
+            "offer_probability": self.offer_probability,
+            "readiness_tier":    self.readiness_tier,
+            "verdict_headline":  self.verdict_headline,
+            "blockers":          self.get_blockers(),
+            "strengths":         self.get_strengths(),
+            "gap_plan":          self.get_gap_plan(),
+            "skill_match":       self.get_skill_match(),
+            "resume_audit":      self.get_resume_audit(),
+            "company_intel":     self.get_company_intel(),
+            "interview_tips":    self.get_interview_tips(),
+            "salary_intel":      self.get_salary_intel(),
+            "score_breakdown":   self.get_score_breakdown(),
+            "coach_message":     self.coach_message,
+            "risk_level":        self.risk_level,
+            "created_at":        self.created_at.strftime("%d %b %Y, %I:%M %p") if self.created_at else "",
+        }
