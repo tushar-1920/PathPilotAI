@@ -1,10 +1,10 @@
-﻿python -c "
-content = '''services:
+services:
   - type: web
     name: pathpilot-ai
     runtime: python
-    buildCommand: \"pip install -r backend/requirements.txt\"
-    startCommand: \"gunicorn --worker-class gthread --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:\$PORT run:app\"
+    rootDir: .
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: gunicorn --worker-class gthread --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:\ run:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
@@ -14,7 +14,3 @@ content = '''services:
         generateValue: true
       - key: OPENAI_API_KEY
         sync: false
-'''
-open('render.yaml', 'w', encoding='utf-8', newline='\n').write(content)
-print('Done')
-"
