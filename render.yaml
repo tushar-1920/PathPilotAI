@@ -3,7 +3,7 @@ services:
     name: pathpilot-ai
     runtime: python
     buildCommand: pip install -r backend/requirements.txt
-    startCommand: gunicorn --worker-class gthread --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:\ wsgi:app
+    startCommand: gunicorn --chdir /opt/render/project/src --worker-class gthread --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:\ wsgi:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
