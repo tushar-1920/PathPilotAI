@@ -862,7 +862,7 @@ def save_battle_result(duel: dict):
             db.session.add(hist)
 
         db.session.commit()
-        print(f"[Battle] Saved result for duel {duel["duel_code"]}" )
+        print(f"[Battle] Saved result for duel {duel['duel_code']}")
     except Exception as e:
         print(f"[Battle] DB save error: {e}")
         try:
