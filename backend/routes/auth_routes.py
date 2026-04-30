@@ -10,10 +10,17 @@ auth_routes = Blueprint("auth_routes", __name__)
 
 # ── Init Firebase Admin once ──
 if not firebase_admin._apps:
-    cred_path = os.path.join(os.path.dirname(__file__), "..", "..", "firebase-admin-key.json")
-    cred = credentials.Certificate(cred_path)
+    import json
+    firebase_json = os.environ.get("FIREBASE_CREDENTIALS_JSON")
+    if firebase_json:
+        # Production — load from environment variable
+        cred_dict = json.loads(firebase_json)
+        cred = credentials.Certificate(cred_dict)
+    else:
+        # Local development — load from file
+        cred_path = os.path.join(os.path.dirname(__file__), "..", "..", "firebase-admin-key.json")
+        cred = credentials.Certificate(cred_path)
     firebase_admin.initialize_app(cred)
-
 RECRUITER_ACCOUNTS = {
     "recruiter@pathpilot.com":   ("recruit123",  "PathPilot Hiring"),
     "google@recruiter.com":      ("google@123",  "Google"),
