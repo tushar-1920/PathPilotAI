@@ -1,15 +1,19 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from backend.models import User, Profile
 from backend.extensions import db
+import firebase_admin
+from firebase_admin import credentials, auth as firebase_auth
+import os
 
 auth_routes = Blueprint("auth_routes", __name__)
 
-# ═══════════════════════════════════════════════════════════
-#  HARDCODED RECRUITER ACCOUNTS
-#  Add / remove entries here to manage recruiter access.
-#  Format: "email": ("password", "Company Display Name")
-# ═══════════════════════════════════════════════════════════
+# ── Init Firebase Admin once ──
+if not firebase_admin._apps:
+    cred_path = os.path.join(os.path.dirname(__file__), "..", "..", "firebase-admin-key.json")
+    cred = credentials.Certificate(cred_path)
+    firebase_admin.initialize_app(cred)
+
 RECRUITER_ACCOUNTS = {
     "recruiter@pathpilot.com":   ("recruit123",  "PathPilot Hiring"),
     "google@recruiter.com":      ("google@123",  "Google"),
@@ -24,14 +28,44 @@ RECRUITER_ACCOUNTS = {
 
 
 def _set_user_session(user):
-    """Helper: populate all session keys for a logged-in user."""
-    session["user_id"]   = user.id
-    session["role"]      = user.role
-    session["user_name"] = user.name or ""
-    session["user_email"] = user.email or ""
-
-    # Load profile photo using the model property — always correct path format
+    session["user_id"]       = user.id
+    session["role"]          = user.role
+    session["user_name"]     = user.name or ""
+    session["user_email"]    = user.email or ""
     session["profile_photo"] = user.profile_photo_url
+
+
+# ================= GOOGLE LOGIN =================
+@auth_routes.route("/auth/google", methods=["POST"])
+def google_login():
+    id_token = request.json.get("idToken")
+    try:
+        decoded   = firebase_auth.verify_id_token(id_token)
+        email     = decoded["email"]
+        name      = decoded.get("name", email.split("@")[0])
+        google_id = decoded["uid"]
+
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            user = User(
+                name=name,
+                email=email,
+                google_id=google_id,
+                auth_provider="google",
+                role="user"
+            )
+            db.session.add(user)
+            db.session.commit()
+        elif not user.google_id:
+            user.google_id    = google_id
+            user.auth_provider = "google"
+            db.session.commit()
+
+        _set_user_session(user)
+        return jsonify({"success": True, "redirect": "/dashboard"})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 401
 
 
 # ================= REGISTER =================
@@ -61,7 +95,7 @@ def register():
         db.session.commit()
 
         _set_user_session(new_user)
-        return redirect("/dashboard")
+        return redirect("/verify-phone")
 
     return render_template("register.html")
 
@@ -73,20 +107,17 @@ def login():
         email    = request.form.get("email")
         password = request.form.get("password")
 
-        # ── RECRUITER CHECK (runs first, before normal user logic) ──
         if email in RECRUITER_ACCOUNTS:
             stored_pass, company_name = RECRUITER_ACCOUNTS[email]
             if password == stored_pass:
                 session["recruiter_email"]   = email
                 session["recruiter_company"] = company_name
                 session["role"]              = "recruiter"
-                # We do NOT set session["user_id"] for recruiters
                 return redirect("/recruiter/dashboard")
             else:
                 flash("Invalid recruiter credentials")
                 return redirect(url_for("auth_routes.login"))
 
-        # ── NORMAL USER LOGIN ──
         user = User.query.filter_by(email=email).first()
         if not user or not check_password_hash(user.password_hash, password):
             flash("Invalid credentials")
@@ -103,3 +134,41 @@ def login():
 def logout():
     session.clear()
     return redirect("/")
+
+
+# ================= PHONE VERIFY =================
+@auth_routes.route("/verify-phone")
+def verify_phone_page():
+    if not session.get("user_id"):
+        return redirect("/login")
+    return render_template("verify_phone.html")
+
+
+@auth_routes.route("/verify-phone", methods=["POST"])
+def verify_phone():
+    if not session.get("user_id"):
+        return jsonify({"success": False, "error": "Not logged in"}), 401
+
+    id_token = request.json.get("idToken")
+    try:
+        decoded      = firebase_auth.verify_id_token(id_token)
+        phone_number = decoded.get("phone_number")
+
+        user = User.query.get(session["user_id"])
+        if not user:
+            return jsonify({"success": False, "error": "User not found"}), 404
+
+        user.is_verified = True
+        db.session.commit()
+
+        session["is_verified"] = True
+        return jsonify({"success": True, "redirect": "/dashboard"})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 401
+
+
+@auth_routes.route("/verify-phone/skip", methods=["POST"])
+def skip_phone_verify():
+    session["is_verified"] = False
+    return jsonify({"success": True})

@@ -316,6 +316,19 @@ footer,.footer,.site-footer,.main-footer,#footer{display:none!important;}
             <span>Sign In to PathPilot</span>
             <div class="btn-arrow">→</div>
           </button>
+          <!-- Google Sign In -->
+        <div style="margin-top:16px;">
+          <button type="button" id="google-signin-btn" style="
+            display:flex;align-items:center;justify-content:center;gap:10px;
+            width:100%;padding:14px;
+            background:rgba(255,255,255,0.05);
+            color:#fff;border:1px solid rgba(255,255,255,0.12);
+            border-radius:12px;font-size:15px;cursor:pointer;font-weight:500;
+            transition:background 0.2s;">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
+            Continue with Google
+          </button>
+        </div>
 
         </form>
 
@@ -385,5 +398,8 @@ function spawnParticles(containerId){
 spawnParticles('leftParticles');
 spawnParticles('rightParticles');
 </script>
-
+<script type="module">
+  import { signInWithGoogle } from "/static/js/firebase-config.js";
+  document.getElementById("google-signin-btn").addEventListener("click", signInWithGoogle);
+</script>
 {% endblock %}

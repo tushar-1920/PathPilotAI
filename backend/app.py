@@ -1,4 +1,4 @@
-from flask import Flask, session, request
+from flask import Flask, session, request, redirect
 from backend.config import Config
 from backend.extensions import db
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -196,6 +196,18 @@ def create_app():
         uid = session.get('user_id')
         if not uid:
             return  # guest — nothing to refresh
+
+        # ── Phone verification gate ──
+        if request.path.startswith('/dashboard') and \
+           request.endpoint not in ('auth_routes.verify_phone_page',
+                                    'auth_routes.verify_phone',
+                                    'auth_routes.skip_phone_verify',
+                                    'auth_routes.logout',
+                                    'static'):
+            from backend.models import User
+            user = User.query.get(uid)
+            if user and not user.is_verified:
+                return redirect('/verify-phone')
 
         # Only refresh if any key is missing (avoids DB hit every single request)
         if session.get('user_name') and session.get('profile_photo') is not False:

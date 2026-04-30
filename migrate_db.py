@@ -61,6 +61,17 @@ def table_exists(table):
 
 
 migrations = []
+# ── users table — Google auth columns ──
+if table_exists("users"):
+    if not column_exists("users", "google_id"):
+        cur.execute("ALTER TABLE users ADD COLUMN google_id VARCHAR(200)")
+        migrations.append("users.google_id")
+
+    if not column_exists("users", "auth_provider"):
+        cur.execute("ALTER TABLE users ADD COLUMN auth_provider VARCHAR(50) DEFAULT 'email'")
+        migrations.append("users.auth_provider")
+else:
+    print("⚠️  users table does not exist")
 
 # ── profiles table ──
 if table_exists("profiles"):

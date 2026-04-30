@@ -65,6 +65,8 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=True)
 
     role = db.Column(db.String(50), default="user")
+    google_id     = db.Column(db.String(200), unique=True, nullable=True)
+    auth_provider = db.Column(db.String(50), default="email")
 
     is_verified = db.Column(db.Boolean, default=False)
 
