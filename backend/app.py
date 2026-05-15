@@ -197,19 +197,34 @@ def create_app():
         if not uid:
             return  # guest — nothing to refresh
 
-        # ── Phone verification gate ──
-        if request.path.startswith('/dashboard') and \
-           request.endpoint not in ('auth_routes.verify_phone_page',
-                                    'auth_routes.verify_phone',
-                                    'auth_routes.skip_phone_verify',
-                                    'auth_routes.logout',
-                                    'static'):
-            from backend.models import User
-            user = User.query.get(uid)
-            if user and not user.is_verified:
-                return redirect('/verify-phone')
+        # ── Email verification gate ──
+        EXEMPT_ENDPOINTS = (
+            'auth_routes.verify_email_page',
+            'auth_routes.verify_email',
+            'auth_routes.resend_otp',
+            'auth_routes.logout',
+            'auth_routes.login',
+            'auth_routes.register',
+            'auth_routes.google_login',
+        )
+        EXEMPT_PATHS = (
+            '/verify-email',
+            '/login',
+            '/logout',
+            '/register',
+            '/auth/google',
+            '/static',
+            '/api/notifications',
+        )
 
-        # Only refresh if any key is missing (avoids DB hit every single request)
+        if request.endpoint not in EXEMPT_ENDPOINTS and \
+           not any(request.path.startswith(p) for p in EXEMPT_PATHS):
+            from backend.models import User as U
+            u = U.query.get(uid)
+            if u and not u.is_verified:
+                return redirect('/verify-email')
+
+        # Only refresh session if keys missing
         if session.get('user_name') and session.get('profile_photo') is not False:
             return
 
@@ -219,13 +234,9 @@ def create_app():
             if not user:
                 session.clear()
                 return
-
-            session['user_name']  = user.name  or ''
-            session['user_email'] = user.email or ''
-            session['role']       = user.role  or 'user'
-
-            prof = Profile.query.filter_by(user_id=uid).first()
-            # Use the User model property — handles prefix/None safely
+            session['user_name']     = user.name  or ''
+            session['user_email']    = user.email or ''
+            session['role']          = user.role  or 'user'
             session['profile_photo'] = user.profile_photo_url
         except Exception as e:
             print(f"[session refresh] {e}")

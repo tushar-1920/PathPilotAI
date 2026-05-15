@@ -40,6 +40,7 @@ def _set_user_session(user):
     session["user_name"]     = user.name or ""
     session["user_email"]    = user.email or ""
     session["profile_photo"] = user.profile_photo_url
+    session["is_verified"]   = bool(user.is_verified)
 
 
 # ================= GOOGLE LOGIN =================
@@ -67,6 +68,10 @@ def google_login():
             user.google_id    = google_id
             user.auth_provider = "google"
             db.session.commit()
+
+        # Google users are already verified by Google
+        user.is_verified = True
+        db.session.commit()
 
         _set_user_session(user)
         return jsonify({"success": True, "redirect": "/dashboard"})
@@ -101,8 +106,19 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
+        # Send OTP email
+        from backend.services.email_service import generate_otp, send_otp_email
+        from datetime import datetime, timedelta
+
+        otp = generate_otp()
+        new_user.otp_code       = otp
+        new_user.otp_expires_at = datetime.utcnow() + timedelta(minutes=10)
+        new_user.otp_attempts   = 0
+        db.session.commit()
+
+        send_otp_email(new_user.email, otp, new_user.name)
         _set_user_session(new_user)
-        return redirect("/verify-phone")
+        return redirect("/verify-email")
 
     return render_template("register.html")
 
@@ -126,12 +142,23 @@ def login():
                 return redirect(url_for("auth_routes.login"))
 
         user = User.query.filter_by(email=email).first()
-        if not user or not check_password_hash(user.password_hash, password):
+        if not user or not user.password_hash or not check_password_hash(user.password_hash, password):
             flash("Invalid credentials")
             return redirect(url_for("auth_routes.login"))
 
+        from backend.services.email_service import generate_otp, send_otp_email
+        from datetime import datetime, timedelta
+
+        otp = generate_otp()
+        user.is_verified    = False
+        user.otp_code       = otp
+        user.otp_expires_at = datetime.utcnow() + timedelta(minutes=10)
+        user.otp_attempts   = 0
+        db.session.commit()
+
+        send_otp_email(user.email, otp, user.name)
         _set_user_session(user)
-        return redirect("/dashboard")
+        return redirect("/verify-email")
 
     return render_template("login.html")
 
@@ -142,40 +169,77 @@ def logout():
     session.clear()
     return redirect("/")
 
-
-# ================= PHONE VERIFY =================
-@auth_routes.route("/verify-phone")
-def verify_phone_page():
+# ================= EMAIL OTP VERIFY =================
+@auth_routes.route("/verify-email")
+def verify_email_page():
     if not session.get("user_id"):
         return redirect("/login")
-    return render_template("verify_phone.html")
+    user = User.query.get(session["user_id"])
+    if user and user.is_verified:
+        return redirect("/dashboard")
+    return render_template("verify_email.html")
 
 
-@auth_routes.route("/verify-phone", methods=["POST"])
-def verify_phone():
+@auth_routes.route("/verify-email", methods=["POST"])
+def verify_email():
     if not session.get("user_id"):
         return jsonify({"success": False, "error": "Not logged in"}), 401
 
-    id_token = request.json.get("idToken")
-    try:
-        decoded      = firebase_auth.verify_id_token(id_token)
-        phone_number = decoded.get("phone_number")
+    data = request.get_json()
+    otp_entered = data.get("otp", "").strip()
 
-        user = User.query.get(session["user_id"])
-        if not user:
-            return jsonify({"success": False, "error": "User not found"}), 404
+    user = User.query.get(session["user_id"])
+    if not user:
+        return jsonify({"success": False, "error": "User not found"}), 404
 
-        user.is_verified = True
+    from datetime import datetime
+
+    # Check attempts
+    if user.otp_attempts >= 5:
+        return jsonify({"success": False, "error": "Too many attempts. Please register again."}), 429
+
+    # Check expiry
+    if not user.otp_expires_at or datetime.utcnow() > user.otp_expires_at:
+        return jsonify({"success": False, "error": "OTP expired. Please request a new one."}), 400
+
+    # Check OTP
+    if user.otp_code != otp_entered:
+        user.otp_attempts += 1
         db.session.commit()
+        remaining = 5 - user.otp_attempts
+        return jsonify({"success": False, "error": f"Wrong OTP. {remaining} attempts left."}), 400
 
-        session["is_verified"] = True
-        return jsonify({"success": True, "redirect": "/dashboard"})
+    # ✅ OTP correct
+    user.is_verified    = True
+    user.otp_code       = None
+    user.otp_expires_at = None
+    user.otp_attempts   = 0
+    db.session.commit()
 
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 401
+    session["is_verified"] = True
+    return jsonify({"success": True, "redirect": "/dashboard"})
 
 
-@auth_routes.route("/verify-phone/skip", methods=["POST"])
-def skip_phone_verify():
-    session["is_verified"] = False
-    return jsonify({"success": True})
+@auth_routes.route("/verify-email/resend", methods=["POST"])
+def resend_otp():
+    if not session.get("user_id"):
+        return jsonify({"success": False, "error": "Not logged in"}), 401
+
+    from backend.services.email_service import generate_otp, send_otp_email
+    from datetime import datetime, timedelta
+
+    user = User.query.get(session["user_id"])
+    if not user:
+        return jsonify({"success": False, "error": "User not found"}), 404
+
+    otp = generate_otp()
+    user.otp_code       = otp
+    user.otp_expires_at = datetime.utcnow() + timedelta(minutes=10)
+    user.otp_attempts   = 0
+    db.session.commit()
+
+    sent = send_otp_email(user.email, otp, user.name)
+    if sent:
+        return jsonify({"success": True, "message": "OTP resent to your email!"})
+    else:
+        return jsonify({"success": False, "error": "Failed to send email. Check mail config."}), 500

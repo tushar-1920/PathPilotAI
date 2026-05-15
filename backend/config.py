@@ -49,4 +49,7 @@ class Config:
 
     OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 
+    MAIL_EMAIL    = os.environ.get("MAIL_EMAIL", "")
+    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "")
+
     
