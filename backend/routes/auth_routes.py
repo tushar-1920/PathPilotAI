@@ -2,10 +2,11 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from werkzeug.security import generate_password_hash, check_password_hash
 from backend.models import User, Profile
 from backend.extensions import db
+from backend.extensions import limiter
+from flask_limiter.util import get_remote_address
 import firebase_admin
 from firebase_admin import credentials, auth as firebase_auth
 import os
-
 auth_routes = Blueprint("auth_routes", __name__)
 
 # ── Init Firebase Admin once ──
@@ -21,17 +22,6 @@ if not firebase_admin._apps:
         cred_path = os.path.join(os.path.dirname(__file__), "..", "..", "firebase-admin-key.json")
         cred = credentials.Certificate(cred_path)
     firebase_admin.initialize_app(cred)
-RECRUITER_ACCOUNTS = {
-    "recruiter@pathpilot.com":   ("recruit123",  "PathPilot Hiring"),
-    "google@recruiter.com":      ("google@123",  "Google"),
-    "microsoft@recruiter.com":   ("msft@123",    "Microsoft"),
-    "amazon@recruiter.com":      ("amzn@123",    "Amazon"),
-    "startup@recruiter.com":     ("start@123",   "TechStartup Inc"),
-    "tcs@recruiter.com":         ("tcs@123",     "TCS"),
-    "infosys@recruiter.com":     ("infy@123",    "Infosys"),
-    "wipro@recruiter.com":       ("wipro@123",   "Wipro"),
-    "caelius@recruiter.com":     ("caelius@123", "Caelius Consulting"),
-}
 
 
 def _set_user_session(user):
@@ -41,6 +31,23 @@ def _set_user_session(user):
     session["user_email"]    = user.email or ""
     session["profile_photo"] = user.profile_photo_url
     session["is_verified"]   = bool(user.is_verified)
+
+
+def _set_recruiter_session(user):
+    """
+    Recruiters bypass OTP and use a slightly different session shape so
+    that all the downstream recruiter routes keep working unchanged.
+    `recruiter_email` and `recruiter_company` are the keys those routes
+    read — preserved from the previous hardcoded-dict flow.
+    """
+    session["user_id"]            = user.id
+    session["user_name"]          = user.name or ""
+    session["user_email"]         = user.email or ""
+    session["recruiter_email"]    = user.email
+    session["recruiter_company"]  = user.name
+    session["role"]               = "recruiter"
+    session["is_verified"]        = True
+    session["profile_photo"]      = user.profile_photo_url
 
 
 # ================= GOOGLE LOGIN =================
@@ -82,6 +89,7 @@ def google_login():
 
 # ================= REGISTER =================
 @auth_routes.route("/register", methods=["GET", "POST"])
+@limiter.limit("5 per minute", methods=["POST"], key_func=get_remote_address)
 def register():
     if request.method == "POST":
         name     = request.form.get("name")
@@ -125,27 +133,25 @@ def register():
 
 # ================= LOGIN =================
 @auth_routes.route("/login", methods=["GET", "POST"])
+@limiter.limit("10 per minute", methods=["POST"], key_func=get_remote_address)
 def login():
     if request.method == "POST":
         email    = request.form.get("email")
         password = request.form.get("password")
 
-        if email in RECRUITER_ACCOUNTS:
-            stored_pass, company_name = RECRUITER_ACCOUNTS[email]
-            if password == stored_pass:
-                session["recruiter_email"]   = email
-                session["recruiter_company"] = company_name
-                session["role"]              = "recruiter"
-                return redirect("/recruiter/dashboard")
-            else:
-                flash("Invalid recruiter credentials")
-                return redirect(url_for("auth_routes.login"))
-
+        # Unified password check — recruiters now live in the User table too
         user = User.query.filter_by(email=email).first()
         if not user or not user.password_hash or not check_password_hash(user.password_hash, password):
             flash("Invalid credentials")
             return redirect(url_for("auth_routes.login"))
 
+        # Recruiter accounts: skip OTP, go straight to recruiter dashboard.
+        # Preserves the exact behavior of the old hardcoded-dict flow.
+        if user.role == "recruiter":
+            _set_recruiter_session(user)
+            return redirect("/recruiter/dashboard")
+
+        # Normal users: go through OTP verification (unchanged)
         from backend.services.email_service import generate_otp, send_otp_email
         from datetime import datetime, timedelta
 
@@ -181,6 +187,7 @@ def verify_email_page():
 
 
 @auth_routes.route("/verify-email", methods=["POST"])
+@limiter.limit("10 per minute")
 def verify_email():
     if not session.get("user_id"):
         return jsonify({"success": False, "error": "Not logged in"}), 401
@@ -209,7 +216,7 @@ def verify_email():
         remaining = 5 - user.otp_attempts
         return jsonify({"success": False, "error": f"Wrong OTP. {remaining} attempts left."}), 400
 
-    # ✅ OTP correct
+    # OTP correct
     user.is_verified    = True
     user.otp_code       = None
     user.otp_expires_at = None
@@ -219,9 +226,10 @@ def verify_email():
     session["is_verified"] = True
     return jsonify({"success": True, "redirect": "/dashboard"})
 
-
 @auth_routes.route("/verify-email/resend", methods=["POST"])
+@limiter.limit("3 per minute")
 def resend_otp():
+
     if not session.get("user_id"):
         return jsonify({"success": False, "error": "Not logged in"}), 401
 

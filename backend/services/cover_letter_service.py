@@ -1,6 +1,7 @@
 import os, json
 from openai import OpenAI
 from backend.models import User, Resume, db
+from backend.services._openai_client import get_client, MODEL_CHEAP, MODEL_SMART
 
 TONES = {
     "professional": {
@@ -45,7 +46,7 @@ LENGTHS = {
 class CoverLetterService:
 
     def __init__(self):
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.client = get_client()
 
     # ══════════════════════════════════════════════════
     #  MAIN GENERATE
@@ -94,7 +95,7 @@ class CoverLetterService:
         )
 
         resp = self.client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=MODEL_CHEAP,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.78,
             max_tokens=900,
@@ -140,7 +141,7 @@ Full letter context: {context[:600]}
 Return ONLY the rewritten paragraph. No quotes, no labels, no explanation."""
 
         resp = self.client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=MODEL_CHEAP,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.72, max_tokens=220,
         )
@@ -169,7 +170,7 @@ Return ONLY this JSON (no markdown):
 }}"""
         try:
             resp = self.client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=MODEL_CHEAP,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.1,
                 response_format={"type": "json_object"},

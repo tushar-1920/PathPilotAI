@@ -3,7 +3,7 @@ services:
     name: pathpilot-ai
     runtime: python
     buildCommand: pip install -r backend/requirements.txt
-    startCommand: gunicorn --chdir /opt/render/project/src --worker-class gthread --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:\ wsgi:app
+    startCommand: gunicorn --worker-class gthread --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT wsgi:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
@@ -12,4 +12,12 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: OPENAI_API_KEY
+        sync: false
+      - key: MAIL_EMAIL
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: FIREBASE_CREDENTIALS_JSON
+        sync: false
+      - key: DATABASE_URL
         sync: false

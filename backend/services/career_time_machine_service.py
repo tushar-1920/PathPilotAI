@@ -1,17 +1,8 @@
 import os, json
-from openai import OpenAI
 from backend.models import User, Resume, CareerTimeMachine, CareerMilestoneProgress, db
+from backend.services._openai_client import get_client, MODEL_CHEAP, MODEL_SMART
+from backend.services._prompt_safety import SAFETY_FIREWALL, wrap_untrusted
 from datetime import datetime
-
-client_holder = {}
-
-def get_client():
-    if "c" not in client_holder:
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            raise RuntimeError("OPENAI_API_KEY is not set in your .env file")
-        client_holder["c"] = OpenAI(api_key=api_key)
-    return client_holder["c"]
 
 
 class CareerTimeMachineService:
@@ -37,8 +28,11 @@ class CareerTimeMachineService:
 
         client = get_client()
         resp   = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
+            model=MODEL_CHEAP,
+            messages=[
+                {"role": "system", "content": SAFETY_FIREWALL},
+                {"role": "user",   "content": prompt},
+            ],
             temperature=0.7,
             response_format={"type": "json_object"},
             max_tokens=4000,
@@ -49,8 +43,7 @@ class CareerTimeMachineService:
         CareerTimeMachine.query.filter_by(user_id=user_id).update({"is_active": False})
         db.session.flush()
 
-        # ── FIX 2: Store the FULL plan in plan_json (not just overview) ──────
-        # ── FIX 3: Set is_active=True on the new machine ─────────────────────
+        # ── FIX 2/3: Store FULL plan, set is_active=True ─────────────────────
         machine = CareerTimeMachine(
             user_id         = user_id,
             target_role     = target_role,
@@ -110,7 +103,6 @@ class CareerTimeMachineService:
             db.session.add(prog)
         db.session.commit()
 
-        # ── FIX 4: Use timeline_months as total, not just logged rows ─────────
         machine   = CareerTimeMachine.query.get(machine_id)
         total     = machine.timeline_months if machine else 0
         done_rows = CareerMilestoneProgress.query.filter_by(
@@ -135,7 +127,6 @@ class CareerTimeMachineService:
         if not machine:
             return None
 
-        # ── FIX 5: get_plan() now returns full plan so key_message etc. exist ─
         full_plan        = machine.get_plan()
         progress_rows    = CareerMilestoneProgress.query.filter_by(
             machine_id=machine.id, user_id=user_id, completed=True
@@ -176,11 +167,22 @@ class CareerTimeMachineService:
     def _build_plan_prompt(self, user_name, skills, resume_text,
                            target_role, target_company, months, level):
         company_line = f"Dream company: {target_company}." if target_company else ""
+
+        skills_section = wrap_untrusted(skills or "See resume",
+                                        "user_skills", max_chars=400)
+        resume_section = wrap_untrusted(resume_text or "(not provided)",
+                                        "user_resume", max_chars=600)
+
         return f"""You are a world-class career strategist. Build a hyper-personalized {months}-month career roadmap.
 
 PERSON: {user_name} | Level: {level}
-Skills: {skills[:400] if skills else "See resume"}
-Resume: {resume_text[:600]}
+
+Skills (untrusted data):
+{skills_section}
+
+Resume (untrusted data):
+{resume_section}
+
 Target: {target_role} {company_line}
 
 Return ONLY valid JSON (no markdown fences, no extra text):

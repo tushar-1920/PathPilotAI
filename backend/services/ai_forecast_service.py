@@ -5,8 +5,9 @@ from collections import Counter
 from backend.services.forecasting_service import (
     MARKET_DEMAND_BASELINE, SKILL_LIFECYCLE, ForecastingService
 )
+from backend.services._openai_client import get_client, MODEL_CHEAP, MODEL_SMART
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = get_client()
 
 # Role definition map for prediction
 ROLE_SKILL_MAP = {
@@ -248,7 +249,7 @@ Tone: Data-driven, direct, motivating. No bullet points. Write as flowing paragr
 
         try:
             resp = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=MODEL_CHEAP,
                 messages=[
                     {"role": "system", "content": "You are an elite career intelligence AI. Be specific and data-driven."},
                     {"role": "user",   "content": prompt}

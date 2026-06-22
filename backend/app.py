@@ -1,6 +1,6 @@
 from flask import Flask, session, request, redirect
 from backend.config import Config
-from backend.extensions import db
+from backend.extensions import db, limiter
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_socketio import SocketIO
 import atexit
@@ -19,6 +19,7 @@ def create_app():
     app.config.from_object(Config)
 
     db.init_app(app)
+    limiter.init_app(app)
 
     # ── Init SocketIO with app ──
     socketio.init_app(app, cors_allowed_origins="*", async_mode="threading")
@@ -181,6 +182,21 @@ def create_app():
     register_battle_socket_events(socketio)
     app.register_blueprint(navbar_routes)
     app.register_blueprint(offer_predictor_routes)
+
+
+    # ── Friendly rate-limit response ──
+    from flask import jsonify
+    @app.errorhandler(429)
+    def handle_rate_limit(e):
+        if request.path.startswith("/api/") or request.is_json:
+            return jsonify({
+                "error": "Too many requests",
+                "message": "You're going a little fast. Please wait a moment and try again."
+            }), 429
+        return (
+            "Too many requests — please wait a moment and try again.",
+            429
+        )
 
     # ==============================
     # Refresh session on every request

@@ -3,6 +3,7 @@ from backend.utils.auth_decorator import login_required
 from backend.services.interview_service import InterviewService, INTERVIEW_CONFIGS, TOTAL_QUESTIONS
 from backend.models import User, db
 import io
+from backend.services._openai_client import get_client, MODEL_CHEAP, MODEL_SMART
 
 interview_routes = Blueprint("interview_routes", __name__)
 service          = InterviewService()
@@ -231,7 +232,7 @@ def speech_to_text():
     try:
         import io, os, tempfile
         from openai import OpenAI
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        client = get_client()
 
         # Read raw bytes from the uploaded file
         audio_bytes = audio_file.read()

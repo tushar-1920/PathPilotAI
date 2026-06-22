@@ -1,4 +1,5 @@
 from openai import OpenAI
+from backend.services._openai_client import get_client, MODEL_CHEAP, MODEL_SMART
 
 client = OpenAI(
     api_key="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"
@@ -27,7 +28,7 @@ Explain:
 """
 
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=MODEL_CHEAP,
             messages=[
                 {"role":"system","content":"You are a global salary market expert."},
                 {"role":"user","content":prompt}

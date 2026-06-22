@@ -18,6 +18,7 @@ import os, json, re
 from openai import OpenAI
 from backend.models import User, Resume, Profile, Certificate, UserSkill, OfferPrediction, db
 from datetime import datetime
+from backend.services._openai_client import get_client, MODEL_CHEAP, MODEL_SMART
 
 # ── Lazy OpenAI client ────────────────────────────────────────
 _client_holder = {}
@@ -27,7 +28,7 @@ def _get_client():
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
             raise RuntimeError("OPENAI_API_KEY is not set in your .env file")
-        _client_holder["c"] = OpenAI(api_key=api_key)
+        _client_holder["c"] = get_client()
     return _client_holder["c"]
 
 
@@ -89,7 +90,7 @@ class OfferPredictorService:
         # ── 3. Call GPT-4o ────────────────────────────────────
         client = _get_client()
         resp = client.chat.completions.create(
-            model="gpt-4o",
+            model=MODEL_SMART,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.65,
             response_format={"type": "json_object"},

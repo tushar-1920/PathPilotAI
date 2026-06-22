@@ -3,8 +3,9 @@ import json
 from collections import Counter, defaultdict
 from backend.models import JobPosting, Skill
 from openai import OpenAI
+from backend.services._openai_client import get_client, MODEL_CHEAP, MODEL_SMART
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = get_client()
 
 # ── 2025-26 Global Market Demand Baseline ─────────────────────
 GLOBAL_DEMAND_2026 = {
@@ -190,7 +191,7 @@ CRITICAL RULES:
         result = {}
         try:
             resp = client.chat.completions.create(
-                model="gpt-4o-mini", temperature=0.35,
+                model=MODEL_CHEAP, temperature=0.35,
                 messages=[{"role":"user","content":prompt}],
                 response_format={"type":"json_object"})
             result = json.loads(resp.choices[0].message.content)
@@ -268,7 +269,7 @@ Top 5 roles: {top5}. For each write 2 sentences: current demand/salary + 12-mont
 Return ONLY JSON: {{"analysis":["role1: ...", "role2: ...", "role3: ...", "role4: ...", "role5: ..."]}}"""
         try:
             resp = client.chat.completions.create(
-                model="gpt-4o-mini", temperature=0.4,
+                model=MODEL_CHEAP, temperature=0.4,
                 messages=[{"role":"user","content":prompt}],
                 response_format={"type":"json_object"})
             return json.loads(resp.choices[0].message.content)

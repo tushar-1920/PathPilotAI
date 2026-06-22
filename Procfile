@@ -1,1 +1,1 @@
-﻿python -c "open('Procfile', 'w', encoding='utf-8', newline='\n').write('web: gunicorn --worker-class gthread --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:\$PORT run:app\n')"
+﻿web: gunicorn --worker-class gthread --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT run:app

@@ -3,6 +3,7 @@ from openai import OpenAI
 from backend.models import JobPosting, User
 from backend.extensions import db
 from backend.services.global_skill_library import GLOBAL_SKILLS_LOWER, SKILL_ALIASES
+from backend.services._openai_client import get_client, MODEL_CHEAP, MODEL_SMART
 
 # ── OpenAI client (lazy init) ──────────────────────────────────
 _client = None
@@ -12,7 +13,7 @@ def _get_client():
         key = os.getenv("OPENAI_API_KEY")
         if not key:
             raise RuntimeError("OPENAI_API_KEY not set")
-        _client = OpenAI(api_key=key)
+        _client = get_client()
     return _client
 
 
@@ -65,7 +66,7 @@ Return ONLY a JSON array of skill strings. No explanation. No markdown. Example:
         try:
             client = _get_client()
             resp = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=MODEL_CHEAP,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.1,        # low temp = consistent extraction
                 max_tokens=600,

@@ -2,8 +2,9 @@ import os, json
 from openai import OpenAI
 from backend.models import User, Resume, db
 from datetime import datetime
+from backend.services._openai_client import get_client, MODEL_CHEAP, MODEL_SMART
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = get_client()
 
 # ── Interview type configurations ─────────────────────────────
 INTERVIEW_CONFIGS = {
@@ -127,7 +128,7 @@ Interview rules:
                 f"Just ask the question directly."})
 
         resp = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=MODEL_CHEAP,
             messages=messages,
             temperature=0.7,
             max_tokens=300,
@@ -138,7 +139,7 @@ Interview rules:
         hint = ""
         if interview_type == "coding":
             hint_resp = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=MODEL_CHEAP,
                 messages=[{"role":"system","content":"You are a helpful mentor."},
                           {"role":"user","content":f"Give ONE subtle hint for this problem without revealing the answer:\n{question}"}],
                 temperature=0.4, max_tokens=80,
@@ -187,7 +188,7 @@ Be honest — don't inflate scores. Score 0-3 for wrong/incomplete, 4-6 for part
 
         try:
             resp = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=MODEL_CHEAP,
                 messages=[{"role":"user","content":prompt}],
                 temperature=0.2,
                 response_format={"type":"json_object"},
@@ -237,7 +238,7 @@ Return ONLY valid JSON:
 
         try:
             resp = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=MODEL_CHEAP,
                 messages=[{"role":"user","content":summary_prompt}],
                 temperature=0.3,
                 response_format={"type":"json_object"},

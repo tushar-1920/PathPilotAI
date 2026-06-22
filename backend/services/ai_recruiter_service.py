@@ -7,6 +7,7 @@ import json
 import logging
 from datetime import datetime
 from typing import Optional, Dict, List
+from backend.services._openai_client import get_client, MODEL_CHEAP, MODEL_SMART
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,6 @@ def _db():
 def _models():
     from backend.models import AIInterviewSession, AIInterviewMessage
     return AIInterviewSession, AIInterviewMessage
-
 
 # ─────────────────────────────────────────────────────────
 #  RECRUITER PERSONALITIES
@@ -548,9 +548,9 @@ Return ONLY valid JSON, no other text.
         try:
             from openai import OpenAI
             from backend.config import Config
-            client = OpenAI(api_key=Config.OPENAI_API_KEY)
+            client = get_client()
             response = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=MODEL_CHEAP,
                 max_tokens=max_tokens,
                 messages=[
                     {"role": "system", "content": "You are a professional AI recruiter conducting real interviews. Be direct, realistic and conversational."},
